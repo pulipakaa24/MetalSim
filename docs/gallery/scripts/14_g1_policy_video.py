@@ -1,5 +1,10 @@
 """Video of the G1 flat benchmark: Isaac's G1 (visual meshes + OmniPBR materials from g1_minimal.usd)
-driven by the policy trained with Isaac's PPO config for 1,500 iterations, 4 envs, tier 2 path tracing."""
+driven by a G1 flat policy, 4 envs, tier 2 path tracing.
+
+    python docs/gallery/scripts/14_g1_policy_video.py [checkpoint]
+
+Default checkpoint: runs/g1regress/ckpt14/flat_main_s0.pt (tracked; trained on main with Isaac's PPO config,
+500 iterations at physics dt 2.5 ms, log beside it; docs/renders/G1_FLAT.md), simulated at that dt."""
 import sys, re, numpy as np, torch, mujoco, warp as wp, imageio.v2 as iio
 wp.config.quiet = True
 from metalsim.learn.g1_velocity import build_g1_model, G1VelocityTask, INIT_POS
@@ -7,11 +12,12 @@ from metalsim.learn.warp_policy import ActorCriticMLP
 from metalsim.render.tier2 import Tier2Renderer
 from metalsim.interop import torch_bridge as tb
 from metalsim.physics.batch import BatchSim, BatchSimOptions
-ckpt = torch.load(sys.argv[1] if len(sys.argv) > 1 else "runs/policies/g1_flat_1500.pt", map_location="mps")
+ckpt = torch.load(sys.argv[1] if len(sys.argv) > 1 else "runs/g1regress/ckpt14/flat_main_s0.pt", map_location="mps")
 n = 4
-task = G1VelocityTask(n, terrain="flat", seed=3)
+PHYSICS_DT = 0.0025   # the g1regress checkpoints' training dt (runs/g1regress/ckpt14/flat_main_s0.log header); not saved in them
+task = G1VelocityTask(n, terrain="flat", seed=3, physics_dt=PHYSICS_DT)
 # hero model: same physics + visual meshes, camera, key light, floor material, sky
-m, info = build_g1_model("flat", visuals=True); spec = info["spec"]
+m, info = build_g1_model("flat", visuals=True, physics_dt=PHYSICS_DT); spec = info["spec"]
 def lookat_quat(pos, target):
     f = np.array(target) - np.array(pos); f /= np.linalg.norm(f); r = np.cross(f, [0, 0, 1]); r /= np.linalg.norm(r); u = np.cross(r, f)
     R = np.stack([r, u, -f], 1); q = np.zeros(4); mujoco.mju_mat2Quat(q, R.reshape(-1)); return q.tolist()

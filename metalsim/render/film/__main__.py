@@ -9,7 +9,9 @@ Stages and outputs (``--out``, default ``runs/film/<task>``):
   record  -> rec/ (twin.xml, rec.npz, rec.json); runs in the task's venv (``FilmTask.venv``; started as a subprocess
              with that interpreter when the current one is not it)
   render  -> <shot>/frames/*.png, render.json, render_frames.jsonl per shot (``FilmTask.shots``); resumable
-  encode  -> <shot>/master.mp4 and docs/renders/<task>[_<shot>].mp4 + stills
+  encode  -> <shot>/master.mp4 and docs/renders/<task>[_<shot>].mp4 + stills; with ``--webp`` also
+             docs/renders/<task>[_<shot>].webp (README animation, MuJoCo Warp's recipe: 320x240, 30 fps, q70;
+             ``--webp-window START:SECONDS``, ``--webp-crop-x``)
   doc     -> ``FilmTask.doc`` (docs/renders/<TASK>.md)
 Each stage reads only files, so stages can run on different machines or venvs.
 """
@@ -61,6 +63,14 @@ def main(argv=None):
     ap.add_argument("--shots", default=None, help="comma-separated shot names (default: all of the task's)")
     ap.add_argument("--frames", default=None, help="render only start:stop[:step] (previews)")
     ap.add_argument("--doc", default=None, help="doc path (default: the task entry's)")
+    ap.add_argument("--webp", nargs="?", const="320x240", default=None, metavar="WxH",
+                    help="encode stage: also write an animated WebP next to the docs mp4 (default size 320x240, "
+                         "cropped to that aspect, 30 fps, quality 70)")
+    ap.add_argument("--webp-window", default="0:5", metavar="START:SECONDS",
+                    help="encode stage: WebP window in the clip [s] (default 0:5; SECONDS 0 = to the end)")
+    ap.add_argument("--webp-crop-x", default=None, metavar="X",
+                    help="encode stage: WebP crop position, a fraction of the spare width in [0, 1] or a left-edge "
+                         "offset in source px (> 1 or <n>px); default centred")
     add_override_args(ap)
     a = ap.parse_args(argv)
     if a.list or not a.task:
@@ -102,6 +112,16 @@ def main(argv=None):
             mp4 = media_path(task, s)
             encode(os.path.join(out, s.name), mp4, fps, task.film.crf, 1280, task.film.stills if s.name == "hero" else
                    task.film.stills[1:2])
+            if a.webp:
+                from metalsim.render.film.encode import encode_webp, parse_crop_x
+                w0, wlen = (float(x) for x in a.webp_window.split(":"))
+                ww, wh = (int(x) for x in a.webp.lower().split("x"))
+                webp = f"{os.path.splitext(mp4)[0]}.webp"
+                cmd = (f"python -m metalsim.render.film {task.name} --stage encode --shots {s.name} --webp {a.webp}"
+                       f" --webp-window {a.webp_window}" + (f" --webp-crop-x {a.webp_crop_x}" if a.webp_crop_x
+                                                             else ""))
+                encode_webp(os.path.join(out, s.name), webp, start=w0, seconds=wlen or None, width=ww, height=wh,
+                            fps=min(30.0, fps), crop_x=parse_crop_x(a.webp_crop_x), src_fps=fps, command=cmd)
     if "doc" in stages and task.doc:
         from metalsim.render.film.doc import write_doc
         cmds = ["scripts/fetch_isaac_assets.sh                # NVIDIA assets (not redistributed)" if any(

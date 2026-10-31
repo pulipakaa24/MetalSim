@@ -2,7 +2,7 @@
 by isaac_side/play_policy.py) and in MetalSim (tier 2, same camera, same lights, same initial state
 and command), one panel each, for several training stages.
 
-    python -m metalsim.parity.side_by_side --isaac runs/parity/play/isaac_it500 --ckpt runs/policies/g1_flat_dt25_fixed_it500.pt \
+    python -m metalsim.parity.side_by_side --isaac runs/parity/play/isaac_it500 --ckpt runs/g1regress/ckpt14/flat_main_s0.pt \
         --out docs/gallery/g1_stage_it500.mp4 --label "iteration 500"
 
 The MetalSim rollout uses the exported policy's own joint order (our checkpoints) or an rsl_rl

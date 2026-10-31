@@ -34,6 +34,7 @@ class ViewerCfg:
     resolution: tuple = (1920, 1080)
     fovy: float = 40.0
     smooth_s: float = 1.0
+    orbit_deg_s: float = 0.0     # slow azimuth orbit about the look-at point, symmetric about mid-clip (0: none)
 
 
 @dataclass
@@ -67,7 +68,9 @@ class FilmCfg:
     "auto" (the adapter's ranking) or a list; ``grid``: 1 = one env full frame, 2 = a 2 x 2 grid of the first four;
     ``video_length``: frames (None: until the filmed episodes end, at most ``max_seconds``); ``hold_s``: seconds the
     last frame of a finished episode is held; ``tier``: 2 = path tracer (Tier2Renderer), 0 = raster (Tier0Renderer);
-    ``passes`` x ``spp`` samples per pixel (tier 2), ``bounces``, ``denoise`` ("oidn" or None)."""
+    ``passes`` x ``spp`` samples per pixel (tier 2), ``bounces``, ``denoise`` ("oidn" or None). ``allow_early_end``:
+    film an env whose first episode ends by a termination (an adapter's ``info["terminated"]``: a fall, not a time-out
+    or a success); by default the record stage refuses such a film."""
 
     num_envs: int = 4
     envs: object = "auto"
@@ -85,6 +88,7 @@ class FilmCfg:
     crf: int = 22
     stills: tuple = (0.25, 0.5, 0.8)
     output_filename_prefix: str = "film"
+    allow_early_end: bool = False
 
 
 @dataclass
@@ -113,13 +117,15 @@ class AssetRef:
 class FilmTask:
     """A task's film entry. ``adapter``: "module:Class" of the recorder adapter (``metalsim.render.film.adapters``);
     ``venv``: interpreter the rollout needs ("main" = .venv, "newton152" = .venv-newton152: the Newton 1.5.2 tasks);
-    ``checkpoint``: default policy (None: the adapter's zero / scripted actions); ``title`` / ``summary`` / ``notes``:
-    prose for the generated doc (``notes``: markdown, "How it was made")."""
+    ``checkpoint``: default policy (None: the adapter's zero / scripted actions); ``adapter_kw``: the adapter's own
+    settings (e.g. task settings the checkpoint does not save, from its training log); ``title`` / ``summary`` /
+    ``notes``: prose for the generated doc (``notes``: markdown, "How it was made")."""
 
     name: str
     adapter: str
     venv: str = "main"
     checkpoint: str | None = None
+    adapter_kw: dict = field(default_factory=dict)
     title: str = ""
     summary: str = ""
     viewer: ViewerCfg = field(default_factory=ViewerCfg)

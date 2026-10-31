@@ -50,6 +50,19 @@ def dyn_groups(layout, n, tpr):
     return [list(range(n))], [(0, 0)]
 
 
+def _cell_rect(p, lo, hi, pad):
+    """(2, 2) range of an infinite plane's local x and y (env_grid.infinite_planes entry) inside the cell [lo, hi] (env
+    frame) grown by ``pad``, when the plane's axes lie along the cell's; None otherwise."""
+    out = []
+    for ax in (np.asarray(p["x"], np.float64), np.asarray(p["y"], np.float64)):
+        a = int(np.argmax(np.abs(ax)))
+        if abs(abs(ax[a]) - 1.0) > 1e-6:
+            return None
+        r = np.sort(np.sign(ax[a]) * (np.array([lo[a], hi[a]]) - float(p["o"][a])))
+        out.append((r[0] - pad, r[1] + pad))
+    return np.asarray(out)
+
+
 class RayTracer:
     def __init__(self, model, n_envs: int, *, max_range: float = 10.0, max_group=3, include_planes=True,
                  decimate_faces: int = 0, terrain_slots: bool = True, draw_hfields: bool = True,
@@ -122,7 +135,10 @@ class RayTracer:
             lo[:2], hi[:2] = -r, r                              # often move things across it (resets, arenas)
             self.grid = EnvGrid(n_envs, self.env_layout, lo=lo, hi=hi, margin=env_margin)
             if ring is not None:                                # the disc covers the cell (beyond it: analytic)
-                ring = float(np.linalg.norm(np.maximum(np.abs(self.grid.lo[:2]), np.abs(self.grid.hi[:2])))) + d_plane + 1.0
+                ring = self._disc_apothem(d_plane)
+        # compact grid: the disc's apothem as built (the table vertices) and as now in the vertex buffer (_fit_plane_discs)
+        self._plane_d, self._plane_ring = d_plane, (ring if self.env_layout != "legacy" else None)
+        self._plane_ring_built = self._plane_ring
         self.tables = build_scene_tables(model, n_envs, max_group=max_group, include_planes=include_planes,
                                          decimate_faces=decimate_faces, sized_geoms="auto" if terrain_slots else (),
                                          draw_hfields=draw_hfields, appearance=appearance,
@@ -268,6 +284,7 @@ class RayTracer:
         self.p_lidar_ext = c.compute_pipeline(lib, "lidar_ext")
         self.p_depth = c.compute_pipeline(lib, "raycast_depth")
         self._build_primitive_structures()
+        self._fit_plane_discs()
         self._alloc_instance_structure()
         self.event = self.ctx.event
         rows = t.pose_rows(model)
@@ -309,7 +326,69 @@ class RayTracer:
         cb.commit(); cb.waitUntilCompleted()
         if cb.error() is not None:
             raise RuntimeError(f"primitive acceleration structure build failed: {cb.error()}")
+        self._prim_descs = descs        # rebuilt in place when the infinite-plane discs grow with the env grid
         self._build_dynamic_structures()
+
+    def _disc_apothem(self, d_plane: float) -> float:
+        """Compact env grid: apothem of the infinite planes' disc, covering the env's cell in x and y with 1 m to spare
+        (rays end at the cell; past it, env_grid.h grid_plane continues the plane analytically); _fit_plane_discs clips
+        it to the cell."""
+        return float(np.linalg.norm(np.maximum(np.abs(self.grid.lo[:2]), np.abs(self.grid.hi[:2])))) + d_plane + 1.0
+
+    def _fit_plane_discs(self):
+        """Compact env grid: fit the infinite planes' discs to the env's cell (at build and whenever the cell grows) and
+        rebuild their primitive structures in place. A ray only meets the disc inside its cell (env_grid.h grid_plane
+        continues the plane only past the cell), so the disc must cover the cell: left at the initial cell's size when
+        the cell grew, the plane was a wedge with the environment showing through between the disc's edge and the new
+        boundary. And it must stop there: the cells are a millimetre apart, so a disc reaching into a neighbour's cell
+        lies in the neighbour's floor plane with its texture offset by the grid stride, and the two z-fight (the legacy
+        grid kept neighbouring discs apart by growing its stride). Planes whose axes lie along the cell's are clipped to
+        the cell's rectangle plus a quarter of the gap; others keep the covering octagon."""
+        if self._plane_ring is None or self.tables.plane is None or not self.grid.planes:
+            return
+        t, c = self.tables, self.ctx
+        ring = self._disc_apothem(self._plane_d)
+        pad = 0.25e-3
+        built = ring
+        by_mesh = {}
+        for p in self.grid.planes:
+            by_mesh.setdefault(int(t.geom_mesh[p["slot"]]), []).append(p)
+        verts = c.buffer_array(self.vbuf, np.float32, (self.vbuf.length() // 32, 8))
+        self._plane_clipped = []
+        for k, planes in by_mesh.items():
+            mesh = t.meshes[k]
+            _, sx, sy, _, us, ua, vs, va = np.asarray(t.plane, np.float64)[planes[0]["slot"]]
+            vi = np.unique(np.asarray(t.indices[mesh["i_off"]:mesh["i_off"] + mesh["i_count"]], np.int64))
+            rects = [_cell_rect(p, self.grid.lo, self.grid.hi, pad) for p in planes]
+            rect = rects[0] if all(r is not None and np.allclose(r, rects[0], atol=1e-9) for r in rects) else None
+            apo = ring
+            if rect is not None:    # every outer vertex (at 22.5 deg + k 45 deg) clamps to a corner: the clamped disc is
+                apo = max(ring, (1.0 + np.sqrt(2.0)) * float(np.abs(rect).max()) + 1.0)     # the whole rectangle
+            xy = np.asarray(t.vertices[vi, :2], np.float64) * (apo / self._plane_ring)    # from the vertices as built
+            if rect is not None:
+                xy = np.clip(xy, rect[:, 0], rect[:, 1])
+                self._plane_clipped.append(k)
+            built = max(built, apo)
+            if sx > 0:
+                xy[:, 0] = np.clip(xy[:, 0], -sx, sx)
+            if sy > 0:
+                xy[:, 1] = np.clip(xy[:, 1], -sy, sy)
+            verts[vi, 0:2] = xy
+            verts[vi, 6] = xy[:, 0] * us + ua
+            verts[vi, 7] = xy[:, 1] * vs + va
+        meshes = list(by_mesh)
+        descs = [self._prim_descs[k] for k in meshes]
+        sizes = [c.device.accelerationStructureSizesWithDescriptor_(d) for d in descs]
+        scratch = c.buffer(max(int(z.buildScratchBufferSize) for z in sizes), label="rt_disc_scratch")
+        cb = c.command_buffer()
+        enc = cb.accelerationStructureCommandEncoder()
+        for k, d in zip(meshes, descs):     # same triangle count: the structure's allocation still fits
+            enc.buildAccelerationStructure_descriptor_scratchBuffer_scratchBufferOffset_(self.prim_as[k], d, scratch, 0)
+        enc.endEncoding()
+        cb.commit(); cb.waitUntilCompleted()
+        if cb.error() is not None:
+            raise RuntimeError(f"infinite-plane disc rebuild failed: {cb.error()}")
+        self._plane_ring_built = built
 
     def _build_dynamic_structures(self):
         """The dynamic objects' structures (``dyn_layout``): built on the first frame, then refit (and rebuilt every
@@ -521,16 +600,35 @@ class RayTracer:
         f = self.ctx.buffer_array(self.grid_flag, np.uint32, (4,))
         if not f[0]:
             return
+        self._grow_grid("geometry neared its env's cell boundary")
+
+    def contain(self, points, what="a camera"):
+        """Compact env grid: grow the cell until every point (env frame, (..., 3)) lies inside it with the growth check's
+        slack, as geometry does (_check_grid). For viewpoints the caller places outside the model (a tracking film
+        camera): a ray starting outside its env's cell is traced up to the cell's far side, through the neighbouring
+        cells' geometry and past the infinite planes' disc, and the plane is only continued beyond that."""
+        if self.grid.clip == 0:
+            return
+        p = np.asarray(points, np.float64).reshape(-1, 3)
+        p = p[np.isfinite(p).all(1)]
+        for _ in range(32):
+            s = 0.5 * self.grid.margin
+            if not len(p) or ((p >= self.grid.lo + s).all() and (p <= self.grid.hi - s).all()):
+                return
+            self._grow_grid(f"{what} is outside its env's cell")
+
+    def _grow_grid(self, why):
         import warnings
         self.ctx.synchronize()
         old = self.grid
         self.grid = old.grown()
         self.grid_growths += 1
-        warnings.warn(f"ray tracer env grid: geometry neared its env's cell boundary; cell {np.round(old.S, 2).tolist()} m -> "
+        warnings.warn(f"ray tracer env grid: {why}; cell {np.round(old.S, 2).tolist()} m -> "
                       f"{np.round(self.grid.S, 2).tolist()} m (largest offset {self.grid.max_offset():.0f} m); "
                       "set RayTracer(env_margin=...) to size it up front")
         self.consts[12:] = self.grid.words()
         self.ctx.write_buffer(self.consts_buf, self.consts)
+        self._fit_plane_discs()
         if self.dyn is not None and self.dyn_layout == "per_env":
             desc = np.zeros((self.n_inst - self.n_inst_static, 16), np.uint32)
             c = self.ctx

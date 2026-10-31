@@ -10,6 +10,8 @@ def add_override_args(ap) -> None:
     ap.add_argument("--envs", default=None, help="filmed envs: 'auto' or comma-separated ids")
     ap.add_argument("--seed", type=int, default=None)
     ap.add_argument("--seconds", type=float, default=None, help="maximum film length [s]")
+    ap.add_argument("--allow-early-end", action="store_true",
+                    help="film an env whose first episode ends by a termination (e.g. a fall); refused by default")
     ap.add_argument("--grid", type=int, default=None, choices=(1, 2), help="1: one env; 2: a 2 x 2 grid")
     ap.add_argument("--eye", type=float, nargs=3, default=None)
     ap.add_argument("--lookat", type=float, nargs=3, default=None)
@@ -42,6 +44,8 @@ def apply_overrides(task, a):
         fk["max_seconds"] = a.seconds
     if getattr(a, "no_denoise", False):
         fk["denoise"] = None
+    if getattr(a, "allow_early_end", False):
+        fk["allow_early_end"] = True
     vk = {}
     for name, key in (("eye", "eye"), ("lookat", "lookat"), ("origin_type", "origin_type"), ("body", "body_name"),
                       ("fovy", "fovy")):

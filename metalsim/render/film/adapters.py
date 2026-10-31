@@ -9,7 +9,9 @@ Protocol (duck-typed):
 * ``reset()``; ``step() -> (snap, done, info, timing)``: advance one frame. ``snap``: "newton": ``body_q`` (N, B, 7)
   and ``particles`` (N, P, 3) or None, both in each env's own frame (env origin subtracted); "mujoco": ``qpos``
   (N, nq). The state is captured before done envs are reset (Isaac Lab's ``ManagerBasedRLEnv.step`` order), so a
-  finished episode's last frame is in the film. ``done`` (N,) bool; ``info``: per-env arrays (outcome at a done);
+  finished episode's last frame is in the film. ``done`` (N,) bool; ``info``: per-env arrays (outcome at a done;
+  ``info["terminated"]``, when an adapter reports it, marks a failure termination such as a fall, as opposed to a
+  time-out or a success: the recorder refuses to film such an episode unless ``FilmCfg.allow_early_end``);
   ``timing``: {"sim_s": seconds of physics + policy for this frame}.
 * ``rank(first) -> list``: env order for automatic selection, given each env's first-episode info.
 * ``twin_newton()`` ("newton"): a Newton model with one world whose bodies are one env's bodies in the same order, for
@@ -134,74 +136,242 @@ class FrankaPour:
                     "implicit MPM media (metalsim.learn.franka_pour_scene)")
 
 
-class G1Flat:
-    """Isaac Lab's G1 flat-terrain velocity task (metalsim.learn.g1_velocity, MuJoCo Warp) with an rsl_rl-style
-    ActorCriticMLP checkpoint; the render model is the same G1 with its 43 USD visual meshes."""
+# task settings ``metalsim.learn.g1_velocity.train_g1`` saves in a checkpoint (the rest, e.g. physics_dt, are in its log header)
+G1_SAVED_TASK_KEYS = ("reward_cfg", "scan_ordering", "terrain_collision", "scan_surface", "solver_cfg", "il3_events",
+                      "contact_cfg", "base_velocity", "feet_slide_velocity")
+
+
+class G1Velocity:
+    """Isaac Lab's G1 velocity task (metalsim.learn.g1_velocity, MuJoCo Warp) with an rsl_rl-style ``ActorCriticMLP``
+    checkpoint evaluated in torch (the actor's mean; no Warp-bound policy, so the PPOWarp load-ordering bug of
+    2026-10-13 does not apply). The render model is the same G1 with its 43 USD visual meshes, on the task's own ground.
+
+    Task settings (``meta()["task_settings"]``): the ones the checkpoint saved (``G1_SAVED_TASK_KEYS``, as
+    scripts/diagnostics/g1_policy_replay.py reads them), then ``FilmTask.adapter_kw["task"]`` (settings a checkpoint
+    does not save, e.g. ``physics_dt``, from its training log header). ``adapter_kw["terrain_level"]`` (rough terrain):
+    every env starts on that difficulty row of its terrain column (default: the task's random initial levels 0-5).
+
+    Done mask: the task's own termination and time-out terms (``G1VelocityTask.launch_reward_done_reset``: torso
+    contact, Isaac's base_contact / illegal_contact, or a non-finite state; the 20 s time-out), read after the frame is
+    captured; the task then resets those envs (curriculum included), as Isaac's ``ManagerBasedRLEnv.step``.
+    ``info["terminated"]`` / ``info["time_out"]`` say which ended an episode."""
 
     backend = "mujoco"
+    terrain = "flat"
 
     def __init__(self, task, film, checkpoint, viewer=None):
+        import inspect
+        from types import SimpleNamespace
+
         import torch
         import warp as wp
 
         wp.config.quiet = True
         from metalsim.interop import torch_bridge as tb
-        from metalsim.learn.g1_velocity import G1VelocityTask, CONTROL_DT
+        from metalsim.learn.g1_velocity import CONTROL_DT, G1VelocityTask
         from metalsim.learn.warp_policy import ActorCriticMLP, bump
 
         self.torch, self.wp, self.tb, self.bump = torch, wp, tb, bump
+        akw = dict(getattr(task, "adapter_kw", None) or {})
         n = self.num_envs = int(film.num_envs)
+        self.checkpoint, self.net, self.note = checkpoint, None, ""
+        ck = torch.load(checkpoint, map_location="cpu", weights_only=False) if checkpoint else None
+        if ck is not None and ck.get("terrain", self.terrain) != self.terrain:
+            raise ValueError(f"checkpoint trained on {ck['terrain']!r} terrain, this film is {self.terrain!r}")
+        if ck is not None and ck.get("engine", "mjwarp") != "mjwarp":
+            raise ValueError(f"checkpoint trained on engine {ck['engine']!r}; the film adapter runs MuJoCo Warp")
+        params = inspect.signature(G1VelocityTask.__init__).parameters
+        self.saved_settings = {k: ck[k] for k in G1_SAVED_TASK_KEYS if ck is not None and k in ck and k in params}
+        self.task_kw = dict(self.saved_settings) | dict(akw.get("task", {}))
         t0 = time.perf_counter()
-        self.task = G1VelocityTask(n, terrain="flat", seed=film.seed)
+        self.task = G1VelocityTask(n, terrain=self.terrain, seed=film.seed, **self.task_kw)
         self.build_s = time.perf_counter() - t0
         self.frame_dt = float(CONTROL_DT)
-        self.checkpoint, self.net, self.note = checkpoint, None, ""
-        if checkpoint:
-            ck = torch.load(checkpoint, map_location="mps", weights_only=False)
+        self.terrain_level = akw.get("terrain_level")
+        if self.terrain_level is not None and self.task.hfield is not None:
+            tab = self.task.hfield["origin_table"]()                     # (levels, terrain types, 3)
+            lv = np.full(n, int(self.terrain_level), np.int32)
+            self.task.level.assign(lv)
+            self.task.origins.assign(tab[lv, self.task.col.numpy()].astype(np.float32))
+        if ck is not None:
             if int(ck["obs_dim"]) == int(self.task.obs_dim) and int(ck["act_dim"]) == int(self.task.act_dim):
                 self.net = ActorCriticMLP(ck["obs_dim"], ck["act_dim"], hidden=tuple(ck["hidden"])).to("mps")
-                self.net.load_state_dict(ck["net"])
+                self.net.load_state_dict({k: v.to("mps") for k, v in ck["net"].items()})
                 self.net.eval()
                 self.ckpt_iter = ck.get("iterations")
             else:
                 self.note = (f"checkpoint obs/act dims {ck['obs_dim']}/{ck['act_dim']} != task {self.task.obs_dim}/"
                              f"{self.task.act_dim}: zero actions")
                 print("[film] " + self.note, flush=True)
-        self.step_idx = wp.zeros(1, dtype=int, device="metal:0")
+        dev = self.task.device
+        self.step_idx = wp.zeros(1, dtype=int, device=dev)
+        self.pol = SimpleNamespace(step_idx=self.step_idx)       # reset randomization keyed by the film's step counter
+        self.bufs = SimpleNamespace(rew=wp.zeros((1, n), dtype=float, device=dev),
+                                    done=wp.zeros((1, n), dtype=float, device=dev),
+                                    timeout=wp.zeros((1, n), dtype=float, device=dev))
         self.t_obs = tb.mps_tensor(self.task.obs)
+
+    def _qpos(self):
+        return self.task.sim.d.qpos.numpy().astype(np.float64).reshape(self.num_envs, -1)
 
     def reset(self):
         self.task.reset_all()
+        q = self._qpos()
+        n = self.num_envs
+        self.start = q[:, :3].copy()                      # first-episode start (after the reset's random xy / yaw)
+        self.level0 = self.task.level.numpy().astype(np.int64).copy()
+        self.col0 = self.task.col.numpy().astype(np.int64).copy()
+        self._xy = q[:, :2].copy()
+        self.dist = np.zeros(n)                           # path length of the root over the first episode [m]
+        self.climb = np.zeros(n)                          # highest root height above its start [m]
+        self.descent = np.zeros(n)                        # lowest root height below its start [m]
+        self._alive = np.ones(n, bool)
 
     def step(self):
-        wp, task = self.wp, self.task
+        wp, task, torch = self.wp, self.task, self.torch
         t0 = time.perf_counter()
-        wp.launch(self.bump, dim=1, inputs=[self.step_idx], device="metal:0")
-        task.launch_obs(self.step_idx)
-        v = task.sim._signal(); task.sim.after(v)
-        with self.torch.no_grad():
-            a = self.net.actor(self.t_obs) if self.net is not None else self.torch.zeros(self.num_envs, task.act_dim, device="mps")
-        task.action_scratch.assign(a.cpu().numpy().astype(np.float32))
-        task.launch_apply_action(task.action_scratch)
-        task.sim.step()
-        task.sim.synchronize()
+        with wp.ScopedDevice(task.device):
+            wp.launch(self.bump, dim=1, inputs=[self.step_idx])
+            task.launch_obs(self.step_idx)
+            v = task.sim._signal(); task.sim.after(v)
+            with torch.no_grad():
+                a = self.net.actor(self.t_obs) if self.net is not None else torch.zeros(self.num_envs, task.act_dim, device="mps")
+            task.action_scratch.assign(a.cpu().numpy().astype(np.float32))
+            task.launch_apply_action(task.action_scratch)
+            task.sim.step()
+            task.sim.synchronize()
+            qpos = self._qpos()                               # the frame: before the task resets done envs
+            task.launch_reward_done_reset(self.pol, self.bufs)
+            task.launch_timeouts(self.pol, self.bufs)
+            task.sim.synchronize()
         sim_s = time.perf_counter() - t0
-        qpos = task.sim.d.qpos.numpy().astype(np.float64).reshape(self.num_envs, -1)
-        n = self.num_envs
-        return dict(qpos=qpos), np.zeros(n, bool), dict(base_z=qpos[:, 2].copy()), dict(sim_s=sim_s)
+        done = self.bufs.done.numpy()[0] > 0.5
+        time_out = self.bufs.timeout.numpy()[0] > 0.5
+        terminated = done & ~time_out
+        al = self._alive
+        self.dist[al] += np.linalg.norm(qpos[al, :2] - self._xy[al], axis=1)
+        dz = qpos[:, 2] - self.start[:, 2]
+        self.climb[al] = np.maximum(self.climb[al], dz[al])
+        self.descent[al] = np.minimum(self.descent[al], dz[al])
+        self._xy = qpos[:, :2].copy()
+        self._alive &= ~done
+        info = dict(terminated=terminated, time_out=time_out, base_z=qpos[:, 2].copy(), level=self.level0, col=self.col0)
+        return dict(qpos=qpos), done, info, dict(sim_s=sim_s)
+
+    def summary(self, ends) -> str:
+        """Per env over its first episode: path length, highest climb and lowest drop of the pelvis relative to its start
+        (a drop beyond ~0.25 m is a robot down without torso contact, which the task does not terminate), end frame."""
+        rows = [f"{e}:{self.dist[e]:.1f}/{self.climb[e]:+.2f}/{self.descent[e]:+.2f}" + (f"@{int(ends[e])}" if ends[e] >= 0 else "")
+                for e in range(self.num_envs)]
+        return ("[record] first episodes, env:path m/climb m/drop m[@end frame]" +
+                (f" (level {self.level0.tolist()})" if self.terrain != "flat" else "") + ": " + " ".join(rows))
 
     def rank(self, first):
-        return list(range(self.num_envs))
+        """Envs whose first episode did not terminate first; flat: then those whose pelvis never dropped more than
+        0.25 m (not down on its knees), the longest path; rough: the most climbed, then the longest path."""
+        n = self.num_envs
+        term = np.asarray(first.get("terminated", np.zeros(n)), bool)
+        if self.terrain == "flat":
+            key = [(term[e], self.descent[e] < -0.25, -self.dist[e], e) for e in range(n)]
+        else:
+            key = [(term[e], -self.climb[e], -self.dist[e], e) for e in range(n)]
+        return [k[-1] for k in sorted(key)]
 
     def twin_spec(self):
+        """The task's G1 with its visual meshes on the task's own ground: the plane, or the rough terrain's collision
+        surface exactly as the task builds it (its heightfield, lowered under box-built cells, and Isaac's terrain
+        boxes, merged into one static mesh ``terrain_boxes``; the task's per-world box slots hold the same boxes)."""
+        import mujoco
+
         from metalsim.learn.g1_velocity import build_g1_model
 
-        m, info = build_g1_model("flat", visuals=True)
-        if m.nq != self.task.model.nq:
-            raise RuntimeError(f"visual G1 nq {m.nq} != task nq {self.task.model.nq}")
-        return info["spec"]
+        t = self.task
+        hf = t.hfield
+        if hf is None:
+            m, info = build_g1_model(self.terrain, visuals=True, physics_dt=t.physics_dt, effort_limit=t.effort_limit)
+            spec = info["spec"]
+        else:
+            vis = dict(hf, collision="hfield")              # the ground geom alone; boxes added below
+            ch = hf.get("collision_hfield")
+            if ch is not None:
+                vis.update({k: ch[k] for k in ("nrow", "ncol", "size", "data", "zmin")})
+            m, info = build_g1_model(self.terrain, vis, visuals=True, physics_dt=t.physics_dt, effort_limit=t.effort_limit)
+            spec = info["spec"]
+            boxes = hf.get("boxes")
+            if hf.get("collision") in ("boxes", "meshes", "boxes_fine", "boxes_local") and boxes is not None and len(boxes):
+                V, F, UV = terrain_box_faces(boxes)
+                me = spec.add_mesh(); me.name = "terrain_boxes"
+                me.uservert = V.ravel().tolist(); me.userface = F.ravel().tolist()
+                g = spec.worldbody.add_geom(); g.name = "terrain_boxes"; g.type = mujoco.mjtGeom.mjGEOM_MESH
+                g.meshname = "terrain_boxes"; g.contype = 0; g.conaffinity = 0
+                # A mesh without texcoords gets MuJoCo's object-linear 2D mapping in its geom frame, and MuJoCo aligns a
+                # mesh's frame with its principal axes (here a tilted frame: the box tops came out smeared). Planar
+                # texcoords per face instead, at the heightfield's world scale (s = 0.5 x, t = -0.5 y, times
+                # texrepeat). With texuniform MuJoCo (and the film's renderer: builtin_geoms.material_uv_transform)
+                # multiplies explicit texcoords by the geom's size, so they are stored divided by it.
+                mc = spec.compile()
+                size = mc.geom_size[mujoco.mj_name2id(mc, mujoco.mjtObj.mjOBJ_GEOM, "terrain_boxes")]
+                me.usertexcoord = (UV / np.maximum(size[:2], 1e-9)).ravel().tolist()
+            self.twin_terrain = dict(heightfield=f"{vis['nrow']} x {vis['ncol']} at {(ch or hf)['res']} m",
+                                     boxes=int(len(boxes)) if boxes is not None else 0, collision=hf.get("collision"))
+        if m.nq != t.model.nq:
+            raise RuntimeError(f"visual G1 nq {m.nq} != task nq {t.model.nq}")
+        return spec
 
     def meta(self):
-        return dict(policy=os.path.relpath(self.checkpoint, ROOT) if self.checkpoint and os.path.isabs(self.checkpoint)
-                    else self.checkpoint, policy_iteration=getattr(self, "ckpt_iter", None), note=self.note,
-                    env_build_s=self.build_s, physics="MuJoCo Warp BatchSim (metalsim.learn.g1_velocity)")
+        from metalsim.render.film import provenance
+
+        t = self.task
+        out = dict(policy=provenance.relpath(self.checkpoint) if self.checkpoint else None,
+                   policy_iteration=getattr(self, "ckpt_iter", None), note=self.note, env_build_s=self.build_s,
+                   physics="MuJoCo Warp BatchSim (metalsim.learn.g1_velocity)", terrain=self.terrain,
+                   saved_task_settings=self.saved_settings, task_settings=self.task_kw,
+                   task_resolved=dict(physics_dt=t.physics_dt, decimation=t.decimation, seed=t.seed,
+                                      reward_cfg=t.reward_cfg, contact_cfg=t.contact_cfg,
+                                      terrain_collision=t.terrain_collision if t.hfield is not None else None),
+                   actions="actor mean", done="task terminations (torso contact, non-finite state) + 20 s time-out")
+        if hasattr(self, "dist"):
+            out["first_episode"] = dict(start=self.start.round(4).tolist(), path_m=self.dist.round(3).tolist(),
+                                        climb_m=self.climb.round(3).tolist(), descent_m=self.descent.round(3).tolist())
+        if t.hfield is not None:
+            out.update(terrain_level=self.terrain_level, levels=getattr(self, "level0", np.zeros(0)).tolist(),
+                       terrain_types=getattr(self, "col0", np.zeros(0)).tolist(),
+                       twin_terrain=getattr(self, "twin_terrain", None))
+        return out
+
+
+def terrain_box_faces(boxes):
+    """Isaac's terrain boxes (``metalsim.learn.terrain.terrain_boxes`` rows: centre, half extents) as one mesh with 4
+    vertices per face (6 outward quads per box) and planar texture coordinates per face in MuJoCo's object-linear
+    convention (0.5 a, -0.5 b): tops (x, y), x faces (y, z), y faces (x, z). Returns (V (N, 3), F (M, 3), UV (N, 2))."""
+    B = np.asarray(boxes, np.float64)
+    c, h = B[:, None, :3], B[:, None, 3:6]
+    q = np.array([[-1, -1], [1, -1], [1, 1], [-1, 1]], np.float64)
+    Vs, UVs = [], []
+    for ax in range(3):
+        a, b = [i for i in range(3) if i != ax]
+        for sg in (-1.0, 1.0):
+            # counter-clockwise seen from outside: (a, b, n) right-handed for n = +x, +z; y is (x, z, -y)
+            qq = q if sg * (1 if ax != 1 else -1) > 0 else q[::-1]
+            P = np.zeros((4, 3)); P[:, ax] = sg; P[:, a] = qq[:, 0]; P[:, b] = qq[:, 1]
+            W = c + h * P[None]                                           # (boxes, 4, 3)
+            Vs.append(W); UVs.append(np.stack([0.5 * W[..., a], -0.5 * W[..., b]], -1))
+    V = np.concatenate(Vs, 1)                                            # (boxes, 24, 3): 6 faces x 4
+    UV = np.concatenate(UVs, 1)
+    quad = np.array([[0, 1, 2], [0, 2, 3]])
+    F = (np.arange(6)[:, None, None] * 4 + quad[None]).reshape(-1, 3)   # (12, 3) per box
+    F = (np.arange(len(B))[:, None, None] * 24 + F[None]).reshape(-1, 3)
+    return V.reshape(-1, 3), F.astype(np.int32), UV.reshape(-1, 2)
+
+
+class G1Flat(G1Velocity):
+    """Isaac Lab's G1 flat-terrain velocity task (``Isaac-Velocity-Flat-G1-v0``)."""
+
+    terrain = "flat"
+
+
+class G1Rough(G1Velocity):
+    """Isaac Lab's G1 rough-terrain velocity task (``Isaac-Velocity-Rough-G1-v0``): Isaac's rough terrain (10 difficulty
+    rows x 20 terrain types, ``metalsim.learn.terrain.isaac_rough_terrain``) with the 187-ray height scan."""
+
+    terrain = "rough"

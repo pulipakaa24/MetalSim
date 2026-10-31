@@ -7,13 +7,19 @@ virtual environment:
 * ``rec.npz``: per frame and filmed env, the world pose of every twin geom (``xpos`` (F, E, G, 3), ``xmat``
   (F, E, G, 9), in each env's own frame), the particles (``particles`` (F, E, P, 3) or empty), the tracked body
   (``track`` (F, E, 3)), each env's first-episode end frame (``ends``), and the twin's compiled geom frames.
-* ``rec.json``: task, envs and their outcomes, timings, provenance.
+* ``rec.json``: task, envs and their outcomes, timings, provenance (the policy checkpoint's repo-relative path and
+  sha256 under ``checkpoint``).
+
+A filmed env whose first episode ends by a termination (the adapter's ``info["terminated"]``: a fall, not a time-out
+or a success) makes the recorder refuse the film unless ``FilmCfg.allow_early_end`` (``--allow-early-end``); with
+``envs="auto"`` envs that did not terminate are ranked first.
 
     python -m metalsim.render.film.record --task franka_pour --out runs/film/franka_pour/rec
 """
 from __future__ import annotations
 
 import argparse
+import hashlib
 import importlib
 import json
 import math
@@ -144,6 +150,48 @@ def prefer_visuals(model) -> dict:
     return dict(colliders_hidden=hid, colliders_shown=shown)
 
 
+def mujoco_visibility(spec) -> dict:
+    """Render-twin visibility for a MuJoCo spec (in place), the MuJoCo counterpart of ``prefer_visuals``:
+
+    * a body (not the world) that has visual-only geoms (contype = conaffinity = 0) hides its colliding geoms: group 3,
+      which MuJoCo's default ``MjvOption`` and the film's ray tracer (``max_group=3``) do not draw. The G1's USD
+      colliders (``Cube``, ``right_ankle_roll_link_Cube``, ``torso_link_Cube``: ``UsdPhysics.CollisionAPI`` meshes
+      authored ``visibility = invisible``, the model's only three colliders) were drawn as plain grey foot plates and
+      torso box. World geoms (ground, terrain) are left as they are.
+    * every site is hidden (group 5): the recording poses geoms only, so a site is drawn where the model's ``qpos0``
+      puts it. The G1's torso touch-sensor box (0.3 x 0.3 x 0.5 m) stood as a grey box at the world origin."""
+    hid = 0
+    for b in spec.bodies:
+        if b.name == "world":
+            continue
+        geoms = list(b.geoms)
+        if any(g.contype == 0 and g.conaffinity == 0 for g in geoms):
+            for g in geoms:
+                if (g.contype or g.conaffinity) and g.group < 3:
+                    g.group = 3
+                    hid += 1
+    sites = 0
+    for st in spec.sites:
+        if st.group < 3:
+            st.group = 5
+            sites += 1
+    return dict(colliders_hidden=hid, sites_hidden=sites)
+
+
+def checkpoint_provenance(path: str | None) -> dict | None:
+    """Repo-relative path (``provenance.relpath``: no machine paths), size and sha256 of a policy checkpoint."""
+    if not path:
+        return None
+    out = dict(path=provenance.relpath(path), in_repo=os.path.abspath(path).startswith(provenance.ROOT + os.sep))
+    if not os.path.exists(path):
+        return out | dict(sha256=None, missing=True)
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
+    return out | dict(sha256=h.hexdigest(), bytes=os.path.getsize(path))
+
+
 def neutral_unauthored_colors(model, rgb=(0.80, 0.80, 0.80)) -> int:
     """Newton gives a shape without an authored colour a palette colour by shape index (``ModelBuilder.
     _shape_palette_color``: a debug-view rainbow); for a film those shapes get a neutral ``rgb`` instead."""
@@ -216,6 +264,7 @@ def mujoco_twin(adapter, snaps, envs, ends, frames, out_dir, track_body=None):
     t0 = time.perf_counter()
     spec = adapter.twin_spec()
     name_geoms(spec)
+    vis = mujoco_visibility(spec)
     m = spec.compile()
     d = mujoco.MjData(m)
     names = [mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_GEOM, g) for g in range(m.ngeom)]
@@ -237,7 +286,7 @@ def mujoco_twin(adapter, snaps, envs, ends, frames, out_dir, track_body=None):
     pose_s = time.perf_counter() - t1
     path = export_twin(spec, out_dir)
     info = dict(kind="mujoco", geoms=G, meshes=int(m.nmesh), textures=int(m.ntex), materials=int(m.nmat),
-                build_s=build_s, poses_s=pose_s)
+                visibility=vis, build_s=build_s, poses_s=pose_s)
     return path, names, m.geom_pos.copy(), m.geom_quat.copy(), xpos, xmat, track, info
 
 
@@ -246,9 +295,14 @@ def load_adapter(spec: str):
     return getattr(importlib.import_module(mod), cls)
 
 
+class FilmEarlyEnd(RuntimeError):
+    """A filmed env's first episode ended by a termination (e.g. the robot fell) inside the film."""
+
+
 def record(task, film, viewer, out_dir: str, checkpoint: str | None, n_keep: int = 4) -> dict:
     os.makedirs(out_dir, exist_ok=True)
     t_all = time.perf_counter()
+    ck_prov = checkpoint_provenance(checkpoint)
     Adapter = load_adapter(task.adapter) if isinstance(task.adapter, str) else task.adapter
     adapter = Adapter(task, film, checkpoint, viewer)
     fps = film.fps or 1.0 / adapter.frame_dt
@@ -262,6 +316,11 @@ def record(task, film, viewer, out_dir: str, checkpoint: str | None, n_keep: int
     ends = np.full(n, -1, np.int64)
     first = {}
     t0 = time.perf_counter()
+
+    def terminated():
+        """(N,) first episode ended by a termination (only adapters that report ``terminated``; else all False)."""
+        return np.asarray(first.get("terminated", np.zeros(n, bool)), bool) & (ends >= 0)
+
     for k in range(max_frames):
         snap, done, info, timing = adapter.step()
         snaps.append(snap)
@@ -272,17 +331,39 @@ def record(task, film, viewer, out_dir: str, checkpoint: str | None, n_keep: int
             first[key][new] = np.asarray(v)[new]
         ends[new] = k
         if k % 30 == 0 or k == max_frames - 1:
+            term = f" ({int(terminated().sum())} by termination)" if "terminated" in first else ""
             print(f"[record] frame {k + 1}/{max_frames}: {sim_s[-1] * 1e3:.0f} ms, episodes ended {int((ends >= 0).sum())}"
-                  f"/{n}", flush=True)
+                  f"/{n}{term}", flush=True)
         if film.video_length is None and (ends >= 0).all():
             break
     rollout_s = time.perf_counter() - t0
     frames = len(snaps)
+    term = terminated()
+    if hasattr(adapter, "summary"):         # optional: per-env first-episode statistics for the log
+        print(adapter.summary(ends), flush=True)
+    if "terminated" in first:
+        fell = np.flatnonzero(term)
+        print(f"[record] first episodes ended by termination: {len(fell)}/{n}"
+              + (f" (env:frame {', '.join(f'{e}:{int(ends[e])}' for e in fell)})" if len(fell) else ""), flush=True)
     if isinstance(film.envs, (list, tuple)):
         envs = [int(e) for e in film.envs]
     else:
-        envs = adapter.rank({k: v for k, v in first.items()})[:max(n_keep, film.grid ** 2)]
+        ranked = [int(e) for e in adapter.rank({k: v for k, v in first.items()})]
+        ranked = [e for e in ranked if not term[e]] + [e for e in ranked if term[e]]    # stable: terminated last
+        g2 = film.grid ** 2             # the slots the render stage films by default; the rest are spares
+        envs = ranked[:g2] + [e for e in ranked[g2:max(n_keep, g2)] if not term[e]]
     print(f"[record] filmed envs {envs} (ends {[int(ends[e]) for e in envs]})", flush=True)
+    early = [e for e in envs if term[e]]
+    if early:
+        msg = "; ".join(f"env {e} terminated at frame {int(ends[e])} ({ends[e] * adapter.frame_dt:.2f} s) of {frames}"
+                        for e in early)
+        ok = [e for e in range(n) if not term[e]]
+        if not film.allow_early_end:
+            raise FilmEarlyEnd(f"[record] {task.name}: {msg}: the film would show the episode ending by a termination "
+                               f"(a fall), not by a time-out or success. {len(ok)}/{n} envs did not terminate"
+                               f"{' (' + ','.join(map(str, ok[:16])) + ')' if ok else ''}: film one of them (--envs), "
+                               f"or pass --allow-early-end to film it anyway.")
+        print(f"[record] WARNING (allow_early_end): {msg}", flush=True)
     twin_fn = newton_twin if adapter.backend == "newton" else mujoco_twin
     path, names, gpos, gquat, xpos, xmat, track, twin_info = twin_fn(adapter, snaps, envs, ends, frames, out_dir,
                                                                      viewer.body_name)
@@ -293,7 +374,8 @@ def record(task, film, viewer, out_dir: str, checkpoint: str | None, n_keep: int
              ends=np.array([int(ends[e]) for e in envs]), geom_pos=gpos, geom_quat=gquat)
     sim = np.asarray(sim_s)
     out = dict(task=task.name, backend=adapter.backend, venv=task.venv, frames=frames, fps=fps, frame_dt=adapter.frame_dt,
-               num_envs=n, envs=envs, geom_names=names,
+               num_envs=n, envs=envs, checkpoint=ck_prov, allow_early_end=bool(film.allow_early_end),
+               early_end_envs=[int(e) for e in early], geom_names=names,
                episodes={str(e): {k: (v[e].item() if hasattr(v[e], "item") else v[e]) for k, v in first.items()}
                          | {"end_frame": int(ends[e])} for e in envs},
                all_first_episodes={k: np.asarray(v).tolist() for k, v in first.items()} | {"end_frame": ends.tolist()},
