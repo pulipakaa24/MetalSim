@@ -140,21 +140,110 @@ class FrankaPour:
 G1_SAVED_TASK_KEYS = ("reward_cfg", "scan_ordering", "terrain_collision", "scan_surface", "solver_cfg", "il3_events",
                       "contact_cfg", "base_velocity", "feet_slide_velocity")
 
+# Isaac Lab 2.3's G1 joint order: PhysX's articulation order (breadth-first over g1_minimal.usd's kinematic tree) as
+# Isaac Sim 5.1 / Isaac Lab 2.3.2 reports it (``robot.joint_names``, written by
+# metalsim/parity/isaac_side/play_policy.py into runs/parity/isaac/rough/play_rough/L*/isaac_it*/traj.npz on the L4). An rsl_rl checkpoint trained in Isaac reads
+# its joint blocks (pos, vel, last action) and writes its actions in this order. MetalSim's G1 model is depth-first
+# (left leg, right leg, torso, arms, hands), so the adapter maps the blocks by joint name, as
+# metalsim/parity/side_by_side.py and scripts/diagnostics/g1_rough_transfer.py do.
+ISAAC_G1_JOINTS = (
+    "left_hip_pitch_joint", "right_hip_pitch_joint", "torso_joint", "left_hip_roll_joint", "right_hip_roll_joint",
+    "left_shoulder_pitch_joint", "right_shoulder_pitch_joint", "left_hip_yaw_joint", "right_hip_yaw_joint",
+    "left_shoulder_roll_joint", "right_shoulder_roll_joint", "left_knee_joint", "right_knee_joint",
+    "left_shoulder_yaw_joint", "right_shoulder_yaw_joint", "left_ankle_pitch_joint", "right_ankle_pitch_joint",
+    "left_elbow_pitch_joint", "right_elbow_pitch_joint", "left_ankle_roll_joint", "right_ankle_roll_joint",
+    "left_elbow_roll_joint", "right_elbow_roll_joint", "left_five_joint", "left_three_joint", "left_zero_joint",
+    "right_five_joint", "right_three_joint", "right_zero_joint", "left_six_joint", "left_four_joint", "left_one_joint",
+    "right_six_joint", "right_four_joint", "right_one_joint", "left_two_joint", "right_two_joint")
+
+# Task settings that an rsl_rl checkpoint of Isaac's own G1 tasks implies (it saves none): Isaac Lab 2.3's G1FlatEnvCfg
+# and G1RoughEnvCfg (assets/isaac/g1_flat_env_cfg.py, g1_rough_env_cfg.py), i.e. their reward and command sets
+# (lin_vel_y in +-0.5 / 0; ``reward_cfg`` "flat" / "rough_isaac") and Isaac's height-scan ray order ("xy", x fastest:
+# GridPatternCfg ordering "xy", metalsim.learn.terrain.scan_grid). The rest are the task's defaults (elliptic contacts
+# "recommended", base and feet-slide velocity at the COM, rough collision "boxes_local" with the exact height scan),
+# the settings of the PARITY §1.5 transfer runs; FilmTask.adapter_kw["task"] (physics_dt) applies on top.
+ISAAC_TASK_SETTINGS = {"flat": {"reward_cfg": "flat"}, "rough": {"reward_cfg": "rough_isaac", "scan_ordering": "xy"}}
+
+
+def load_g1_checkpoint(path: str) -> dict:
+    """A G1 policy checkpoint in either format, loaded with ``torch.load(weights_only=True)`` (Isaac's published
+    checkpoints are downloaded pickles):
+
+    * "metalsim": ``metalsim.learn.g1_velocity.train_g1``'s ``{"net": ActorCriticMLP state, "iterations", "terrain",
+      task settings}``; joints in MetalSim's order;
+    * "rsl_rl": rsl_rl's ``{"model_state_dict": actor.* / critic.* / std, "optimizer_state_dict", "iter", "infos"}``
+      (Isaac Lab's training and its published PretrainedCheckpoints); the actor is read as
+      ``metalsim.parity.side_by_side.load_policy`` reads it (the ``actor.*`` keys of an ELU MLP); joints in Isaac's
+      order (the checkpoint's ``joint_names`` if it has them, else ``ISAAC_G1_JOINTS``).
+
+    Returns dict(format, actor: the state dict of ``ActorCriticMLP.actor``, hidden, obs_dim, act_dim, iteration,
+    terrain, engine, joints: the policy's joint order (None: MetalSim's), saved: the task settings the checkpoint
+    saved)."""
+    import torch
+
+    ck = torch.load(path, map_location="cpu", weights_only=True)
+    if "model_state_dict" in ck:
+        fmt, net, it = "rsl_rl", ck["model_state_dict"], ck.get("iter")
+        joints, saved = list(ck.get("joint_names") or ISAAC_G1_JOINTS), {}
+    elif "net" in ck:
+        fmt, net, it, joints = "metalsim", ck["net"], ck.get("iterations"), None
+        saved = {k: ck[k] for k in G1_SAVED_TASK_KEYS if k in ck}
+    else:
+        raise ValueError(f"{path}: neither an rsl_rl checkpoint (model_state_dict) nor a MetalSim one (net)")
+    sd = {k[len("actor."):]: v for k, v in net.items() if k.startswith("actor.")}
+    lin = sorted(int(k.split(".")[0]) for k in sd if k.endswith(".weight"))
+    hidden = tuple(int(sd[f"{i}.weight"].shape[0]) for i in lin[:-1])
+    obs_dim, act_dim = int(sd[f"{lin[0]}.weight"].shape[1]), int(sd[f"{lin[-1]}.weight"].shape[0])
+    # Isaac's G1 tasks: 12 + 3 x 37 policy inputs on flat ground, + 187 height-scan rays on rough terrain
+    terrain = ck.get("terrain") if fmt == "metalsim" else {123: "flat", 310: "rough"}.get(obs_dim)
+    return dict(format=fmt, actor=sd, hidden=hidden, obs_dim=obs_dim, act_dim=act_dim, iteration=it, terrain=terrain,
+                engine=ck.get("engine", "mjwarp") if fmt == "metalsim" else "physx (Isaac Lab)", joints=joints,
+                saved=saved)
+
+
+def checkpoint_source(path: str | None) -> dict:
+    """Where a G1 checkpoint comes from: Isaac Lab's published rsl_rl checkpoints (fetched by
+    scripts/fetch_isaac_assets.sh to assets/isaac/pretrained/rsl_rl/<task id>/checkpoint.pt) map back to their URL and
+    published sha256 (``tasks.ISAAC_PRETRAINED``); anything else is this repository's."""
+    from metalsim.render.film import provenance, tasks
+
+    rel = provenance.relpath(path) if path else None
+    for tid, ent in tasks.ISAAC_PRETRAINED.items():
+        if rel == ent["path"]:
+            return dict(source="NVIDIA Isaac Lab 2.3 published pretrained checkpoint", task_id=tid,
+                        source_url=ent["url"], published_sha256=ent["sha256"], iteration=ent["iteration"],
+                        licence=tasks.NVIDIA_TERMS)
+    return dict(source="this repository", source_url=None)
+
 
 class G1Velocity:
-    """Isaac Lab's G1 velocity task (metalsim.learn.g1_velocity, MuJoCo Warp) with an rsl_rl-style ``ActorCriticMLP``
-    checkpoint evaluated in torch (the actor's mean; no Warp-bound policy, so the PPOWarp load-ordering bug of
-    2026-10-13 does not apply). The render model is the same G1 with its 43 USD visual meshes, on the task's own ground.
+    """Isaac Lab's G1 velocity task (metalsim.learn.g1_velocity, MuJoCo Warp) with a policy checkpoint evaluated in
+    torch (the actor's mean; no Warp-bound policy, so the PPOWarp load-ordering bug of 2026-10-13 does not apply). The
+    render model is the same G1 with its 43 USD visual meshes, on the task's own ground.
+
+    Checkpoints (``load_g1_checkpoint``): MetalSim's (``train_g1``) or rsl_rl's (Isaac Lab's training and its
+    published pretrained checkpoints). An rsl_rl actor reads and writes the joint blocks in Isaac's joint order
+    (``ISAAC_G1_JOINTS``): its joint pos / joint vel / last action blocks are permuted from MetalSim's order by joint
+    name and its actions back, exactly as metalsim/parity/side_by_side.py and scripts/diagnostics/g1_rough_transfer.py
+    do; the 12-value head (base lin vel, base ang vel, projected gravity, command) and the 187 height-scan rays (Isaac's
+    "xy" order, which the task is then required to use) are passed through.
 
     Task settings (``meta()["task_settings"]``): the ones the checkpoint saved (``G1_SAVED_TASK_KEYS``, as
-    scripts/diagnostics/g1_policy_replay.py reads them), then ``FilmTask.adapter_kw["task"]`` (settings a checkpoint
-    does not save, e.g. ``physics_dt``, from its training log header). ``adapter_kw["terrain_level"]`` (rough terrain):
+    scripts/diagnostics/g1_policy_replay.py reads them; rsl_rl: ``ISAAC_TASK_SETTINGS``), then
+    ``FilmTask.adapter_kw["task"]`` (settings a checkpoint does not save, e.g. ``physics_dt``, from its training log
+    header). ``adapter_kw["terrain_level"]`` (rough terrain):
     every env starts on that difficulty row of its terrain column (default: the task's random initial levels 0-5).
 
     Done mask: the task's own termination and time-out terms (``G1VelocityTask.launch_reward_done_reset``: torso
     contact, Isaac's base_contact / illegal_contact, or a non-finite state; the 20 s time-out), read after the frame is
     captured; the task then resets those envs (curriculum included), as Isaac's ``ManagerBasedRLEnv.step``.
-    ``info["terminated"]`` / ``info["time_out"]`` say which ended an episode."""
+    ``info["terminated"]`` / ``info["time_out"]`` say which ended an episode.
+
+    Gait (``record.gait_metrics``): each frame also carries the two foot colliders' centres (``feet``, world frame, by
+    forward kinematics of the recorded ``qpos``) and the xy of their bounding-box corners (``feet_footprint``), the
+    task's foot touch sensors above 1 N (``feet_contact``, the contact threshold of its reward terms) and the command
+    (``cmd``); ``ground_height`` is the task's own collision-surface lookup (``metalsim.learn.terrain.collision_top``,
+    the top of the MuJoCo collision geometry straight above a point, equal to ``mj_ray``; 0 on flat ground)."""
 
     backend = "mujoco"
     terrain = "flat"
@@ -163,6 +252,7 @@ class G1Velocity:
         import inspect
         from types import SimpleNamespace
 
+        import mujoco
         import torch
         import warp as wp
 
@@ -175,13 +265,16 @@ class G1Velocity:
         akw = dict(getattr(task, "adapter_kw", None) or {})
         n = self.num_envs = int(film.num_envs)
         self.checkpoint, self.net, self.note = checkpoint, None, ""
-        ck = torch.load(checkpoint, map_location="cpu", weights_only=False) if checkpoint else None
-        if ck is not None and ck.get("terrain", self.terrain) != self.terrain:
+        self.perm_obs = self.perm_act = None
+        ck = load_g1_checkpoint(checkpoint) if checkpoint else None
+        self.ckpt_format = ck["format"] if ck else None
+        if ck is not None and ck["terrain"] not in (None, self.terrain):
             raise ValueError(f"checkpoint trained on {ck['terrain']!r} terrain, this film is {self.terrain!r}")
-        if ck is not None and ck.get("engine", "mjwarp") != "mjwarp":
+        if ck is not None and ck["format"] == "metalsim" and ck["engine"] != "mjwarp":
             raise ValueError(f"checkpoint trained on engine {ck['engine']!r}; the film adapter runs MuJoCo Warp")
         params = inspect.signature(G1VelocityTask.__init__).parameters
-        self.saved_settings = {k: ck[k] for k in G1_SAVED_TASK_KEYS if ck is not None and k in ck and k in params}
+        saved = (ck["saved"] if ck["format"] == "metalsim" else ISAAC_TASK_SETTINGS[self.terrain]) if ck else {}
+        self.saved_settings = {k: v for k, v in saved.items() if k in params}
         self.task_kw = dict(self.saved_settings) | dict(akw.get("task", {}))
         t0 = time.perf_counter()
         self.task = G1VelocityTask(n, terrain=self.terrain, seed=film.seed, **self.task_kw)
@@ -193,12 +286,25 @@ class G1Velocity:
             lv = np.full(n, int(self.terrain_level), np.int32)
             self.task.level.assign(lv)
             self.task.origins.assign(tab[lv, self.task.col.numpy()].astype(np.float32))
+        self.ckpt_iter = ck["iteration"] if ck else None
+        self.ckpt_source = checkpoint_source(checkpoint) if checkpoint else None
         if ck is not None:
-            if int(ck["obs_dim"]) == int(self.task.obs_dim) and int(ck["act_dim"]) == int(self.task.act_dim):
-                self.net = ActorCriticMLP(ck["obs_dim"], ck["act_dim"], hidden=tuple(ck["hidden"])).to("mps")
-                self.net.load_state_dict({k: v.to("mps") for k, v in ck["net"].items()})
+            if ck["obs_dim"] == int(self.task.obs_dim) and ck["act_dim"] == int(self.task.act_dim):
+                self.net = ActorCriticMLP(ck["obs_dim"], ck["act_dim"], hidden=ck["hidden"]).to("mps")
+                self.net.actor.load_state_dict({k: v.to("mps") for k, v in ck["actor"].items()})
                 self.net.eval()
-                self.ckpt_iter = ck.get("iterations")
+                if ck["joints"] is not None:          # rsl_rl: Isaac's joint order inside the three joint blocks
+                    ours = [mujoco.mj_id2name(self.task.model, mujoco.mjtObj.mjOBJ_JOINT, j)
+                            for j in range(1, self.task.model.njnt)]
+                    pol = list(ck["joints"])
+                    if sorted(pol) != sorted(ours):
+                        raise ValueError(f"checkpoint joints {pol} are not the task's {ours}")
+                    # policy joint k <- our joint perm_obs[k]; our joint i <- policy output perm_act[i]
+                    self.perm_obs = torch.as_tensor([ours.index(j) for j in pol], device="mps")
+                    self.perm_act = torch.as_tensor([pol.index(j) for j in ours], device="mps")
+                    self.policy_joints = pol
+                if ck["format"] == "rsl_rl" and self.task.scanner is not None and self.task.scanner.ordering != "xy":
+                    raise ValueError("an Isaac rsl_rl policy reads Isaac's height-scan ray order: scan_ordering='xy'")
             else:
                 self.note = (f"checkpoint obs/act dims {ck['obs_dim']}/{ck['act_dim']} != task {self.task.obs_dim}/"
                              f"{self.task.act_dim}: zero actions")
@@ -210,6 +316,39 @@ class G1Velocity:
                                     done=wp.zeros((1, n), dtype=float, device=dev),
                                     timeout=wp.zeros((1, n), dtype=float, device=dev))
         self.t_obs = tb.mps_tensor(self.task.obs)
+        # gait data: the foot colliders (the G1's only foot geoms) posed on the host from each frame's qpos
+        m = self.task.model
+        fb = [int(self.task.foot_body[0]), int(self.task.foot_body[1])]
+        self.foot_geoms = [int(next(g for g in range(m.ngeom) if m.geom_bodyid[g] == b and
+                                    (m.geom_contype[g] or m.geom_conaffinity[g]))) for b in fb]
+        self.foot_geom_names = [mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_GEOM, g) for g in self.foot_geoms]
+        self._fk = mujoco.MjData(m)
+        self.touch_adr = [int(self.task.touch_adr[0]), int(self.task.touch_adr[1])]
+
+    def _feet(self, qpos):
+        """For each env's ``qpos``: (N, 2, 3) world centres of the left / right foot colliders and (N, 2, 8, 2) the xy
+        of their bounding boxes' corners (the footprint the foot can stand on)."""
+        import mujoco
+
+        m, d = self.task.model, self._fk
+        out, fp = np.zeros((len(qpos), 2, 3)), np.zeros((len(qpos), 2, 8, 2))
+        corners = np.array([[sx, sy, sz] for sx in (-1, 1) for sy in (-1, 1) for sz in (-1, 1)], np.float64)
+        for e in range(len(qpos)):
+            d.qpos[:] = qpos[e]
+            mujoco.mj_kinematics(m, d)
+            for f, g in enumerate(self.foot_geoms):
+                c, h = m.geom_aabb[g, :3], m.geom_aabb[g, 3:]
+                out[e, f] = d.geom_xpos[g]
+                fp[e, f] = (d.geom_xpos[g] + (c + corners * h) @ d.geom_xmat[g].reshape(3, 3).T)[:, :2]
+        return out, fp
+
+    def ground_height(self, x, y):
+        """Top of the task's collision surface straight above world points (0 on flat ground)."""
+        if self.task.hfield is None:
+            return np.zeros(np.shape(x))
+        from metalsim.learn.terrain import collision_top
+
+        return collision_top(self.task.hfield, np.ravel(x), np.ravel(y)).reshape(np.shape(x))
 
     def _qpos(self):
         return self.task.sim.d.qpos.numpy().astype(np.float64).reshape(self.num_envs, -1)
@@ -235,12 +374,24 @@ class G1Velocity:
             task.launch_obs(self.step_idx)
             v = task.sim._signal(); task.sim.after(v)
             with torch.no_grad():
-                a = self.net.actor(self.t_obs) if self.net is not None else torch.zeros(self.num_envs, task.act_dim, device="mps")
+                if self.net is None:
+                    a = torch.zeros(self.num_envs, task.act_dim, device="mps")
+                else:
+                    o = self.t_obs
+                    if self.perm_obs is not None:     # MetalSim's joint order -> the policy's (side_by_side.py)
+                        nj, p = task.nj, self.perm_obs
+                        o = torch.cat([o[:, :12], o[:, 12:12 + nj][:, p], o[:, 12 + nj:12 + 2 * nj][:, p],
+                                       o[:, 12 + 2 * nj:12 + 3 * nj][:, p], o[:, 12 + 3 * nj:]], 1)
+                    a = self.net.actor(o)
+                    if self.perm_act is not None:
+                        a = a[:, self.perm_act]
             task.action_scratch.assign(a.cpu().numpy().astype(np.float32))
             task.launch_apply_action(task.action_scratch)
             task.sim.step()
             task.sim.synchronize()
             qpos = self._qpos()                               # the frame: before the task resets done envs
+            touch = task.sim.d.sensordata.numpy()[:, self.touch_adr] > 1.0
+            cmd = task.cmd.numpy().copy()
             task.launch_reward_done_reset(self.pol, self.bufs)
             task.launch_timeouts(self.pol, self.bufs)
             task.sim.synchronize()
@@ -256,7 +407,9 @@ class G1Velocity:
         self._xy = qpos[:, :2].copy()
         self._alive &= ~done
         info = dict(terminated=terminated, time_out=time_out, base_z=qpos[:, 2].copy(), level=self.level0, col=self.col0)
-        return dict(qpos=qpos), done, info, dict(sim_s=sim_s)
+        feet, footprint = self._feet(qpos)
+        snap = dict(qpos=qpos, feet=feet, feet_footprint=footprint, feet_contact=touch, cmd=cmd)
+        return snap, done, info, dict(sim_s=sim_s)
 
     def summary(self, ends) -> str:
         """Per env over its first episode: path length, highest climb and lowest drop of the pelvis relative to its start
@@ -266,15 +419,20 @@ class G1Velocity:
         return ("[record] first episodes, env:path m/climb m/drop m[@end frame]" +
                 (f" (level {self.level0.tolist()})" if self.terrain != "flat" else "") + ": " + " ".join(rows))
 
-    def rank(self, first):
+    def rank(self, first, gait=None):
         """Envs whose first episode did not terminate first; flat: then those whose pelvis never dropped more than
-        0.25 m (not down on its knees), the longest path; rough: the most climbed, then the longest path."""
+        0.25 m (not down on its knees); then, with ``gait`` (``record.gait_metrics``), a natural-gait preference:
+        envs whose lower swing apex of the two feet is at least the median of these candidates and whose larger stance
+        slip is at most their median (relative to the take's own envs: no absolute reference value exists); then flat:
+        the longest path; rough: the most climbed, then the longest path."""
         n = self.num_envs
         term = np.asarray(first.get("terminated", np.zeros(n)), bool)
+        down = (self.descent < -0.25) if self.terrain == "flat" else np.zeros(n, bool)
+        self.natural = natural_gait(gait, [e for e in range(n) if not term[e] and not down[e]], n)
         if self.terrain == "flat":
-            key = [(term[e], self.descent[e] < -0.25, -self.dist[e], e) for e in range(n)]
+            key = [(term[e], down[e], not self.natural[e], -self.dist[e], e) for e in range(n)]
         else:
-            key = [(term[e], -self.climb[e], -self.dist[e], e) for e in range(n)]
+            key = [(term[e], not self.natural[e], -self.climb[e], -self.dist[e], e) for e in range(n)]
         return [k[-1] for k in sorted(key)]
 
     def twin_spec(self):
@@ -323,7 +481,11 @@ class G1Velocity:
 
         t = self.task
         out = dict(policy=provenance.relpath(self.checkpoint) if self.checkpoint else None,
-                   policy_iteration=getattr(self, "ckpt_iter", None), note=self.note, env_build_s=self.build_s,
+                   policy_iteration=getattr(self, "ckpt_iter", None), policy_format=self.ckpt_format,
+                   policy_source=self.ckpt_source,
+                   policy_joint_order=("Isaac's (ISAAC_G1_JOINTS), mapped by joint name" if self.perm_obs is not None
+                                       else "MetalSim's" if self.net is not None else None),
+                   foot_geoms=self.foot_geom_names, note=self.note, env_build_s=self.build_s,
                    physics="MuJoCo Warp BatchSim (metalsim.learn.g1_velocity)", terrain=self.terrain,
                    saved_task_settings=self.saved_settings, task_settings=self.task_kw,
                    task_resolved=dict(physics_dt=t.physics_dt, decimation=t.decimation, seed=t.seed,
@@ -338,6 +500,25 @@ class G1Velocity:
                        terrain_types=getattr(self, "col0", np.zeros(0)).tolist(),
                        twin_terrain=getattr(self, "twin_terrain", None))
         return out
+
+
+def natural_gait(gait, cands, n) -> np.ndarray:
+    """(n,) bool: among ``cands``, envs whose lower swing apex of the two feet is at least the candidates' median and
+    whose larger stance slip is at most their median (``record.gait_metrics`` per-env values); all False without gait
+    data."""
+    out = np.zeros(n, bool)
+    per = (gait or {}).get("per_env") or {}
+    rows = {e: per.get(str(e)) for e in cands}
+    rows = {e: r for e, r in rows.items() if r and r.get("apex_m") and r.get("slip_mps")
+            and None not in r["apex_m"] + r["slip_mps"]}
+    if len(rows) < 2:
+        return out
+    apex = {e: min(r["apex_m"]) for e, r in rows.items()}
+    slip = {e: max(r["slip_mps"]) for e, r in rows.items()}
+    ma, ms = np.median(list(apex.values())), np.median(list(slip.values()))
+    for e in rows:
+        out[e] = apex[e] >= ma and slip[e] <= ms
+    return out
 
 
 def terrain_box_faces(boxes):

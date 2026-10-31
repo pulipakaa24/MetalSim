@@ -21,7 +21,7 @@
  "samples_per_pixel": 64,
  "bounces": 3,
  "denoise": "oidn",
- "exposure": 1.2130711694049827,
+ "exposure": 1.2131855643529978,
  "viewer": {
   "eye": [
    1.95,
@@ -54,13 +54,13 @@
  },
  "particles_per_env": 0,
  "particle_radius": 0.0,
- "setup_s": 1.6640837920058402,
+ "setup_s": 1.749359875000664,
  "probe": {
   "frame": 0,
-  "warmup_s": 0.11953175000235206,
-  "one_pass_s": 0.02305441699718358,
-  "full_s": 0.14432062500418397,
-  "per_pass_s": 0.008084413867133359
+  "warmup_s": 0.1205392080009915,
+  "one_pass_s": 0.0233133750007255,
+  "full_s": 0.14715091700782068,
+  "per_pass_s": 0.008255836133806345
  },
  "twin_geoms": 48,
  "frame_corrections": 34,
@@ -73,9 +73,9 @@
   ],
   "growths": 0
  },
- "cache_key": "dc26c71dc5b7d28356a9",
+ "cache_key": "61ba75a35e9a466362f7",
  "software": {
-  "metalsim": "687f3d7b1d+dirty",
+  "metalsim": "ef346e7efc+dirty",
   "warp": {
    "version": "1.18.0.dev20260917",
    "git": "4127c48183",
@@ -91,6 +91,14 @@
  "hardware": {
   "machine": "arm64",
   "python": "3.13.7",
+  "power": {
+   "source": "Battery Power",
+   "battery_percent": 52,
+   "battery_state": "discharging",
+   "mode": "High Power",
+   "mode_setting": "powermode 2",
+   "at": "2026-10-31T05:00:35-0700"
+  },
   "model": "Mac16,6",
   "cpu": "Apple M4 Max",
   "memory_gb": 64,

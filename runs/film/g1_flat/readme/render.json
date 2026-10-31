@@ -5,7 +5,7 @@
   0
  ],
  "envs": [
-  6
+  3
  ],
  "frames": 301,
  "fps": 50.0,
@@ -21,7 +21,7 @@
  "samples_per_pixel": 64,
  "bounces": 3,
  "denoise": "oidn",
- "exposure": 0.8189178442959074,
+ "exposure": 0.8197859258940282,
  "viewer": {
   "eye": [
    1.95,
@@ -54,28 +54,28 @@
  },
  "particles_per_env": 0,
  "particle_radius": 0.0,
- "setup_s": 0.8057970420049969,
+ "setup_s": 0.8996114999972633,
  "probe": {
   "frame": 0,
-  "warmup_s": 0.09928750000108266,
-  "one_pass_s": 0.018891542000346817,
-  "full_s": 0.07222941700456431,
-  "per_pass_s": 0.0035558583336144996
+  "warmup_s": 0.10915437500079861,
+  "one_pass_s": 0.018941916998301167,
+  "full_s": 0.0737052920012502,
+  "per_pass_s": 0.003650891666863269
  },
  "twin_geoms": 47,
  "frame_corrections": 32,
  "env_grid": {
-  "margin": 10.324269989456921,
+  "margin": 21.016732444104875,
   "cell": [
-   21.027830375132243,
-   21.184086773972947,
-   21.904103690062183
+   42.41275528442815,
+   42.569011683268855,
+   43.28902859935808
   ],
   "growths": 0
  },
- "cache_key": "28fcc1c5b46361410a08",
+ "cache_key": "85d69d284d0157bf3eb8",
  "software": {
-  "metalsim": "687f3d7b1d+dirty",
+  "metalsim": "ef346e7efc+dirty",
   "warp": {
    "version": "1.18.0.dev20260917",
    "git": "4127c48183",
@@ -91,6 +91,14 @@
  "hardware": {
   "machine": "arm64",
   "python": "3.13.7",
+  "power": {
+   "source": "Battery Power",
+   "battery_percent": 62,
+   "battery_state": "discharging",
+   "mode": "High Power",
+   "mode_setting": "powermode 2",
+   "at": "2026-10-31T04:53:12-0700"
+  },
   "model": "Mac16,6",
   "cpu": "Apple M4 Max",
   "memory_gb": 64,
