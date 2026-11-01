@@ -28,6 +28,21 @@ ISAAC_PRETRAINED = {
         ("Isaac-Velocity-Rough-G1-v0", "d85a9adea70e5476675f130cbc70f41bdef7a28d52f443fae902afc0e2358851", 2999,
          "310 -> 512-256-128 -> 37 (ELU)"))}
 FETCH_PH = "scripts/fetch_polyhaven_assets.sh train"
+# Ground textures at their real size (LookCfg.ground_tile_m): the edge in metres of the floor each image shows, Poly
+# Haven's "dimensions" in mm (https://api.polyhaven.com/info/<id>, read 2026-10-31)
+LAMINATE_TILE_M = 1.70           # laminate_floor_02: 1700 x 1700 mm, eight planks of 21 cm across the image
+# The G1 films' floor before ground_tile_m (ground_repeat 0.5: one image per 2 / 0.5 = 4.0 m;
+# runs/readme_media/handoff/ground-scale.md, "Per film"), which the G1 Unitree page's re-render replaced
+LAMINATE_OLD_G1_TILE_M = 4.0
+
+
+def _tile(take, real_m):
+    """(the floor tile of the take's frames in metres, whether it is the texture's real size ``real_m``), the tile read
+    from the take's render logs (``doc.Take.ground_tile_m``); (None, False) when the logs do not show it, as for a
+    take rendered before ``ground_tile_m`` existed, at another tile. Notes state a floor size only from this."""
+    t = take.ground_tile_m
+    return t, t is not None and abs(t - real_m) < 1e-9
+
 
 # Unitree's unitree_rl_gym (BSD-3-Clause), fetched by scripts/fetch_unitree_rl_gym.sh at ``commit`` (main on
 # 2026-10-31) into ``root`` (git-ignored, never committed): the pretrained G1 walking policy Unitree plays in MuJoCo
@@ -47,16 +62,12 @@ UNITREE_RL_GYM = dict(
 # 36 deg vertical at 16:9 (isaaclab.sim.PinholeCameraCfg defaults / Kit's /OmniverseKit_Persp)
 KIT_FOVY_16_9 = 36.0
 
-FRANKA_POUR = FilmTask(
-    name="franka_pour",
-    adapter="metalsim.render.film.adapters:FrankaPour",
-    venv="newton152",
-    checkpoint="runs/franka_pour/logs/m414_2048_model_299.pt",
-    title="Franka-Pour",
-    summary=("A Franka Panda grasps a cup holding 735 MPM particles of granular media and pours them into a second "
-             "cup: Isaac Lab 3.0-EA's `IsaacContrib-Franka-Pour` task on metalsim (Newton 1.5.2 coupled MuJoCo Warp + "
-             "implicit MPM on Metal), driven by a policy trained here with Isaac's PPO configuration."),
-    notes="""
+
+def _franka_pour_notes(take) -> str:
+    t, real = _tile(take, LAMINATE_TILE_M)
+    floor = (f" (Poly Haven's `laminate_floor_02` at {'its real size, ' if real else ''}{t:.2f} m per image; "
+             "`ground_tile_m`) sits on\n" if t else " sits on ")
+    return f"""
 **The policy.** Trained on metalsim on the 14-inch M4 Max: 2,048 envs, 300 iterations of the task's rsl_rl PPO
 configuration (96 steps per env per iteration, MLP 512-256-128-64, learning rate 1.5e-4; 59.0 M env steps, about
 16.4 h at ~945 env-steps/s; `runs/franka_pour/logs/m414_2048_config.json`, `m414_2048_log.jsonl`). Logged training
@@ -82,10 +93,22 @@ twin is built by the same scene builder with Isaac's USD visual meshes loaded (N
 bodies matched one to one to the simulated world's; a body that has visual meshes hides its colliders. Each MPM
 particle (radius 2.5 mm) is drawn as 4 render grains (`metalsim/render/PARTICLES.md`). Lighting is a Poly Haven studio
 HDRI as an importance-sampled dome instead of Isaac's plain grey dome (it gives the metal and plastic reflections);
-the floor texture sits on Isaac's ground plane 1.05 m below the tabletop. OIDN denoiser, ACES tone map, sRGB.
+the floor texture{floor}Isaac's ground plane 1.05 m below the tabletop. OIDN denoiser, ACES tone map, sRGB.
 The tool is generic: `python -m metalsim.render.film <task>`; a task adds a `FilmTask` entry and a small recorder
 adapter (`metalsim/render/film/`).
-""",
+"""
+
+
+FRANKA_POUR = FilmTask(
+    name="franka_pour",
+    adapter="metalsim.render.film.adapters:FrankaPour",
+    venv="newton152",
+    checkpoint="runs/franka_pour/logs/m414_2048_model_299.pt",
+    title="Franka-Pour",
+    summary=("A Franka Panda grasps a cup holding 735 MPM particles of granular media and pours them into a second "
+             "cup: Isaac Lab 3.0-EA's `IsaacContrib-Franka-Pour` task on metalsim (Newton 1.5.2 coupled MuJoCo Warp + "
+             "implicit MPM on Metal), driven by a policy trained here with Isaac's PPO configuration."),
+    notes=_franka_pour_notes,
     # Isaac Lab's play-mode camera for this task (pour_env_cfg.py:821-833: NewtonRTXVisualizerCfg eye (0.9, 0.65, 0.5),
     # lookat (0.5, 0, 0.1), env frame)
     viewer=ViewerCfg(eye=(0.9, 0.65, 0.5), lookat=(0.5, 0.0, 0.1), origin_type="env", fovy=KIT_FOVY_16_9,
@@ -93,7 +116,7 @@ adapter (`metalsim/render/film/`).
     film=FilmCfg(num_envs=24, envs="auto", grid=1, seed=7, max_seconds=12.0, hold_s=1.0, passes=64, spp=4, bounces=4,
                  output_filename_prefix="franka_pour"),
     look=LookCfg(hdri="hdri/train/poly_haven_studio.hdr", hdri_yaw_deg=0.0, sun=False,
-                 ground_texture="tex/train/laminate_floor_02.png", ground_repeat=1.0,
+                 ground_texture="tex/train/laminate_floor_02.png", ground_tile_m=LAMINATE_TILE_M,
                  # Isaac's media colour (media.py: MPMGridCfg visual_color (0.85, 0.72, 0.45)) with a little spread
                  particle_palette=((0.85, 0.72, 0.45, 0.6), (0.74, 0.60, 0.36, 0.25), (0.55, 0.43, 0.27, 0.15)),
                  grains_per_particle=4, grain_scale=1.2,
@@ -171,10 +194,21 @@ mujoco_warp at `d41a47c0`, lines 43 and 142) sets `cam.azimuth = 90 + (step - ns
 so 10 deg/s.
 """
 
-G1_RENDER_NOTES = """
+
+def _g1_render_notes(take) -> str:
+    """The G1 films' "Rendering" paragraph; the floor's size as the take's render logs show it (``_tile``)."""
+    t, real = _tile(take, LAMINATE_TILE_M)
+    if t is None:
+        size = ""
+    elif real:            # the laminate image is eight planks across
+        size = (f", at its real size (Poly Haven's `laminate_floor_02`: {t:.2f} m per image,\neight {t / 8 * 100:.0f} "
+                "cm planks; `ground_tile_m`)")
+    else:
+        size = f", at {t:.2f} m per image (`ground_tile_m`; `laminate_floor_02` is {LAMINATE_TILE_M:.2f} m across)"
+    return f"""
 **Rendering.** Tier 2 (the path tracer), 64 samples per pixel (16 passes x 4), 3 bounces, Open Image Denoise, ACES
 tone map, sRGB; lit by a Poly Haven studio HDRI as an importance-sampled dome, with a laminate floor texture on the
-task's ground instead of Isaac's grey ground. The render twin is the task's own G1 model with Isaac's visual meshes
+task's ground instead of Isaac's grey ground{size}. The render twin is the task's own G1 model with Isaac's visual meshes
 (`build_g1_model(visuals=True)`), posed per frame from the recorded joint state. On bodies that have visual meshes the
 colliders are hidden (the three `*Cube` boxes, `rec.json` `twin.visibility`), and the touch-sensor sites are hidden:
 one of them, `torso_link_touch`, was the grey box of the earlier G1 film. The ray tracer's env cell is sized up front
@@ -185,20 +219,21 @@ changes a pixel, so a re-recording into the same directory re-renders rather tha
 """
 
 
-# The power state each take's stages stamped (rec.json and render.json hardware.power), quoted in its notes
-G1_FLAT_POWER = ("on battery and discharging at every stamp (66 % when the record stage wrote `rec.json` at 04:51, "
-                 "66 % at the hero shot's first frame at 04:51 and 62 % at the readme shot's at 04:53, local time), "
-                 "with pmset's power-mode setting at High Power (`powermode 2`: the configured setting, which does "
-                 "not show that the machine ran in High Power Mode); the encode and doc stages stamp nothing")
-G1_ROUGH_POWER = ("on battery and discharging at every stamp (60 % when the record stage wrote `rec.json` at 04:54, "
-                  "59 % at the hero shot's first frame at 04:58 and 52 % at the readme shot's at 05:00, local time), "
-                  "with pmset's power-mode setting at High Power (`powermode 2`: the configured setting, which does "
-                  "not show that the machine ran in High Power Mode); the encode and doc stages stamp nothing")
-
-
-def _g1_take_notes(name: str, power: str) -> str:
-    """The README WebP and the timings paragraph of one G1 take (``name``: the task and its media prefix; ``power``:
-    the power state its stages stamped, as the doc's "Power as each stage stamped it" line gives it)."""
+def _g1_take_notes(take, name: str, uncommitted: str) -> str:
+    """The README WebP and the timings paragraph of one G1 take (``name``: the task and its media prefix;
+    ``uncommitted``: what the take's uncommitted changes were). Day, machine, commit and power come from the take's
+    stage logs."""
+    this_take = take.fill(f"""
+**This take, and where its timings come from.** Recorded, rendered and encoded on {take.day} on the {take.machine},
+at metalsim {take.metalsim_at(uncommitted)}. This was not a timing run: MetalSim's timing runs are made on the 16-inch
+through the GPU queue's timing kind (`scripts/gpu_run.sh <name> timing <minutes> -- <command>`, which waits for an idle
+device), and its throughput figures are in `docs/PARITY.md` §1.4 and §1.8. The Performance table above records how
+long each stage took here; quote nothing on this page as MetalSim's speed. Power, as the stages stamped it (`pmset -g
+batt` and `pmset -g`; "Hardware and pins" below): {take.power_prose()}. Record and render ran as GPU-queue jobs of kind
+render, one at a time, into `runs/film/{name}` (the tool's default `--out`): `--stage record`, then `--stage render`
+(both shots); then `--stage encode --shots hero`, the README WebP command above and `--stage doc` (CPU). A new
+recording is another take of the same policy, not this one: the GPU rollout is not bitwise repeatable, so which env is
+filmed, and its path, can change.""")
     return f"""
 **README clip.** [{name}.webp]({name}.webp) is the `readme` shot from 0.5 s to 5.5 s (frames 25 to 274), resampled
 from 50 to 30 fps and written as MuJoCo Warp writes its README clips: 320x240 (Lanczos), lossy animated WebP from
@@ -208,18 +243,14 @@ stage: `python -m metalsim.render.film.encode webp runs/film/{name}/readme/frame
 --shots readme --webp --webp-window 0.5:5`, uses the same encoder but names its output `{name}_readme.webp` and also
 writes a `{name}_readme.mp4` and a still.
 
-**This take, and where its timings come from.** Recorded, rendered and encoded on 2026-10-31 on the 14-inch MacBook
-Pro (Mac16,6), at metalsim `ef346e7e` plus the uncommitted switch to Isaac's checkpoints (hence `+dirty` in the pins).
-This was not a timing run: MetalSim's timing runs are made on the 16-inch through the GPU queue's timing kind
-(`scripts/gpu_run.sh <name> timing <minutes> -- <command>`, which waits for an idle device), and its throughput
-figures are in `docs/PARITY.md` §1.4 and §1.8. The Performance table above records how long each stage took here;
-quote nothing on this page as MetalSim's speed. Power, as the stages stamped it (`pmset -g batt` and `pmset -g`;
-"Hardware and pins" below): {power}. Record and render ran as GPU-queue jobs of kind render, one at a time,
-into `runs/film/{name}` (the tool's default `--out`): `--stage record`, then `--stage render` (both shots); then
-`--stage encode --shots hero`, the README WebP command above and `--stage doc` (CPU). A new recording is another take
-of the same policy, not this one: the GPU rollout is not bitwise repeatable, so which env is filmed, and its path, can
-change.
+{this_take}
 """
+
+
+def _g1_notes(story: str, name: str, uncommitted: str = "the uncommitted switch to Isaac's checkpoints"):
+    """FilmTask.notes of a G1 Isaac film: its fixed ``story`` (policy, task, env, gait, camera), then the parts the
+    take's stage logs decide (``_g1_render_notes``, ``_g1_take_notes``)."""
+    return lambda take: story + _g1_render_notes(take) + _g1_take_notes(take, name, uncommitted)
 
 
 # Doc prose for the Isaac checkpoints, shared by the two G1 films
@@ -257,7 +288,7 @@ G1_FLAT = FilmTask(
              "driven by NVIDIA's published Isaac Lab 2.3 policy for the task (rsl_rl, iteration 1499, trained in "
              "PhysX), played without retraining. Rendered on the 14-inch MacBook Pro (Mac16,6), not in a timing run, so "
              "its Performance table is not a timing figure."),
-    notes="""
+    notes=_g1_notes("""
 **The policy.** NVIDIA's published Isaac Lab 2.3 checkpoint for `Isaac-Velocity-Flat-G1-v0`: rsl_rl, iteration
 1499, the last of the task's 1,500 (`assets/isaac/g1_rsl_rl_ppo_cfg.py`, `G1FlatPPORunnerCfg`), trained by NVIDIA in
 Isaac Sim with PhysX. MetalSim plays it as published, without retraining or fine-tuning. Source:
@@ -299,13 +330,13 @@ its definition; `record.GAIT_DEFINITION`). Env 3, filmed: 0.85 m/s at a commande
 second on both feet (touch-downs 3.59 / 3.79 per second, left / right); swing apex 7.1 / 7.0 cm above the stance
 height; stance slip 0.019 / 0.015 m/s; airborne 56 / 47 % of the time; 0.225 m covered per gait cycle. Medians over
 the 16 envs: 0.53 m/s (commanded 0.62), 3.91 Hz, apex 7.3 / 5.7 cm, slip 0.019 / 0.013 m/s, 0.134 m per cycle.
-""" + G1_ISAAC_GAIT_NOTE + G1_CAMERA_NOTES + G1_RENDER_NOTES + _g1_take_notes("g1_flat", G1_FLAT_POWER),
+""" + G1_ISAAC_GAIT_NOTE + G1_CAMERA_NOTES, "g1_flat"),
     viewer=G1_VIEWER,
     # 16 envs, "auto": the longest walk among envs that neither terminated nor went down (G1Flat.rank)
     film=FilmCfg(num_envs=16, envs="auto", grid=1, seed=3, max_seconds=6.0, hold_s=0.0, passes=16, spp=4, bounces=3,
                  output_filename_prefix="g1_flat"),
     look=LookCfg(hdri="hdri/train/poly_haven_studio.hdr", sun=False, ground_texture="tex/train/laminate_floor_02.png",
-                 ground_geoms=("ground", "floor", "ground_plane"), ground_repeat=0.5),
+                 ground_geoms=("ground", "floor", "ground_plane"), ground_tile_m=LAMINATE_TILE_M),
     assets=G1_ASSETS + [
         AssetRef("Policy: Isaac Lab 2.3 pretrained rsl_rl checkpoint (Isaac-Velocity-Flat-G1-v0, iteration 1499; "
                  "sha256 fdf0f242...)", "NVIDIA Isaac Lab", ISAAC_PRETRAINED["Isaac-Velocity-Flat-G1-v0"]["url"],
@@ -330,7 +361,7 @@ G1_ROUGH = FilmTask(
              "scan) on metalsim (MuJoCo Warp on Metal), driven by NVIDIA's published Isaac Lab 2.3 policy for the task "
              "(rsl_rl, iteration 2999, trained in PhysX), played without retraining. Rendered on the 14-inch MacBook "
              "Pro (Mac16,6), not in a timing run, so its Performance table is not a timing figure."),
-    notes="""
+    notes=_g1_notes("""
 **The policy.** NVIDIA's published Isaac Lab 2.3 checkpoint for `Isaac-Velocity-Rough-G1-v0`: rsl_rl, iteration
 2999, the last of the task's 3,000 (`assets/isaac/g1_rsl_rl_ppo_cfg.py`, `G1RoughPPORunnerCfg`), trained by NVIDIA in
 Isaac Sim with PhysX on Isaac's terrain curriculum. MetalSim plays it as published, without retraining or fine-tuning.
@@ -390,14 +421,14 @@ is not the cadence: read the touch-downs). Medians over the 40 envs, most of the
 **Terrain in the render.** The twin carries the task's own collision surface: its heightfield (2001 x 1201 samples
 at 0.1 m) and Isaac's 14,080 terrain boxes merged into one mesh, `terrain_boxes`, with planar UVs on each face so
 that the floor texture lies flat on treads and risers; both take the laminate texture (`ground_geoms`).
-""" + G1_CAMERA_NOTES + G1_RENDER_NOTES + _g1_take_notes("g1_rough", G1_ROUGH_POWER),
+""" + G1_CAMERA_NOTES, "g1_rough"),
     viewer=G1_VIEWER,
     # 40 envs: two per terrain type (Isaac's column assignment); "auto" films the one that climbed most without
     # terminating (G1Rough.rank)
     film=FilmCfg(num_envs=40, envs="auto", grid=1, seed=0, max_seconds=6.0, hold_s=0.0, passes=16, spp=4, bounces=3,
                  output_filename_prefix="g1_rough"),
     look=LookCfg(hdri="hdri/train/poly_haven_studio.hdr", sun=False, ground_texture="tex/train/laminate_floor_02.png",
-                 ground_geoms=("ground", "terrain_boxes"), ground_repeat=0.5),
+                 ground_geoms=("ground", "terrain_boxes"), ground_tile_m=LAMINATE_TILE_M),
     assets=G1_ASSETS + [
         AssetRef("Rough terrain: Isaac Lab 2.3.2 ROUGH_TERRAINS_CFG (10 x 20 sub-terrains of 8 m), generated from the "
                  "task seed", "Isaac Lab task config (port: metalsim.learn.isaac_terrain)",
@@ -413,11 +444,11 @@ that the floor texture lies flat on treads and risers; both take the laminate te
 
 FETCH_UNITREE = UNITREE_RL_GYM["fetch"]
 UNITREE_BLOB = f"{UNITREE_REPO}/blob/{UNITREE_COMMIT}"
-G1_UNITREE_POWER = ("on AC power and charging at every stamp (36 % when the record stage wrote `rec.json` at 13:55, 36 % at "
-                    "the hero shot's first frame at 13:55 and 37 % at the readme shot's at 13:57, local time), with "
-                    "pmset's power-mode setting at High Power (`powermode 2`: the configured setting, which does not show "
-                    "that the machine ran in High Power Mode); the encode and doc stages stamp nothing")
-G1_UNITREE_NOTES = f"""
+# The fixed part of G1_UNITREE's notes (policy, loop, sim2sim check, gait, world, camera). The sim2sim table's distances
+# are the full-precision pelvis distances of the re-run on MuJoCo Warp 8eb51fe (runs/readme_media/handoff/revalidate.md,
+# "Old against new": 1.44-1.77 um at 5 s, 3.84-4.43 um at 8 s); compare.json rounds positions to 0.1 mm, so they are
+# not in the take's files for the doc stage to read.
+G1_UNITREE_STORY = f"""
 **The policy.** Unitree's own pretrained G1 walking policy from Unitree's `unitree_rl_gym`
 (<{UNITREE_REPO}>, BSD-3-Clause, commit `{UNITREE_COMMIT}`): `deploy/pre_train/g1/motion.pt`, the file both of
 Unitree's playback scripts load, the MuJoCo sim2sim one (`deploy/deploy_mujoco/configs/g1.yaml`, `policy_path`) and the
@@ -457,8 +488,8 @@ with the same code (`record.gait_metrics`, window 1 to 8 s). Scripts and results
 
 | | Unitree's loop, CPU MuJoCo | MetalSim, MuJoCo Warp (4 worlds) |
 |---|---|---|
-| pelvis at 5 s (x, y, z) | (2.2244, -0.0988, 0.7703) m | the same to 0.1 mm; distance 1.3 to 2.2 um |
-| pelvis at 8 s | (3.6469, -0.2573, 0.7723) m | distance 2.8 to 3.7 um |
+| pelvis at 5 s (x, y, z) | (2.2244, -0.0988, 0.7703) m | the same to 0.1 mm; distance 1.4 to 1.8 um |
+| pelvis at 8 s | (3.6469, -0.2573, 0.7723) m | distance 3.8 to 4.4 um |
 | gait cycles per second (FFT of foot height), left / right | 1.251 / 1.251 | 1.251 / 1.251 |
 | touch-downs per second, left / right | 1.14 / 1.29 | 1.14 / 1.29 |
 | swing apex above stance (sole), left / right | 4.2 / 4.4 cm | 4.2 / 4.4 cm |
@@ -487,10 +518,48 @@ natural-gait preference, then the longest path): the four tie on gait, and world
 Under "What is shown", `base_z` is written only when an episode ends; with `end_frame` -1 (still walking when the
 film ends) its 0 is a placeholder (the pelvis stays near 0.77 m). Both shots film one world, the first of that list
 (`render.json` `envs`).
-""" + G1_CAMERA_NOTES + """
+""" + G1_CAMERA_NOTES
+
+
+def _g1_unitree_notes(take) -> str:
+    """G1_UNITREE's notes: the story, then rendering, README clip and this take, whose floor size, day, machine,
+    commits, fork pins and power are read from the take's stage logs (``doc.Take``)."""
+    t, real = _tile(take, LAMINATE_TILE_M)
+    if t is None:
+        size = ""
+    elif real:            # the laminate image is eight planks across
+        size = (f", at its real size (Poly Haven's `laminate_floor_02`: {t:.2f} m\nper image, eight {t / 8 * 100:.0f} "
+                "cm planks; `ground_tile_m`)")
+    else:
+        size = f", at {t:.2f} m per image (`ground_tile_m`; `laminate_floor_02` is {LAMINATE_TILE_M:.2f} m across)"
+    mjw, warp, hero_warp = take.commit("mujoco_warp", n=7), take.commit("warp"), take.commit("warp", "hero")
+    mjw = (f"on the pinned MuJoCo Warp fork commit `{mjw}`" if take.at_pin("mujoco_warp") else
+           f"on the MuJoCo Warp fork commit `{mjw}`, not its pin `{take.pin('mujoco_warp', 7)}`")
+    warp = (f"Warp itself at its pin `{warp}`" if take.at_pin("warp") else
+            f"Warp itself at `{warp}`, not its pin `{take.pin('warp')}`")
+    hero_warp = (f"`{hero_warp}`, its pin" if take.at_pin("warp", "hero") else
+                 f"`{hero_warp}`, not its pin `{take.pin('warp')}`")
+    hero = take.at("hero")
+    # the frames this re-render replaced: the G1 films' floor before ground_tile_m
+    old_floor = (f", after the film tool started laying the floor texture at its real size (`ground_tile_m`; the "
+                 f"earlier frames drew it {LAMINATE_OLD_G1_TILE_M / t:.2f} times too large, as "
+                 f"{LAMINATE_OLD_G1_TILE_M / 8 * 100:.0f} cm planks)" if real else "")
+    this_take = take.fill(f"""
+**This take, and where its timings come from.** Recorded, rendered and encoded on {take.day} on the {take.machine},
+at metalsim {take.metalsim_at("uncommitted changes")}, {mjw} ({warp}). It replaces a take recorded at 13:55 the same
+day on a stale fork checkout (`07a51a6`); the two recordings differ by at most 2 um in any body position. The frames on
+this page were rendered again on {hero[:10]} at {hero[11:16]} from that same recording (`rec.npz`, `rec.json` and
+`twin.xml` unchanged; that render ran on Warp {hero_warp}, as the render stage's pins above say){old_floor}. This was
+not a timing run: MetalSim's timing runs are made on the 16-inch through the GPU queue's timing kind, and its
+throughput figures are in `docs/PARITY.md` §1.4 and §1.8; quote nothing on this page as MetalSim's speed. Power, as
+the stages stamped it ("Hardware and pins" below): {take.power_prose("the two render stamps are the re-render's")}.
+Record and render ran as GPU-queue jobs of kind render, one at a time, into `runs/film/g1_unitree`: `--stage record`,
+then `--stage render` (both shots); later a second `--stage render` job (both shots, the real-size floor); then
+`--stage encode --shots hero`, the README WebP command above and `--stage doc` (CPU).""")
+    return G1_UNITREE_STORY + f"""
 **Rendering.** Tier 2 (the path tracer), 64 samples per pixel (16 passes x 4), 3 bounces, Open Image Denoise, ACES
 tone map, sRGB; lit by the Poly Haven studio HDRI as an importance-sampled dome, with the laminate floor texture on
-the scene's `floor` plane in place of Unitree's checker, the same look as the G1 flat film. The render twin is
+the scene's `floor` plane in place of Unitree's checker{size}, the same look as the G1 flat film. The render twin is
 Unitree's own `scene.xml` with its STL meshes, posed per frame from the recorded joint state. Unitree's model gives
 each link a visual mesh and a colliding copy; the colliding copies and the foot spheres are hidden (`rec.json`
 `twin.visibility`), and the meshes keep Unitree's two greys. The scene's own lights, sky and checker floor are
@@ -502,14 +571,9 @@ WebP from Pillow at quality 70, 33 ms per frame, looping; 150 frames. Command, r
 render stage: `python -m metalsim.render.film.encode webp runs/film/g1_unitree/readme/frames
 docs/renders/g1_unitree.webp --start 0.5 --seconds 5 --src-fps 50 --fps 30`.
 
-**This take, and where its timings come from.** Recorded, rendered and encoded on 2026-10-31 on the 14-inch MacBook
-Pro (Mac16,6), at metalsim `dfec9ebf` plus the uncommitted Unitree port (hence `+dirty` in the pins). This was not a
-timing run: MetalSim's timing runs are made on the 16-inch through the GPU queue's timing kind, and its throughput
-figures are in `docs/PARITY.md` §1.4 and §1.8; quote nothing on this page as MetalSim's speed. Power, as the stages
-stamped it ("Hardware and pins" below): """ + G1_UNITREE_POWER + """. Record and render ran as GPU-queue jobs of kind
-render, one at a time, into `runs/film/g1_unitree`: `--stage record`, then `--stage render` (both shots); then
-`--stage encode --shots hero`, the README WebP command above and `--stage doc` (CPU).
+{this_take}
 """
+
 
 G1_UNITREE = FilmTask(
     name="g1_unitree",
@@ -524,13 +588,13 @@ G1_UNITREE = FilmTask(
              "(`deploy_mujoco.py`, `configs/g1.yaml`) ported to metalsim's MuJoCo Warp on Metal, on Unitree's own G1 "
              "model and meshes. Rendered on the 14-inch MacBook Pro (Mac16,6), not in a timing run, so its "
              "Performance table is not a timing figure."),
-    notes=G1_UNITREE_NOTES,
+    notes=_g1_unitree_notes,
     viewer=G1_VIEWER,
     # 4 copies of Unitree's single start (they differ only by GPU float noise); "auto": not down, natural gait, path
     film=FilmCfg(num_envs=4, envs="auto", grid=1, seed=0, max_seconds=6.0, hold_s=0.0, passes=16, spp=4, bounces=3,
                  output_filename_prefix="g1_unitree"),
     look=LookCfg(hdri="hdri/train/poly_haven_studio.hdr", sun=False, ground_texture="tex/train/laminate_floor_02.png",
-                 ground_geoms=("floor",), ground_repeat=0.5),
+                 ground_geoms=("floor",), ground_tile_m=LAMINATE_TILE_M),
     assets=[
         AssetRef("Unitree G1, 12-dof legs model (g1_12dof.xml in scene.xml) and its STL meshes", "Unitree Robotics "
                  "unitree_rl_gym", f"{UNITREE_BLOB}/resources/robots/g1_description", "BSD-3-Clause", FETCH_UNITREE),

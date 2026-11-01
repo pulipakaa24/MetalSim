@@ -86,6 +86,66 @@ def _cfg_dict(x):
     return dataclasses.asdict(x) if dataclasses.is_dataclass(x) else dict(vars(x))
 
 
+# The ground texture's real size. With texuniform="true" MuJoCo's renderer lays one texture image per 2 / texrepeat m,
+# not per 1 / texrepeat m as its XML reference words it (material/texuniform: "repeated N times over one spatial
+# unit"), on every geom type a film textures as ground (MuJoCo 3.14.0 src/render/classic; the path tracer uses the
+# same coordinates, metalsim/render/builtin_geoms.py):
+# * infinite plane: makePlane stores u = x / 2, v = -y / 2 (render_context.c 179-224; its grid step there is one
+#   image, sX = 2 / texrepeat) and settexture scales them by texrepeat; texuniform changes nothing on an infinite
+#   axis, whose size is 0 (render_gl3.c 129-148);
+# * finite plane, box face: the face spans u = 0..1 over 2 x size (render_context.c 209-219, the box list at
+#   1059-1078), scaled by texrepeat x size (texuniform; render_gl3.c 134-141);
+# * heightfield, mesh without texcoords: object-linear s = 0.5 x texrepeat / size x size (render_gl3.c 172-199);
+# * mesh texcoords stored in that convention, (0.5 x, -0.5 y) / size (adapters.terrain_box_faces: G1 rough's
+#   terrain_boxes).
+# Spheres, cylinders, capsules and ellipsoids wrap the image around themselves instead: not a ground.
+# tests/test_film_ground_scale.py checks the period per geom type through the renderer's scene tables.
+GROUND_TEXUNIFORM_PERIOD_M = 2.0       # metres per texture image at texrepeat 1, texuniform, on the types above
+GROUND_GEOM_TYPES = ("mjGEOM_PLANE", "mjGEOM_BOX", "mjGEOM_HFIELD", "mjGEOM_MESH")
+
+
+def ground_texrepeat(tile_m) -> float:
+    """MuJoCo ``texrepeat`` of the film's ground material (texuniform) that lays one texture image per ``tile_m``
+    metres on planes, boxes, heightfields and object-linear meshes (``GROUND_TEXUNIFORM_PERIOD_M`` / ``tile_m``)."""
+    if tile_m is None or not float(tile_m) > 0:
+        raise ValueError(f"ground_tile_m must be the floor size in metres the ground texture shows (Poly Haven's "
+                         f"dimensions), got {tile_m!r}")
+    return GROUND_TEXUNIFORM_PERIOD_M / float(tile_m)
+
+
+def add_ground_material(spec, look) -> float:
+    """``look.ground_texture`` as the texuniform material ``film_ground`` on the geoms named in ``look.ground_geoms``,
+    one image per ``look.ground_tile_m`` metres (``ground_texrepeat``). Returns the texrepeat."""
+    import mujoco
+
+    rep = ground_texrepeat(look.ground_tile_m)
+    tex = spec.add_texture(name="film_ground", type=mujoco.mjtTexture.mjTEXTURE_2D,
+                           file=os.path.join(PH, look.ground_texture))
+    tex.colorspace = mujoco.mjtColorSpace.mjCOLORSPACE_SRGB
+    mat = spec.add_material(name="film_ground", texrepeat=[rep, rep], texuniform=True,
+                            rgba=[*look.ground_tint, 1.0], specular=0.3, shininess=0.2)
+    mat.roughness = 0.55
+    mat.textures[mujoco.mjtTextureRole.mjTEXROLE_RGB] = "film_ground"
+    ok = tuple(getattr(mujoco.mjtGeom, t) for t in GROUND_GEOM_TYPES)
+    for g in spec.geoms:
+        if g.name in look.ground_geoms:
+            if g.type not in ok:
+                raise ValueError(f"ground geom {g.name!r} is a {g.type}: the ground texture's scale holds on "
+                                 f"{', '.join(GROUND_GEOM_TYPES)} only")
+            g.material = "film_ground"
+    return rep
+
+
+def _key_look(look) -> dict:
+    """The look as the cache key hashes it: the ground's scale as the texrepeat it resolves to, under the field's
+    earlier name ``ground_repeat`` (1.0 without a ground texture, its old default), so a take whose floor did not
+    change keeps its key (TRON1: a 3 m tile is texrepeat 2/3 before and after ``ground_tile_m``)."""
+    d = _cfg_dict(look)
+    tile = d.pop("ground_tile_m", None)
+    d["ground_repeat"] = ground_texrepeat(tile) if d.get("ground_texture") else 1.0
+    return d
+
+
 def cache_key(rec_dir, film, look, viewer, grid, slots) -> str:
     """Key of a shot's frames: the recording (rec.npz, rec.json, twin.xml) and every setting that changes a frame's pixels
     (tier, passes, spp, bounces, denoiser, the look, the viewer with its resolution, grid, filmed slots)."""
@@ -96,7 +156,7 @@ def cache_key(rec_dir, film, look, viewer, grid, slots) -> str:
             for chunk in iter(lambda: f.read(1 << 22), b""):
                 h.update(chunk)
     settings = dict(tier=film.tier, passes=film.passes, spp=film.spp, bounces=film.bounces, denoise=film.denoise,
-                    look=_cfg_dict(look), viewer=_cfg_dict(viewer), resolution=list(viewer.resolution), grid=grid,
+                    look=_key_look(look), viewer=_cfg_dict(viewer), resolution=list(viewer.resolution), grid=grid,
                     slots=list(slots))
     h.update(json.dumps(settings, sort_keys=True, default=str).encode())
     return h.hexdigest()[:20]
@@ -171,16 +231,7 @@ def build_scene(rec_dir, rec, look, viewer):
                                  dir=[-0.4, 0.3, -0.85], diffuse=[0.9, 0.9, 0.9], castshadow=True)
     spec.worldbody.add_camera(name="film", pos=[0, 0, 1], fovy=float(viewer.fovy))
     if look.ground_texture:
-        tex = spec.add_texture(name="film_ground", type=mujoco.mjtTexture.mjTEXTURE_2D,
-                               file=os.path.join(PH, look.ground_texture))
-        tex.colorspace = mujoco.mjtColorSpace.mjCOLORSPACE_SRGB
-        mat = spec.add_material(name="film_ground", texrepeat=[look.ground_repeat, look.ground_repeat], texuniform=True,
-                                rgba=[*look.ground_tint, 1.0], specular=0.3, shininess=0.2)
-        mat.roughness = 0.55
-        mat.textures[mujoco.mjtTextureRole.mjTEXROLE_RGB] = "film_ground"
-        for g in spec.geoms:
-            if g.name in look.ground_geoms:
-                g.material = "film_ground"
+        add_ground_material(spec, look)
     for i, (pat, kw) in enumerate(look.materials.items()):
         mname = f"film_mat_{i}"
         m = spec.add_material(name=mname, rgba=list(kw.get("rgba", (0.8, 0.8, 0.8, 1.0))))
@@ -360,6 +411,8 @@ def render(task, rec_dir, out_dir, frames_arg=None, skip_existing=True, grid=Non
                     exposure=exposure, viewer=vars(viewer) if not hasattr(viewer, "__dataclass_fields__") else
                     {k_: getattr(viewer, k_) for k_ in viewer.__dataclass_fields__}, look=dict(
                         hdri=look.hdri, sun=look.sun, ground_texture=look.ground_texture,
+                        ground_tile_m=look.ground_tile_m if look.ground_texture else None,
+                        ground_texrepeat=ground_texrepeat(look.ground_tile_m) if look.ground_texture else None,
                         grains_per_particle=look.grains_per_particle, grain_radius=g_r if has_p else None),
                     particles_per_env=int(R["particles"].shape[2]), particle_radius=prad, setup_s=setup_s,
                     probe=probe, twin_geoms=len(gid), frame_corrections=len(fix),

@@ -42,6 +42,13 @@ def venv_python(name: str) -> str:
     raise FileNotFoundError(f"no {rel} under {roots}")
 
 
+def ph_splits(task) -> str:
+    """The ``scripts/fetch_polyhaven_assets.sh`` splits a task's assets name (their ``fetch`` lines; "train" if none)."""
+    tag = "fetch_polyhaven_assets.sh"
+    found = [x.fetch.split(tag, 1)[1].split() for x in task.assets if tag in (x.fetch or "")]
+    return " ".join(dict.fromkeys(s for f in found for s in f)) or "train"
+
+
 def shot_task(task, shot):
     film = replace(task.film, grid=shot.grid, passes=shot.passes or task.film.passes)
     return replace(task, film=film, viewer=shot.viewer or task.viewer)
@@ -128,7 +135,7 @@ def main(argv=None):
                     "fetch_isaac" in x.fetch for x in task.assets) else None,
                 "scripts/fetch_unitree_rl_gym.sh              # Unitree's unitree_rl_gym at a pinned commit (BSD-3)" if any(
                     "fetch_unitree" in x.fetch for x in task.assets) else None,
-                "scripts/fetch_polyhaven_assets.sh train      # CC0 HDRI and textures",
+                f"scripts/fetch_polyhaven_assets.sh {ph_splits(task):<11}# CC0 HDRI and textures",
                 f"python -m metalsim.render.film {task.name}   # record, render, encode, doc (main venv)",
                 "# or stage by stage (resumable):",
                 f"python -m metalsim.render.film {task.name} --stage record   # runs in the {VENVS[task.venv]} venv",

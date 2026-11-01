@@ -138,17 +138,19 @@ stage: `python -m metalsim.render.film.encode webp runs/film/g1_flat/readme/fram
 --shots readme --webp --webp-window 0.5:5`, uses the same encoder but names its output `g1_flat_readme.webp` and also
 writes a `g1_flat_readme.mp4` and a still.
 
-**This take, and where its timings come from.** Recorded, rendered and encoded on 2026-10-31 on the 14-inch MacBook
-Pro (Mac16,6), at metalsim `ef346e7e` plus the uncommitted switch to Isaac's checkpoints (hence `+dirty` in the pins).
-This was not a timing run: MetalSim's timing runs are made on the 16-inch through the GPU queue's timing kind
-(`scripts/gpu_run.sh <name> timing <minutes> -- <command>`, which waits for an idle device), and its throughput
-figures are in `docs/PARITY.md` §1.4 and §1.8. The Performance table above records how long each stage took here;
-quote nothing on this page as MetalSim's speed. Power, as the stages stamped it (`pmset -g batt` and `pmset -g`;
-"Hardware and pins" below): on battery and discharging at every stamp (66 % when the record stage wrote `rec.json` at 04:51, 66 % at the hero shot's first frame at 04:51 and 62 % at the readme shot's at 04:53, local time), with pmset's power-mode setting at High Power (`powermode 2`: the configured setting, which does not show that the machine ran in High Power Mode); the encode and doc stages stamp nothing. Record and render ran as GPU-queue jobs of kind render, one at a time,
-into `runs/film/g1_flat` (the tool's default `--out`): `--stage record`, then `--stage render` (both shots); then
-`--stage encode --shots hero`, the README WebP command above and `--stage doc` (CPU). A new recording is another take
-of the same policy, not this one: the GPU rollout is not bitwise repeatable, so which env is filmed, and its path, can
-change.
+**This take, and where its timings come from.** Recorded, rendered and encoded on 2026-10-31 on the 14-inch MacBook Pro
+(Mac16,6), at metalsim `ef346e7e` plus the uncommitted switch to Isaac's checkpoints (hence `+dirty` in the pins). This
+was not a timing run: MetalSim's timing runs are made on the 16-inch through the GPU queue's timing kind
+(`scripts/gpu_run.sh <name> timing <minutes> -- <command>`, which waits for an idle device), and its throughput figures
+are in `docs/PARITY.md` §1.4 and §1.8. The Performance table above records how long each stage took here; quote nothing
+on this page as MetalSim's speed. Power, as the stages stamped it (`pmset -g batt` and `pmset -g`; "Hardware and pins"
+below): on battery and discharging at every stamp (66 % when the record stage wrote `rec.json` at 04:51, 66 % at the
+hero shot's first frame at 04:51 and 62 % at the readme shot's at 04:53, local time), with pmset's power-mode setting at
+High Power (`powermode 2`: the configured setting, which does not show that the machine ran in High Power Mode); the
+encode and doc stages stamp nothing. Record and render ran as GPU-queue jobs of kind render, one at a time, into
+`runs/film/g1_flat` (the tool's default `--out`): `--stage record`, then `--stage render` (both shots); then `--stage
+encode --shots hero`, the README WebP command above and `--stage doc` (CPU). A new recording is another take of the same
+policy, not this one: the GPU rollout is not bitwise repeatable, so which env is filmed, and its path, can change.
 
 ## Reproduce
 
