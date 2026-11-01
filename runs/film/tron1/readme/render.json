@@ -5,7 +5,7 @@
   0
  ],
  "envs": [
-  8
+  9
  ],
  "frames": 351,
  "fps": 50.0,
@@ -21,7 +21,7 @@
  "samples_per_pixel": 64,
  "bounces": 3,
  "denoise": "oidn",
- "exposure": 1.4,
+ "exposure": 0.9,
  "viewer": {
   "eye": [
    1.49,
@@ -49,36 +49,38 @@
   "hdri": "hdri/heldout/machine_shop_02.hdr",
   "sun": false,
   "ground_texture": "tex/heldout/concrete_floor_worn_001.png",
+  "ground_tile_m": 3.0,
+  "ground_texrepeat": 0.6666666666666666,
   "grains_per_particle": 4,
   "grain_radius": null
  },
  "particles_per_env": 0,
  "particle_radius": 0.0,
- "setup_s": 0.9234074169999076,
+ "setup_s": 0.7197776250031893,
  "probe": {
   "frame": 0,
-  "warmup_s": 0.13254729099935503,
-  "one_pass_s": 0.021379334000812378,
-  "full_s": 0.09189474999948288,
-  "per_pass_s": 0.0047010277332447
+  "warmup_s": 0.09866979200160131,
+  "one_pass_s": 0.019463374999759253,
+  "full_s": 0.08583379199990304,
+  "per_pass_s": 0.004424694466676252
  },
  "twin_geoms": 21,
  "frame_corrections": 4,
  "env_grid": {
-  "margin": 6.672899153702338,
+  "margin": 6.908862498276313,
   "cell": [
-   13.879010979838213,
-   13.824528322549897,
-   14.46688127364292
+   14.350937668986163,
+   14.296455011697846,
+   14.93880796279087
   ],
   "growths": 0
  },
- "cache_key": "f43293eac6050257a3fe",
+ "cache_key": "3ee0a1b38f366ebbe1c6",
  "software": {
-  "metalsim": "ed66d8ef3e+dirty",
+  "metalsim": "68f695b29f+dirty",
   "warp": {
    "version": "1.18.0.dev20260917",
-   "git": "4127c48183",
+   "git": "52c09cdd82",
    "checkout": "upstream/warp-metalsim"
   },
   "mujoco": {
@@ -92,12 +94,12 @@
   "machine": "arm64",
   "python": "3.13.7",
   "power": {
-   "source": "Battery Power",
-   "battery_percent": 66,
-   "battery_state": "discharging",
+   "source": "AC Power",
+   "battery_percent": 100,
+   "battery_state": "finishing charge",
    "mode": "High Power",
    "mode_setting": "powermode 2",
-   "at": "2026-10-31T16:07:41-0700"
+   "at": "2026-11-01T00:44:10-0700"
   },
   "model": "Mac16,6",
   "cpu": "Apple M4 Max",

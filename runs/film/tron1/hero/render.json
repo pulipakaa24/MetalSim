@@ -5,7 +5,7 @@
   0
  ],
  "envs": [
-  8
+  9
  ],
  "frames": 351,
  "fps": 50.0,
@@ -21,7 +21,7 @@
  "samples_per_pixel": 64,
  "bounces": 3,
  "denoise": "oidn",
- "exposure": 1.4,
+ "exposure": 0.9,
  "viewer": {
   "eye": [
    1.99,
@@ -49,36 +49,38 @@
   "hdri": "hdri/heldout/machine_shop_02.hdr",
   "sun": false,
   "ground_texture": "tex/heldout/concrete_floor_worn_001.png",
+  "ground_tile_m": 3.0,
+  "ground_texrepeat": 0.6666666666666666,
   "grains_per_particle": 4,
   "grain_radius": null
  },
  "particles_per_env": 0,
  "particle_radius": 0.0,
- "setup_s": 1.016023292000682,
+ "setup_s": 0.9194563749988447,
  "probe": {
   "frame": 0,
-  "warmup_s": 0.15665974999865284,
-  "one_pass_s": 0.050882542000181274,
-  "full_s": 0.18038974999944912,
-  "per_pass_s": 0.008633813866617856
+  "warmup_s": 0.1362192079977831,
+  "one_pass_s": 0.05128654100553831,
+  "full_s": 0.1848342910016072,
+  "per_pass_s": 0.008903183333071258
  },
  "twin_geoms": 21,
  "frame_corrections": 4,
  "env_grid": {
-  "margin": 6.892600258113737,
+  "margin": 7.129487764531742,
   "cell": [
-   14.318413188661012,
-   14.263930531372695,
-   14.906283482465719
+   14.792188201497021,
+   14.737705544208707,
+   15.38005849530173
   ],
   "growths": 0
  },
- "cache_key": "e380feb638b0e45fd9f2",
+ "cache_key": "e334149b722508c27f16",
  "software": {
-  "metalsim": "ed66d8ef3e+dirty",
+  "metalsim": "68f695b29f+dirty",
   "warp": {
    "version": "1.18.0.dev20260917",
-   "git": "4127c48183",
+   "git": "52c09cdd82",
    "checkout": "upstream/warp-metalsim"
   },
   "mujoco": {
@@ -92,12 +94,12 @@
   "machine": "arm64",
   "python": "3.13.7",
   "power": {
-   "source": "Battery Power",
-   "battery_percent": 69,
-   "battery_state": "discharging",
+   "source": "AC Power",
+   "battery_percent": 100,
+   "battery_state": "finishing charge",
    "mode": "High Power",
    "mode_setting": "powermode 2",
-   "at": "2026-10-31T16:05:17-0700"
+   "at": "2026-11-01T00:42:16-0700"
   },
   "model": "Mac16,6",
   "cpu": "Apple M4 Max",

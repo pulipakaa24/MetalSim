@@ -13,8 +13,14 @@ Policy at 50 Hz (every 10th call of a 500 Hz loop); legs `q = 0.25 a` with Kp 42
 80 N m torque-bound action clip; wheels velocity `0.8 a` via Kd 0.8 with the 40 N m bound.
 
 Differences from the deploy script, on purpose: velocity commands are scaled as in training (see
-CMD_SCALE), and the 1 s stand-up blend is skipped because the sim starts the robot standing in the
-policy's default pose.
+CMD_SCALE), and the deploy script's stand mode (`handle_stand_mode`: leg targets blended toward a
+fixed pose before the policy takes over) is skipped, so the policy runs from the first call.
+
+`initial_q` (q = 0: LimX's `default_joint_angle`, the policy's action offset) is straight legs, not
+a standing pose. Reset there (`Tron1Sim.reset(initial_q())`), the base starts about 0.91 m up; the
+policy drops it to about 0.68 m within 0.26 s, then rocks for seconds before it settles near its own
+stance, about 0.77 m (nominal realism, medians of 16 seeds). Run it at zero command first when a
+settled start matters (the TRON1 film stands each robot for 3 s).
 """
 from __future__ import annotations
 
