@@ -1,0 +1,147 @@
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     ~/Library/Caches/warp/1.18.0.dev20260917
+[render] so101_lift_smooth: 300 frames, 1x1 panels of 1280x720, 16 x 4 spp, 55 twin geoms (1 frame corrections), particles/env 0, env cell [3.4, 3.0, 4.0] m (margin 1.13 m), setup 0.8 s, cache key 6252478899da06005346
+[render] automatic exposure 0.6094
+[render] frame 0/300: 0.30 s (render 0.20 s)
+[render] frame 15/300: 0.27 s (render 0.21 s)
+[render] frame 30/300: 0.27 s (render 0.21 s)
+[render] frame 45/300: 0.27 s (render 0.21 s)
+[render] frame 60/300: 0.27 s (render 0.21 s)
+[render] frame 75/300: 0.27 s (render 0.21 s)
+[render] frame 90/300: 0.27 s (render 0.21 s)
+[render] frame 105/300: 0.26 s (render 0.20 s)
+[render] frame 120/300: 0.27 s (render 0.21 s)
+[render] frame 135/300: 0.27 s (render 0.20 s)
+[render] frame 150/300: 0.27 s (render 0.20 s)
+[render] frame 165/300: 0.27 s (render 0.20 s)
+[render] frame 180/300: 0.27 s (render 0.21 s)
+[render] frame 195/300: 0.27 s (render 0.21 s)
+[render] frame 210/300: 0.27 s (render 0.21 s)
+[render] frame 225/300: 0.27 s (render 0.21 s)
+[render] frame 240/300: 0.27 s (render 0.20 s)
+[render] frame 255/300: 0.27 s (render 0.20 s)
+[render] frame 270/300: 0.28 s (render 0.21 s)
+[render] frame 285/300: 0.27 s (render 0.20 s)
+[render] done: 300 frames rendered -> runs/film/so101_lift_smooth/hero
+[render] so101_lift_smooth: 300 frames, 1x1 panels of 640x480, 16 x 4 spp, 55 twin geoms (1 frame corrections), particles/env 0, env cell [3.4, 3.0, 4.0] m (margin 1.13 m), setup 0.7 s, cache key b193631d75b1a3dcc902
+[render] automatic exposure 0.6742
+[render] frame 0/300: 0.11 s (render 0.09 s)
+[render] frame 15/300: 0.13 s (render 0.10 s)
+[render] frame 30/300: 0.12 s (render 0.10 s)
+[render] frame 45/300: 0.13 s (render 0.10 s)
+[render] frame 60/300: 0.12 s (render 0.10 s)
+[render] frame 75/300: 0.12 s (render 0.10 s)
+[render] frame 90/300: 0.12 s (render 0.10 s)
+[render] frame 105/300: 0.12 s (render 0.10 s)
+[render] frame 120/300: 0.12 s (render 0.10 s)
+[render] frame 135/300: 0.12 s (render 0.10 s)
+[render] frame 150/300: 0.12 s (render 0.10 s)
+[render] frame 165/300: 0.12 s (render 0.10 s)
+[render] frame 180/300: 0.12 s (render 0.10 s)
+[render] frame 195/300: 0.12 s (render 0.10 s)
+[render] frame 210/300: 0.12 s (render 0.10 s)
+[render] frame 225/300: 0.12 s (render 0.10 s)
+[render] frame 240/300: 0.12 s (render 0.10 s)
+[render] frame 255/300: 0.12 s (render 0.09 s)
+[render] frame 270/300: 0.12 s (render 0.10 s)
+[render] frame 285/300: 0.12 s (render 0.10 s)
+[render] done: 300 frames rendered -> runs/film/so101_lift_smooth/readme
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     ~/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth d0e6c82 load on device 'metal:0' took 28.19 ms  (cached)
+Module _nxn_broadphase__locals__kernel_3582bd6f 3582bd6 load on device 'metal:0' took 18.20 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_b3676d17 b3676d1 load on device 'metal:0' took 25.41 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_d21969d4 d21969d load on device 'metal:0' took 26.79 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_5ba5212b 5ba5212 load on device 'metal:0' took 21.80 ms  (cached)
+Module mujoco_warp._src.constraint f5f4518 load on device 'metal:0' took 15.69 ms  (cached)
+Module _friction_dof__locals__kernel_0bb9a331 0bb9a33 load on device 'metal:0' took 15.62 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_914cb5e1 914cb5e load on device 'metal:0' took 15.61 ms  (cached)
+Module _efc_contact_init__locals__kernel_7bf04e1f 7bf04e1 load on device 'metal:0' took 15.25 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_1364491d 6a9b106 load on device 'metal:0' took 15.31 ms  (cached)
+Module _efc_contact_update__locals__kernel_a5cf4f2b a5cf4f2 load on device 'metal:0' took 17.05 ms  (cached)
+Module mujoco_warp._src.forward d8b3582 load on device 'metal:0' took 22.14 ms  (cached)
+Module mujoco_warp._src.passive 9e93f67 load on device 'metal:0' took 20.57 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_8ed29e9b 8ed29e9 load on device 'metal:0' took 15.68 ms  (cached)
+Module mujoco_warp._src.forward 2b3c9a0 load on device 'metal:0' took 21.86 ms  (cached)
+Module _qfrc_smooth__locals__kernel_08dfc9ad 08dfc9a load on device 'metal:0' took 15.85 ms  (cached)
+Module mujoco_warp._src.support 040f2c5 load on device 'metal:0' took 16.05 ms  (cached)
+Module _small_cholesky_factorize_solve_block__locals__kernel_58a45453 5174c95 load on device 'metal:0' took 16.84 ms  (cached)
+Module _solve_init_dof__locals__kernel_72ef2137 72ef213 load on device 'metal:0' took 15.67 ms  (cached)
+Module _solve_init_efc__locals__kernel_bdeaa14b bdeaa14 load on device 'metal:0' took 15.27 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_0fd85089 0fd8508 load on device 'metal:0' took 15.67 ms  (cached)
+Module mul_m_kernel__locals___mul_m_505d9f1c 505d9f1 load on device 'metal:0' took 15.93 ms  (cached)
+Module _update_constraint_efc__locals__kernel_1994cb68 1994cb6 load on device 'metal:0' took 15.97 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_6f502a20 6f502a2 load on device 'metal:0' took 15.63 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_86f1e084 86f1e08 load on device 'metal:0' took 15.55 ms  (cached)
+Module _update_gradient_grad__locals__kernel_e5baa4a1 e5baa4a load on device 'metal:0' took 15.37 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_23026ac6 0821a2d load on device 'metal:0' took 15.82 ms  (cached)
+Module mujoco_warp._src.solver a260d3b load on device 'metal:0' took 17.67 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_64ccf1d1 3ab6b91 load on device 'metal:0' took 15.50 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_5ef17fd0 f507482 load on device 'metal:0' took 18.35 ms  (cached)
+Module _update_constraint_gradient_fused__locals__kernel_8a519169 0d7000b load on device 'metal:0' took 16.91 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_f0a97446 26648ef load on device 'metal:0' took 16.02 ms  (cached)
+Module _solve_done__locals__kernel_58601440 5860144 load on device 'metal:0' took 15.71 ms  (cached)
+Module mujoco_warp._src.derivative 356952f load on device 'metal:0' took 18.41 ms  (cached)
+Module _next_time_builder__locals___next_time_bd97507a bd97507 load on device 'metal:0' took 15.62 ms  (cached)
+Module metalsim.physics.batch 0febfdf load on device 'metal:0' took 15.61 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_f05e0f72 f05e0f7 load on device 'metal:0' took 15.34 ms  (cached)
+Module reset_data__locals__reset_M_debb12fa debb12f load on device 'metal:0' took 15.14 ms  (cached)
+Module reset_data__locals__reset_mocap_d5f6a172 d5f6a17 load on device 'metal:0' took 15.12 ms  (cached)
+Module reset_data__locals__reset_contact_10be067b 10be067 load on device 'metal:0' took 15.19 ms  (cached)
+Module reset_data__locals__reset_sleep_4c0bb4a4 4c0bb4a load on device 'metal:0' took 15.05 ms  (cached)
+Module reset_data__locals__reset_nworld_f0ec89aa f0ec89a load on device 'metal:0' took 15.22 ms  (cached)
+[record] so101_lift_smooth: 16 envs, up to 301 frames at 50.0 fps
+[record] frame 1/301: 14 ms, episodes ended 0/16 (0 by termination)
+[record] frame 31/301: 8 ms, episodes ended 0/16 (0 by termination)
+[record] frame 61/301: 8 ms, episodes ended 0/16 (0 by termination)
+[record] frame 91/301: 8 ms, episodes ended 0/16 (0 by termination)
+[record] frame 121/301: 7 ms, episodes ended 0/16 (0 by termination)
+[record] frame 151/301: 7 ms, episodes ended 0/16 (0 by termination)
+[record] frame 181/301: 7 ms, episodes ended 0/16 (0 by termination)
+[record] frame 211/301: 8 ms, episodes ended 0/16 (0 by termination)
+[record] frame 241/301: 8 ms, episodes ended 0/16 (0 by termination)
+[record] frame 271/301: 8 ms, episodes ended 0/16 (0 by termination)
+[record] first episodes, seed:success[@time to lift]/max height/RMS joint acc rad/s^2: 10000:S@0.88s/0.196m/35.2 10001:S@1.98s/0.206m/38.0 10002:S@0.76s/0.207m/33.6 10003:S@1.16s/0.200m/35.8 10004:S@0.86s/0.221m/35.3 10005:S@1.04s/0.223m/28.9 10006:S@2.20s/0.208m/39.1 10007:S@0.96s/0.202m/34.6 10008:S@0.86s/0.209m/28.8 10009:S@0.94s/0.188m/41.1 10010:S@1.00s/0.195m/35.2 10011:S@1.54s/0.193m/36.0 10012:S@0.86s/0.203m/43.7 10013:S@1.16s/0.212m/36.4 10014:S@1.38s/0.197m/41.1 10015:S@0.82s/0.200m/34.9
+[record] first episodes ended by termination: 0/16
+[record] filmed envs [13] (ends [299])
+[record] done: 300 frames, sim 8 ms/frame mean, twin 55 geoms, wall 5 s -> runs/readme_media/scratch/so101-smooth/take_w13/rec
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     ~/Library/Caches/warp/1.18.0.dev20260917
+[render] so101_lift_smooth: 300 frames, 1x1 panels of 640x480, 16 x 4 spp, 55 twin geoms (1 frame corrections), particles/env 0, env cell [3.4, 3.0, 4.0] m (margin 1.13 m), setup 0.8 s, cache key 80a72450b916b631eb83
+[render] automatic exposure 0.6628
+[render] frame 0/300: 0.14 s (render 0.09 s)
+[render] frame 15/300: 0.13 s (render 0.10 s)
+[render] frame 30/300: 0.13 s (render 0.11 s)
+[render] frame 45/300: 0.14 s (render 0.12 s)
+[render] frame 60/300: 0.13 s (render 0.10 s)
+[render] frame 75/300: 0.12 s (render 0.10 s)
+[render] frame 90/300: 0.12 s (render 0.10 s)
+[render] frame 105/300: 0.12 s (render 0.10 s)
+[render] frame 120/300: 0.13 s (render 0.10 s)
+[render] frame 135/300: 0.12 s (render 0.10 s)
+[render] frame 150/300: 0.12 s (render 0.10 s)
+[render] frame 165/300: 0.12 s (render 0.10 s)
+[render] frame 180/300: 0.12 s (render 0.10 s)
+[render] frame 195/300: 0.12 s (render 0.09 s)
+[render] frame 210/300: 0.12 s (render 0.10 s)
+[render] frame 225/300: 0.12 s (render 0.10 s)
+[render] frame 240/300: 0.12 s (render 0.10 s)
+[render] frame 255/300: 0.12 s (render 0.10 s)
+[render] frame 270/300: 0.12 s (render 0.10 s)
+[render] frame 285/300: 0.12 s (render 0.10 s)
+[render] done: 300 frames rendered -> runs/readme_media/scratch/so101-smooth/take_w13/readme

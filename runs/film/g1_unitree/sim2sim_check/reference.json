@@ -1,0 +1,124 @@
+{
+ "source": "unitree_rl_gym deploy_mujoco.py loop, CPU MuJoCo 3.14.0",
+ "seconds": 8.0,
+ "sim_dt": 0.002,
+ "decimation": 10,
+ "cmd": [
+  0.5,
+  0.0,
+  0.0
+ ],
+ "base_at": {
+  "1s": [
+   0.33311,
+   0.00477,
+   0.77089
+  ],
+  "2s": [
+   0.80373,
+   -0.02201,
+   0.76754
+  ],
+  "3s": [
+   1.27924,
+   -0.0568,
+   0.77061
+  ],
+  "4s": [
+   1.75553,
+   -0.07339,
+   0.77226
+  ],
+  "5s": [
+   2.22441,
+   -0.09875,
+   0.77027
+  ],
+  "6s": [
+   2.70065,
+   -0.15495,
+   0.76765
+  ],
+  "7s": [
+   3.17204,
+   -0.21475,
+   0.77066
+  ],
+  "8s": [
+   3.64685,
+   -0.25725,
+   0.77227
+  ]
+ },
+ "mean_base_z": 0.7698426417995587,
+ "ankle_origin_swing_p95_m": [
+  0.07695997246963737,
+  0.08103230231689915
+ ],
+ "gait": {
+  "definition": "Per env and foot over its window (from 1 s to the first episode's end or the clip's end). Foot: the centre of the foot collider (adapter's feet), its height taken above the task's collision surface (adapter.ground_height; 0 on flat ground): the highest surface point under the foot's footprint (adapter's feet_footprint: its bounding-box corners; else straight below the centre), so a foot standing across a step edge is on the upper tread. cadence_hz: peak of the Hann-windowed FFT of the mean-removed foot height (zero-padded to >= 16x, searched in 0.5-10 Hz), i.e. gait cycles per second of that foot. apex_m: 95th percentile of the foot height above its stance height (median height while in contact). slip_mps: median horizontal speed of the foot between consecutive frames that are both in contact. air_frac: fraction of frames not in contact. touchdowns_hz: contact onsets after at least 2 frames in the air, per second (a terrain-independent cross-check of the cadence; needs feet_contact). Contact: the adapter's feet_contact (the task's touch sensor > 1 N), else within 15 mm of the window's lowest height. speed_mps: pelvis horizontal path / window time; stride_m: speed / mean cadence (ground covered per gait cycle). Summary: medians over envs whose first episode did not terminate and that walk (speed >= 0.15 m/s).",
+  "t0_s": 1.0,
+  "contact": "adapter feet_contact",
+  "per_env": {
+   "0": {
+    "window_s": [
+     1.0,
+     8.0
+    ],
+    "cadence_hz": [
+     1.251,
+     1.251
+    ],
+    "apex_m": [
+     0.0417,
+     0.0438
+    ],
+    "slip_mps": [
+     0.0037,
+     0.0036
+    ],
+    "air_frac": [
+     0.46,
+     0.437
+    ],
+    "touchdowns_hz": [
+     1.143,
+     1.286
+    ],
+    "speed_mps": 0.48,
+    "stride_m": 0.3837,
+    "cmd_speed_mps": 0.5,
+    "cmd_yaw_rate": 0.0,
+    "terminated": false
+   }
+  },
+  "summary": {
+   "envs": 1,
+   "envs_standing": 0,
+   "envs_terminated": 0,
+   "cadence_hz": [
+    1.251,
+    1.251
+   ],
+   "touchdowns_hz": [
+    1.143,
+    1.286
+   ],
+   "apex_m": [
+    0.0417,
+    0.0438
+   ],
+   "slip_mps": [
+    0.0037,
+    0.0036
+   ],
+   "air_frac": [
+    0.46,
+    0.437
+   ],
+   "speed_mps": 0.48,
+   "stride_m": 0.3837,
+   "cmd_speed_mps": 0.5
+  }
+ }
+}

@@ -447,7 +447,7 @@ def record(task, film, viewer, out_dir: str, checkpoint: str | None, n_keep: int
         pub = ck_prov.get("published_sha256")
         if pub and ck_prov.get("sha256") and pub != ck_prov["sha256"]:
             raise ValueError(f"{ck_prov['path']}: sha256 {ck_prov['sha256']} is not the published {pub} "
-                             f"(re-run scripts/fetch_isaac_assets.sh)")
+                             f"(re-run {ck_prov.get('fetch') or 'scripts/fetch_isaac_assets.sh'})")
     fps = film.fps or 1.0 / adapter.frame_dt
     if abs(fps * adapter.frame_dt - 1.0) > 1e-6:
         raise ValueError("the recorder films one frame per policy step: fps must be 1 / step_dt")
@@ -495,7 +495,8 @@ def record(task, film, viewer, out_dir: str, checkpoint: str | None, n_keep: int
         import inspect
         rk = dict(gait=gait) if "gait" in inspect.signature(adapter.rank).parameters else {}
         ranked = [int(e) for e in adapter.rank({k: v for k, v in first.items()}, **rk)]
-        ranked = [e for e in ranked if not term[e]] + [e for e in ranked if term[e]]    # stable: terminated last
+        if not getattr(adapter, "rank_keeps_terminated", False):     # (an adapter that films the typical outcome,
+            ranked = [e for e in ranked if not term[e]] + [e for e in ranked if term[e]]   # a fall, opts out) terminated last
         g2 = film.grid ** 2             # the slots the render stage films by default; the rest are spares
         envs = ranked[:g2] + [e for e in ranked[g2:max(n_keep, g2)] if not term[e]]
     print(f"[record] filmed envs {envs} (ends {[int(ends[e]) for e in envs]})", flush=True)

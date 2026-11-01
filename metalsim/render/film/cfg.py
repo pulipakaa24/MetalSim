@@ -41,17 +41,19 @@ class ViewerCfg:
 class LookCfg:
     """Offline-render look. ``hdri``: path relative to the Poly Haven root (``POLYHAVEN`` or assets/polyhaven);
     ``sun``: split the HDRI's sun into an analytic sun disk (outdoor maps; ``metalsim.render.hdr.extract_sun``);
-    ``ground_texture``: Poly Haven texture for the geoms named in ``ground_geoms`` (texrepeat ``ground_repeat`` per m);
-    ``particle_palette``: (r, g, b, weight) linear colours of the render grains; ``materials``: {geom-name regex:
-    dict(rgba, roughness, metallic, specular)} overrides; ``exposure``: linear exposure (0 = automatic from the first
-    frame: median luminance to 0.2 before ACES)."""
+    ``ground_texture``: Poly Haven texture for the geoms named in ``ground_geoms``, laid at its real size:
+    ``ground_tile_m`` is the edge in metres of the floor the texture image shows (Poly Haven's ``dimensions``,
+    ``https://api.polyhaven.com/info/<id>``), required with a texture; the render stage converts it to MuJoCo's
+    ``texrepeat`` (``render.ground_texrepeat``); ``particle_palette``: (r, g, b, weight) linear colours of the render
+    grains; ``materials``: {geom-name regex: dict(rgba, roughness, metallic, specular)} overrides; ``exposure``: linear
+    exposure (0 = automatic from the first frame: median luminance to 0.2 before ACES)."""
 
     hdri: str | None = "hdri/train/poly_haven_studio.hdr"
     hdri_yaw_deg: float = 0.0
     sun: bool = False
     ground_texture: str | None = None
     ground_geoms: tuple = ("ground_plane", "ground", "floor")
-    ground_repeat: float = 1.0
+    ground_tile_m: float | None = None
     ground_tint: tuple = (1.0, 1.0, 1.0)
     particle_palette: tuple = ((0.60, 0.49, 0.35, 0.74), (0.76, 0.68, 0.55, 0.14), (0.40, 0.30, 0.21, 0.08),
                                (0.14, 0.13, 0.12, 0.04))
@@ -70,7 +72,9 @@ class FilmCfg:
     last frame of a finished episode is held; ``tier``: 2 = path tracer (Tier2Renderer), 0 = raster (Tier0Renderer);
     ``passes`` x ``spp`` samples per pixel (tier 2), ``bounces``, ``denoise`` ("oidn" or None). ``allow_early_end``:
     film an env whose first episode ends by a termination (an adapter's ``info["terminated"]``: a fall, not a time-out
-    or a success); by default the record stage refuses such a film."""
+    or a success); by default the record stage refuses such a film. ``after_end``: what the render shows after a
+    filmed episode's end: "hold" (its last frame, for ``hold_s``) or "play" (the recorded simulation goes on to the
+    end of the recording: for adapters that keep simulating an ended env, e.g. Unitree's playback after a fall)."""
 
     num_envs: int = 4
     envs: object = "auto"
@@ -89,6 +93,7 @@ class FilmCfg:
     stills: tuple = (0.25, 0.5, 0.8)
     output_filename_prefix: str = "film"
     allow_early_end: bool = False
+    after_end: str = "hold"
 
 
 @dataclass

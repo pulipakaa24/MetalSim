@@ -46,6 +46,8 @@ runs/rigid_perf/**/*.npz
 
 # Poly Haven CC0 HDRIs and textures are fetched, not committed (scripts/fetch_polyhaven_assets.sh)
 assets/polyhaven/
+# Unitree's unitree_rl_gym (BSD-3-Clause) is fetched at a pinned commit, not committed (scripts/fetch_unitree_rl_gym.sh)
+assets/unitree_rl_gym/
 
 # public 3D Gaussian splat scenes are fetched, not committed (scripts/fetch_splat_scenes.sh; InteriorGS forbids redistribution)
 assets/splats/

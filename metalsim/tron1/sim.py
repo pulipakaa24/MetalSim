@@ -77,6 +77,11 @@ def quat_to_mat(q):
 
 def build_model(params: SimParams, terrain=None) -> mujoco.MjModel:
     """LimX's WF_TRON1A model with the body/ground/joint parts of `params` applied."""
+    return build_spec(params, terrain).compile()
+
+
+def build_spec(params: SimParams, terrain=None) -> mujoco.MjSpec:
+    """The uncompiled `build_model` (e.g. for a render twin of the simulated model)."""
     spec = mujoco.MjSpec.from_file(str(WF_XML))
     spec.option.timestep = PHYS_DT_US * 1e-6
     base = spec.body("base_Link")
@@ -131,7 +136,7 @@ def build_model(params: SimParams, terrain=None) -> mujoco.MjModel:
             g.size = [LIMX_CYLINDER_RADIUS, params.tyre_half_width, 0.0]
     if terrain is not None:
         terrain.attach(spec)
-    return spec.compile()
+    return spec
 
 
 @dataclass

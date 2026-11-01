@@ -86,9 +86,113 @@ def _cfg_dict(x):
     return dataclasses.asdict(x) if dataclasses.is_dataclass(x) else dict(vars(x))
 
 
+# The ground texture's real size. With texuniform="true" MuJoCo's renderer lays one texture image per 2 / texrepeat m,
+# not per 1 / texrepeat m as its XML reference words it (material/texuniform: "repeated N times over one spatial
+# unit"), on every geom type a film textures as ground (MuJoCo 3.14.0 src/render/classic; the path tracer uses the
+# same coordinates, metalsim/render/builtin_geoms.py):
+# * infinite plane: makePlane stores u = x / 2, v = -y / 2 (render_context.c 179-224; its grid step there is one
+#   image, sX = 2 / texrepeat) and settexture scales them by texrepeat; texuniform changes nothing on an infinite
+#   axis, whose size is 0 (render_gl3.c 129-148);
+# * finite plane, box face: the face spans u = 0..1 over 2 x size (render_context.c 209-219, the box list at
+#   1059-1078), scaled by texrepeat x size (texuniform; render_gl3.c 134-141);
+# * heightfield, mesh without texcoords: object-linear s = 0.5 x texrepeat / size x size (render_gl3.c 172-199);
+# * mesh texcoords stored in that convention, (0.5 x, -0.5 y) / size (adapters.terrain_box_faces: G1 rough's
+#   terrain_boxes).
+# Spheres, cylinders, capsules and ellipsoids wrap the image around themselves instead: not a ground.
+# tests/test_film_ground_scale.py checks the period per geom type through the renderer's scene tables.
+GROUND_TEXUNIFORM_PERIOD_M = 2.0       # metres per texture image at texrepeat 1, texuniform, on the types above
+GROUND_GEOM_TYPES = ("mjGEOM_PLANE", "mjGEOM_BOX", "mjGEOM_HFIELD", "mjGEOM_MESH")
+
+
+def ground_texrepeat(tile_m) -> float:
+    """MuJoCo ``texrepeat`` of the film's ground material (texuniform) that lays one texture image per ``tile_m``
+    metres on planes, boxes, heightfields and object-linear meshes (``GROUND_TEXUNIFORM_PERIOD_M`` / ``tile_m``)."""
+    if tile_m is None or not float(tile_m) > 0:
+        raise ValueError(f"ground_tile_m must be the floor size in metres the ground texture shows (Poly Haven's "
+                         f"dimensions), got {tile_m!r}")
+    return GROUND_TEXUNIFORM_PERIOD_M / float(tile_m)
+
+
+def add_ground_material(spec, look) -> float:
+    """``look.ground_texture`` as the texuniform material ``film_ground`` on the geoms named in ``look.ground_geoms``,
+    one image per ``look.ground_tile_m`` metres (``ground_texrepeat``). Returns the texrepeat."""
+    import mujoco
+
+    rep = ground_texrepeat(look.ground_tile_m)
+    tex = spec.add_texture(name="film_ground", type=mujoco.mjtTexture.mjTEXTURE_2D,
+                           file=os.path.join(PH, look.ground_texture))
+    tex.colorspace = mujoco.mjtColorSpace.mjCOLORSPACE_SRGB
+    mat = spec.add_material(name="film_ground", texrepeat=[rep, rep], texuniform=True,
+                            rgba=[*look.ground_tint, 1.0], specular=0.3, shininess=0.2)
+    mat.roughness = 0.55
+    mat.textures[mujoco.mjtTextureRole.mjTEXROLE_RGB] = "film_ground"
+    ok = tuple(getattr(mujoco.mjtGeom, t) for t in GROUND_GEOM_TYPES)
+    for g in spec.geoms:
+        if g.name in look.ground_geoms:
+            if g.type not in ok:
+                raise ValueError(f"ground geom {g.name!r} is a {g.type}: the ground texture's scale holds on "
+                                 f"{', '.join(GROUND_GEOM_TYPES)} only")
+            g.material = "film_ground"
+            g.rgba = [*look.ground_tint, 1.0]   # the geom's own rgba too, or a non-default one is drawn instead of the
+                                                # tint (scene_tables.geom_rgba; cache_key: geoms_recoloured)
+    return rep
+
+
+def _key_look(look) -> dict:
+    """The look as the cache key hashes it: the ground's scale as the texrepeat it resolves to, under the field's
+    earlier name ``ground_repeat`` (1.0 without a ground texture, its old default), so a take whose floor did not
+    change keeps its key (TRON1: a 3 m tile is texrepeat 2/3 before and after ``ground_tile_m``)."""
+    d = _cfg_dict(look)
+    tile = d.pop("ground_tile_m", None)
+    d["ground_repeat"] = ground_texrepeat(tile) if d.get("ground_texture") else 1.0
+    return d
+
+
+MATERIAL_RGBA = (0.8, 0.8, 0.8, 1.0)                     # a ``look.materials`` entry's colour when it gives no rgba
+MUJOCO_DEFAULT_GEOM_RGBA = np.array([0.5, 0.5, 0.5, 1.0], np.float32)
+
+
+def _drawn_rgba(own, mat) -> np.ndarray:
+    """The colour MuJoCo draws a geom with own rgba ``own`` and material rgba ``mat`` (``scene_tables.geom_rgba``)."""
+    return mat if np.array_equal(own, MUJOCO_DEFAULT_GEOM_RGBA) else own
+
+
+def geoms_recoloured(rec_dir, look) -> list:
+    """Twin geoms whose drawn colour a look colour sets only because ``build_scene`` also writes it into the geom's own
+    ``rgba`` (since 2026-11-01): the ground tint on ``look.ground_geoms`` and a ``look.materials`` entry's rgba. MuJoCo
+    draws a geom's own rgba over its material's unless the geom's is the default (0.5, 0.5, 0.5, 1)
+    (``scene_tables.geom_rgba``; the path tracer multiplies a texture by that colour), so before that a geom with its
+    own rgba kept it: the SO-101 box and table legs, and the table top's wood texture times (0.6, 0.45, 0.3); every
+    LimX TRON1 geom, and its concrete floor times LimX's (0.5, 0.6, 0.7). Replays ``build_scene``'s assignments on the
+    twin's spec (ground first, then each materials entry in order) with and without the geom writes. Empty, without
+    reading the twin, when the look has no ground texture and no materials rgba."""
+    if not look.ground_texture and not any("rgba" in kw for kw in look.materials.values()):
+        return []
+    import mujoco
+
+    spec = mujoco.MjSpec.from_file(os.path.join(rec_dir, "twin.xml"))
+    out = []
+    for g in spec.geoms:
+        own = new = np.asarray(g.rgba, np.float32)
+        mat = None
+        if look.ground_texture and g.name in look.ground_geoms:
+            mat = new = np.asarray([*look.ground_tint, 1.0], np.float32)
+        for pat, kw in look.materials.items():
+            if g.name and re.search(pat, g.name):
+                mat = np.asarray(kw.get("rgba", MATERIAL_RGBA), np.float32)
+                if "rgba" in kw:
+                    new = mat
+        if mat is not None and not np.array_equal(_drawn_rgba(own, mat), _drawn_rgba(new, mat)):
+            out.append(g.name)
+    return out
+
+
 def cache_key(rec_dir, film, look, viewer, grid, slots) -> str:
     """Key of a shot's frames: the recording (rec.npz, rec.json, twin.xml) and every setting that changes a frame's pixels
-    (tier, passes, spp, bounces, denoiser, the look, the viewer with its resolution, grid, filmed slots)."""
+    (tier, passes, spp, bounces, denoiser, the look, the viewer with its resolution, grid, filmed slots). Two fields
+    enter only when they change pixels, so the keys of other takes stay as they were: ``after_end`` when not "hold", and
+    ``look_rgba_on_geoms`` when a look colour reaches a geom only through ``build_scene``'s write of the geom's own rgba
+    (``geoms_recoloured``), so frames drawn before that write get a new key."""
     h = hashlib.sha256()
     for name in ("rec.npz", "rec.json", "twin.xml"):
         h.update(name.encode())
@@ -96,8 +200,12 @@ def cache_key(rec_dir, film, look, viewer, grid, slots) -> str:
             for chunk in iter(lambda: f.read(1 << 22), b""):
                 h.update(chunk)
     settings = dict(tier=film.tier, passes=film.passes, spp=film.spp, bounces=film.bounces, denoise=film.denoise,
-                    look=_cfg_dict(look), viewer=_cfg_dict(viewer), resolution=list(viewer.resolution), grid=grid,
+                    look=_key_look(look), viewer=_cfg_dict(viewer), resolution=list(viewer.resolution), grid=grid,
                     slots=list(slots))
+    if getattr(film, "after_end", "hold") != "hold":      # only when set, so the keys of existing takes are unchanged
+        settings["after_end"] = film.after_end
+    if geoms_recoloured(rec_dir, look):                    # only then (2026-11-01), as after_end
+        settings["look_rgba_on_geoms"] = True
     h.update(json.dumps(settings, sort_keys=True, default=str).encode())
     return h.hexdigest()[:20]
 
@@ -171,25 +279,19 @@ def build_scene(rec_dir, rec, look, viewer):
                                  dir=[-0.4, 0.3, -0.85], diffuse=[0.9, 0.9, 0.9], castshadow=True)
     spec.worldbody.add_camera(name="film", pos=[0, 0, 1], fovy=float(viewer.fovy))
     if look.ground_texture:
-        tex = spec.add_texture(name="film_ground", type=mujoco.mjtTexture.mjTEXTURE_2D,
-                               file=os.path.join(PH, look.ground_texture))
-        tex.colorspace = mujoco.mjtColorSpace.mjCOLORSPACE_SRGB
-        mat = spec.add_material(name="film_ground", texrepeat=[look.ground_repeat, look.ground_repeat], texuniform=True,
-                                rgba=[*look.ground_tint, 1.0], specular=0.3, shininess=0.2)
-        mat.roughness = 0.55
-        mat.textures[mujoco.mjtTextureRole.mjTEXROLE_RGB] = "film_ground"
-        for g in spec.geoms:
-            if g.name in look.ground_geoms:
-                g.material = "film_ground"
+        add_ground_material(spec, look)
     for i, (pat, kw) in enumerate(look.materials.items()):
         mname = f"film_mat_{i}"
-        m = spec.add_material(name=mname, rgba=list(kw.get("rgba", (0.8, 0.8, 0.8, 1.0))))
+        m = spec.add_material(name=mname, rgba=list(kw.get("rgba", MATERIAL_RGBA)))
         for key in ("roughness", "metallic", "specular"):
             if key in kw:
                 setattr(m, key, float(kw[key]))
         for g in spec.geoms:
             if g.name and re.search(pat, g.name):
                 g.material = mname
+                if "rgba" in kw:        # MuJoCo draws a geom's own rgba, not its material's, unless the geom's is the
+                    g.rgba = list(kw["rgba"])   # default (scene_tables.geom_rgba): set both, or the override is lost
+                                                # (cache_key: geoms_recoloured)
     model = spec.compile()
     return model, sky, sun, yaw
 
@@ -212,7 +314,10 @@ def render(task, rec_dir, out_dir, frames_arg=None, skip_existing=True, grid=Non
     fps = rec["fps"]
     ends = R["ends"]
     F_rec = R["xpos"].shape[0]
-    last = [int(ends[s]) if ends[s] >= 0 else F_rec - 1 for s in slots]
+    if film.after_end not in ("hold", "play"):
+        raise ValueError(f"after_end must be 'hold' or 'play', not {film.after_end!r}")
+    # "play": the recording goes on after an episode's end (the adapter kept simulating it): film it to the end
+    last = [int(ends[s]) if ends[s] >= 0 and film.after_end == "hold" else F_rec - 1 for s in slots]
     hold = int(round(film.hold_s * fps))
     n_frames = min(max(last) + 1 + hold, film.video_length or 10**9)
     W, H = viewer.resolution
@@ -360,6 +465,8 @@ def render(task, rec_dir, out_dir, frames_arg=None, skip_existing=True, grid=Non
                     exposure=exposure, viewer=vars(viewer) if not hasattr(viewer, "__dataclass_fields__") else
                     {k_: getattr(viewer, k_) for k_ in viewer.__dataclass_fields__}, look=dict(
                         hdri=look.hdri, sun=look.sun, ground_texture=look.ground_texture,
+                        ground_tile_m=look.ground_tile_m if look.ground_texture else None,
+                        ground_texrepeat=ground_texrepeat(look.ground_tile_m) if look.ground_texture else None,
                         grains_per_particle=look.grains_per_particle, grain_radius=g_r if has_p else None),
                     particles_per_env=int(R["particles"].shape[2]), particle_radius=prad, setup_s=setup_s,
                     probe=probe, twin_geoms=len(gid), frame_corrections=len(fix),

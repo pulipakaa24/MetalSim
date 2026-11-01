@@ -1,0 +1,27 @@
+{
+ "variant": "isaac_scaled",
+ "total_steps": 10000000,
+ "switch_at_steps": 2777778,
+ "w_initial": 2.4324324324324327e-05,
+ "w_final": 0.024324324324324326,
+ "servo": "7v4",
+ "start": {
+  "dir": "rl/runs/lift_ppo (run 2)"
+ },
+ "isaac": {
+  "w_initial": 0.0001,
+  "w_final": 0.1,
+  "switch_common_steps": 10000,
+  "total_common_steps": 36000,
+  "source": "IsaacLab3 contrib/lift/lift_env_cfg.py RewardsCfg action_rate/joint_vel, CurriculumCfg; config/franka/agents/rsl_rl_ppo_cfg.py max_iterations 1500, num_steps_per_env 24"
+ },
+ "variant_cfg": {
+  "scale": 0.24324324324324326,
+  "note": "Isaac Lab's weights times so101Sim / Isaac Lab largest task reward per step"
+ },
+ "n_envs": 12,
+ "script": "MetalSim runs/readme_media/scratch/so101-smooth/train_smooth.py",
+ "started": "Sat Oct 31 15:33:34 2026",
+ "finished": "Sat Oct 31 15:49:24 2026",
+ "num_timesteps": 18008064
+}

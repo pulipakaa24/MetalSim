@@ -1,0 +1,62 @@
+[evals] 2026-10-31 16:13:55 mujoco_warp 8eb51fe6 METALSIM_CHANGES.md: deterministic-mode _solve_done and update
+[evals] 16:13:55 expert_7v4: expert 7v4
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     ~/Library/Caches/warp/1.18.0.dev20260917
+metalsim expert 7v4          succ  36 up  29 ttl 4.20s | sat%  29.3  70.4  74.5  67.6  54.1  95.1 | da 0.0142 dctrl 0.0210 rad | a@lim 0.7% | vpk 5.16 ep-med 4.33
+cpu agreement: {'same_outcome': 56, 'only_metalsim': [10003, 10006, 10007, 10008, 10014, 10017, 10019, 10020, 10021, 10028, 10029, 10031, 10036, 10043, 10048, 10049, 10051, 10059, 10062, 10064, 10067, 10073, 10074, 10080, 10090, 10091, 10092, 10093, 10095, 10099], 'only_cpu': [10004, 10022, 10025, 10026, 10034, 10044, 10045, 10046, 10053, 10065, 10072, 10079, 10081, 10086]} overflow: {'ITERATIONS': 8, 'LS_ITERATIONS': 100}
+[evals] 16:14:02 orig_7v4: runs/film/so101_lift/policy/so101_lift_ppo.pt 7v4
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     ~/Library/Caches/warp/1.18.0.dev20260917
+metalsim so101_lift_ppo.pt 7v4 succ  75 up  68 ttl 1.50s | sat%  93.0  95.2  99.8  51.4 100.0  98.0 | da 0.6962 dctrl 1.4262 rad | a@lim 66.3% | vpk 6.33 ep-med 5.37
+cpu agreement: {'same_outcome': 82, 'only_metalsim': [10011, 10024, 10032, 10040, 10058, 10065, 10081, 10092], 'only_cpu': [10001, 10012, 10030, 10038, 10053, 10064, 10073, 10079, 10082, 10099]} overflow: {'ITERATIONS': 18, 'LS_ITERATIONS': 100}
+[evals] 16:14:08 isaac_scaled_7v4: runs/film/so101_lift_smooth/policy/candidates/isaac_scaled.pt 7v4
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     ~/Library/Caches/warp/1.18.0.dev20260917
+metalsim isaac_scaled.pt 7v4 succ  77 up  73 ttl 1.65s | sat%  96.7  88.3  99.9  42.8 100.0  99.9 | da 0.7613 dctrl 1.5768 rad | a@lim 77.0% | vpk 6.23 ep-med 5.37
+cpu agreement: {'same_outcome': 80, 'only_metalsim': [10016, 10037, 10039, 10055, 10058, 10059, 10066, 10067, 10075, 10097], 'only_cpu': [10010, 10021, 10028, 10040, 10044, 10049, 10061, 10065, 10071, 10081]} overflow: {'ITERATIONS': 6, 'LS_ITERATIONS': 100}
+[evals] 16:14:14 isaac_unscaled_raw_7v4: runs/film/so101_lift_smooth/policy/candidates/isaac_unscaled_raw.pt 7v4
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     ~/Library/Caches/warp/1.18.0.dev20260917
+metalsim isaac_unscaled_raw.pt 7v4 succ  92 up  85 ttl 1.34s | sat%  86.0  40.1  99.7  34.3  99.9  99.7 | da 0.3546 dctrl 0.6600 rad | a@lim 72.3% | vpk 5.96 ep-med 5.31
+cpu agreement: {'same_outcome': 84, 'only_metalsim': [10013, 10034, 10046, 10047, 10054, 10055, 10073, 10081, 10088, 10091, 10094], 'only_cpu': [10029, 10049, 10058, 10079, 10098]} overflow: {'ITERATIONS': 13, 'LS_ITERATIONS': 100}
+[evals] 16:14:19 orig_12v: runs/film/so101_lift/policy/so101_lift_ppo.pt 12v
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     ~/Library/Caches/warp/1.18.0.dev20260917
+metalsim so101_lift_ppo.pt 12v succ  98 up  97 ttl 0.95s | sat%  99.9  97.0  99.8  19.5  99.9  99.9 | da 0.9822 dctrl 2.0167 rad | a@lim 79.2% | vpk 5.53 ep-med 5.13
+cpu agreement: {'same_outcome': 98, 'only_metalsim': [], 'only_cpu': [10021, 10027]} overflow: {'ITERATIONS': 10, 'LS_ITERATIONS': 100}
+[evals] 16:14:25 expert_12v: expert 12v
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     ~/Library/Caches/warp/1.18.0.dev20260917
+metalsim expert 12v          succ  98 up  94 ttl 1.37s | sat%   6.3  16.1  20.0  15.4  13.5  93.7 | da 0.0043 dctrl 0.0068 rad | a@lim 0.1% | vpk 5.00 ep-med 4.79
+cpu agreement: {'same_outcome': 93, 'only_metalsim': [10008, 10017, 10040, 10071, 10099], 'only_cpu': [10025, 10068]} overflow: {'ITERATIONS': 1, 'LS_ITERATIONS': 100}
+[evals] 16:14:33 done

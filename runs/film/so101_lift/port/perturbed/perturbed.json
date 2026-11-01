@@ -1,0 +1,139 @@
+{
+ "what": "CPU outcome spread under tiny start perturbations: reference.py with, after so101Sim's reset, the start qpos rounded to float32 (f32) or N(0, sigma) noise on the six arm joints (noise<sigma>, rng seed ep + 1000 k); 100 episodes each, seeds 10000-10099",
+ "runs": {
+  "f32": {
+   "successes": 100,
+   "lifted_at_end": 99,
+   "time_to_lift_mean_s": 0.929,
+   "max_height_mean": 0.1698,
+   "failed": [],
+   "dropped": [
+    10014
+   ]
+  },
+  "k1": {
+   "successes": 100,
+   "lifted_at_end": 96,
+   "time_to_lift_mean_s": 0.94,
+   "max_height_mean": 0.1692,
+   "failed": [],
+   "dropped": [
+    10014,
+    10048,
+    10058,
+    10071
+   ]
+  },
+  "k2": {
+   "successes": 100,
+   "lifted_at_end": 99,
+   "time_to_lift_mean_s": 0.9492,
+   "max_height_mean": 0.1704,
+   "failed": [],
+   "dropped": [
+    10014
+   ]
+  },
+  "k3": {
+   "successes": 100,
+   "lifted_at_end": 98,
+   "time_to_lift_mean_s": 0.949,
+   "max_height_mean": 0.1703,
+   "failed": [],
+   "dropped": [
+    10014,
+    10048
+   ]
+  },
+  "k4": {
+   "successes": 99,
+   "lifted_at_end": 95,
+   "time_to_lift_mean_s": 0.959,
+   "max_height_mean": 0.1692,
+   "failed": [
+    10058
+   ],
+   "dropped": [
+    10014,
+    10029,
+    10048,
+    10092
+   ]
+  },
+  "k5": {
+   "successes": 100,
+   "lifted_at_end": 98,
+   "time_to_lift_mean_s": 0.9436,
+   "max_height_mean": 0.1706,
+   "failed": [],
+   "dropped": [
+    10014,
+    10048
+   ]
+  },
+  "k6": {
+   "successes": 99,
+   "lifted_at_end": 97,
+   "time_to_lift_mean_s": 0.9426,
+   "max_height_mean": 0.1686,
+   "failed": [
+    10058
+   ],
+   "dropped": [
+    10014,
+    10048
+   ]
+  },
+  "k7": {
+   "successes": 99,
+   "lifted_at_end": 98,
+   "time_to_lift_mean_s": 0.9218,
+   "max_height_mean": 0.1693,
+   "failed": [
+    10058
+   ],
+   "dropped": [
+    10014
+   ]
+  },
+  "k8": {
+   "successes": 99,
+   "lifted_at_end": 97,
+   "time_to_lift_mean_s": 0.9545,
+   "max_height_mean": 0.1694,
+   "failed": [
+    10058
+   ],
+   "dropped": [
+    10014,
+    10045
+   ]
+  },
+  "noise1e-6": {
+   "successes": 99,
+   "lifted_at_end": 96,
+   "time_to_lift_mean_s": 0.9362,
+   "max_height_mean": 0.1685,
+   "failed": [
+    10058
+   ],
+   "dropped": [
+    10014,
+    10045,
+    10070
+   ]
+  },
+  "noise1e-7": {
+   "successes": 100,
+   "lifted_at_end": 99,
+   "time_to_lift_mean_s": 0.9344,
+   "max_height_mean": 0.1701,
+   "failed": [],
+   "dropped": [
+    10014
+   ]
+  }
+ },
+ "perturbation_script": "reference.py plus 4 lines after env.reset (scratch copy, not kept): f32: d.qpos[:] = d.qpos.astype(float32); noise: d.qpos[:6] += rng.normal(0, sigma, 6); then mj_forward and obs = env._obs()",
+ "keys": "f32: float32-rounded start; noise1e-7 / noise1e-6: sigma 1e-7 / 1e-6 rad, k = 0; k1..k8: sigma 1e-6 rad with rng seed ep + 1000 k"
+}

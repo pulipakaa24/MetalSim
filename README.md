@@ -16,12 +16,12 @@ project, not affiliated with or endorsed by NVIDIA, Google DeepMind or Apple.
 <table>
   <tr>
     <td align="center" width="33%">
-      <img width="320" src="docs/renders/g1_flat.webp" alt="Unitree G1 walking on flat ground with NVIDIA's pretrained Isaac Lab policy, path traced">
-      <br><b>python -m metalsim.render.film g1_flat</b>
+      <img width="320" src="docs/renders/g1_unitree.webp" alt="Unitree G1 walking on flat ground with Unitree's own pretrained walking policy on MuJoCo Warp, path traced">
+      <br><b>python -m metalsim.render.film g1_unitree</b>
     </td>
     <td align="center" width="33%">
-      <img width="320" src="docs/renders/g1_rough.webp" alt="Unitree G1 climbing stairs on Isaac Lab's rough terrain with NVIDIA's pretrained Isaac Lab policy, path traced">
-      <br><b>python -m metalsim.render.film g1_rough</b>
+      <img width="320" src="docs/renders/g1_bumps.webp" alt="Unitree G1 with Unitree's own flat-trained walking policy stumbling over Isaac Lab's random rough terrain and falling backwards, a typical outcome, simulated on MuJoCo Warp, path traced">
+      <br><b>python -m metalsim.render.film g1_bumps</b>
     </td>
     <td align="center" width="33%">
       <img width="320" src="docs/renders/anymal_sand.webp" alt="ANYmal C trotting across 25 million path-traced sand grains">
@@ -34,12 +34,12 @@ project, not affiliated with or endorsed by NVIDIA, Google DeepMind or Apple.
       <br><b>python -m metalsim.render.film franka_pour</b>
     </td>
     <td align="center" width="33%">
-      <img width="320" src="docs/renders/parity_g1_isaac.webp" alt="Isaac Lab's own G1 policy walking in Isaac Sim 5.1 (PhysX, RTX real-time)">
-      <br><b>Isaac Sim 5.1 (PhysX, RTX)</b>
+      <img width="320" src="docs/renders/tron1.webp" alt="LimX TRON1 wheel-legged robot driving, turning and stopping under LimX's own RL policy, simulated on CPU MuJoCo with sensor and actuator latency and noise, path traced">
+      <br><b>python -m metalsim.render.film tron1</b>
     </td>
     <td align="center" width="33%">
-      <img width="320" src="docs/renders/parity_g1_metalsim.webp" alt="The same Isaac Lab G1 policy walking in MetalSim (MuJoCo Warp, tier-2 path tracer)">
-      <br><b>MetalSim (MuJoCo Warp, tier 2)</b>
+      <img width="320" src="docs/renders/so101_lift_deploy.webp" alt="SO-101 arm grasping a box and lifting it off a wooden table, the box tilting with the hand: a scripted IK expert streaming joint goals at 30 Hz to a model of its 7.4 V servos, on MuJoCo Warp, path traced">
+      <br><b>python -m metalsim.render.film so101_lift_deploy</b>
     </td>
   </tr>
   <tr>
@@ -58,21 +58,29 @@ project, not affiliated with or endorsed by NVIDIA, Google DeepMind or Apple.
   </tr>
 </table>
 
-Row 1: Isaac Lab's G1 flat and rough velocity tasks driven by NVIDIA's published Isaac Lab 2.3 checkpoints
-(rsl_rl, iterations 1499 and 2999, trained in PhysX) and played in MetalSim without retraining, and ANYmal C on
-Newton's MPM sand (25 M render grains; [how to run](docs/DEMO.md#the-25-m-grain-render-anymal-on-sand-at-demo-scale)),
-all with the tier-2 path tracer. The quick, short steps (3.8 gait cycles per second in the flat clip) are how
-Isaac's G1 policies walk in PhysX too: checkpoints of the same flat task trained with Isaac Lab step at 3.2 to
-3.8 Hz in Isaac Sim, and MuJoCo Warp adds 3.4 to 5.9 % to their cadence
-([research note](docs/research/speculative_contacts_2026-09-27.md)). The checkpoints are NVIDIA's files, fetched by
-`scripts/fetch_isaac_assets.sh` and not redistributed. Row 2: Isaac Lab 3.0-EA's Franka-Pour (MuJoCo Warp arm
-coupled to implicit MPM), then a G1 flat policy trained with Isaac Lab in PhysX (iteration 1499 of this project's
-own rsl_rl run on an L4; row 1 plays NVIDIA's published checkpoint of the same task) from the same start, camera
-and lights in Isaac Sim 5.1 (PhysX, RTX real-time) and in MetalSim (MuJoCo Warp, tier 2): over 8 s it walks
-3.11 m in Isaac and 3.21 m in MetalSim ([PARITY §1.5](docs/PARITY.md#15-learning-on-the-g1-task); made by
-`metalsim.parity.side_by_side`). Rendering
-alone, on identical states, the robot is 24.0 dB PSNR from RTX real-time and 28.8 dB from RTX's path tracer, whose
-own two modes are 25.9 dB apart ([§1.7](docs/PARITY.md#17-fidelity-protocol-against-isaac-sim-51-on-an-l4-recorded-2026-09-24-physx--rtx)). Row 3: one scene through three sensors, a ball rolling behind a glass
+Row 1: Unitree's own pretrained G1 walking policy (`unitree_rl_gym`'s `deploy/pre_train/g1/motion.pt`,
+BSD-3-Clause, fetched by `scripts/fetch_unitree_rl_gym.sh`) through Unitree's MuJoCo sim2sim loop ported to MuJoCo
+Warp: it steps at 1.25 gait cycles per second, the 0.8 s gait clock Unitree trains it with, and stays within 3 µm of
+Unitree's own CPU MuJoCo run of the same loop after 5 s ([G1_UNITREE.md](docs/renders/G1_UNITREE.md)). Then the
+same blind, flat-trained policy on Isaac Lab's random rough terrain (bumps of 2 to 10 cm every 0.1 m), on MuJoCo
+Warp at fork commit `787a5b3`, whose heightfield contacts for the G1's sphere feet match the exact geometry: 75 % of
+the robots fall within 8 s (180 of 240: five tiles, 16 robots each, three runs; CPU MuJoCo 68 %), and the clip shows
+a typical one, down at 5.3 s ([G1_BUMPS.md](docs/renders/G1_BUMPS.md)). Then ANYmal C on Newton's MPM sand (25 M
+render grains; [how to run](docs/DEMO.md#the-25-m-grain-render-anymal-on-sand-at-demo-scale)).
+Row 2: Isaac Lab 3.0-EA's Franka-Pour (MuJoCo Warp arm coupled to implicit MPM). Then LimX's TRON1 wheel-legged robot
+driven by LimX's own open RL policy (the ONNX export in LimX's `tron1-rl-deploy-python`, Apache-2.0) in MetalSim's
+TRON1 simulation on CPU MuJoCo, at its nominal realism settings (command and sensor latency, quantized encoders, joint
+friction, IMU noise, a 1.5 kg sensor pack), unchanged: none of 16 simulated robots fell over the 8 s drive, turn and
+stop (each stood up for 3 s first, with its commands ramped over 0.5 s, as an operator drives), with 0.27 m/s and
+0.14 rad/s RMS speed and yaw-rate tracking error ([TRON1.md](docs/renders/TRON1.md)). Then
+the SO-101 lifting a box with so101Sim's scripted IK plan, streamed as absolute joint goals at LeRobot's 30 Hz to
+Rhoban BAM's identified model of the standard follower's 7.4 V servos (load-dependent gearbox friction, LeRobot's
+registers): 100 of 100 seeds lift on MuJoCo Warp and on CPU MuJoCo. Scripted, not learned; the box pose comes from
+the simulator. The box tilts with the hand, which the lift pitches by about 36 degrees, as real teleoperated lifts
+do; the grasp is less real: the hand comes down 26 to 28 degrees off vertical (real operators: 4 to 13) and the
+closing jaw tips the box on the table
+([SO101_LIFT.md](docs/renders/SO101_LIFT.md#deployment-style-scripted-expert-on-7v4_bam)). Rows 1 and 2 with the
+tier-2 path tracer. Row 3: one scene through three sensors, a ball rolling behind a glass
 pane: the path-traced camera sees it through the glass, the depth camera stops at the pane (as MuJoCo and Isaac do),
 and a two-return lidar sees both (cyan: echoes on glass; the rest coloured by range). As in MuJoCo Warp's README,
 a caption is the command that makes the scene; the exact command that cut each 320x240 clip, its source, assets and
@@ -147,7 +155,9 @@ the user guide, [`docs/GUIDE.md`](docs/GUIDE.md). What landed when is in [`CHANG
 - Scenes: [`docs/SCENES.md`](docs/SCENES.md): a robot, objects, camera mounts, lidar and a background (plane, HDRI or Gaussian splat behind a collision proxy) from one YAML file (Isaac Lab names): `python -m metalsim.run scene.yaml`.
 - Renders: [`docs/renders/`](docs/renders) (filmed tasks with a doc each: what is shown, timings, assets and
   licences, how to reproduce; [Franka-Pour](docs/renders/FRANKA_POUR.md), [G1 flat](docs/renders/G1_FLAT.md),
-  [G1 rough](docs/renders/G1_ROUGH.md)), made with
+  [G1 rough](docs/renders/G1_ROUGH.md), [G1 with Unitree's policy](docs/renders/G1_UNITREE.md),
+  [G1 on rough ground](docs/renders/G1_BUMPS.md), [TRON1](docs/renders/TRON1.md),
+  [SO-101 cube lift](docs/renders/SO101_LIFT.md)), made with
   `python -m metalsim.render.film <task>`; the clips at the top of this page are there too.
 - Images and data: [`docs/gallery/`](docs/gallery) (September test renders and Isaac-side playback videos),
   [`docs/measurements/`](docs/measurements) (figures and JSON behind the docs' numbers); run logs under `runs/`.
@@ -165,7 +175,7 @@ The evidence, test by test, is in [`docs/PARITY.md`](docs/PARITY.md); open and c
 | G1 flat throughput, 4096 envs | **with the elliptic default (impratio 10, cap 20): full PPO loop 37.3–37.7 K env-steps/s, env step 41.8–42.0 K, physics alone 85.7–85.9 K** (measured 2026-09-26 afternoon after the elliptic-path fusion and Metal early exit, two interleaved repeats, `runs/ellip_ws/final.wrapper.log`). Pyramidal (`recommended_pyramidal`) in the same session: loop 56.9–57.5 K, env step 62.7 K, physics 102.7–103.2 K. The elliptic premium is 1.53× on the loop; the review (`docs/research/elliptic_cost_review_2026-09-26.md`) shows the rest is inherent to impratio 10 (MuJoCo C needs the same extra iterations). Rough, pyramidal: env step 49.1 K, loop 44.5 K | Isaac Lab 3.0 on the L4 (`isaaclab benchmark runtime`, env step alone): 72.0 K with its default Newton / MuJoCo Warp, 45.1 K PhysX; rough 51.2 K / 35.7 K. Isaac Lab 2.3.2 + PhysX on the L4: 45.9 K; RTX 4090, rough task (`Isaac-Velocity-Rough-G1`): 94 K env step, 82 K with training (published) | [§1.4](docs/PARITY.md#14-throughput-on-the-g1-task-isaacs-protocol-4096-envs), [§1.8](docs/PARITY.md#18-isaac-lab-30-ea-reference-isaac-sim-61-measured-on-the-l4-2026-09-25) |
 | Rendering vs RTX (G1 scene, identical states) | tier 2 + Open Image Denoise vs RTX path tracer: robot pixels 28.8 dB PSNR / SSIM 0.94, whole frame 45.6 dB | RTX real-time vs RTX path tracer on the robot: 25.9 dB apart | [§1.7](docs/PARITY.md#17-fidelity-protocol-against-isaac-sim-51-on-an-l4-recorded-2026-09-24-physx--rtx) |
 | Physics vs PhysX (same asset, open-loop protocol) | joints within 0.03–0.06 rad through hold and 1 m drop; contact impulses within 1–4 % of Isaac's; **default contacts since 2026-09-26: elliptic friction cones (PhysX's exact cone), impratio 10, Newton cap 20**, on top of the 10 ms impact-stiffened preset with hard joint limits: 20 ms impact forces 1.08× / 1.07× of PhysX's (pyramidal 1.70× / 1.23×), feet slide within noise of Isaac's; learning inside seed spread. **Open: peak foot penetration at the 1 m landing is 13 mm against PhysX's 0.5 mm** (measured like for like 2026-09-26): MuJoCo only builds a contact row once a foot corner is inside the surface, so at a 2.5 ms substep no stock setting gets below ~8 mm without losing slide or exceeding PhysX's force bound; a speculative-contact prototype in the fork reaches 1.6 mm but was not adopted (2026-09-27: it loses the slide match and costs 1.20×; archived behind `MJW_SPECULATIVE_GAP`, [GAPS](docs/GAPS.md)) | Isaac Sim 5.1 PhysX recording; Isaac Sim 6.1 / Isaac Lab 3.0 PhysX reproduces it within 0.002 rad, and 3.0's own MuJoCo Warp sits 0.002–0.005 rad from its PhysX | [§1.7](docs/PARITY.md#17-fidelity-protocol-against-isaac-sim-51-on-an-l4-recorded-2026-09-24-physx--rtx), [§1.8](docs/PARITY.md#18-isaac-lab-30-ea-reference-isaac-sim-61-measured-on-the-l4-2026-09-25) |
-| Deformables (cloth, rope, soft cube) | vs PhysX 5.1: rope period 1.077 vs 1.026 s, soft-cube bounce 0.140 vs 0.135 m, penetration 2.6 vs 1.6 mm (damping fitted); vs Isaac Lab 3.0: soft cube matches PhysX's FEM with PhysX's own parameters, cloth within 7 mm; Newton VBD run on Metal replays 3.0's Newton recording within 1.2 mm over 5 s (same solver, Metal vs CUDA) | Isaac Sim 5.1 and 6.1 recordings | [§2](docs/PARITY.md#2-platform-capabilities-the-workstreams-with-the-tests-behind-them), [GAPS](docs/GAPS.md#open-2026-09-25-evening) |
+| Deformables (cloth, rope, soft cube) | vs PhysX 5.1: rope period 1.077 vs 1.026 s, soft-cube bounce 0.140 vs 0.135 m, penetration 2.6 vs 1.6 mm (damping fitted); vs Isaac Lab 3.0: soft cube matches PhysX's FEM with PhysX's own parameters, cloth within 7 mm; Newton VBD run on Metal replays 3.0's Newton recording within 1.2 mm over 5 s (same solver, Metal vs CUDA) | Isaac Sim 5.1 and 6.1 recordings | [§2](docs/PARITY.md#2-platform-capabilities-the-workstreams-with-the-tests-behind-them), [GAPS](docs/GAPS.md#open-2026-09-25-late-evening-refreshed-after-the-elliptic-cone-throughput-terrain-and-30-rounds) |
 | MPM (Isaac Lab 3.0-EA's Newton 1.5.2 implicit MPM) and Franka-Pour, Isaac's MPM manipulation task | MPM on Metal with CUDA's semantics, bitwise deterministic; column collapse, Newton's MPM examples and the coupled ANYmal / two-way scenes all inside the L4's own perturbation ensemble. Speed (ms/frame vs the L4): pure-MPM scenes near or past the L4 with fast_math honoured, slower with the parity default; coupled scenes captured at one world 1.21x the L4's time, ANYmal and two-way (MPM.md 8k; 1.29x / 1.76x before it). Franka-Pour end to end at 1,024 envs: 992 env-steps/s for the full PPO loop, about 3.1x the L4; learning (5 seeds ours, 3 Isaac's) equal through iteration 49, Isaac's mean 0.035 success ahead at iterations 50-59, not significant (p = 0.09; partial) | Isaac Lab 3.0-EA on the L4: 317 env-steps/s at 1,024 envs; the task's 2,048 envs do not fit the L4 | [MPM.md](metalsim/physics/mpm/MPM.md) 8e, 8j; [§1b](docs/PARITY.md#1b-isaaccontrib-franka-pour-isaac-lab-30-ea-granular-mpm-manipulation-2026-10-12) |
 | Camera RL (Isaac-Cartpole-RGB-Camera, 1024 envs, Isaac's skrl config) | 12.7 K env-steps/s including training (1 spp); 8.8 K at the physical tier-2 default, return 85.3 vs 86.3 for tier 0 | RTX 4090: 32 K (published, throughput only) | [§2](docs/PARITY.md#2-platform-capabilities-the-workstreams-with-the-tests-behind-them) |
 
