@@ -133,6 +133,8 @@ def add_ground_material(spec, look) -> float:
                 raise ValueError(f"ground geom {g.name!r} is a {g.type}: the ground texture's scale holds on "
                                  f"{', '.join(GROUND_GEOM_TYPES)} only")
             g.material = "film_ground"
+            g.rgba = [*look.ground_tint, 1.0]   # the geom's own rgba too, or a non-default one is drawn instead of the
+                                                # tint (scene_tables.geom_rgba; cache_key: geoms_recoloured)
     return rep
 
 
@@ -146,9 +148,51 @@ def _key_look(look) -> dict:
     return d
 
 
+MATERIAL_RGBA = (0.8, 0.8, 0.8, 1.0)                     # a ``look.materials`` entry's colour when it gives no rgba
+MUJOCO_DEFAULT_GEOM_RGBA = np.array([0.5, 0.5, 0.5, 1.0], np.float32)
+
+
+def _drawn_rgba(own, mat) -> np.ndarray:
+    """The colour MuJoCo draws a geom with own rgba ``own`` and material rgba ``mat`` (``scene_tables.geom_rgba``)."""
+    return mat if np.array_equal(own, MUJOCO_DEFAULT_GEOM_RGBA) else own
+
+
+def geoms_recoloured(rec_dir, look) -> list:
+    """Twin geoms whose drawn colour a look colour sets only because ``build_scene`` also writes it into the geom's own
+    ``rgba`` (since 2026-11-01): the ground tint on ``look.ground_geoms`` and a ``look.materials`` entry's rgba. MuJoCo
+    draws a geom's own rgba over its material's unless the geom's is the default (0.5, 0.5, 0.5, 1)
+    (``scene_tables.geom_rgba``; the path tracer multiplies a texture by that colour), so before that a geom with its
+    own rgba kept it: the SO-101 box and table legs, and the table top's wood texture times (0.6, 0.45, 0.3); every
+    LimX TRON1 geom, and its concrete floor times LimX's (0.5, 0.6, 0.7). Replays ``build_scene``'s assignments on the
+    twin's spec (ground first, then each materials entry in order) with and without the geom writes. Empty, without
+    reading the twin, when the look has no ground texture and no materials rgba."""
+    if not look.ground_texture and not any("rgba" in kw for kw in look.materials.values()):
+        return []
+    import mujoco
+
+    spec = mujoco.MjSpec.from_file(os.path.join(rec_dir, "twin.xml"))
+    out = []
+    for g in spec.geoms:
+        own = new = np.asarray(g.rgba, np.float32)
+        mat = None
+        if look.ground_texture and g.name in look.ground_geoms:
+            mat = new = np.asarray([*look.ground_tint, 1.0], np.float32)
+        for pat, kw in look.materials.items():
+            if g.name and re.search(pat, g.name):
+                mat = np.asarray(kw.get("rgba", MATERIAL_RGBA), np.float32)
+                if "rgba" in kw:
+                    new = mat
+        if mat is not None and not np.array_equal(_drawn_rgba(own, mat), _drawn_rgba(new, mat)):
+            out.append(g.name)
+    return out
+
+
 def cache_key(rec_dir, film, look, viewer, grid, slots) -> str:
     """Key of a shot's frames: the recording (rec.npz, rec.json, twin.xml) and every setting that changes a frame's pixels
-    (tier, passes, spp, bounces, denoiser, the look, the viewer with its resolution, grid, filmed slots)."""
+    (tier, passes, spp, bounces, denoiser, the look, the viewer with its resolution, grid, filmed slots). Two fields
+    enter only when they change pixels, so the keys of other takes stay as they were: ``after_end`` when not "hold", and
+    ``look_rgba_on_geoms`` when a look colour reaches a geom only through ``build_scene``'s write of the geom's own rgba
+    (``geoms_recoloured``), so frames drawn before that write get a new key."""
     h = hashlib.sha256()
     for name in ("rec.npz", "rec.json", "twin.xml"):
         h.update(name.encode())
@@ -160,6 +204,8 @@ def cache_key(rec_dir, film, look, viewer, grid, slots) -> str:
                     slots=list(slots))
     if getattr(film, "after_end", "hold") != "hold":      # only when set, so the keys of existing takes are unchanged
         settings["after_end"] = film.after_end
+    if geoms_recoloured(rec_dir, look):                    # only then (2026-11-01), as after_end
+        settings["look_rgba_on_geoms"] = True
     h.update(json.dumps(settings, sort_keys=True, default=str).encode())
     return h.hexdigest()[:20]
 
@@ -236,13 +282,16 @@ def build_scene(rec_dir, rec, look, viewer):
         add_ground_material(spec, look)
     for i, (pat, kw) in enumerate(look.materials.items()):
         mname = f"film_mat_{i}"
-        m = spec.add_material(name=mname, rgba=list(kw.get("rgba", (0.8, 0.8, 0.8, 1.0))))
+        m = spec.add_material(name=mname, rgba=list(kw.get("rgba", MATERIAL_RGBA)))
         for key in ("roughness", "metallic", "specular"):
             if key in kw:
                 setattr(m, key, float(kw[key]))
         for g in spec.geoms:
             if g.name and re.search(pat, g.name):
                 g.material = mname
+                if "rgba" in kw:        # MuJoCo draws a geom's own rgba, not its material's, unless the geom's is the
+                    g.rgba = list(kw["rgba"])   # default (scene_tables.geom_rgba): set both, or the override is lost
+                                                # (cache_key: geoms_recoloured)
     model = spec.compile()
     return model, sky, sun, yaw
 
