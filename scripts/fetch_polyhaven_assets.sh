@@ -1,11 +1,13 @@
 #!/bin/zsh
 # Fetches the CC0 Poly Haven environment maps (equirectangular HDR) and textures used by the tier 2 environment-map
-# lighting (docs/HANDOFF_tier2_hdri_envmap.md) and the ANYmal-on-sand particle demo (scripts/particle_demo/). They are
-# fetched, not committed.
+# lighting (docs/HANDOFF_tier2_hdri_envmap.md), the ANYmal-on-sand particle demo (scripts/particle_demo/) and the
+# outdoor G1 film (g1_bumps, metalsim/render/film/tasks.py). They are fetched, not committed. All are CC0 1.0
+# (https://polyhaven.com/license; each asset page states it).
 # Usage: scripts/fetch_polyhaven_assets.sh [split...]   (default: train heldout)
 #   train, heldout: 2k HDRIs and 1k table textures; train and held-out rooms are disjoint, for domain randomization
 #                   with a held-out evaluation set
-#   demo:           the particle demo's goegap 8k HDRI (~100 MB) and coast_sand_01 2k diffuse texture
+#   demo:           the particle demo's goegap 8k HDRI (~100 MB) and coast_sand_01 2k diffuse texture; the g1_bumps
+#                   film's sandy_gravel_02 2k diffuse texture (Poly Haven's Namaqualand collection, as goegap; 2.53 m)
 # Env: POLYHAVEN (default <repo>/assets/polyhaven), the directory they go to (render_anymal.py reads the same variable).
 set -e
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
@@ -14,7 +16,7 @@ TRAIN_HDRI=(poly_haven_studio lebombo brown_photostudio_02 artist_workshop small
             lythwood_room comfy_cafe reading_room pine_attic)
 HELDOUT_HDRI=(photo_studio_loft_hall empty_play_room machine_shop_02)
 TRAIN_TEX=(wood_table_001 plywood oak_veneer_01 laminate_floor_02)
-HELDOUT_TEX=(wood_table_worn)
+HELDOUT_TEX=(wood_table_worn concrete_floor_worn_001)   # concrete: the TRON1 film's floor (with machine_shop_02)
 fetch() {   # fetch <url> <dest>
   [ -s "$2" ] || { curl -fsSL -o "$2.part" "$1" && mv "$2.part" "$2"; }
 }
@@ -31,6 +33,8 @@ for split in $SPLITS; do
       [ -s "$PH/hdri/demo/goegap_8k.hdr" ] || fetch "$(api goegap "j['hdri']['8k']['hdr']['url']")" "$PH/hdri/demo/goegap_8k.hdr"
       [ -s "$PH/tex/demo/coast_sand_01_diff_2k.png" ] || \
         fetch "$(api coast_sand_01 "j['Diffuse']['2k']['png']['url']")" "$PH/tex/demo/coast_sand_01_diff_2k.png"
+      [ -s "$PH/tex/demo/sandy_gravel_02_diff_2k.png" ] || \
+        fetch "$(api sandy_gravel_02 "j['Diffuse']['2k']['png']['url']")" "$PH/tex/demo/sandy_gravel_02_diff_2k.png"
       continue ;;
     *) echo "unknown split $split (train | heldout | demo)"; exit 2 ;;
   esac

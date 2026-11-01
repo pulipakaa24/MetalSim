@@ -1,0 +1,164 @@
+{
+ "placements": 3000,
+ "sphere_radius": 0.005,
+ "depth_mm": [
+  0.5,
+  3.0
+ ],
+ "exact_tilt_deg_p50_p95_max": [
+  24.1,
+  40.3,
+  48.5
+ ],
+ "engines": {
+  "MuJoCo C 3.14 (mj_forward)": {
+   "all": {
+    "n": 3000,
+    "no_contact": 0,
+    "contacts_mean": 1.25,
+    "deepest_normal_err_deg_p50_p95": [
+     0.0,
+     0.0
+    ],
+    "weighted_normal_err_deg_p50_p95": [
+     0.0,
+     14.15
+    ],
+    "depth_err_mm_p50_p95": [
+     0.0,
+     0.0
+    ],
+    "horizontal_normal_share": 0.0
+   },
+   "steep": {
+    "n": 1911,
+    "no_contact": 0,
+    "contacts_mean": 1.23,
+    "deepest_normal_err_deg_p50_p95": [
+     0.0,
+     0.0
+    ],
+    "weighted_normal_err_deg_p50_p95": [
+     0.0,
+     14.24
+    ],
+    "depth_err_mm_p50_p95": [
+     0.0,
+     0.0
+    ],
+    "horizontal_normal_share": 0.0
+   },
+   "flat": {
+    "n": 1089,
+    "no_contact": 0,
+    "contacts_mean": 1.28,
+    "deepest_normal_err_deg_p50_p95": [
+     0.0,
+     0.0
+    ],
+    "weighted_normal_err_deg_p50_p95": [
+     0.0,
+     13.69
+    ],
+    "depth_err_mm_p50_p95": [
+     0.0,
+     0.0
+    ],
+    "horizontal_normal_share": 0.0
+   },
+   "all_contacts_vs_true_set": {
+    "contacts": 3736,
+    "normal_err_deg_p50_p95_p99": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "share_over_10deg": 0.0,
+    "count_equal_true": 0.996,
+    "fewer_than_true": 0,
+    "more_than_true": 11
+   }
+  },
+  "MuJoCo Warp, GJK/EPA per prism (HFIELD_PLANE_CONTACTS False)": {
+   "all": {
+    "n": 3000,
+    "no_contact": 0,
+    "contacts_mean": 1.24,
+    "deepest_normal_err_deg_p50_p95": [
+     0.0,
+     0.01
+    ],
+    "weighted_normal_err_deg_p50_p95": [
+     0.0,
+     14.12
+    ],
+    "depth_err_mm_p50_p95": [
+     0.0,
+     0.0
+    ],
+    "horizontal_normal_share": 0.0
+   },
+   "steep": {
+    "n": 1911,
+    "no_contact": 0,
+    "contacts_mean": 1.22,
+    "deepest_normal_err_deg_p50_p95": [
+     0.0,
+     0.01
+    ],
+    "weighted_normal_err_deg_p50_p95": [
+     0.0,
+     14.21
+    ],
+    "depth_err_mm_p50_p95": [
+     0.0,
+     0.0
+    ],
+    "horizontal_normal_share": 0.0
+   },
+   "flat": {
+    "n": 1089,
+    "no_contact": 0,
+    "contacts_mean": 1.27,
+    "deepest_normal_err_deg_p50_p95": [
+     0.0,
+     0.01
+    ],
+    "weighted_normal_err_deg_p50_p95": [
+     0.0,
+     13.64
+    ],
+    "depth_err_mm_p50_p95": [
+     0.0,
+     0.0
+    ],
+    "horizontal_normal_share": 0.0
+   },
+   "mujoco_warp": {
+    "file": "runs/readme_media/scratch/g1-bumps-metalsim/mjw_787a5b3/mujoco_warp/__init__.py",
+    "git": null,
+    "archive_of": "787a5b3a37acc2551ffc8a2c1af1e9781d76723f (git -C upstream/mujoco_warp archive 787a5b3a)"
+   },
+   "all_contacts_vs_true_set": {
+    "contacts": 3707,
+    "normal_err_deg_p50_p95_p99": [
+     0.0,
+     0.01,
+     0.02
+    ],
+    "share_over_10deg": 0.0003,
+    "count_equal_true": 0.995,
+    "fewer_than_true": 14,
+    "more_than_true": 0
+   }
+  }
+ },
+ "exact_contacts_per_sphere": {
+  "1": 2339,
+  "2": 630,
+  "3": 15,
+  "4": 3,
+  "5": 10,
+  "6": 3
+ }
+}

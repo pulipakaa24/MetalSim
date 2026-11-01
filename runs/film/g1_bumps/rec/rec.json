@@ -1,0 +1,1194 @@
+{
+ "task": "g1_bumps",
+ "backend": "mujoco",
+ "venv": "main",
+ "frames": 401,
+ "fps": 50.0,
+ "frame_dt": 0.02,
+ "num_envs": 16,
+ "envs": [
+  6
+ ],
+ "checkpoint": {
+  "path": "assets/unitree_rl_gym/deploy/pre_train/g1/motion.pt",
+  "in_repo": false,
+  "sha256": "cf668f75b90d1abf73d2b87612a6e76bccc61ff7e083b63582d3f6aaa3c1759d",
+  "bytes": 145745,
+  "format": "torchscript",
+  "source": "Unitree unitree_rl_gym pretrained G1 policy",
+  "source_url": "https://github.com/unitreerobotics/unitree_rl_gym/blob/276801e46c5d433564f24658bac64f254b7d2d4b/deploy/pre_train/g1/motion.pt",
+  "published_sha256": "cf668f75b90d1abf73d2b87612a6e76bccc61ff7e083b63582d3f6aaa3c1759d",
+  "commit": "276801e46c5d433564f24658bac64f254b7d2d4b",
+  "licence": "BSD-3-Clause",
+  "fetch": "scripts/fetch_unitree_rl_gym.sh"
+ },
+ "allow_early_end": true,
+ "early_end_envs": [
+  6
+ ],
+ "geom_names": [
+  "floor",
+  "backdrop",
+  "_film_geom_2",
+  "_film_geom_3",
+  "_film_geom_4",
+  "_film_geom_5",
+  "_film_geom_6",
+  "_film_geom_7",
+  "_film_geom_8",
+  "_film_geom_9",
+  "_film_geom_10",
+  "_film_geom_11",
+  "_film_geom_12",
+  "_film_geom_13",
+  "_film_geom_14",
+  "_film_geom_15",
+  "_film_geom_16",
+  "_film_geom_17",
+  "_film_geom_18",
+  "_film_geom_19",
+  "_film_geom_20",
+  "_film_geom_21",
+  "_film_geom_22",
+  "_film_geom_23",
+  "_film_geom_24",
+  "_film_geom_25",
+  "_film_geom_26",
+  "_film_geom_27",
+  "_film_geom_28",
+  "_film_geom_29",
+  "_film_geom_30",
+  "_film_geom_31",
+  "_film_geom_32",
+  "_film_geom_33",
+  "_film_geom_34",
+  "_film_geom_35",
+  "_film_geom_36",
+  "_film_geom_37",
+  "_film_geom_38",
+  "_film_geom_39",
+  "_film_geom_40",
+  "_film_geom_41",
+  "_film_geom_42",
+  "_film_geom_43",
+  "_film_geom_44",
+  "_film_geom_45",
+  "_film_geom_46",
+  "_film_geom_47",
+  "_film_geom_48",
+  "_film_geom_49",
+  "_film_geom_50",
+  "_film_geom_51",
+  "_film_geom_52",
+  "_film_geom_53",
+  "_film_geom_54",
+  "_film_geom_55",
+  "_film_geom_56",
+  "_film_geom_57",
+  "_film_geom_58",
+  "_film_geom_59",
+  "_film_geom_60"
+ ],
+ "episodes": {
+  "6": {
+   "terminated": true,
+   "base_z": 0.3752555251121521,
+   "end_frame": 266
+  }
+ },
+ "all_first_episodes": {
+  "terminated": [
+   true,
+   false,
+   true,
+   true,
+   true,
+   false,
+   true,
+   true,
+   true,
+   true,
+   false,
+   true,
+   true,
+   false,
+   true,
+   true
+  ],
+  "base_z": [
+   0.3783104717731476,
+   0.0,
+   0.39573419094085693,
+   0.3687131106853485,
+   0.3769325911998749,
+   0.0,
+   0.3752555251121521,
+   0.395381897687912,
+   0.3727646470069885,
+   0.39851510524749756,
+   0.0,
+   0.39037203788757324,
+   0.38136112689971924,
+   0.0,
+   0.3663513958454132,
+   0.3798770308494568
+  ],
+  "end_frame": [
+   129,
+   -1,
+   264,
+   224,
+   172,
+   -1,
+   266,
+   249,
+   286,
+   286,
+   -1,
+   261,
+   389,
+   -1,
+   183,
+   275
+  ]
+ },
+ "particles_per_env": 0,
+ "particle_radius": 0.0,
+ "twin": {
+  "kind": "mujoco",
+  "geoms": 61,
+  "meshes": 27,
+  "textures": 2,
+  "materials": 1,
+  "visibility": {
+   "colliders_hidden": 32,
+   "sites_hidden": 0
+  },
+  "build_s": 0.025103958003455773,
+  "poses_s": 0.0009255830009351484
+ },
+ "adapter": {
+  "policy": "assets/unitree_rl_gym/deploy/pre_train/g1/motion.pt",
+  "policy_format": "torchscript",
+  "policy_source": {
+   "source": "Unitree unitree_rl_gym pretrained G1 policy",
+   "source_url": "https://github.com/unitreerobotics/unitree_rl_gym/blob/276801e46c5d433564f24658bac64f254b7d2d4b/deploy/pre_train/g1/motion.pt",
+   "published_sha256": "cf668f75b90d1abf73d2b87612a6e76bccc61ff7e083b63582d3f6aaa3c1759d",
+   "commit": "276801e46c5d433564f24658bac64f254b7d2d4b",
+   "licence": "BSD-3-Clause",
+   "fetch": "scripts/fetch_unitree_rl_gym.sh"
+  },
+  "policy_arch": "TorchScript: LSTM 47 -> 64, ELU MLP 64 -> 32 -> 12; one loaded copy per env (recurrent state in the module)",
+  "unitree_rl_gym": {
+   "repo": "https://github.com/unitreerobotics/unitree_rl_gym",
+   "commit": "276801e46c5d433564f24658bac64f254b7d2d4b",
+   "licence": "BSD-3-Clause",
+   "config": "deploy/deploy_mujoco/configs/g1.yaml",
+   "scene": "resources/robots/g1_description/scene.xml",
+   "policy": "deploy/pre_train/g1/motion.pt"
+  },
+  "unitree_config": {
+   "simulation_dt": 0.002,
+   "control_decimation": 10,
+   "kps": [
+    100.0,
+    100.0,
+    100.0,
+    150.0,
+    40.0,
+    40.0,
+    100.0,
+    100.0,
+    100.0,
+    150.0,
+    40.0,
+    40.0
+   ],
+   "kds": [
+    2.0,
+    2.0,
+    2.0,
+    4.0,
+    2.0,
+    2.0,
+    2.0,
+    2.0,
+    2.0,
+    4.0,
+    2.0,
+    2.0
+   ],
+   "default_angles": [
+    -0.10000000149011612,
+    0.0,
+    0.0,
+    0.30000001192092896,
+    -0.20000000298023224,
+    0.0,
+    -0.10000000149011612,
+    0.0,
+    0.0,
+    0.30000001192092896,
+    -0.20000000298023224,
+    0.0
+   ],
+   "ang_vel_scale": 0.25,
+   "dof_pos_scale": 1.0,
+   "dof_vel_scale": 0.05,
+   "action_scale": 0.25,
+   "cmd_scale": [
+    2.0,
+    2.0,
+    0.25
+   ],
+   "num_actions": 12,
+   "num_obs": 47,
+   "cmd_init": [
+    0.5,
+    0.0,
+    0.0
+   ]
+  },
+  "cmd": [
+   0.5,
+   0.0,
+   0.0
+  ],
+  "env_build_s": 3.0087243329980993,
+  "engine": "mujoco_warp",
+  "physics": "MuJoCo Warp BatchSim (metalsim.physics.batch), Unitree's scene.xml; Unitree's PD torque every physics step (Warp kernel: before the first step of a policy step, then BatchSim.add_substep_hook after each)",
+  "model": {
+   "timestep": 0.002,
+   "integrator": 0,
+   "cone": 0,
+   "solver": 2,
+   "iterations": 100,
+   "ls_iterations": 50,
+   "nq": 19,
+   "nv": 18,
+   "nu": 12
+  },
+  "foot_geoms": {
+   "bodies": [
+    "left_ankle_roll_link",
+    "right_ankle_roll_link"
+   ],
+   "geoms": [
+    [
+     41,
+     42,
+     43,
+     44
+    ],
+    [
+     56,
+     57,
+     58,
+     59
+    ]
+   ],
+   "point": "mean of the four sole-sphere centres",
+   "contact": "any sphere-floor contact"
+  },
+  "capacity_overflow": {},
+  "actions": "Unitree's policy output (deterministic)",
+  "done": "none (Unitree's playback has no termination); pelvis below 0.4 m reported as down",
+  "terrain": {
+   "config": {
+    "isaac": "ROUGH_TERRAINS_CFG['random_rough'] (Isaac Lab v2.3.2 config/rough.py)",
+    "sub_terrain": {
+     "function": "hf_random_uniform",
+     "proportion": 0.2,
+     "noise_range": [
+      0.02,
+      0.1
+     ],
+     "noise_step": 0.02,
+     "downsampled_scale": null,
+     "border_width": 0.25
+    },
+    "isaac_noise_range": [
+     0.02,
+     0.1
+    ],
+    "exact_isaac": true,
+    "size": [
+     8.0,
+     8.0
+    ],
+    "border_width": 20.0,
+    "horizontal_scale": 0.1,
+    "vertical_scale": 0.005,
+    "slope_threshold": 0.75,
+    "seed": 0,
+    "generator_seed": 0,
+    "difficulty": 0.2698,
+    "difficulty_note": "drawn by the generator and ignored by random_uniform_terrain"
+   },
+   "stats": {
+    "hfield_samples": [
+     481,
+     481
+    ],
+    "extent_m": [
+     48.0,
+     48.0
+    ],
+    "tile_heights_m": [
+     0.02,
+     0.04,
+     0.06,
+     0.08,
+     0.1
+    ],
+    "tile_max_m": 0.10000000149011612,
+    "grid_edges": 12960,
+    "wall_edges": 1014,
+    "wall_note": "edges of Isaac's height field whose jump exceeds slope_threshold x horizontal_scale: vertical walls in Isaac's mesh, 0.1 m ramps in the heightfield"
+   },
+   "geom": "floor (Unitree's floor plane, now type hfield)",
+   "capacity": {
+    "nconmax": 512,
+    "njmax": 2048
+   }
+  },
+  "starts": {
+   "rule": {
+    "x0": -2.0,
+    "y": [
+     -3.0,
+     3.0
+    ]
+   },
+   "xy": [
+    [
+     -2.0,
+     -3.0
+    ],
+    [
+     -2.0,
+     -2.6
+    ],
+    [
+     -2.0,
+     -2.2
+    ],
+    [
+     -2.0,
+     -1.8
+    ],
+    [
+     -2.0,
+     -1.4
+    ],
+    [
+     -2.0,
+     -1.0
+    ],
+    [
+     -2.0,
+     -0.6
+    ],
+    [
+     -2.0,
+     -0.2
+    ],
+    [
+     -2.0,
+     0.2
+    ],
+    [
+     -2.0,
+     0.6
+    ],
+    [
+     -2.0,
+     1.0
+    ],
+    [
+     -2.0,
+     1.4
+    ],
+    [
+     -2.0,
+     1.8
+    ],
+    [
+     -2.0,
+     2.2
+    ],
+    [
+     -2.0,
+     2.6
+    ],
+    [
+     -2.0,
+     3.0
+    ]
+   ]
+  },
+  "pick": "typical",
+  "pick_info": {
+   "rule": "typical outcome (UnitreeG1._rank_typical)",
+   "outcome": "fall",
+   "envs_down": 12,
+   "envs": 16,
+   "median": 5.27,
+   "median_of": "fall time, s (frame end)",
+   "film_lanes_y": [
+    -1.4,
+    1.0
+   ],
+   "eligible": [
+    4,
+    6,
+    7,
+    8,
+    9
+   ],
+   "chosen": 6,
+   "chosen_value": 5.34
+  },
+  "first_episode": {
+   "start": [
+    [
+     -2.0,
+     -3.0,
+     0.893
+    ],
+    [
+     -2.0,
+     -2.6,
+     0.8761
+    ],
+    [
+     -2.0,
+     -2.2,
+     0.883
+    ],
+    [
+     -2.0,
+     -1.8,
+     0.8725
+    ],
+    [
+     -2.0,
+     -1.4,
+     0.893
+    ],
+    [
+     -2.0,
+     -1.0,
+     0.8711
+    ],
+    [
+     -2.0,
+     -0.6,
+     0.8928
+    ],
+    [
+     -2.0,
+     -0.2,
+     0.8929
+    ],
+    [
+     -2.0,
+     0.2,
+     0.8517
+    ],
+    [
+     -2.0,
+     0.6,
+     0.8924
+    ],
+    [
+     -2.0,
+     1.0,
+     0.8826
+    ],
+    [
+     -2.0,
+     1.4,
+     0.8914
+    ],
+    [
+     -2.0,
+     1.8,
+     0.893
+    ],
+    [
+     -2.0,
+     2.2,
+     0.8574
+    ],
+    [
+     -2.0,
+     2.6,
+     0.8548
+    ],
+    [
+     -2.0,
+     3.0,
+     0.8554
+    ]
+   ],
+   "path_m": [
+    1.498,
+    3.001,
+    2.324,
+    2.313,
+    2.552,
+    3.088,
+    2.876,
+    2.654,
+    3.002,
+    3.417,
+    4.037,
+    3.052,
+    4.336,
+    3.099,
+    3.19,
+    2.81
+   ],
+   "descent_m": [
+    -0.515,
+    -0.075,
+    -0.487,
+    -0.504,
+    -0.516,
+    -0.059,
+    -0.518,
+    -0.497,
+    -0.479,
+    -0.494,
+    -0.209,
+    -0.501,
+    -0.512,
+    -0.08,
+    -0.488,
+    -0.476
+   ]
+  },
+  "down_frame": [
+   129,
+   -1,
+   264,
+   224,
+   172,
+   -1,
+   266,
+   249,
+   286,
+   286,
+   -1,
+   261,
+   389,
+   -1,
+   183,
+   275
+  ],
+  "forward_m": [
+   -0.598,
+   2.795,
+   2.162,
+   0.217,
+   2.174,
+   2.696,
+   0.74,
+   1.603,
+   2.578,
+   2.576,
+   3.823,
+   1.95,
+   3.852,
+   1.979,
+   2.571,
+   0.887
+  ]
+ },
+ "gait": {
+  "definition": "Per env and foot over its window (from 1 s to the first episode's end or the clip's end). Foot: the centre of the foot collider (adapter's feet), its height taken above the task's collision surface (adapter.ground_height; 0 on flat ground): the highest surface point under the foot's footprint (adapter's feet_footprint: its bounding-box corners; else straight below the centre), so a foot standing across a step edge is on the upper tread. cadence_hz: peak of the Hann-windowed FFT of the mean-removed foot height (zero-padded to >= 16x, searched in 0.5-10 Hz), i.e. gait cycles per second of that foot. apex_m: 95th percentile of the foot height above its stance height (median height while in contact). slip_mps: median horizontal speed of the foot between consecutive frames that are both in contact. air_frac: fraction of frames not in contact. touchdowns_hz: contact onsets after at least 2 frames in the air, per second (a terrain-independent cross-check of the cadence; needs feet_contact). Contact: the adapter's feet_contact (the task's touch sensor > 1 N), else within 15 mm of the window's lowest height. speed_mps: pelvis horizontal path / window time; stride_m: speed / mean cadence (ground covered per gait cycle). Summary: medians over envs whose first episode did not terminate and that walk (speed >= 0.15 m/s).",
+  "t0_s": 1.0,
+  "contact": "adapter feet_contact",
+  "per_env": {
+   "0": null,
+   "1": {
+    "window_s": [
+     1.0,
+     8.02
+    ],
+    "cadence_hz": [
+     1.257,
+     1.251
+    ],
+    "apex_m": [
+     0.0587,
+     0.0635
+    ],
+    "slip_mps": [
+     0.0273,
+     0.0246
+    ],
+    "air_frac": [
+     0.436,
+     0.433
+    ],
+    "touchdowns_hz": [
+     1.567,
+     1.282
+    ],
+    "speed_mps": 0.398,
+    "stride_m": 0.3174,
+    "cmd_speed_mps": 0.5,
+    "cmd_yaw_rate": 0.0,
+    "terminated": false
+   },
+   "2": {
+    "window_s": [
+     1.0,
+     5.3
+    ],
+    "cadence_hz": [
+     1.16,
+     1.27
+    ],
+    "apex_m": [
+     0.066,
+     0.0762
+    ],
+    "slip_mps": [
+     0.0263,
+     0.0276
+    ],
+    "air_frac": [
+     0.265,
+     0.177
+    ],
+    "touchdowns_hz": [
+     0.93,
+     0.698
+    ],
+    "speed_mps": 0.468,
+    "stride_m": 0.3852,
+    "cmd_speed_mps": 0.5,
+    "cmd_yaw_rate": 0.0,
+    "terminated": true
+   },
+   "3": {
+    "window_s": [
+     1.0,
+     4.5
+    ],
+    "cadence_hz": [
+     1.013,
+     1.257
+    ],
+    "apex_m": [
+     0.1047,
+     0.0514
+    ],
+    "slip_mps": [
+     0.0672,
+     0.0542
+    ],
+    "air_frac": [
+     0.509,
+     0.131
+    ],
+    "touchdowns_hz": [
+     2.286,
+     1.143
+    ],
+    "speed_mps": 0.521,
+    "stride_m": 0.459,
+    "cmd_speed_mps": 0.5,
+    "cmd_yaw_rate": 0.0,
+    "terminated": true
+   },
+   "4": {
+    "window_s": [
+     1.0,
+     3.46
+    ],
+    "cadence_hz": [
+     0.513,
+     0.513
+    ],
+    "apex_m": [
+     0.3575,
+     0.0617
+    ],
+    "slip_mps": [
+     0.1083,
+     0.1422
+    ],
+    "air_frac": [
+     0.439,
+     0.301
+    ],
+    "touchdowns_hz": [
+     1.626,
+     1.626
+    ],
+    "speed_mps": 0.934,
+    "stride_m": 1.8207,
+    "cmd_speed_mps": 0.5,
+    "cmd_yaw_rate": 0.0,
+    "terminated": true
+   },
+   "5": {
+    "window_s": [
+     1.0,
+     8.02
+    ],
+    "cadence_hz": [
+     1.324,
+     1.221
+    ],
+    "apex_m": [
+     0.0533,
+     0.068
+    ],
+    "slip_mps": [
+     0.0431,
+     0.0235
+    ],
+    "air_frac": [
+     0.464,
+     0.393
+    ],
+    "touchdowns_hz": [
+     1.994,
+     1.425
+    ],
+    "speed_mps": 0.404,
+    "stride_m": 0.3175,
+    "cmd_speed_mps": 0.5,
+    "cmd_yaw_rate": 0.0,
+    "terminated": false
+   },
+   "6": {
+    "window_s": [
+     1.0,
+     5.34
+    ],
+    "cadence_hz": [
+     1.099,
+     1.233
+    ],
+    "apex_m": [
+     0.1044,
+     0.1029
+    ],
+    "slip_mps": [
+     0.0215,
+     0.0576
+    ],
+    "air_frac": [
+     0.3,
+     0.488
+    ],
+    "touchdowns_hz": [
+     1.843,
+     1.613
+    ],
+    "speed_mps": 0.569,
+    "stride_m": 0.488,
+    "cmd_speed_mps": 0.5,
+    "cmd_yaw_rate": 0.0,
+    "terminated": true
+   },
+   "7": {
+    "window_s": [
+     1.0,
+     5.0
+    ],
+    "cadence_hz": [
+     1.331,
+     1.392
+    ],
+    "apex_m": [
+     0.0572,
+     0.0805
+    ],
+    "slip_mps": [
+     0.044,
+     0.0558
+    ],
+    "air_frac": [
+     0.33,
+     0.36
+    ],
+    "touchdowns_hz": [
+     1.25,
+     1.5
+    ],
+    "speed_mps": 0.576,
+    "stride_m": 0.4231,
+    "cmd_speed_mps": 0.5,
+    "cmd_yaw_rate": 0.0,
+    "terminated": true
+   },
+   "8": {
+    "window_s": [
+     1.0,
+     5.74
+    ],
+    "cadence_hz": [
+     1.599,
+     1.343
+    ],
+    "apex_m": [
+     0.0645,
+     0.0672
+    ],
+    "slip_mps": [
+     0.0925,
+     0.0467
+    ],
+    "air_frac": [
+     0.295,
+     0.405
+    ],
+    "touchdowns_hz": [
+     1.688,
+     1.899
+    ],
+    "speed_mps": 0.571,
+    "stride_m": 0.3882,
+    "cmd_speed_mps": 0.5,
+    "cmd_yaw_rate": 0.0,
+    "terminated": true
+   },
+   "9": {
+    "window_s": [
+     1.0,
+     5.74
+    ],
+    "cadence_hz": [
+     1.233,
+     1.257
+    ],
+    "apex_m": [
+     0.0518,
+     0.0808
+    ],
+    "slip_mps": [
+     0.1174,
+     0.0447
+    ],
+    "air_frac": [
+     0.308,
+     0.274
+    ],
+    "touchdowns_hz": [
+     1.266,
+     1.055
+    ],
+    "speed_mps": 0.643,
+    "stride_m": 0.5165,
+    "cmd_speed_mps": 0.5,
+    "cmd_yaw_rate": 0.0,
+    "terminated": true
+   },
+   "10": {
+    "window_s": [
+     1.0,
+     8.02
+    ],
+    "cadence_hz": [
+     1.251,
+     1.257
+    ],
+    "apex_m": [
+     0.0489,
+     0.0547
+    ],
+    "slip_mps": [
+     0.0234,
+     0.0321
+    ],
+    "air_frac": [
+     0.419,
+     0.379
+    ],
+    "touchdowns_hz": [
+     1.567,
+     1.567
+    ],
+    "speed_mps": 0.519,
+    "stride_m": 0.4139,
+    "cmd_speed_mps": 0.5,
+    "cmd_yaw_rate": 0.0,
+    "terminated": false
+   },
+   "11": {
+    "window_s": [
+     1.0,
+     5.24
+    ],
+    "cadence_hz": [
+     0.5,
+     0.696
+    ],
+    "apex_m": [
+     0.0659,
+     0.0737
+    ],
+    "slip_mps": [
+     0.0598,
+     0.0767
+    ],
+    "air_frac": [
+     0.208,
+     0.151
+    ],
+    "touchdowns_hz": [
+     2.123,
+     0.708
+    ],
+    "speed_mps": 0.584,
+    "stride_m": 0.9766,
+    "cmd_speed_mps": 0.5,
+    "cmd_yaw_rate": 0.0,
+    "terminated": true
+   },
+   "12": {
+    "window_s": [
+     1.0,
+     7.8
+    ],
+    "cadence_hz": [
+     1.227,
+     1.245
+    ],
+    "apex_m": [
+     0.0679,
+     0.0765
+    ],
+    "slip_mps": [
+     0.0571,
+     0.0457
+    ],
+    "air_frac": [
+     0.332,
+     0.368
+    ],
+    "touchdowns_hz": [
+     1.471,
+     1.765
+    ],
+    "speed_mps": 0.588,
+    "stride_m": 0.4757,
+    "cmd_speed_mps": 0.5,
+    "cmd_yaw_rate": 0.0,
+    "terminated": true
+   },
+   "13": {
+    "window_s": [
+     1.0,
+     8.02
+    ],
+    "cadence_hz": [
+     1.251,
+     0.714
+    ],
+    "apex_m": [
+     0.0545,
+     0.0715
+    ],
+    "slip_mps": [
+     0.0286,
+     0.0401
+    ],
+    "air_frac": [
+     0.336,
+     0.308
+    ],
+    "touchdowns_hz": [
+     0.997,
+     0.997
+    ],
+    "speed_mps": 0.397,
+    "stride_m": 0.4041,
+    "cmd_speed_mps": 0.5,
+    "cmd_yaw_rate": 0.0,
+    "terminated": false
+   },
+   "14": {
+    "window_s": [
+     1.0,
+     3.68
+    ],
+    "cadence_hz": [
+     3.076,
+     3.125
+    ],
+    "apex_m": [
+     0.0989,
+     0.0973
+    ],
+    "slip_mps": [
+     0.2605,
+     0.1252
+    ],
+    "air_frac": [
+     0.403,
+     0.366
+    ],
+    "touchdowns_hz": [
+     2.239,
+     2.612
+    ],
+    "speed_mps": 1.018,
+    "stride_m": 0.3283,
+    "cmd_speed_mps": 0.5,
+    "cmd_yaw_rate": 0.0,
+    "terminated": true
+   },
+   "15": {
+    "window_s": [
+     1.0,
+     5.52
+    ],
+    "cadence_hz": [
+     1.27,
+     1.257
+    ],
+    "apex_m": [
+     0.0495,
+     0.0483
+    ],
+    "slip_mps": [
+     0.0227,
+     0.0543
+    ],
+    "air_frac": [
+     0.363,
+     0.265
+    ],
+    "touchdowns_hz": [
+     1.77,
+     1.106
+    ],
+    "speed_mps": 0.547,
+    "stride_m": 0.4329,
+    "cmd_speed_mps": 0.5,
+    "cmd_yaw_rate": 0.0,
+    "terminated": true
+   }
+  },
+  "summary": {
+   "envs": 4,
+   "envs_standing": 0,
+   "envs_terminated": 12,
+   "cadence_hz": [
+    1.254,
+    1.236
+   ],
+   "touchdowns_hz": [
+    1.567,
+    1.3535
+   ],
+   "apex_m": [
+    0.0539,
+    0.0658
+   ],
+   "slip_mps": [
+    0.028,
+    0.0284
+   ],
+   "air_frac": [
+    0.4275,
+    0.386
+   ],
+   "speed_mps": 0.401,
+   "stride_m": 0.3608,
+   "cmd_speed_mps": 0.5
+  },
+  "filmed": {
+   "6": {
+    "window_s": [
+     1.0,
+     5.34
+    ],
+    "cadence_hz": [
+     1.099,
+     1.233
+    ],
+    "apex_m": [
+     0.1044,
+     0.1029
+    ],
+    "slip_mps": [
+     0.0215,
+     0.0576
+    ],
+    "air_frac": [
+     0.3,
+     0.488
+    ],
+    "touchdowns_hz": [
+     1.843,
+     1.613
+    ],
+    "speed_mps": 0.569,
+    "stride_m": 0.488,
+    "cmd_speed_mps": 0.5,
+    "cmd_yaw_rate": 0.0,
+    "terminated": true
+   }
+  }
+ },
+ "timing": {
+  "sim_ms_mean": 66.361546149536,
+  "sim_ms_median": 68.29987500532297,
+  "sim_ms_first": 77.29183299670694,
+  "sim_s_total": 26.61098000596394,
+  "rollout_s": 26.72064833300101,
+  "twin_s": 0.02602954100439092,
+  "record_wall_s": 30.820131250002305,
+  "env_build_s": 3.0087243329980993
+ },
+ "software": {
+  "metalsim": "e67efcb9f9+dirty",
+  "warp": {
+   "version": "1.18.0.dev20260917",
+   "git": "52c09cdd82",
+   "checkout": "upstream/warp-metalsim"
+  },
+  "mujoco": {
+   "version": "3.14.0"
+  },
+  "mujoco_warp": {
+   "version": "3.14.0",
+   "git": "787a5b3a37",
+   "checkout": "upstream/mujoco_warp"
+  },
+  "torch": {
+   "version": "2.14.0"
+  },
+  "numpy": {
+   "version": "2.5.3"
+  }
+ },
+ "hardware": {
+  "machine": "arm64",
+  "python": "3.13.7",
+  "power": {
+   "source": "AC Power",
+   "battery_percent": 89,
+   "battery_state": "charging",
+   "mode": "High Power",
+   "mode_setting": "powermode 2",
+   "at": "2026-10-31T23:37:22-0700"
+  },
+  "model": "Mac16,6",
+  "cpu": "Apple M4 Max",
+  "memory_gb": 64,
+  "macos": "27.0.1",
+  "macos_build": "26A434",
+  "gpu": "Apple M4 Max",
+  "gpu_cores": "40"
+ }
+}

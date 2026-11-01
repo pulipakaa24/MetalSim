@@ -1,0 +1,227 @@
+{
+ "placements": 3000,
+ "sphere_radius": 0.005,
+ "depth_mm": [
+  0.5,
+  3.0
+ ],
+ "exact_tilt_deg_p50_p95_max": [
+  24.1,
+  40.3,
+  48.5
+ ],
+ "engines": {
+  "MuJoCo C 3.14 (mj_forward)": {
+   "all": {
+    "n": 3000,
+    "no_contact": 0,
+    "contacts_mean": 1.25,
+    "deepest_normal_err_deg_p50_p95": [
+     0.0,
+     0.0
+    ],
+    "weighted_normal_err_deg_p50_p95": [
+     0.0,
+     14.15
+    ],
+    "depth_err_mm_p50_p95": [
+     0.0,
+     0.0
+    ],
+    "horizontal_normal_share": 0.0
+   },
+   "steep": {
+    "n": 1911,
+    "no_contact": 0,
+    "contacts_mean": 1.23,
+    "deepest_normal_err_deg_p50_p95": [
+     0.0,
+     0.0
+    ],
+    "weighted_normal_err_deg_p50_p95": [
+     0.0,
+     14.24
+    ],
+    "depth_err_mm_p50_p95": [
+     0.0,
+     0.0
+    ],
+    "horizontal_normal_share": 0.0
+   },
+   "flat": {
+    "n": 1089,
+    "no_contact": 0,
+    "contacts_mean": 1.28,
+    "deepest_normal_err_deg_p50_p95": [
+     0.0,
+     0.0
+    ],
+    "weighted_normal_err_deg_p50_p95": [
+     0.0,
+     13.69
+    ],
+    "depth_err_mm_p50_p95": [
+     0.0,
+     0.0
+    ],
+    "horizontal_normal_share": 0.0
+   },
+   "all_contacts_vs_true_set": {
+    "contacts": 3736,
+    "normal_err_deg_p50_p95_p99": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "share_over_10deg": 0.0,
+    "count_equal_true": 0.996,
+    "fewer_than_true": 0,
+    "more_than_true": 11
+   }
+  },
+  "MuJoCo Warp, fork plane contacts (HFIELD_PLANE_CONTACTS True, MetalSim default)": {
+   "all": {
+    "n": 3000,
+    "no_contact": 31,
+    "contacts_mean": 1.03,
+    "deepest_normal_err_deg_p50_p95": [
+     0.0,
+     0.01
+    ],
+    "weighted_normal_err_deg_p50_p95": [
+     0.0,
+     0.0
+    ],
+    "depth_err_mm_p50_p95": [
+     0.0,
+     0.0
+    ],
+    "horizontal_normal_share": 0.0
+   },
+   "steep": {
+    "n": 1911,
+    "no_contact": 28,
+    "contacts_mean": 1.03,
+    "deepest_normal_err_deg_p50_p95": [
+     0.0,
+     0.01
+    ],
+    "weighted_normal_err_deg_p50_p95": [
+     0.0,
+     0.0
+    ],
+    "depth_err_mm_p50_p95": [
+     0.0,
+     0.0
+    ],
+    "horizontal_normal_share": 0.0
+   },
+   "flat": {
+    "n": 1089,
+    "no_contact": 3,
+    "contacts_mean": 1.04,
+    "deepest_normal_err_deg_p50_p95": [
+     0.0,
+     0.01
+    ],
+    "weighted_normal_err_deg_p50_p95": [
+     0.0,
+     0.0
+    ],
+    "depth_err_mm_p50_p95": [
+     0.0,
+     0.0
+    ],
+    "horizontal_normal_share": 0.0
+   },
+   "all_contacts_vs_true_set": {
+    "contacts": 3098,
+    "normal_err_deg_p50_p95_p99": [
+     0.0,
+     0.01,
+     0.01
+    ],
+    "share_over_10deg": 0.0006,
+    "count_equal_true": 0.819,
+    "fewer_than_true": 543,
+    "more_than_true": 0
+   }
+  },
+  "MuJoCo Warp, upstream GJK/EPA per prism (HFIELD_PLANE_CONTACTS False)": {
+   "all": {
+    "n": 3000,
+    "no_contact": 0,
+    "contacts_mean": 1.26,
+    "deepest_normal_err_deg_p50_p95": [
+     0.0,
+     24.09
+    ],
+    "weighted_normal_err_deg_p50_p95": [
+     0.0,
+     21.49
+    ],
+    "depth_err_mm_p50_p95": [
+     0.0,
+     8.0
+    ],
+    "horizontal_normal_share": 0.0
+   },
+   "steep": {
+    "n": 1911,
+    "no_contact": 0,
+    "contacts_mean": 1.27,
+    "deepest_normal_err_deg_p50_p95": [
+     0.0,
+     29.5
+    ],
+    "weighted_normal_err_deg_p50_p95": [
+     0.0,
+     26.58
+    ],
+    "depth_err_mm_p50_p95": [
+     0.0,
+     14.8
+    ],
+    "horizontal_normal_share": 0.0
+   },
+   "flat": {
+    "n": 1089,
+    "no_contact": 0,
+    "contacts_mean": 1.25,
+    "deepest_normal_err_deg_p50_p95": [
+     0.0,
+     0.01
+    ],
+    "weighted_normal_err_deg_p50_p95": [
+     0.0,
+     14.07
+    ],
+    "depth_err_mm_p50_p95": [
+     0.0,
+     0.0
+    ],
+    "horizontal_normal_share": 0.0
+   },
+   "all_contacts_vs_true_set": {
+    "contacts": 3781,
+    "normal_err_deg_p50_p95_p99": [
+     0.0,
+     21.8,
+     35.8
+    ],
+    "share_over_10deg": 0.0611,
+    "count_equal_true": 0.888,
+    "fewer_than_true": 126,
+    "more_than_true": 211
+   }
+  }
+ },
+ "exact_contacts_per_sphere": {
+  "1": 2339,
+  "2": 630,
+  "3": 15,
+  "4": 3,
+  "5": 10,
+  "6": 3
+ }
+}

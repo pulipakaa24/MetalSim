@@ -1,0 +1,52 @@
+[evals] 2026-10-31 15:57:58 mujoco_warp 8eb51fe6 METALSIM_CHANGES.md: deterministic-mode _solve_done and update
+[evals] 15:57:58 expert_7v4: expert 7v4
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     ~/Library/Caches/warp/1.18.0.dev20260917
+metalsim expert 7v4          succ  35 up  32 ttl 4.27s | sat%  27.8  69.2  72.7  66.5  52.7  94.0 | da 0.0138 dctrl 0.0205 rad | a@lim 0.8% | vpk 5.16 ep-med 4.35
+cpu agreement: {'same_outcome': 57, 'only_metalsim': [10003, 10006, 10008, 10014, 10017, 10018, 10019, 10020, 10029, 10030, 10032, 10040, 10042, 10048, 10049, 10051, 10056, 10057, 10058, 10062, 10067, 10070, 10074, 10080, 10091, 10092, 10093, 10095, 10099], 'only_cpu': [10004, 10022, 10025, 10026, 10034, 10039, 10044, 10046, 10053, 10065, 10072, 10079, 10081, 10086]} overflow: {'ITERATIONS': 8, 'LS_ITERATIONS': 100}
+[evals] 15:58:06 orig_7v4: runs/film/so101_lift/policy/so101_lift_ppo.pt 7v4
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     ~/Library/Caches/warp/1.18.0.dev20260917
+metalsim so101_lift_ppo.pt 7v4 succ  72 up  68 ttl 1.58s | sat%  92.5  94.8  99.8  54.7 100.0  97.7 | da 0.6849 dctrl 1.4003 rad | a@lim 65.1% | vpk 6.02 ep-med 5.38
+cpu agreement: {'same_outcome': 75, 'only_metalsim': [10010, 10011, 10024, 10040, 10046, 10047, 10054, 10065, 10081, 10092], 'only_cpu': [10003, 10007, 10012, 10023, 10025, 10030, 10038, 10063, 10073, 10074, 10082, 10084, 10095, 10096, 10099]} overflow: {'ITERATIONS': 16, 'LS_ITERATIONS': 100}
+[evals] 15:58:13 isaac_scaled_7v4: runs/film/so101_lift_smooth/policy/candidates/isaac_scaled.pt 7v4
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     ~/Library/Caches/warp/1.18.0.dev20260917
+metalsim isaac_scaled.pt 7v4 succ  78 up  74 ttl 1.52s | sat%  96.7  87.4  99.9  39.3 100.0 100.0 | da 0.7593 dctrl 1.5786 rad | a@lim 77.9% | vpk 5.89 ep-med 5.39
+cpu agreement: {'same_outcome': 85, 'only_metalsim': [10012, 10016, 10037, 10055, 10058, 10059, 10066, 10097], 'only_cpu': [10021, 10028, 10040, 10070, 10081, 10082, 10092]} overflow: {'ITERATIONS': 5, 'LS_ITERATIONS': 100}
+[evals] 15:58:20 orig_12v: runs/film/so101_lift/policy/so101_lift_ppo.pt 12v
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     ~/Library/Caches/warp/1.18.0.dev20260917
+metalsim so101_lift_ppo.pt 12v succ  99 up  95 ttl 0.94s | sat%  98.6  97.1  99.8  19.0  99.9  99.5 | da 0.9729 dctrl 1.9978 rad | a@lim 78.7% | vpk 5.56 ep-med 5.13
+cpu agreement: {'same_outcome': 99, 'only_metalsim': [], 'only_cpu': [10027]} overflow: {'ITERATIONS': 9, 'LS_ITERATIONS': 100}
+[evals] 15:58:27 expert_12v: expert 12v
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     ~/Library/Caches/warp/1.18.0.dev20260917
+metalsim expert 12v          succ  98 up  93 ttl 1.38s | sat%   6.4  15.8  19.9  15.3  13.3  93.4 | da 0.0043 dctrl 0.0068 rad | a@lim 0.1% | vpk 5.03 ep-med 4.79
+cpu agreement: {'same_outcome': 93, 'only_metalsim': [10008, 10017, 10040, 10071, 10099], 'only_cpu': [10025, 10068]} overflow: {'LS_ITERATIONS': 100}
+[evals] 15:58:36 done

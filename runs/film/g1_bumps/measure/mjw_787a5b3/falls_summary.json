@@ -1,0 +1,224 @@
+{
+ "CPU MuJoCo 3.14 (deterministic)": {
+  "per_seed": {
+   "0": [
+    11
+   ],
+   "1": [
+    10
+   ],
+   "2": [
+    14
+   ],
+   "3": [
+    12
+   ],
+   "4": [
+    8
+   ]
+  },
+  "robots": 80,
+  "falls": 55,
+  "share": 0.688,
+  "per_80_robot_run": [
+   55
+  ],
+  "mean_sd_per_80": [
+   55.0,
+   null
+  ],
+  "files": [
+   "runs/readme_media/scratch/hfield-contacts/falls/cpu_ref.json"
+  ]
+ },
+ "CPU MuJoCo, start + N(0, 1e-6 rad)": {
+  "per_seed": {
+   "0": [
+    12,
+    11,
+    10
+   ],
+   "1": [
+    13,
+    12,
+    11
+   ],
+   "2": [
+    13,
+    11,
+    11
+   ],
+   "3": [
+    11,
+    11,
+    10
+   ],
+   "4": [
+    10,
+    13,
+    5
+   ]
+  },
+  "robots": 240,
+  "falls": 164,
+  "share": 0.683,
+  "per_80_robot_run": [
+   59,
+   58,
+   47
+  ],
+  "mean_sd_per_80": [
+   54.7,
+   6.7
+  ],
+  "files": [
+   "runs/readme_media/scratch/hfield-contacts/falls/cpu_pert_r1.json",
+   "runs/readme_media/scratch/hfield-contacts/falls/cpu_pert_r2.json",
+   "runs/readme_media/scratch/hfield-contacts/falls/cpu_pert_r3.json"
+  ]
+ },
+ "MuJoCo Warp fork 8eb51fe (before the heightfield fixes)": {
+  "per_seed": {
+   "0": [
+    2,
+    5,
+    4,
+    3,
+    1,
+    3
+   ],
+   "1": [
+    3,
+    3,
+    6
+   ],
+   "2": [
+    1,
+    6,
+    5
+   ],
+   "3": [
+    3,
+    1,
+    4
+   ],
+   "4": [
+    1,
+    1,
+    2
+   ]
+  },
+  "robots": 288,
+  "falls": 54,
+  "share": 0.188,
+  "per_80_robot_run": [
+   10,
+   12,
+   20
+  ],
+  "mean_sd_per_80": [
+   14.0,
+   5.3
+  ],
+  "files": [
+   "runs/readme_media/scratch/hfield-contacts/falls/gpu_base.json",
+   "runs/readme_media/scratch/hfield-contacts/falls/gpu_base0_r1.json",
+   "runs/readme_media/scratch/hfield-contacts/falls/gpu_base0_r2.json",
+   "runs/readme_media/scratch/hfield-contacts/falls/gpu_base0_r3.json",
+   "runs/readme_media/scratch/hfield-contacts/falls/gpu_baseall_r1.json",
+   "runs/readme_media/scratch/hfield-contacts/falls/gpu_baseall_r2.json"
+  ]
+ },
+ "MuJoCo Warp, hfield-contacts fix branch (before the EPA fix)": {
+  "per_seed": {
+   "0": [
+    10,
+    11,
+    13
+   ],
+   "1": [
+    16,
+    14,
+    14
+   ],
+   "2": [
+    13,
+    12,
+    14
+   ],
+   "3": [
+    12,
+    13,
+    15
+   ],
+   "4": [
+    7,
+    8,
+    10
+   ]
+  },
+  "robots": 240,
+  "falls": 182,
+  "share": 0.758,
+  "per_80_robot_run": [
+   58,
+   58,
+   66
+  ],
+  "mean_sd_per_80": [
+   60.7,
+   4.6
+  ],
+  "files": [
+   "runs/readme_media/scratch/hfield-contacts/falls/gpu_fix_r1.json",
+   "runs/readme_media/scratch/hfield-contacts/falls/gpu_fix_r2.json",
+   "runs/readme_media/scratch/hfield-contacts/falls/gpu_fix_r3.json"
+  ]
+ },
+ "MuJoCo Warp fork 787a5b3 (this film)": {
+  "per_seed": {
+   "0": [
+    11,
+    11,
+    11
+   ],
+   "1": [
+    13,
+    15,
+    15
+   ],
+   "2": [
+    12,
+    12,
+    12
+   ],
+   "3": [
+    15,
+    11,
+    11
+   ],
+   "4": [
+    9,
+    11,
+    11
+   ]
+  },
+  "robots": 240,
+  "falls": 180,
+  "share": 0.75,
+  "per_80_robot_run": [
+   60,
+   60,
+   60
+  ],
+  "mean_sd_per_80": [
+   60.0,
+   0.0
+  ],
+  "files": [
+   "runs/readme_media/scratch/g1-bumps-metalsim/falls/gpu_m787_r1.json",
+   "runs/readme_media/scratch/g1-bumps-metalsim/falls/gpu_m787_r2.json",
+   "runs/readme_media/scratch/g1-bumps-metalsim/falls/gpu_m787_r3.json"
+  ]
+ }
+}

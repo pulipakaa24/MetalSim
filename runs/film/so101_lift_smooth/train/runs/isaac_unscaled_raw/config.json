@@ -1,0 +1,28 @@
+{
+ "variant": "isaac_unscaled_raw",
+ "total_steps": 10000000,
+ "switch_at_steps": 2777778,
+ "w_initial": 0.0001,
+ "w_final": 0.1,
+ "servo": "7v4",
+ "start": {
+  "dir": "rl/runs/lift_ppo (run 2)"
+ },
+ "isaac": {
+  "w_initial": 0.0001,
+  "w_final": 0.1,
+  "switch_common_steps": 10000,
+  "total_common_steps": 36000,
+  "source": "IsaacLab3 contrib/lift/lift_env_cfg.py RewardsCfg action_rate/joint_vel, CurriculumCfg; config/franka/agents/rsl_rl_ppo_cfg.py max_iterations 1500, num_steps_per_env 24"
+ },
+ "variant_cfg": {
+  "scale": 1.0,
+  "raw": true,
+  "note": "Isaac Lab's weights as they are, action_rate_l2 on the raw (unclipped) policy output as Isaac Lab computes it; the env clips to [-1, 1] for the servo targets"
+ },
+ "n_envs": 12,
+ "script": "MetalSim runs/readme_media/scratch/so101-smooth/train_smooth.py",
+ "started": "Sat Oct 31 15:56:10 2026",
+ "finished": "Sat Oct 31 16:12:47 2026",
+ "num_timesteps": 18008064
+}

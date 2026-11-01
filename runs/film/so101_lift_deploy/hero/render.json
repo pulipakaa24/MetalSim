@@ -1,0 +1,112 @@
+{
+ "task": "so101_lift_deploy",
+ "grid": 1,
+ "slots": [
+  0
+ ],
+ "envs": [
+  51
+ ],
+ "frames": 300,
+ "fps": 50.0,
+ "width": 1280,
+ "height": 720,
+ "panel": [
+  1280,
+  720
+ ],
+ "tier": 2,
+ "passes": 16,
+ "spp": 4,
+ "samples_per_pixel": 64,
+ "bounces": 4,
+ "denoise": "oidn",
+ "exposure": 0.5999753318483286,
+ "viewer": {
+  "eye": [
+   0.62,
+   -0.48,
+   0.36
+  ],
+  "lookat": [
+   0.12,
+   0.03,
+   0.1
+  ],
+  "origin_type": "env",
+  "env_index": 0,
+  "asset_name": null,
+  "body_name": null,
+  "resolution": [
+   1280,
+   720
+  ],
+  "fovy": 36.0,
+  "smooth_s": 0.0,
+  "orbit_deg_s": 0.0
+ },
+ "look": {
+  "hdri": "hdri/train/poly_haven_studio.hdr",
+  "sun": false,
+  "ground_texture": "tex/train/wood_table_001.png",
+  "ground_tile_m": 1.5,
+  "ground_texrepeat": 1.3333333333333333,
+  "grains_per_particle": 4,
+  "grain_radius": null
+ },
+ "particles_per_env": 0,
+ "particle_radius": 0.0,
+ "setup_s": 0.7933390830003191,
+ "probe": {
+  "frame": 0,
+  "warmup_s": 0.1274184160065488,
+  "one_pass_s": 0.052273540997703094,
+  "full_s": 0.2023228329999256,
+  "per_pass_s": 0.0100032861334815
+ },
+ "twin_geoms": 55,
+ "frame_corrections": 1,
+ "env_grid": {
+  "margin": 1.133416685774214,
+  "cell": [
+   3.367833371548428,
+   2.9678333715484277,
+   4.0378333715484285
+  ],
+  "growths": 0
+ },
+ "cache_key": "5451cd60e7acb74baf1a",
+ "software": {
+  "metalsim": "68f695b29f+dirty",
+  "warp": {
+   "version": "1.18.0.dev20260917",
+   "git": "52c09cdd82",
+   "checkout": "upstream/warp-metalsim"
+  },
+  "mujoco": {
+   "version": "3.14.0"
+  },
+  "numpy": {
+   "version": "2.5.3"
+  }
+ },
+ "hardware": {
+  "machine": "arm64",
+  "python": "3.13.7",
+  "power": {
+   "source": "AC Power",
+   "battery_percent": 100,
+   "battery_state": "finishing charge",
+   "mode": "High Power",
+   "mode_setting": "powermode 2",
+   "at": "2026-11-01T00:31:52-0700"
+  },
+  "model": "Mac16,6",
+  "cpu": "Apple M4 Max",
+  "memory_gb": 64,
+  "macos": "27.0.1",
+  "macos_build": "26A434",
+  "gpu": "Apple M4 Max",
+  "gpu_cores": "40"
+ }
+}

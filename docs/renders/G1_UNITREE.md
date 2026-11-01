@@ -10,11 +10,11 @@ Unitree G1 walking on flat ground with Unitree's own pretrained walking policy (
 
 ## What is shown
 
-- 4 envs simulated, filmed: 2, 3, 0, 1 (selection: automatic, the adapter ranking).
+- 4 envs simulated, filmed: 2, 1, 3, 0 (selection: automatic, the adapter ranking).
   - env 2: terminated False, base_z 0.000, end_frame -1
+  - env 1: terminated False, base_z 0.000, end_frame -1
   - env 3: terminated False, base_z 0.000, end_frame -1
   - env 0: terminated False, base_z 0.000, end_frame -1
-  - env 1: terminated False, base_z 0.000, end_frame -1
 - Policy: `assets/unitree_rl_gym/deploy/pre_train/g1/motion.pt` (torchscript); physics: MuJoCo Warp BatchSim (metalsim.physics.batch), Unitree's scene.xml; Unitree's PD torque every physics step (Warp kernel: before the first step of a policy step, then BatchSim.add_substep_hook after each).
 
 ## Performance
@@ -23,19 +23,19 @@ Measured on the machine below; one frame = one policy step (Isaac Lab's `render_
 
 | stage | measurement |
 |---|---|
-| simulate (record) | 301 frames x 4 envs: 60 ms/frame mean (61 median, first 95 incl. graph capture), 18.1 s total; env build 1.7 s; stage wall 20.8 s |
+| simulate (record) | 301 frames x 4 envs: 47 ms/frame mean (47 median, first 81 incl. graph capture), 14.0 s total; env build 1.7 s; stage wall 16.8 s |
 | render twin (CPU) | 60 geoms, 27 meshes, 2 textures; build 0.0 s, poses 0.0 s |
-| render: hero | 1280x720 (1x1 panels of 1280x720), tier 2 path tracing, 64 spp (16 passes x 4), 3 bounces, denoiser oidn; 0.25 s/frame mean (0.25 median, 0.30 max), 74.3 s for 301 frames; first frame: one pass 49 ms, 8 ms per further pass; set-up 1.2 s |
-| encode: hero | 3.3 s (master CRF 16 + docs copy CRF 22, libx264 slow) |
-| render: readme | 640x480 (1x1 panels of 640x480), tier 2 path tracing, 64 spp (16 passes x 4), 3 bounces, denoiser oidn; 0.10 s/frame mean (0.10 median, 0.16 max), 31.0 s for 301 frames; first frame: one pass 19 ms, 4 ms per further pass; set-up 1.0 s |
+| render: hero | 1280x720 (1x1 panels of 1280x720), tier 2 path tracing, 64 spp (16 passes x 4), 3 bounces, denoiser oidn; 0.25 s/frame mean (0.25 median, 0.34 max), 74.4 s for 301 frames; first frame: one pass 51 ms, 8 ms per further pass; set-up 1.2 s |
+| encode: hero | 3.1 s (master CRF 16 + docs copy CRF 22, libx264 slow) |
+| render: readme | 640x480 (1x1 panels of 640x480), tier 2 path tracing, 64 spp (16 passes x 4), 3 bounces, denoiser oidn; 0.11 s/frame mean (0.11 median, 0.12 max), 32.8 s for 301 frames; first frame: one pass 19 ms, 4 ms per further pass; set-up 0.9 s |
 | end to end | 2.2 min (record + render + encode, sum of stage walls) |
 
 ## Hardware and pins
 
 - Mac16,6 (Apple M4 Max, 40 GPU cores, 64 GB), macOS 27.0.1 (26A434).
-- Power as each stage stamped it (`pmset -g batt` and `pmset -g`; `hardware.power`: the record stage's when it wrote rec.json, a render shot's at its first frame): record: on AC power (36 %, charging), power-mode setting High Power (pmset `powermode 2`), 2026-10-31 13:55 (-0700); render hero: on AC power (36 %, charging), power-mode setting High Power (pmset `powermode 2`), 2026-10-31 13:55 (-0700); render readme: on AC power (37 %, charging), power-mode setting High Power (pmset `powermode 2`), 2026-10-31 13:57 (-0700).
-- metalsim `dfec9ebf2b+dirty`; record stage (main venv): warp 1.18.0.dev20260917 (`4127c48183`), mujoco 3.14.0, mujoco_warp 3.14.0 (`07a51a63bc`), torch 2.14.0, numpy 2.5.3.
-- render stage (main venv): warp 1.18.0.dev20260917 (`4127c48183`), mujoco 3.14.0, numpy 2.5.3.
+- Power as each stage stamped it (`pmset -g batt` and `pmset -g`; `hardware.power`: the record stage's when it wrote rec.json, a render shot's at its first frame): record: on battery (86 %, discharging), power-mode setting High Power (pmset `powermode 2`), 2026-10-31 15:52 (-0700); render hero: on AC power (79 %, charging), power-mode setting High Power (pmset `powermode 2`), 2026-10-31 21:48 (-0700); render readme: on AC power (79 %, charging), power-mode setting High Power (pmset `powermode 2`), 2026-10-31 21:50 (-0700).
+- metalsim `ed66d8ef3e+dirty`; record stage (main venv): warp 1.18.0.dev20260917 (`4127c48183`), mujoco 3.14.0, mujoco_warp 3.14.0 (`8eb51fe637`), torch 2.14.0, numpy 2.5.3.
+- render stage (main venv): warp 1.18.0.dev20260917 (`52c09cdd82`), mujoco 3.14.0, numpy 2.5.3.
 
 ## Assets
 
@@ -88,8 +88,8 @@ with the same code (`record.gait_metrics`, window 1 to 8 s). Scripts and results
 
 | | Unitree's loop, CPU MuJoCo | MetalSim, MuJoCo Warp (4 worlds) |
 |---|---|---|
-| pelvis at 5 s (x, y, z) | (2.2244, -0.0988, 0.7703) m | the same to 0.1 mm; distance 1.3 to 2.2 um |
-| pelvis at 8 s | (3.6469, -0.2573, 0.7723) m | distance 2.8 to 3.7 um |
+| pelvis at 5 s (x, y, z) | (2.2244, -0.0988, 0.7703) m | the same to 0.1 mm; distance 1.4 to 1.8 um |
+| pelvis at 8 s | (3.6469, -0.2573, 0.7723) m | distance 3.8 to 4.4 um |
 | gait cycles per second (FFT of foot height), left / right | 1.251 / 1.251 | 1.251 / 1.251 |
 | touch-downs per second, left / right | 1.14 / 1.29 | 1.14 / 1.29 |
 | swing apex above stance (sole), left / right | 4.2 / 4.4 cm | 4.2 / 4.4 cm |
@@ -133,7 +133,8 @@ so 10 deg/s.
 
 **Rendering.** Tier 2 (the path tracer), 64 samples per pixel (16 passes x 4), 3 bounces, Open Image Denoise, ACES
 tone map, sRGB; lit by the Poly Haven studio HDRI as an importance-sampled dome, with the laminate floor texture on
-the scene's `floor` plane in place of Unitree's checker, the same look as the G1 flat film. The render twin is
+the scene's `floor` plane in place of Unitree's checker, at its real size (Poly Haven's `laminate_floor_02`: 1.70 m
+per image, eight 21 cm planks; `ground_tile_m`), the same look as the G1 flat film. The render twin is
 Unitree's own `scene.xml` with its STL meshes, posed per frame from the recorded joint state. Unitree's model gives
 each link a visual mesh and a colliding copy; the colliding copies and the foot spheres are hidden (`rec.json`
 `twin.visibility`), and the meshes keep Unitree's two greys. The scene's own lights, sky and checker floor are
@@ -145,13 +146,23 @@ WebP from Pillow at quality 70, 33 ms per frame, looping; 150 frames. Command, r
 render stage: `python -m metalsim.render.film.encode webp runs/film/g1_unitree/readme/frames
 docs/renders/g1_unitree.webp --start 0.5 --seconds 5 --src-fps 50 --fps 30`.
 
-**This take, and where its timings come from.** Recorded, rendered and encoded on 2026-10-31 on the 14-inch MacBook
-Pro (Mac16,6), at metalsim `dfec9ebf` plus the uncommitted Unitree port (hence `+dirty` in the pins). This was not a
-timing run: MetalSim's timing runs are made on the 16-inch through the GPU queue's timing kind, and its throughput
-figures are in `docs/PARITY.md` §1.4 and §1.8; quote nothing on this page as MetalSim's speed. Power, as the stages
-stamped it ("Hardware and pins" below): on AC power and charging at every stamp (36 % when the record stage wrote `rec.json` at 13:55, 36 % at the hero shot's first frame at 13:55 and 37 % at the readme shot's at 13:57, local time), with pmset's power-mode setting at High Power (`powermode 2`: the configured setting, which does not show that the machine ran in High Power Mode); the encode and doc stages stamp nothing. Record and render ran as GPU-queue jobs of kind
-render, one at a time, into `runs/film/g1_unitree`: `--stage record`, then `--stage render` (both shots); then
-`--stage encode --shots hero`, the README WebP command above and `--stage doc` (CPU).
+**This take, and where its timings come from.** Recorded, rendered and encoded on 2026-10-31 on the 14-inch MacBook Pro
+(Mac16,6), at metalsim `ed66d8ef` plus uncommitted changes (hence `+dirty` in the pins), on the pinned MuJoCo Warp fork
+commit `8eb51fe` (Warp itself at `4127c481`, not its pin `52c09cdd`). It replaces a take recorded at 13:55 the same day
+on a stale fork checkout (`07a51a6`); the two recordings differ by at most 2 um in any body position. The frames on this
+page were rendered again on 2026-10-31 at 21:48 from that same recording (`rec.npz`, `rec.json` and `twin.xml`
+unchanged; that render ran on Warp `52c09cdd`, its pin, as the render stage's pins above say), after the film tool
+started laying the floor texture at its real size (`ground_tile_m`; the earlier frames drew it 2.35 times too large, as
+50 cm planks). This was not a timing run: MetalSim's timing runs are made on the 16-inch through the GPU queue's timing
+kind, and its throughput figures are in `docs/PARITY.md` §1.4 and §1.8; quote nothing on this page as MetalSim's speed.
+Power, as the stages stamped it ("Hardware and pins" below): on battery, 86 %, discharging, when the record stage wrote
+`rec.json` at 15:52; on AC power, 79 %, charging, at the hero shot's first frame at 21:48 and on AC power, 79 %,
+charging, at the readme shot's at 21:50 (local time; the two render stamps are the re-render's), with pmset's power-mode
+setting at High Power at every stamp (`powermode 2`: the configured setting, which does not show that the machine ran in
+High Power Mode); the encode and doc stages stamp nothing. Record and render ran as GPU-queue jobs of kind render, one
+at a time, into `runs/film/g1_unitree`: `--stage record`, then `--stage render` (both shots); later a second `--stage
+render` job (both shots, the real-size floor); then `--stage encode --shots hero`, the README WebP command above and
+`--stage doc` (CPU).
 
 ## Reproduce
 

@@ -1,0 +1,165 @@
+{
+ "mode": "gpu",
+ "tag": "m787_r3",
+ "ceiling": 0.1,
+ "robots": 16,
+ "seconds": 8.0,
+ "seeds": {
+  "0": {
+   "falls": 11,
+   "fall_s_first": 2.76,
+   "fall_s_median": 5.32,
+   "forward_m_median": 1.968,
+   "nonfoot": 16,
+   "fell": [
+    true,
+    false,
+    true,
+    true,
+    true,
+    false,
+    false,
+    true,
+    true,
+    true,
+    false,
+    true,
+    false,
+    true,
+    true,
+    true
+   ],
+   "info": {
+    "engine": "MuJoCo Warp BatchSim (film adapter UnitreeG1)",
+    "overflow": {},
+    "hfield_plane_contacts": false,
+    "rollout_s": 24.9
+   }
+  },
+  "1": {
+   "falls": 15,
+   "fall_s_first": 1.58,
+   "fall_s_median": 3.38,
+   "forward_m_median": 1.3905,
+   "nonfoot": 15,
+   "fell": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    false
+   ],
+   "info": {
+    "engine": "MuJoCo Warp BatchSim (film adapter UnitreeG1)",
+    "overflow": {},
+    "hfield_plane_contacts": false,
+    "rollout_s": 32.1
+   }
+  },
+  "2": {
+   "falls": 12,
+   "fall_s_first": 2.58,
+   "fall_s_median": 3.92,
+   "forward_m_median": 1.883,
+   "nonfoot": 15,
+   "fell": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    false,
+    true,
+    true,
+    false,
+    true,
+    false,
+    true,
+    false,
+    true,
+    true,
+    true
+   ],
+   "info": {
+    "engine": "MuJoCo Warp BatchSim (film adapter UnitreeG1)",
+    "overflow": {},
+    "hfield_plane_contacts": false,
+    "rollout_s": 28.5
+   }
+  },
+  "3": {
+   "falls": 11,
+   "fall_s_first": 1.58,
+   "fall_s_median": 4.0,
+   "forward_m_median": 2.1755,
+   "nonfoot": 16,
+   "fell": [
+    false,
+    true,
+    true,
+    false,
+    true,
+    true,
+    false,
+    true,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    true,
+    true
+   ],
+   "info": {
+    "engine": "MuJoCo Warp BatchSim (film adapter UnitreeG1)",
+    "overflow": {},
+    "hfield_plane_contacts": false,
+    "rollout_s": 30.7
+   }
+  },
+  "4": {
+   "falls": 11,
+   "fall_s_first": 2.32,
+   "fall_s_median": 4.6,
+   "forward_m_median": 2.0975,
+   "nonfoot": 16,
+   "fell": [
+    true,
+    true,
+    false,
+    true,
+    true,
+    true,
+    false,
+    true,
+    false,
+    false,
+    true,
+    false,
+    true,
+    true,
+    true,
+    true
+   ],
+   "info": {
+    "engine": "MuJoCo Warp BatchSim (film adapter UnitreeG1)",
+    "overflow": {},
+    "hfield_plane_contacts": false,
+    "rollout_s": 25.8
+   }
+  }
+ },
+ "mujoco_warp": "upstream/mujoco_warp/mujoco_warp/__init__.py"
+}
