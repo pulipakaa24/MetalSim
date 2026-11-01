@@ -1,0 +1,16 @@
+=== job rr_smoke_export_s0 start 2026-10-31T17:27:34 on Mac16,6 (MacBook Pro (10))
+power: AC Power | battery 68%; charging; 1:03 remaining present: true | powermode 2
+metalsim HEAD ed66d8ef3ecd7f17aa16207231000b1d22ff7812 2026-10-31 14:02 G1 flat README cell: Unitree's own pretrained walking policy, via its sim2sim loop
+metalsim local changes in the training / evaluation path (git status --short, empty = clean):
+    ?? metalsim/physics/actuation.py
+upstream/mujoco_warp HEAD 93e5ce18e76854c430ce669314af00ddceb92147 branch metalsim (pinned-fix expectation 93e5ce18)
+upstream/warp-metalsim HEAD 52c09cdd82f79e8564b5ae17cdcee7b52d10d075 (expected 52c09cdd)
+PYTHONPATH=<unset>
+mujoco_warp loaded from ~/MetalSim/upstream/mujoco_warp/mujoco_warp/__init__.py commit 93e5ce18e76854c430ce669314af00ddceb92147 (git HEAD of the checkout)
+mujoco_warp heightfield flags {'HFIELD_DUP_COS': 0.99999962, 'HFIELD_DUP_DIST': 0.0001, 'HFIELD_LOCAL_ORIGIN': True, 'HFIELD_PLANE_CONTACTS': False, 'HFIELD_PLANE_CONTACTS_PRIMITIVES': False, 'HFIELD_SELECT_DEDUP': True, 'HFIELD_TRUE_DISTANCE': True, 'HFIELD_PRISM_POLYTOPE': True}
+warp 1.18.0.dev20260917 from ~/MetalSim/upstream/warp-metalsim/warp/__init__.py; mujoco 3.14.0; torch 2.14.0; metalsim from ~/MetalSim/metalsim/__init__.py
+cmd: runs/rough_rerun_2026-10-31/jobs/export.sh runs/rough_rerun_2026-10-31/smoke/ckpt/g1_rough_ppowarp_fixed_s0.pt=runs/rough_rerun_2026-10-31/smoke/isaac_export/metalsim_ckpts_rough/rerun_s0_final.pt
+=== output
+--- 17:27:35 export runs/rough_rerun_2026-10-31/smoke/ckpt/g1_rough_ppowarp_fixed_s0.pt -> runs/rough_rerun_2026-10-31/smoke/isaac_export/metalsim_ckpts_rough/rerun_s0_final.pt
+exported runs/rough_rerun_2026-10-31/smoke/ckpt/g1_rough_ppowarp_fixed_s0.pt -> runs/rough_rerun_2026-10-31/smoke/isaac_export/metalsim_ckpts_rough/rerun_s0_final.pt: 8 tensors, 37 joints
+--- rc 0

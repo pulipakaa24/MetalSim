@@ -1,0 +1,6 @@
+G1 rough PPO: N=4096 obs_dim 310 act_dim 37 rollout 24 x 8 iterations, engine mjwarp, physics dt 0.0025 (decimation 8), seed 0, reward_cfg rough_il3, height-scan ray order xy, terrain collision hfield, height scan exact, solver_cfg isaaclab3_every_substep_cap20, contact_cfg recommended_pyramidal, base velocity com, feet-slide velocity com, initial reset True, effort limit on the actuator, Isaac Lab 3.0 events True (backend newton_mjwarp), add_base_mass {'body': 'torso_link', 'scale_min': 0.8000494837760925, 'scale_max': 1.2497823238372803, 'dof_invweight0_ratio_range': [0.9505320191383362, 1.0460337400436401], 'limit_timeconst_ratio_range': [0.9787044773626695, 1.0248058414581651]}
+it    1 steps     98304 sps   23,095 | ep_ret   -5.60 ep_len   23.7 (n=13) | pg 0.067 vf 0.162 kl 0.1780 lr 1.0e-05
+[anomaly] it 1: KL 0.178 > 10x target: stale data or LR too high
+[anomaly] it 1: joint limit violated by 0.33 rad
+terrain it    1 mean_level 2.4839
+terms it    1 {"track_lin_vel_xy_exp": 0.00455, "track_ang_vel_z_exp": 0.00354, "feet_air_time": 1e-05, "feet_slide": -0.00108, "joint_deviation": -0.00515, "flat_orientation_l2": -0.01074, "action_rate_l2": -0.00881, "termination_penalty": -0.2, "lin_vel_z_l2": 0.0, "ang_vel_xy_l2": -0.05326, "dof_torques_l2": -9e-05, "dof_acc_l2": -0.00899, "dof_pos_limits": -0.00011, "episodes": 13, "base_contact": 1.0, "pushes": 0}

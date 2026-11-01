@@ -1,0 +1,14 @@
+G1 rough PPO: N=64 obs_dim 310 act_dim 37 rollout 24 x 3 iterations, engine mjwarp, physics dt 0.0025 (decimation 8), seed 1, reward_cfg rough_isaac, height-scan ray order xy, terrain collision boxes_local, height scan exact, solver_cfg None, contact_cfg default, base velocity origin, feet-slide velocity origin, initial reset True, effort limit on the actuator
+it    1 steps      1536 sps    1,593 | ep_ret    0.00 ep_len    0.0 (n=0) | pg 0.127 vf 0.129 kl 1.2981 lr 1.0e-05
+[anomaly] it 1: KL 1.298 > 10x target: stale data or LR too high
+[anomaly] it 1: joint limit violated by 0.13 rad
+[anomaly] it 1: contact penetration 2.5 cm
+terrain it    1 mean_level 2.5938
+it    2 steps      3072 sps    1,755 | ep_ret   -5.90 ep_len   37.0 (n=57) | pg -0.029 vf 4.134 kl 0.0143 lr 1.0e-05
+[anomaly] it 2: joint limit violated by 0.14 rad
+terrain it    2 mean_level 1.8281
+it    3 steps      4608 sps    1,814 | ep_ret   -5.92 ep_len   37.7 (n=27) | pg -0.039 vf 1.782 kl 0.0166 lr 1.0e-05
+[anomaly] it 3: joint limit violated by 0.12 rad
+[anomaly] it 3: contact penetration 3.0 cm
+terrain it    3 mean_level 1.5312
+saved policy to runs/rough_rerun_2026-10-31/smoke/ckpt/g1_rough_ppowarp_fixed_s1.pt

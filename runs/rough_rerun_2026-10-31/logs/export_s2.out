@@ -1,0 +1,23 @@
+=== job rr_export_s2 start 2026-10-31T21:56:31 on Mac16,6 (MacBook Pro (10))
+power: AC Power | battery 79%; charging; 1:51 remaining present: true | powermode 2
+metalsim HEAD ed66d8ef3ecd7f17aa16207231000b1d22ff7812 2026-10-31 14:02 G1 flat README cell: Unitree's own pretrained walking policy, via its sim2sim loop
+metalsim local changes in the training / evaluation path (git status --short, empty = clean):
+    ?? metalsim/physics/actuation.py
+upstream/mujoco_warp HEAD 787a5b3a37acc2551ffc8a2c1af1e9781d76723f branch metalsim (pinned-fix expectation 93e5ce18)
+upstream/warp-metalsim HEAD 52c09cdd82f79e8564b5ae17cdcee7b52d10d075 (expected 52c09cdd)
+PYTHONPATH=<unset>
+mujoco_warp loaded from ~/MetalSim/upstream/mujoco_warp/mujoco_warp/__init__.py commit 787a5b3a37acc2551ffc8a2c1af1e9781d76723f (git HEAD of the checkout)
+mujoco_warp heightfield flags {'HFIELD_DUP_COS': 0.99999962, 'HFIELD_DUP_DIST': 0.0001, 'HFIELD_LOCAL_ORIGIN': True, 'HFIELD_PLANE_CONTACTS': False, 'HFIELD_PLANE_CONTACTS_PRIMITIVES': False, 'HFIELD_SELECT_DEDUP': True, 'HFIELD_TRUE_DISTANCE': True, 'HFIELD_MARGIN_SHRINK': True, 'HFIELD_PRISM_POLYTOPE': True}
+warp 1.18.0.dev20260917 from ~/MetalSim/upstream/warp-metalsim/warp/__init__.py; mujoco 3.14.0; torch 2.14.0; metalsim from ~/MetalSim/metalsim/__init__.py
+WARNING: loaded MuJoCo Warp commit 787a5b3a37acc2551ffc8a2c1af1e9781d76723f is not the expected 93e5ce18
+cmd: runs/rough_rerun_2026-10-31/jobs/export.sh runs/rough_rerun_2026-10-31/ckpt/g1_rough_ppowarp_fixed_s2_it500.pt=runs/rough_rerun_2026-10-31/isaac_export/metalsim_ckpts_rough/rerun_s2_it500.pt runs/rough_rerun_2026-10-31/ckpt/g1_rough_ppowarp_fixed_s2_it1000.pt=runs/rough_rerun_2026-10-31/isaac_export/metalsim_ckpts_rough/rerun_s2_it1000.pt runs/rough_rerun_2026-10-31/ckpt/g1_rough_ppowarp_fixed_s2_it1500.pt=runs/rough_rerun_2026-10-31/isaac_export/metalsim_ckpts_rough/rerun_s2_it1500.pt
+=== output
+--- 21:56:32 export runs/rough_rerun_2026-10-31/ckpt/g1_rough_ppowarp_fixed_s2_it500.pt -> runs/rough_rerun_2026-10-31/isaac_export/metalsim_ckpts_rough/rerun_s2_it500.pt
+exported runs/rough_rerun_2026-10-31/ckpt/g1_rough_ppowarp_fixed_s2_it500.pt -> runs/rough_rerun_2026-10-31/isaac_export/metalsim_ckpts_rough/rerun_s2_it500.pt: 8 tensors, 37 joints
+--- rc 0
+--- 21:56:34 export runs/rough_rerun_2026-10-31/ckpt/g1_rough_ppowarp_fixed_s2_it1000.pt -> runs/rough_rerun_2026-10-31/isaac_export/metalsim_ckpts_rough/rerun_s2_it1000.pt
+exported runs/rough_rerun_2026-10-31/ckpt/g1_rough_ppowarp_fixed_s2_it1000.pt -> runs/rough_rerun_2026-10-31/isaac_export/metalsim_ckpts_rough/rerun_s2_it1000.pt: 8 tensors, 37 joints
+--- rc 0
+--- 21:56:36 export runs/rough_rerun_2026-10-31/ckpt/g1_rough_ppowarp_fixed_s2_it1500.pt -> runs/rough_rerun_2026-10-31/isaac_export/metalsim_ckpts_rough/rerun_s2_it1500.pt
+exported runs/rough_rerun_2026-10-31/ckpt/g1_rough_ppowarp_fixed_s2_it1500.pt -> runs/rough_rerun_2026-10-31/isaac_export/metalsim_ckpts_rough/rerun_s2_it1500.pt: 8 tensors, 37 joints
+--- rc 0

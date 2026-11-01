@@ -1,0 +1,15 @@
+G1 rough PPO: N=64 obs_dim 310 act_dim 37 rollout 24 x 3 iterations, engine mjwarp, physics dt 0.0025 (decimation 8), seed 0, reward_cfg rough_il3, height-scan ray order xy, terrain collision hfield, height scan exact, solver_cfg isaaclab3_every_substep_cap20, contact_cfg recommended_pyramidal, base velocity com, feet-slide velocity com, initial reset False, effort limit on the actuator, Isaac Lab 3.0 events True (backend newton_mjwarp), add_base_mass {'body': 'torso_link', 'scale_min': 0.8007341623306274, 'scale_max': 1.2467087507247925, 'dof_invweight0_ratio_range': [0.9510952830314636, 1.045864224433899], 'limit_timeconst_ratio_range': [0.9787797363563435, 1.0245113809316853]}
+it    1 steps      1536 sps      534 | ep_ret   -4.53 ep_len    2.2 (n=64) | pg 0.028 vf 1.596 kl 0.7898 lr 1.0e-05
+[anomaly] it 1: KL 0.790 > 10x target: stale data or LR too high
+[anomaly] it 1: joint limit violated by 0.18 rad
+terrain it    1 mean_level 3.5938
+terms it    1 {"track_lin_vel_xy_exp": 0.00048, "track_ang_vel_z_exp": 0.00014, "feet_air_time": 0.0, "feet_slide": -0.00029, "joint_deviation": -0.00101, "flat_orientation_l2": -1e-05, "action_rate_l2": -0.00061, "termination_penalty": -0.2, "lin_vel_z_l2": 0.0, "ang_vel_xy_l2": -0.00182, "dof_torques_l2": -1e-05, "dof_acc_l2": -0.02348, "dof_pos_limits": 0.0, "episodes": 64, "base_contact": 1.0, "pushes": 64}
+it    2 steps      3072 sps      669 | ep_ret   -5.94 ep_len   35.6 (n=51) | pg -0.033 vf 3.550 kl 0.0193 lr 1.0e-05
+[anomaly] it 2: joint limit violated by 0.15 rad
+terrain it    2 mean_level 2.8594
+terms it    2 {"track_lin_vel_xy_exp": 0.00524, "track_ang_vel_z_exp": 0.00502, "feet_air_time": 3e-05, "feet_slide": -0.00239, "joint_deviation": -0.00825, "flat_orientation_l2": -0.01333, "action_rate_l2": -0.01326, "termination_penalty": -0.2, "lin_vel_z_l2": 0.0, "ang_vel_xy_l2": -0.05519, "dof_torques_l2": -0.00015, "dof_acc_l2": -0.01458, "dof_pos_limits": -0.0003, "episodes": 51, "base_contact": 1.0, "pushes": 0}
+it    3 steps      4608 sps      722 | ep_ret   -6.29 ep_len   41.7 (n=32) | pg -0.036 vf 1.985 kl 0.0178 lr 1.0e-05
+[anomaly] it 3: joint limit violated by 0.15 rad
+terrain it    3 mean_level 2.3750
+terms it    3 {"track_lin_vel_xy_exp": 0.00701, "track_ang_vel_z_exp": 0.00538, "feet_air_time": 4e-05, "feet_slide": -0.00304, "joint_deviation": -0.01, "flat_orientation_l2": -0.01431, "action_rate_l2": -0.01603, "termination_penalty": -0.2, "lin_vel_z_l2": 0.0, "ang_vel_xy_l2": -0.06387, "dof_torques_l2": -0.00017, "dof_acc_l2": -0.01894, "dof_pos_limits": -0.00033, "episodes": 32, "base_contact": 1.0, "pushes": 0}
+saved policy to runs/rough_rerun_2026-10-31/smoke/ckpt/il3fix_rough_s0.pt
