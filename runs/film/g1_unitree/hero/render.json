@@ -21,7 +21,7 @@
  "samples_per_pixel": 64,
  "bounces": 3,
  "denoise": "oidn",
- "exposure": 0.7759123003570688,
+ "exposure": 0.7867002125106805,
  "viewer": {
   "eye": [
    2.6,
@@ -49,36 +49,38 @@
   "hdri": "hdri/train/poly_haven_studio.hdr",
   "sun": false,
   "ground_texture": "tex/train/laminate_floor_02.png",
+  "ground_tile_m": 1.7,
+  "ground_texrepeat": 1.1764705882352942,
   "grains_per_particle": 4,
   "grain_radius": null
  },
  "particles_per_env": 0,
  "particle_radius": 0.0,
- "setup_s": 1.2106226250000418,
+ "setup_s": 1.2033464580017608,
  "probe": {
   "frame": 0,
-  "warmup_s": 0.19275595799990697,
-  "one_pass_s": 0.049371416999974826,
-  "full_s": 0.16505079100011244,
-  "per_pass_s": 0.007711958266675841
+  "warmup_s": 0.15055587499955436,
+  "one_pass_s": 0.05053720900104963,
+  "full_s": 0.16530829100156552,
+  "per_pass_s": 0.007651405466701059
  },
  "twin_geoms": 60,
  "frame_corrections": 0,
  "env_grid": {
-  "margin": 10.136572583080486,
+  "margin": 10.136573536754803,
   "cell": [
-   21.01960144522672,
-   20.713489774505355,
-   21.616872118047496
+   21.019603352575352,
+   20.713491681853988,
+   21.61687402539613
   ],
   "growths": 0
  },
- "cache_key": "66bc4ee77aff6cb51478",
+ "cache_key": "fd13895d4c17cf018b4c",
  "software": {
-  "metalsim": "dfec9ebf2b+dirty",
+  "metalsim": "ed66d8ef3e+dirty",
   "warp": {
    "version": "1.18.0.dev20260917",
-   "git": "4127c48183",
+   "git": "52c09cdd82",
    "checkout": "upstream/warp-metalsim"
   },
   "mujoco": {
@@ -93,11 +95,11 @@
   "python": "3.13.7",
   "power": {
    "source": "AC Power",
-   "battery_percent": 36,
+   "battery_percent": 79,
    "battery_state": "charging",
    "mode": "High Power",
    "mode_setting": "powermode 2",
-   "at": "2026-10-31T13:55:45-0700"
+   "at": "2026-10-31T21:48:43-0700"
   },
   "model": "Mac16,6",
   "cpu": "Apple M4 Max",
