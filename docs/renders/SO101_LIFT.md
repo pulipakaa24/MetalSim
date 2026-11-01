@@ -2,7 +2,7 @@
 
 The Robot Studio's SO-101 arm grasps a 4 x 4 x 6 cm box and lifts it: so101Sim's state-based cube-lift task and its PPO teacher (trained on CPU MuJoCo in so101Sim), played on metalsim (MuJoCo Warp on Metal) through so101Sim's own observation, action and control loop. The realism check below finds the motion beyond what the standard SO-101 follower's servos can do. Rendered on the 14-inch MacBook Pro (Mac16,6), not in a timing run, so its Performance table is not a timing figure.
 
-**hero** (300 frames, 6.0 s at 50 fps): [video](so101_lift.mp4) (0.7 MB, H.264)
+**hero** (300 frames, 6.0 s at 50 fps): [video](so101_lift.mp4) (0.8 MB, H.264)
 
 ![hero, frame 15](so101_lift_still1.jpg)
 ![hero, frame 30](so101_lift_still2.jpg)
@@ -25,17 +25,17 @@ Measured on the machine below; one frame = one policy step (Isaac Lab's `render_
 |---|---|
 | simulate (record) | 300 frames x 16 envs: 9 ms/frame mean (9 median, first 15 incl. graph capture), 2.7 s total; env build 1.2 s; stage wall 4.8 s |
 | render twin (CPU) | 55 geoms, 18 meshes, 1 textures; build 0.0 s, poses 0.0 s |
-| render: hero | 1280x720 (1x1 panels of 1280x720), tier 2 path tracing, 64 spp (16 passes x 4), 4 bounces, denoiser oidn; 0.27 s/frame mean (0.27 median, 0.36 max), 81.7 s for 300 frames; first frame: one pass 51 ms, 10 ms per further pass; set-up 0.8 s |
-| encode: hero | 1.8 s (master CRF 16 + docs copy CRF 22, libx264 slow) |
-| render: readme | 640x480 (1x1 panels of 640x480), tier 2 path tracing, 64 spp (16 passes x 4), 4 bounces, denoiser oidn; 0.12 s/frame mean (0.12 median, 0.21 max), 36.3 s for 300 frames; first frame: one pass 19 ms, 4 ms per further pass; set-up 0.7 s |
+| render: hero | 1280x720 (1x1 panels of 1280x720), tier 2 path tracing, 64 spp (16 passes x 4), 4 bounces, denoiser oidn; 0.27 s/frame mean (0.27 median, 0.30 max), 80.9 s for 300 frames; first frame: one pass 52 ms, 10 ms per further pass; set-up 0.8 s |
+| encode: hero | 2.2 s (master CRF 16 + docs copy CRF 22, libx264 slow) |
+| render: readme | 640x480 (1x1 panels of 640x480), tier 2 path tracing, 64 spp (16 passes x 4), 4 bounces, denoiser oidn; 0.11 s/frame mean (0.11 median, 0.12 max), 33.8 s for 300 frames; first frame: one pass 20 ms, 5 ms per further pass; set-up 0.6 s |
 | end to end | 2.1 min (record + render + encode, sum of stage walls) |
 
 ## Hardware and pins
 
 - Mac16,6 (Apple M4 Max, 40 GPU cores, 64 GB), macOS 27.0.1 (26A434).
-- Power as each stage stamped it (`pmset -g batt` and `pmset -g`; `hardware.power`: the record stage's when it wrote rec.json, a render shot's at its first frame): record: on AC power (88 %, charging), power-mode setting High Power (pmset `powermode 2`), 2026-10-31 14:53 (-0700); render hero: on AC power (89 %, charging), power-mode setting High Power (pmset `powermode 2`), 2026-10-31 14:54 (-0700); render readme: on AC power (89 %, charging), power-mode setting High Power (pmset `powermode 2`), 2026-10-31 14:54 (-0700).
+- Power as each stage stamped it (`pmset -g batt` and `pmset -g`; `hardware.power`: the record stage's when it wrote rec.json, a render shot's at its first frame): record: on AC power (88 %, charging), power-mode setting High Power (pmset `powermode 2`), 2026-10-31 14:53 (-0700); render hero: on AC power (100 %, finishing charge), power-mode setting High Power (pmset `powermode 2`), 2026-11-01 00:34 (-0700); render readme: on AC power (100 %, finishing charge), power-mode setting High Power (pmset `powermode 2`), 2026-11-01 00:36 (-0700).
 - metalsim `ed66d8ef3e+dirty`; record stage (main venv): warp 1.18.0.dev20260917 (`4127c48183`), mujoco 3.14.0, mujoco_warp 3.14.0 (`07a51a63bc`), torch 2.14.0, numpy 2.5.3.
-- render stage (main venv): warp 1.18.0.dev20260917 (`4127c48183`), mujoco 3.14.0, numpy 2.5.3.
+- render stage (main venv): warp 1.18.0.dev20260917 (`52c09cdd82`), mujoco 3.14.0, numpy 2.5.3.
 
 ## Assets
 
@@ -187,7 +187,10 @@ it): `hero`, 1280x720, eye (0.62, -0.48, 0.36) m, looking at (0.12, 0.03, 0.10) 
 README grid), eye (0.55, -0.42, 0.32), looking at (0.12, 0.03, 0.11). The render twin is the simulated scene with the
 floor plane (z = 0, what the arm and box stand on) replaced by a 0.9 x 0.7 m wooden table top, 4 cm thick, on four
 legs, with a grey studio floor 0.75 m below (render-only geoms; `SO101Lift.twin_spec`); Poly Haven's `wood_table_001`
-on the top, the box in so101Sim's green (0.1, 0.9, 0.15).
+on the top at its real size (1.5 m per image, `ground_tile_m`) and in its own colours, the box in so101Sim's green
+(0.1, 0.9, 0.15), the legs dark metal (0.12, metallic 0.6). The film tool writes these look colours into the geoms' own
+`rgba` (`render.build_scene`): the twin gives the box (0, 1, 0), the legs 0.2 and the top (0.6, 0.45, 0.3), and MuJoCo
+draws a geom's own `rgba` over its material's (times the texture on the top).
 
 **Rendering.** Tier 2 (the path tracer), 64 samples per pixel (16 passes x 4), 4 bounces, Open Image Denoise, ACES
 tone map, sRGB, lit by the Poly Haven studio HDRI as an importance-sampled dome. One frame per 20 ms control step
@@ -199,15 +202,18 @@ Pillow at quality 70, 33 ms per frame, looping; 150 frames. Command, from the re
 `python -m metalsim.render.film.encode webp runs/film/so101_lift/readme/frames docs/renders/so101_lift.webp --start 0
 --seconds 5 --src-fps 50 --fps 30`.
 
-**This take, and where its timings come from.** Recorded, rendered and encoded on 2026-10-31 on the 14-inch MacBook
-Pro (Mac16,6), at metalsim `ed66d8ef` plus this film's uncommitted files (hence `+dirty` in the pins). This was not a
-timing run; quote nothing on this page as MetalSim's speed (MetalSim's timing runs are made on the 16-inch through the
-GPU queue's timing kind; throughput figures are in `docs/PARITY.md`). Power, as the stages stamped it: on AC power and
-charging at every stamp (88 % when the record stage wrote `rec.json` at 14:53, 89 % at both shots' first frames at
-14:54, local time), with pmset's power-mode setting at High Power (`powermode 2`: the configured setting, which does
-not show that the machine ran in High Power Mode). Record and render ran as GPU-queue jobs of kind render, one at a
-time, into `runs/film/so101_lift`; the render resumed five preview frames (0, 60, 120, 180, 240) rendered with the same
-settings. The entry is registered in `tasks.py` (`python -m metalsim.render.film so101_lift`, as below);
+**This take, and where its timings come from.** Recorded on 2026-10-31 on the 14-inch MacBook Pro (Mac16,6), at
+metalsim `ed66d8ef` plus this film's uncommitted files (hence `+dirty` in the pins); rendered and encoded again on
+2026-11-01 on the same machine, at metalsim `68f695b2` plus uncommitted files, from the same recording,
+after the film tool started laying the wood at its real size and drawing the look's colours on geoms with their own
+`rgba` (the frames rendered on 2026-10-31 had the wood 1.33 times too large and tinted (0.6, 0.45, 0.3), the box in
+(0, 1, 0) and the legs at 0.2). This was not a timing run; quote nothing on this page as MetalSim's speed (MetalSim's
+timing runs are made on the 16-inch through the GPU queue's timing kind; throughput figures are in `docs/PARITY.md`).
+Power, as the stages stamped it: on AC power at every stamp (charging at 88 % when the record stage wrote `rec.json` at
+14:53 on 2026-10-31; 100 % and finishing its charge at the shots' first frames, 00:34 and 00:36 on 2026-11-01, local
+time), with pmset's power-mode setting at High Power (`powermode 2`: the configured setting, which does not show that
+the machine ran in High Power Mode). Record and render ran as GPU-queue jobs of kind render, one at a time, into
+`runs/film/so101_lift`. The entry is registered in `tasks.py` (`python -m metalsim.render.film so101_lift`, as below);
 `python -m metalsim.render.film.so101 <film-tool args>` also runs the film tool with it. A new recording is another
 take: the GPU rollout is not bitwise repeatable.
 
@@ -323,10 +329,13 @@ films world 13 (seed 10013), the 12 V take's env, whatever happens in it.
   - the arm holds the box at 0.14 to 0.15 m to the end, hanging tilted in the jaws (at 12 V it lies on its side).
 - Clip: [so101_lift_74v.webp](so101_lift_74v.webp), made with the same command and window as so101_lift.webp (`--start
   0 --seconds 5 --src-fps 50 --fps 30`).
-- Hero: [so101_lift_74v.mp4](so101_lift_74v.mp4) (0.7 MB) and `so101_lift_74v_still{1,2,3}.jpg` (frames 15, 30
+- Hero: [so101_lift_74v.mp4](so101_lift_74v.mp4) (0.8 MB) and `so101_lift_74v_still{1,2,3}.jpg` (frames 15, 30
   and 150).
-- Recorded and rendered on the 14-inch MacBook Pro (Mac16,6), 2026-10-31, on AC power and charging at every stamp
-  (97 to 98 %, 15:17 to 15:19), powermode 2. This was not a timing run.
+- Recorded and first rendered on the 14-inch MacBook Pro (Mac16,6), 2026-10-31, on AC power and charging at every
+  stamp (97 to 98 %, 15:17 to 15:19), powermode 2. The frames here were rendered again from that recording on
+  2026-11-01 (00:37 to 00:39, AC power, 100 % and finishing its charge, powermode 2), at metalsim `68f695b2` plus
+  uncommitted files, with the wood at its real size and the look's colours, as so101_lift's ("This
+  take" above). This was not a timing run.
 
 **Verdict.** On a model of the standard follower's servos, the unchanged policy succeeds 77 times in 100 on CPU (73 to
 78 on MetalSim over four runs) instead of 100. It takes 1.6 s instead of 0.95 s to lift, and the box is still up at 6 s
@@ -440,10 +449,13 @@ checked against SB3's predict clipped to [-1, 1]: 1.7e-6).
     in the jaws, to the end;
   - during the hold the wrist and box still turn back and forth by a few degrees from frame to frame.
 - Clip: [so101_lift_smooth.webp](so101_lift_smooth.webp), the same command and window as so101_lift.webp.
-- Hero: [so101_lift_smooth.mp4](so101_lift_smooth.mp4) (0.6 MB) and `so101_lift_smooth_still{1,2,3}.jpg` (frames
+- Hero: [so101_lift_smooth.mp4](so101_lift_smooth.mp4) (0.7 MB) and `so101_lift_smooth_still{1,2,3}.jpg` (frames
   15, 30 and 150).
-- Recorded and rendered on the 14-inch MacBook Pro (Mac16,6), 2026-10-31, 16:14 to 16:17, with MuJoCo Warp at
-  `8eb51fe637`, **on battery** (58 to 55 %, discharging), powermode 2. This was not a timing run.
+- Recorded and first rendered on the 14-inch MacBook Pro (Mac16,6), 2026-10-31, 16:14 to 16:17, with MuJoCo Warp at
+  `8eb51fe637`, **on battery** (58 to 55 %, discharging), powermode 2. The frames here were rendered again from that
+  recording on 2026-11-01 (00:39 to 00:42, AC power, 100 % and finishing its charge, powermode 2), at metalsim
+  `68f695b2` plus uncommitted files, with the wood at its real size and the look's colours, as
+  so101_lift's ("This take" above). This was not a timing run.
 
 Still a simulation: the servo's P loop, current limit, overload protection and backlash are not modelled, and nothing
 has run on the arm.
@@ -868,15 +880,20 @@ wrist roll / gripper; the measures of the section above):
   - success (the box above 0.10 m for 10 control steps) is counted at 2.26 s;
   - the box rises to 0.19 m and hangs tilted in the jaws, 43 deg from upright, still 0.19 m up at 6 s.
 - Clip: [so101_lift_deploy.webp](so101_lift_deploy.webp), the `readme` shot from 0 to 5 s, made with the same command
-  and window as so101_lift.webp (0.66 MB, 150 frames, PSNR 34.9 dB against the source frames).
-- Hero: [so101_lift_deploy.mp4](so101_lift_deploy.mp4) (0.6 MB) and `so101_lift_deploy_still{1,2,3}.jpg` (frames 60,
+  and window as so101_lift.webp (0.69 MB, 150 frames, PSNR 34.5 dB against the source frames).
+- Hero: [so101_lift_deploy.mp4](so101_lift_deploy.mp4) (0.7 MB) and `so101_lift_deploy_still{1,2,3}.jpg` (frames 60,
   110 and 199: the open jaws coming down over the box, the box rising, the hold).
-- Recorded and rendered on 2026-10-31 in one GPU-queue job of kind render (21:51 to 21:54), on the 14-inch MacBook
-  Pro (Mac16,6). At every stage stamp (21:51:30 to 21:53:14) and at the job's start and end it was on AC power and
-  charging (79 %), powermode 2. Software: MuJoCo Warp `787a5b3a37`, Warp `52c09cdd82`, MuJoCo 3.14.0, metalsim
+- Recorded on 2026-10-31 in one GPU-queue job of kind render (21:51 to 21:54), on the 14-inch MacBook Pro (Mac16,6),
+  with a first render. At every stage stamp (21:51:30 to 21:53:14) and at the job's start and end it was on AC power
+  and charging (79 %), powermode 2. Software: MuJoCo Warp `787a5b3a37`, Warp `52c09cdd82`, MuJoCo 3.14.0, metalsim
   `ed66d8ef` plus uncommitted changes. This was not a timing run.
+- The frames here were rendered again from that recording on 2026-11-01 (00:31 to 00:34, a GPU-queue job of kind
+  render; AC power, 100 % and finishing its charge at both shots' stamps, powermode 2), at metalsim `68f695b2` plus
+  uncommitted files, after the film tool started drawing the look's colours on geoms with their own
+  `rgba` (`render.build_scene`): the first render drew the box in the twin's (0, 1, 0), the table legs at 0.2 and the
+  wood times (0.6, 0.45, 0.3).
 - Rendering: tier 2, 64 samples per pixel, 4 bounces, Open Image Denoise, the studio HDRI. The table's wood texture is
-  at its real size (Poly Haven's 1.5 m tile, `ground_tile_m`).
+  at its real size (Poly Haven's 1.5 m tile, `ground_tile_m`) and in its own colours.
 
 **Against the 7v4_real take** (the same seed, plan, cameras and frames; `runs/readme_media/scratch/so101-film-bam/`):
 
