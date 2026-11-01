@@ -1,0 +1,37 @@
+2026-10-31T17:41:12 === pipeline start (SMOKE=0 FROM= SKIP=) pid 10451 power AC Power; metalsim ed66d8ef, mjw 93e5ce18, warp 52c09cdd
+2026-10-31T17:41:12 tests: queued (render, 15 min, power AC Power) -> runs/rough_rerun_2026-10-31/logs/tests.out
+2026-10-31T17:43:00 tests: finished rc 0 (power AC Power)
+2026-10-31T17:43:00 transfer_old_fix: queued (render, 20 min, power AC Power) -> runs/rough_rerun_2026-10-31/logs/transfer_old_fix.out
+2026-10-31T17:44:30 transfer_old_fix: finished rc 0 (power AC Power)
+2026-10-31T17:44:30 transfer_old_pin: queued (render, 20 min, power AC Power) -> runs/rough_rerun_2026-10-31/logs/transfer_old_pin.out
+2026-10-31T17:45:38 transfer_old_pin: finished rc 0 (power AC Power)
+2026-10-31T17:45:38 g1_rough_ppowarp_fixed_s0: queued (train, 110 min, power AC Power) -> runs/rough_rerun_2026-10-31/logs/g1_rough_ppowarp_fixed_s0.out
+2026-10-31T18:54:34 g1_rough_ppowarp_fixed_s0: finished rc 0 (power AC Power)
+2026-10-31T18:54:34 export_s0: queued (render, 3 min, power AC Power) -> runs/rough_rerun_2026-10-31/logs/export_s0.out
+2026-10-31T19:20:46 export_s0: finished rc 0 (power AC Power)
+2026-10-31T19:20:46 transfer_new_s0: queued (render, 20 min, power AC Power) -> runs/rough_rerun_2026-10-31/logs/transfer_new_s0.out
+2026-10-31T19:22:53 transfer_new_s0: finished rc 0 (power AC Power)
+2026-10-31T19:22:53 g1_rough_ppowarp_fixed_s1: queued (train, 110 min, power AC Power) -> runs/rough_rerun_2026-10-31/logs/g1_rough_ppowarp_fixed_s1.out
+2026-10-31T20:31:39 g1_rough_ppowarp_fixed_s1: finished rc 0 (power AC Power)
+2026-10-31T20:31:39 export_s1: queued (render, 3 min, power AC Power) -> runs/rough_rerun_2026-10-31/logs/export_s1.out
+2026-10-31T20:40:44 export_s1: finished rc 0 (power AC Power)
+2026-10-31T20:40:44 g1_rough_ppowarp_fixed_s2: queued (train, 110 min, power AC Power) -> runs/rough_rerun_2026-10-31/logs/g1_rough_ppowarp_fixed_s2.out
+2026-10-31T21:48:13 g1_rough_ppowarp_fixed_s2: finished rc 0 (power AC Power)
+2026-10-31T21:48:13 export_s2: queued (render, 3 min, power AC Power) -> runs/rough_rerun_2026-10-31/logs/export_s2.out
+2026-10-31T21:56:37 export_s2: finished rc 0 (power AC Power)
+2026-10-31T21:56:37 il3fix_rough_s0: STOP file present, not started
+2026-10-31T21:56:37 === pipeline finished, power AC Power
+2026-10-31T21:56:39 === pipeline start (SMOKE=0 FROM=il3fix_rough_s0 SKIP=) pid 28442 power AC Power; metalsim ed66d8ef, mjw 787a5b3a, warp 52c09cdd
+2026-10-31T21:56:39 tests: before FROM=il3fix_rough_s0, skipped
+2026-10-31T21:56:39 transfer_old_fix: before FROM=il3fix_rough_s0, skipped
+2026-10-31T21:56:39 transfer_old_pin: before FROM=il3fix_rough_s0, skipped
+2026-10-31T21:56:39 g1_rough_ppowarp_fixed_s0: before FROM=il3fix_rough_s0, skipped
+2026-10-31T21:56:39 export_s0: before FROM=il3fix_rough_s0, skipped
+2026-10-31T21:56:39 transfer_new_s0: before FROM=il3fix_rough_s0, skipped
+2026-10-31T21:56:39 g1_rough_ppowarp_fixed_s1: before FROM=il3fix_rough_s0, skipped
+2026-10-31T21:56:39 export_s1: before FROM=il3fix_rough_s0, skipped
+2026-10-31T21:56:39 g1_rough_ppowarp_fixed_s2: before FROM=il3fix_rough_s0, skipped
+2026-10-31T21:56:39 export_s2: before FROM=il3fix_rough_s0, skipped
+2026-10-31T21:56:39 il3fix_rough_s0: queued (train, 110 min, power AC Power) -> runs/rough_rerun_2026-10-31/logs/il3fix_rough_s0.out
+2026-10-31T23:36:45 il3fix_rough_s0: finished rc 0 (power AC Power)
+2026-10-31T23:36:45 === pipeline finished, power AC Power

@@ -1,0 +1,25 @@
+From 6596bd73b4b605c05b68d69f6ecfbd60f829b63c Mon Sep 17 00:00:00 2001
+From: pulipakaa24 <adipu@utexas.edu>
+Date: Sat, 31 Oct 2026 16:36:48 -0700
+Subject: [PATCH 22/23] METALSIM_CHANGES.md: heightfield contacts
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ METALSIM_CHANGES.md | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/METALSIM_CHANGES.md b/METALSIM_CHANGES.md
+index 6cb4db7..7c04e93 100644
+--- a/METALSIM_CHANGES.md
++++ b/METALSIM_CHANGES.md
+@@ -48,6 +48,7 @@ The changes below modify Apache-2.0 code and are offered under the same licence.
+ | `cfa290b` | Deterministic mode (Warp `RUN_TO_RUN`): non-heightfield CCD runs as a solve kernel without a slot counter (EPA / multicontact scratch row = thread id, launch width at most `naccdmax`) that stages each collision's contacts, then a contact-write kernel. The single kernel took its EPA row from a counter, so Warp's counting pass ran EPA on stale scratch and a contact could land in another world's slot. In deterministic mode a primitive against a heightfield (GJK/EPA) raises. `MJW_CCD_DET_SPLIT=0` keeps the single kernel; default mode unchanged. |
+ | `8227c3b` | `_solve_done` keeps the solver's iteration count in a local (it read back an in-place increment, which Warp's deterministic counting pass suppresses: a world at the iteration cap then made the early exit's counter call in one pass only); the counter's return is consumed only with the early exit. |
+ | `bf2e209` | Warp's deterministic mode takes the unfused Newton update (the fused kernel reads back its own change counter within the launch; its deterministic plan at 1,024 worlds asked for more than 2^31 scratch elements). |
++| `d514112`, `bdc3f71`, `7f6310d`, tests | Heightfield contacts against the exact geometry (MetalSim `docs/research/hfield_contacts_2026-10-31.md`). (1) The prism is a plain convex polytope, as in MuJoCo C (`collision_gjk.HFIELD_PRISM_POLYTOPE`): upstream #928's side-wall override in `_inflate` / `_epa_witness` returned a vertical penetration for prisms clear of the geom (a 5 mm sphere 8.6 mm clear came back 25.6 mm deep). (2) The prism support returns vertex index 0-5: with -2 / -3 for all six vertices discrete EPA (box, mesh) stopped at a "repeated" vertex (a box 9.25 mm into a prism came back 2.57 mm; MuJoCo C's `mjc_prism_support` has the same defect). (3) `ccd_hfield_kernel`: penetrating prisms only; contacts 1-3 skip duplicates (1e-4 m and 0.05 deg, `HFIELD_SELECT_DEDUP`) instead of stopping within 1 mm, which lost a sphere's second face in a crease; prisms relative to the other geom (`HFIELD_LOCAL_ORIGIN`); margin and gap as MuJoCo C main 8626d3c (`HFIELD_TRUE_DISTANCE`). (4) Meshes take GJK/EPA (`HFIELD_PLANE_CONTACTS` now False; the plane path missed terrain vertices inside a mesh face: Isaac's G1 foot, no contact in 178 of 1000 touching placements); Warp's deterministic mode keeps the plane path for meshes. g1_bumps tile, against the exact sets: sphere contact sets 88.8 -> 99.97 %, box 76.6 -> 99.9 %, G1 foot mesh 52.9 -> 99.9 %, normals > 10 deg 6.1 / 16.9 / 9.5 % -> 0. Five `-k hfield` tests added. |
+ 
+ Every flex change and every solver launch-form change is behind a module-level flag or environment variable that restores upstream's behaviour; the details and measurements are in
+ the commit messages and in MetalSim's `scripts/diagnostics/deformable/UPSTREAM.md`. The same sixteen code commits are
+-- 
+2.54.0
+

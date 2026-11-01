@@ -1,0 +1,40 @@
+G1 rough PPO: N=4096 obs_dim 310 act_dim 37 rollout 24 x 8 iterations, engine mjwarp, physics dt 0.0025 (decimation 8), seed 1, reward_cfg rough_isaac, height-scan ray order xy, terrain collision boxes_local, height scan exact, solver_cfg None, contact_cfg default, base velocity origin, feet-slide velocity origin, initial reset False, effort limit on the actuator
+it    1 steps     98304 sps   28,260 | ep_ret    0.00 ep_len    0.0 (n=0) | pg 0.115 vf 0.139 kl 0.4639 lr 1.0e-05
+[anomaly] it 1: KL 0.464 > 10x target: stale data or LR too high
+[anomaly] it 1: joint limit violated by 0.39 rad
+[anomaly] it 1: contact penetration 8.4 cm
+[anomaly] it 1: contact force 51983 N > 50x robot weight
+terrain it    1 mean_level 2.5327
+it    2 steps    196608 sps   30,586 | ep_ret   -6.63 ep_len   44.9 (n=693) | pg 0.001 vf 1.127 kl 0.0082 lr 1.1e-04
+[anomaly] it 2: joint limit violated by 0.42 rad
+[anomaly] it 2: contact penetration 9.0 cm
+[anomaly] it 2: contact force 47588 N > 50x robot weight
+terrain it    2 mean_level 2.7019
+it    3 steps    294912 sps   33,035 | ep_ret   -7.10 ep_len   57.5 (n=2779) | pg -0.003 vf 1.993 kl 0.0082 lr 3.8e-04
+[anomaly] it 3: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 3: joint limit violated by 0.35 rad
+[anomaly] it 3: contact penetration 7.4 cm
+[anomaly] it 3: contact force 46922 N > 50x robot weight
+terrain it    3 mean_level 3.3494
+it    4 steps    393216 sps   35,416 | ep_ret   -6.18 ep_len   44.4 (n=2535) | pg -0.003 vf 1.912 kl 0.0143 lr 5.8e-04
+[anomaly] it 4: joint limit violated by 0.35 rad
+[anomaly] it 4: contact penetration 7.4 cm
+[anomaly] it 4: contact force 44898 N > 50x robot weight
+terrain it    4 mean_level 3.0217
+it    5 steps    491520 sps   37,242 | ep_ret   -6.00 ep_len   41.8 (n=2449) | pg -0.002 vf 1.347 kl 0.0131 lr 3.8e-04
+[anomaly] it 5: joint limit violated by 0.30 rad
+[anomaly] it 5: contact penetration 5.6 cm
+[anomaly] it 5: contact force 22061 N > 50x robot weight
+terrain it    5 mean_level 2.5581
+it    6 steps    589824 sps   38,676 | ep_ret   -5.86 ep_len   39.1 (n=2610) | pg -0.002 vf 1.204 kl 0.0133 lr 5.8e-04
+[anomaly] it 6: joint limit violated by 0.24 rad
+[anomaly] it 6: contact penetration 4.9 cm
+terrain it    6 mean_level 2.0527
+it    7 steps    688128 sps   39,859 | ep_ret   -5.82 ep_len   38.5 (n=2520) | pg 0.001 vf 0.958 kl 0.0143 lr 3.8e-04
+[anomaly] it 7: joint limit violated by 0.40 rad
+[anomaly] it 7: contact penetration 5.0 cm
+terrain it    7 mean_level 1.6145
+it    8 steps    786432 sps   40,775 | ep_ret   -5.83 ep_len   39.3 (n=2510) | pg -0.004 vf 0.735 kl 0.0141 lr 8.6e-04
+[anomaly] it 8: joint limit violated by 0.41 rad
+[anomaly] it 8: contact penetration 5.5 cm
+terrain it    8 mean_level 1.2268

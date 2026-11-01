@@ -19,7 +19,7 @@ git clone https://github.com/pulipakaa24/MetalSim && cd MetalSim
 python3.12 -m venv .venv && source .venv/bin/activate     # uv only: "$(uv python find 3.12)" -m venv .venv
 pip install -e ".[full]"
 scripts/setup_warp.sh
-pip install -e "git+https://github.com/pulipakaa24/mujoco_warp@8eb51fe637437108185f5a4750b7f5f64ef26624#egg=mujoco-warp" "mujoco>=3.14,<3.15"      # pinned: README "Install"
+pip install -e "git+https://github.com/pulipakaa24/mujoco_warp@787a5b3a37acc2551ffc8a2c1af1e9781d76723f#egg=mujoco-warp" "mujoco>=3.14,<3.15"      # pinned: README "Install"
 scripts/fetch_isaac_assets.sh
 git clone --depth 1 https://github.com/google-deepmind/mujoco_menagerie upstream/mujoco_menagerie
 pytest tests -q
@@ -101,9 +101,11 @@ from `fuse_fp`, GPU sort / BSR / NanoVDB builders, `fast_math` forms with `warp.
 default) are listed in the branch's `METALSIM_CHANGES.md` and in `metalsim/physics/mpm/MPM.md`.
 
 **MuJoCo Warp** ([pulipakaa24/mujoco_warp](https://github.com/pulipakaa24/mujoco_warp), branch
-`metalsim`, pinned commit `8eb51fe`, installed by the `pip install` line above; the commits since `8fbf965`, which
+`metalsim`, pinned commit `787a5b3`, installed by the `pip install` line above; the commits since `8fbf965`, which
 this paragraph describes, are listed in the README's "MuJoCo Warp fork" section: elliptic cones on Metal, the fused and
-early-exiting Newton iterations, scratch reuse, the equality block at `njmax`). Google DeepMind's MuJoCo Warp v3.14.0
+early-exiting Newton iterations, scratch reuse, the equality block at `njmax`, deterministic mode, and since 2026-10-31
+heightfield contacts against the exact prism geometry, which replace the plane path below for meshes,
+with EPA's horizon and the heightfield margin as in MuJoCo C (`docs/research/hfield_contacts_2026-10-31.md`, §12)). Google DeepMind's MuJoCo Warp v3.14.0
 (`88af9cc`) with, up to `8fbf965`, sixteen commits:
 the Metal device patch, heightfield contacts computed against each prism's top plane (upstream
 produced inverted normals and launched worlds on rough terrain), and the plane-to-convex contact set of
@@ -115,10 +117,16 @@ match MuJoCo C (per-pair contact cap and selection, box-triangle and cable-capsu
 every flex, active-layer volume contacts, mesh normals), order flex equality rows deterministically (the Metal
 `FlexConstraintTest` failures) and sort on the device on Metal; each behind a `collision_flex` flag
 (`scripts/diagnostics/deformable/UPSTREAM.md`). The same sixteen commits (flex ones rebased linearly after the
-throughput ones; identical tree to the merge `8fbf965`) are in `patches/mujoco_warp/0001-0016`. To build the pinned
+throughput ones; identical tree to the merge `8fbf965`) are in `patches/mujoco_warp/0001-0016`;
+`patches/mujoco_warp/0017` is the deterministic CCD split as a plain diff, `0018-0023` are the six heightfield-contact
+commits of 2026-10-31 (`git am` on `8eb51fe` gives `93e5ce1`) and `0024-0031` the eight EPA-horizon and
+margin-shrink commits after them (`git am` of `0018-0031` on the previous pin `8eb51fe` gives the pinned tree). To build the pinned
 tree without the fork, clone google-deepmind/mujoco_warp at `88af9cc`, `git apply`
-`patches/mujoco_warp/metalsim-8eb51fe.diff` (the whole branch as one diff) and `pip install -e` the checkout (README
-"Install"). Superseded: "`git am` those patches" gives the `8fbf965` tree, not the pinned one.
+`patches/mujoco_warp/metalsim-787a5b3.diff` (the whole branch as one diff, `git diff --abbrev=7 88af9cc 787a5b3`)
+and `pip install -e` the checkout (README "Install"). Superseded: "`git am` those patches" (`0001-0016`) gives the
+`8fbf965` tree, not the pinned one. Shared fork checkouts in `upstream/` (`upstream/mujoco_warp`, `upstream/warp-metalsim`) are moved
+to the pins with `scripts/fork_sync.sh` (`-n` reports without changing anything); `tests/test_fork_pins.py` fails while
+one of them, or the checkout the installed package comes from, is off its pin.
 
 **Newton** ([pulipakaa24/newton](https://github.com/pulipakaa24/newton), branch `metalsim`, pinned commit
 `9f31739` = XPBD code `90e2332` plus the Metal fixes: HashTable, 64-bit atomics, mesh-SDF barrier, collision launches). Only needed for the experimental Newton XPBD engine. The fork fixes XPBD solver defects
@@ -491,8 +499,14 @@ A job refuses to start while the GPU shows runaway work (utilisation of 90 % or 
 minutes): the queue pauses and writes `runs/GPU_RUNAWAY_ALERT` (`scripts/gpu_run.sh`).
 
 **Updating the shared fork checkouts.** `scripts/fork_sync.sh` fast-forwards `upstream/mujoco_warp` and
-`upstream/warp-innate` to their `fork/metalsim` heads through the queue (timing class), so the working tree never
-changes under a job that is importing it. Agents work in worktrees and never touch the shared checkouts.
+`upstream/warp-metalsim` (`upstream/warp-innate` on older setups) to the commits the tree pins (MuJoCo Warp: the
+README's pip line; Warp: `PIN` in `scripts/setup_warp.sh`) through the queue (timing class), so the working tree never
+changes under a job that is importing it. It finds each fork's remote by URL, fetches only when the pinned commit is
+missing, leaves a checkout that is ahead of its pin, diverged or modified as it is (and says so), rebuilds libwarp
+when Warp's native sources changed, and ends with one `wp.init()`. `scripts/fork_sync.sh -n` reports without changing
+anything or using the queue. Run from a git worktree it reads that tree's pins and syncs the main checkout's
+`upstream/`. `tests/test_fork_pins.py` fails while a checkout is off its pin. Agents work in worktrees and never touch
+the shared checkouts.
 
 **Live dashboard.** `scripts/gpu_dashboard.sh` starts a local page at http://localhost:8765 (idempotent;
 `--restart` to restart; `python3 scripts/gpu_dashboard.py --watch` is the terminal form, `/json` the

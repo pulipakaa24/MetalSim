@@ -1,0 +1,121 @@
+From ba9cfb7d2079278dfc56f8dd613fe07773360cac Mon Sep 17 00:00:00 2001
+From: pulipakaa24 <adipu@utexas.edu>
+Date: Sat, 31 Oct 2026 20:08:02 -0700
+Subject: [PATCH 29/31] Tests: EPA's horizon loop test and the restart after a
+ scan that is not one loop
+
+test_horizon_is_loop runs _horizon_is_loop on synthetic horizons: one loop in any edge order, figure-8s through the walk's start vertex and through another vertex (one in an edge order where a walk that does not reject a vertex on four horizon edges uses all edges before it closes), two disjoint loops, an open path, fewer than 3 edges and an overflowed buffer.
+
+test_epa_nonloop_horizon: three poses (two stacked 5 cm boxes, two ellipsoids; MetalSim epa-review) on which EPA's face scan, with the full-size horizon buffer, leaves a horizon that is not one loop, so the scan is undone and the region grows from the closest face. The deepest contact matches MuJoCo C's (2e-8 m for the boxes, the ccd tolerance for the ellipsoids) with no overflow bit. The face scan alone (93e5ce1) gives the same contacts on these poses, so the test pins the restart path rather than a change of result: a restart that drops the contact fails it.
+---
+ mujoco_warp/_src/collision_gjk_test.py | 75 ++++++++++++++++++++++++++
+ 1 file changed, 75 insertions(+)
+
+diff --git a/mujoco_warp/_src/collision_gjk_test.py b/mujoco_warp/_src/collision_gjk_test.py
+index f274b3b..5024c73 100644
+--- a/mujoco_warp/_src/collision_gjk_test.py
++++ b/mujoco_warp/_src/collision_gjk_test.py
+@@ -18,11 +18,14 @@ import warp as wp
+ from absl.testing import absltest
+ from absl.testing import parameterized
+ 
++import mujoco_warp as mjw
+ from mujoco_warp import Data
+ from mujoco_warp import GeomType
+ from mujoco_warp import Model
+ from mujoco_warp import test_data
+ from mujoco_warp._src.collision_core import Geom
++from mujoco_warp._src.collision_gjk import Polytope
++from mujoco_warp._src.collision_gjk import _horizon_is_loop
+ from mujoco_warp._src.collision_gjk import ccd
+ from mujoco_warp._src.collision_gjk import epa_horizon_size
+ from mujoco_warp._src.collision_gjk import multicontact
+@@ -303,6 +306,22 @@ def _geom_dist(
+   return dist_out.numpy()[0], ncon_out.numpy()[0], pos_out.numpy()[0], pos_out.numpy()[1]
+ 
+ 
++@wp.kernel(module="unique", enable_backward=False)
++def _horizon_is_loop_kernel(horizon: wp.array[int], nhorizon: int, is_loop_out: wp.array[int]):
++  pt = Polytope()
++  pt.horizon = horizon
++  pt.nhorizon = nhorizon
++  is_loop_out[0] = wp.where(_horizon_is_loop(pt), 1, 0)
++
++
++def _horizon_is_loop_np(edges, nhorizon=None) -> bool:
++  """MetalSim: _horizon_is_loop on a horizon of vertex index pairs (EPA's edge encoding)."""
++  horizon = wp.array([(min(a, b) << 10) | max(a, b) for a, b in edges] or [0], dtype=int)
++  is_loop = wp.zeros(1, dtype=int)
++  wp.launch(_horizon_is_loop_kernel, dim=1, inputs=[horizon, len(edges) if nhorizon is None else nhorizon], outputs=[is_loop])
++  return bool(is_loop.numpy()[0])
++
++
+ class GJKTest(parameterized.TestCase):
+   """Tests for GJK/EPA."""
+ 
+@@ -864,6 +883,62 @@ class GJKTest(parameterized.TestCase):
+     self.assertEqual(epa_horizon_size(35), 114)
+     self.assertEqual(epa_horizon_size(1), MJ_MAX_EPAHORIZON)
+ 
++  def test_horizon_is_loop(self):
++    """MetalSim: the horizon test that decides whether EPA's face scan deleted a disk."""
++    self.assertTrue(_horizon_is_loop_np([(0, 1), (1, 2), (2, 0)]))
++    self.assertTrue(_horizon_is_loop_np([(3, 4), (0, 1), (4, 0), (2, 3), (1, 2)]))  # any order and orientation
++    # two regions touching at a vertex: a figure-8 through the walk's start vertex (1) and through
++    # another vertex (2)
++    self.assertFalse(_horizon_is_loop_np([(0, 1), (0, 2), (2, 1), (1, 3), (3, 4), (4, 1)]))
++    self.assertFalse(_horizon_is_loop_np([(0, 1), (1, 2), (2, 0), (2, 3), (3, 4), (4, 2)]))
++    # loops 1-0-2-3 and 2-4-5 in an order where a walk that ignores the second edge at vertex 2 uses
++    # all 7 edges (0 -> 2 -> 4 -> 5 -> 2 -> 0) before it closes
++    self.assertFalse(_horizon_is_loop_np([(0, 1), (2, 3), (5, 2), (2, 4), (0, 2), (4, 5), (3, 1)]))
++    # two disjoint loops (a ring of deleted faces)
++    self.assertFalse(_horizon_is_loop_np([(0, 1), (1, 2), (2, 0), (3, 4), (4, 5), (5, 3)]))
++    self.assertFalse(_horizon_is_loop_np([(0, 1), (1, 2), (2, 3)]))  # open path
++    self.assertFalse(_horizon_is_loop_np([(0, 1), (1, 2)]))  # fewer than 3 edges
++    self.assertFalse(_horizon_is_loop_np([(0, 1), (1, 2), (2, 0)], nhorizon=-1))  # buffer overflow
++
++  @parameterized.parameters(
++    # boxstack world 1531 (MetalSim epa-review): MJW -4.538894e-05, MuJoCo C -4.538434e-05
++    (
++      '<geom type="box" size=".025 .025 .025"/><body><freejoint/><geom type="box" size=".025 .025 .025"/></body>',
++      "-2.1158824352e-02 -6.6878882263e-03 4.9974132254e-02 1.3436272695e-01 2.9754414064e-05 -5.2466821423e-04 "
++      "9.9093207711e-01",
++      2e-8,
++    ),
++    # boxstack world 3635: MJW -7.370859e-05, MuJoCo C -7.370276e-05
++    (
++      '<geom type="box" size=".025 .025 .025"/><body><freejoint/><geom type="box" size=".025 .025 .025"/></body>',
++      "1.1042433995e-02 1.7353867029e-02 4.9951583291e-02 2.6547766364e-01 -4.7347918626e-04 1.0911244443e-04 9.6411688815e-01",
++      2e-8,
++    ),
++    # ellipsoids world 320: MJW -2.778232e-05, MuJoCo C -2.755865e-05 (EPA to ccd_tolerance)
++    (
++      '<geom type="ellipsoid" size=".05 .03 .02"/><body><freejoint/><geom type="ellipsoid" size=".04 .025 .03"/></body>',
++      "0.0502827088 0.028716553 -0.0339722746 -0.049520108 0.2793360898 0.8799608347 0.3810354803",
++      1e-6,
++    ),
++  )
++  def test_epa_nonloop_horizon(self, bodies, qpos, tol):
++    """MetalSim: poses where EPA's face scan leaves a horizon that is not one loop (full buffer).
++
++    The scan is undone and the region grows from the closest face (MuJoCo C's horizon); the result
++    is the C contact. The scan's own answer happens to be the same on these poses, so this pins the
++    restart, not a change of result.
++    """
++    mjm, mjd, m, d = test_data.fixture(
++      xml=f"<mujoco><worldbody>{bodies}</worldbody><keyframe><key qpos='{qpos}'/></keyframe></mujoco>", keyframe=0
++    )
++    mjw.kinematics(m, d)
++    mjw.collision(m, d)
++    nacon = d.nacon.numpy()[0]
++    self.assertGreater(nacon, 0)
++    self.assertEqual(d.overflow.numpy()[0], 0)
++    self.assertGreater(mjd.ncon, 0)
++    self.assertAlmostEqual(d.contact.dist.numpy()[:nacon].min(), mjd.contact.dist[: mjd.ncon].min(), delta=tol)
++
+   def test_box_box_rotation(self):
+     """Test box-box with slight rotation which should give 4 contacts."""
+     _, _, m, d = test_data.fixture(
+-- 
+2.54.0
+

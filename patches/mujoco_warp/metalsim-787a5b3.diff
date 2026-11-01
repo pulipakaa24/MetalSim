@@ -1,9 +1,9 @@
 diff --git a/METALSIM_CHANGES.md b/METALSIM_CHANGES.md
 new file mode 100644
-index 0000000..6cb4db7
+index 0000000..b954049
 --- /dev/null
 +++ b/METALSIM_CHANGES.md
-@@ -0,0 +1,57 @@
+@@ -0,0 +1,59 @@
 +# MetalSim changes on this branch (`metalsim`)
 +
 +This branch is the MuJoCo Warp build that [MetalSim](https://github.com/pulipakaa24/MetalSim) runs on (see the
@@ -54,6 +54,8 @@ index 0000000..6cb4db7
 +| `cfa290b` | Deterministic mode (Warp `RUN_TO_RUN`): non-heightfield CCD runs as a solve kernel without a slot counter (EPA / multicontact scratch row = thread id, launch width at most `naccdmax`) that stages each collision's contacts, then a contact-write kernel. The single kernel took its EPA row from a counter, so Warp's counting pass ran EPA on stale scratch and a contact could land in another world's slot. In deterministic mode a primitive against a heightfield (GJK/EPA) raises. `MJW_CCD_DET_SPLIT=0` keeps the single kernel; default mode unchanged. |
 +| `8227c3b` | `_solve_done` keeps the solver's iteration count in a local (it read back an in-place increment, which Warp's deterministic counting pass suppresses: a world at the iteration cap then made the early exit's counter call in one pass only); the counter's return is consumed only with the early exit. |
 +| `bf2e209` | Warp's deterministic mode takes the unfused Newton update (the fused kernel reads back its own change counter within the launch; its deterministic plan at 1,024 worlds asked for more than 2^31 scratch elements). |
++| `d514112`, `bdc3f71`, `7f6310d`, tests | Heightfield contacts against the exact geometry (MetalSim `docs/research/hfield_contacts_2026-10-31.md`). (1) The prism is a plain convex polytope, as in MuJoCo C (`collision_gjk.HFIELD_PRISM_POLYTOPE`): upstream #928's side-wall override in `_inflate` / `_epa_witness` returned a vertical penetration for prisms clear of the geom (a 5 mm sphere 8.6 mm clear came back 25.6 mm deep). (2) The prism support returns vertex index 0-5: with -2 / -3 for all six vertices discrete EPA (box, mesh) stopped at a "repeated" vertex (a box 9.25 mm into a prism came back 2.57 mm; MuJoCo C's `mjc_prism_support` has the same defect). (3) `ccd_hfield_kernel`: penetrating prisms only; contacts 1-3 skip duplicates (1e-4 m and 0.05 deg, `HFIELD_SELECT_DEDUP`) instead of stopping within 1 mm, which lost a sphere's second face in a crease; prisms relative to the other geom (`HFIELD_LOCAL_ORIGIN`); margin and gap as MuJoCo C main 8626d3c (`HFIELD_TRUE_DISTANCE`). (4) Meshes take GJK/EPA (`HFIELD_PLANE_CONTACTS` now False; the plane path missed terrain vertices inside a mesh face: Isaac's G1 foot, no contact in 178 of 1000 touching placements); Warp's deterministic mode keeps the plane path for meshes. g1_bumps tile, against the exact sets: sphere contact sets 88.8 -> 99.97 %, box 76.6 -> 99.9 %, G1 foot mesh 52.9 -> 99.9 %, normals > 10 deg 6.1 / 16.9 / 9.5 % -> 0. Five `-k hfield` tests added. |
++| `439b808`, `f85879c`, `d7a90fb`, `3d8f48c`, tests | EPA horizon and the heightfield margin (MetalSim `docs/research/hfield_contacts_2026-10-31.md` §12). (1) EPA's horizon scan tested every face on its own, so with the support point on (to rounding) the planes of several faces it deleted faces not connected to the closest face; the horizon was then not one loop and the fixed 24-edge buffer could fill, and EPA returned no face: the pair lost its contact (`EPA_HORIZON`; Isaac's G1 feet on the rough heightfield with Isaac Lab 3.0's geom gap, a few worlds per 4096-world PPO iteration). As MuJoCo C (`horizon` / `horizonRec`), the deleted region now grows from the closest face when the scan's horizon is not one loop (a scan that gives one loop is kept: bitwise unchanged); the buffer is sized `3 (5 + ccd_iterations) - 6` (`epa_horizon_size`); a full buffer (`EPA_HORIZON`) or a region that is still not a disk returns no contact, as MuJoCo C's `epa` when its horizon runs out of edges (neither occurs at the derived size); a full face buffer ends EPA with its closest face, as C's `epa`, instead of no contact. (2) `HFIELD_MARGIN_SHRINK` (default True; only with `HFIELD_PRISM_POLYTOPE`, as upstream keeps heightfields off its shrink): a heightfield prism pair with a margin or gap runs GJK on the uninflated shapes first and EPA only when they overlap, as MuJoCo C's `mjc_ccd` (upstream does it for non-heightfield pairs); before, every prism within margin + gap ran EPA on the inflated shapes. No effect at margin = gap = 0 (heightfield contact checks bitwise unchanged). rough_il3 smoke (4096 envs, 8 iterations, the 14-inch on AC, ratios only): `EPA_HORIZON` 3 worlds -> 0; per PPO iteration 2.05x the plane-path pin `8eb51fe` -> 1.68x; the 2.3.2 heightfield config unchanged (+0.3 %). `HFIELD_PRISM_POLYTOPE` and `HFIELD_MARGIN_SHRINK` are read by `wp.static` when `collision_gjk` is imported: change them in the source (assigning them after import has no effect). Tests: `test_box_box_horizon`, `test_epa_horizon_size`, `test_horizon_is_loop`, `test_epa_nonloop_horizon`, `test_hfield_mesh_gap_distance`. |
 +
 +Every flex change and every solver launch-form change is behind a module-level flag or environment variable that restores upstream's behaviour; the details and measurements are in
 +the commit messages and in MetalSim's `scripts/diagnostics/deformable/UPSTREAM.md`. The same sixteen code commits are
@@ -62,7 +64,7 @@ index 0000000..6cb4db7
 +
 +Only on `metalsim-flex`, not merged here: implicit flex damping (`c013067`) and `FLEX_MAXCONPAIR` (`64a1ea5`).
 diff --git a/mujoco_warp/_src/collision_convex.py b/mujoco_warp/_src/collision_convex.py
-index 1715c57..277e40d 100644
+index 1715c57..8fcddb0 100644
 --- a/mujoco_warp/_src/collision_convex.py
 +++ b/mujoco_warp/_src/collision_convex.py
 @@ -15,6 +15,8 @@
@@ -74,23 +76,183 @@ index 1715c57..277e40d 100644
  import warp as wp
  
  from mujoco_warp._src.collision_core import CollisionContext
-@@ -35,6 +37,15 @@ from mujoco_warp._src.collision_primitive import contact_params
+@@ -26,6 +28,7 @@ from mujoco_warp._src.collision_core import geom_collision_pair
+ from mujoco_warp._src.collision_core import geom_collision_pair_from_types
+ from mujoco_warp._src.collision_core import write_contact
+ from mujoco_warp._src.collision_gjk import ccd
++from mujoco_warp._src.collision_gjk import epa_horizon_size
+ from mujoco_warp._src.collision_gjk import epa_phase
+ from mujoco_warp._src.collision_gjk import gjk_phase
+ from mujoco_warp._src.collision_gjk import multicontact
+@@ -35,9 +38,45 @@ from mujoco_warp._src.collision_primitive import contact_params
  from mujoco_warp._src.collision_primitive import geom_collision_pair
  from mujoco_warp._src.collision_primitive import write_contact
  from mujoco_warp._src.math import make_frame
 +
-+# MetalSim: heightfield contacts from the prism top plane (see ccd_hfield_kernel)
-+HFIELD_PLANE_CONTACTS = True
++# MetalSim: heightfield contacts from the prism top plane (see ccd_hfield_kernel). Off by default since 2026-10-31:
++# with the prism treated as a plain polytope (collision_gjk.HFIELD_PRISM_POLYTOPE, unique prism vertex indices) GJK/EPA
++# per prism is exact for meshes too, while the plane path misses every contact whose deepest point is a terrain vertex
++# or edge inside the mesh (Isaac's G1 foot on the g1_bumps tile: no contact in 178 of 1000 placements that touch,
++# 9.6 % of normals > 10 deg off; GJK/EPA: 0 and 0 %; MetalSim docs/research/hfield_contacts_2026-10-31.md). True
++# restores it (meshes of at most 256 vertices). Warp's deterministic mode keeps the plane path for meshes regardless:
++# the GJK/EPA path is not repeatable there (convex_narrowphase).
++HFIELD_PLANE_CONTACTS = False
 +# Which geoms take the per-triangle plane path against a heightfield: meshes of at most 256 vertices always (the G1
 +# feet; every vertex is tested against the triangle's column). Primitives (sphere, capsule, box, ...) only have their
 +# single support point along the triangle normal available, which misses the contact whenever that point's
 +# footprint falls outside the triangle (a 2 m box on a 0.2 m heightfield: upstream's test_hfield_maxconpair, 0
 +# contacts instead of 4); with False (default since 2026-09-25) they use upstream's GJK/EPA against the prism.
 +HFIELD_PLANE_CONTACTS_PRIMITIVES = False
++# MetalSim: heightfield contact selection (contacts 1-3 of a pair). Upstream ends the selection when the next candidate
++# is within 1 mm of the deepest one, by position only; a 5 mm sphere in a crease touches two faces at points 0.4 mm
++# apart (p5 of the g1_bumps tile's two-contact sets), so it lost the second face. A candidate is now skipped only when
++# it duplicates a selected contact: within HFIELD_DUP_DIST and with a normal within acos(HFIELD_DUP_COS) (the same
++# triangle feature reached from two prisms, e.g. a shared edge; float32 witness noise is ~2e-5 m on a 200 m field).
++# HFIELD_SELECT_DEDUP False restores upstream's rule.
++HFIELD_SELECT_DEDUP = True
++HFIELD_DUP_DIST = 1.0e-4
++HFIELD_DUP_COS = 0.99999962  # cos(0.05 deg)
++# MetalSim: heightfield prisms are built relative to the other geom's position (in the heightfield frame), so GJK/EPA
++# and the plane test run on small numbers. In absolute heightfield coordinates float32 witness points carry ~1e-5 m of
++# noise 100 m from the centre (MetalSim's rough terrain is 200 m across), ~0.3 deg on a 5 mm sphere's normal, which the
++# duplicate test cannot tell from a second face. Upstream's CCD kernel shifts its origin the same way ("translation
++# invariance"). False keeps the absolute frame.
++HFIELD_LOCAL_ORIGIN = True
++# MetalSim: heightfield margin convention. True (default): MuJoCo C main's (8626d3c "Fix margin and gap double-counting
++# in heightfield collisions", 2026-10-06; test MjcConvexTest.HFieldMarginAndGap): prism and geom each inflated by half of
++# margin + gap, contact while the separation is below margin + gap, dist = the separation, as every other CCD pair here.
++# False: MuJoCo C 3.14's: prism top raised by margin + gap and geom inflated by half of it, dist = separation -
++# 1.5 (margin + gap), contact while the separation is below margin + gap (upstream MuJoCo Warp raises by margin only).
++# Identical at margin = gap = 0.
++HFIELD_TRUE_DISTANCE = True
  from mujoco_warp._src.math import upper_trid_index
  from mujoco_warp._src.types import MJ_MAX_EPAFACES
- from mujoco_warp._src.types import MJ_MAX_EPAHORIZON
-@@ -465,50 +476,104 @@ def ccd_hfield_kernel_builder(
+-from mujoco_warp._src.types import MJ_MAX_EPAHORIZON
+ from mujoco_warp._src.types import MJ_MAXCONPAIR
+ from mujoco_warp._src.types import MJ_MAXVAL
+ from mujoco_warp._src.types import Data
+@@ -66,6 +105,7 @@ def _hfield_filter(
+   geom_size: wp.array2d[wp.vec3],
+   geom_rbound: wp.array2d[float],
+   geom_margin: wp.array2d[float],
++  geom_gap: wp.array2d[float],
+   mesh_vertadr: wp.array[int],
+   mesh_vertnum: wp.array[int],
+   mesh_graphadr: wp.array[int],
+@@ -103,6 +143,8 @@ def _hfield_filter(
+ 
+   # TODO(team): margin?
+   margin = geom_margin[margin_id, g1] + geom_margin[margin_id, g2]
++  # MetalSim: plus the gap, as MuJoCo C (mjc_ConvexHField receives margin + gap)
++  margin += geom_gap[worldid % geom_gap.shape[0], g1] + geom_gap[worldid % geom_gap.shape[0], g2]
+ 
+   # box-sphere test: horizontal plane
+   for i in range(2):
+@@ -168,8 +210,13 @@ def ccd_hfield_kernel_builder(
+   epa_iterations: int,
+   geomgeomid: int,
+   warn_overflow: int,
++  plane_contacts: bool = False,
+ ):
+-  """Kernel builder for heightfield CCD collisions (no multiccd args)."""
++  """Kernel builder for heightfield CCD collisions (no multiccd args).
++
++  plane_contacts: MetalSim's per-triangle plane path for meshes of at most 256 vertices (and primitives with
++  HFIELD_PLANE_CONTACTS_PRIMITIVES); convex_narrowphase passes HFIELD_PLANE_CONTACTS or Warp's deterministic mode.
++  """
+ 
+   # runs convex collision on a set of geom pairs to recover contact info
+   @wp.kernel(module="unique", enable_backward=False, grid_stride=False)
+@@ -273,6 +320,7 @@ def ccd_hfield_kernel_builder(
+       geom_size,
+       geom_rbound,
+       geom_margin,
++      geom_gap,
+       mesh_vertadr,
+       mesh_vertnum,
+       mesh_graphadr,
+@@ -359,6 +407,12 @@ def ccd_hfield_kernel_builder(
+     geom1.pos = wp.vec3(0.0, 0.0, 0.0)
+     geom1.rot = wp.identity(n=3, dtype=float)
+ 
++    # MetalSim: local origin at geom2 (HFIELD_LOCAL_ORIGIN); prism vertices and contacts are relative to org
++    org = wp.vec3(0.0)
++    if wp.static(HFIELD_LOCAL_ORIGIN):
++      org = geom2.pos
++      geom2.pos = wp.vec3(0.0)
++
+     # see MuJoCo mjc_ConvexHField
+     geom1_dataid = geom_dataid[worldid % geom_dataid.shape[0], g1]
+ 
+@@ -379,12 +433,17 @@ def ccd_hfield_kernel_builder(
+     dy = (2.0 * size[1]) / float(nrow - 1)
+     dr = wp.vec2i(1, 0)
+ 
++    # subgrid corner relative to org (one rounding for the whole subgrid)
++    x0 = dx * float(cmin) - size[0] - org[0]
++    y0 = dy * float(rmin) - size[1] - org[1]
++    zmin = zmin - org[2]
++
+     prism = mat63()
+ 
+     # set zbottom value using base size
+-    prism[0, 2] = -size[3]
+-    prism[1, 2] = -size[3]
+-    prism[2, 2] = -size[3]
++    prism[0, 2] = -size[3] - org[2]
++    prism[1, 2] = -size[3] - org[2]
++    prism[2, 2] = -size[3] - org[2]
+ 
+     adr = hfield_adr[geom1_dataid]
+ 
+@@ -396,8 +455,18 @@ def ccd_hfield_kernel_builder(
+     min_pos = wp.vec3(MJ_MAXVAL, MJ_MAXVAL, MJ_MAXVAL)
+     min_id = int(-1)
+ 
+-    # geom1 margin added to z-axis of hfield prism top points below
+-    geom2.margin = margin
++    # MetalSim: margin + gap, as MuJoCo C (mjc_ConvexHField receives margin + gap). HFIELD_TRUE_DISTANCE: both the
++    # prism and geom2 are inflated by half of it and dist is corrected to the separation below (C main); otherwise the
++    # prism top is raised by it and geom2 inflated by half (C 3.14: dist = separation - 1.5 * (margin + gap))
++    hfmargin = margin + gap
++    geom2.margin = hfmargin
++    # prism top raise (MuJoCo C 3.14) or prism inflation (C main: support offset by half the margin, as geom2)
++    zraise = float(0.0)
++    if wp.static(HFIELD_TRUE_DISTANCE):
++      geom1.margin = hfmargin
++      zmin = zmin - hfmargin  # C main expands the geom's bounds by the margin before the prism height test
++    else:
++      zraise = hfmargin
+ 
+     # EPA memory
+     epa_vert = epa_vert_in[ccdid]
+@@ -414,9 +483,9 @@ def ccd_hfield_kernel_builder(
+     for r in range(rmin, rmax):
+       # pre-initialize first 2 vertices
+       for init_i in range(2):
+-        x = dx * float(cmin) - size[0]
+-        y = dy * float(r + dr[init_i]) - size[1]
+-        z = hfield_data[adr + (r + dr[init_i]) * ncol + cmin] * size[2] + margin
++        x = x0
++        y = dy * float(r + dr[init_i] - rmin) + y0
++        z = hfield_data[adr + (r + dr[init_i]) * ncol + cmin] * size[2] + zraise - org[2]
+ 
+         prism[0] = prism[1]
+         prism[1] = prism[2]
+@@ -444,9 +513,9 @@ def ccd_hfield_kernel_builder(
+             continue
+ 
+           # add vert
+-          x = dx * float(c) - size[0]
+-          y = dy * float(r + dr[i]) - size[1]
+-          z = hfield_data[adr + (r + dr[i]) * ncol + c] * size[2] + margin
++          x = dx * float(c - cmin) + x0
++          y = dy * float(r + dr[i] - rmin) + y0
++          z = hfield_data[adr + (r + dr[i]) * ncol + c] * size[2] + zraise - org[2]
+ 
+           prism[0] = prism[1]
+           prism[1] = prism[2]
+@@ -465,50 +534,111 @@ def ccd_hfield_kernel_builder(
  
            geom1.polyvert = prism
  
@@ -117,7 +279,7 @@ index 1715c57..277e40d 100644
 -            wp.static(bool(warn_overflow & OverflowType.EPA_HORIZON)),
 -            worldid,
 -            overflow_out,
-+          plane_path = wp.static(HFIELD_PLANE_CONTACTS) and (
++          plane_path = wp.static(plane_contacts) and (
 +            wp.static(HFIELD_PLANE_CONTACTS_PRIMITIVES) or (geomtype2 == int(GeomType.MESH) and geom2.vertnum <= 256)
            )
 -
@@ -156,8 +318,13 @@ index 1715c57..277e40d 100644
 +            if tn_len < 1.0e-12:
 +              continue
 +            tn = tn / tn_len
-+            best_depth = float(0.0)
 +            best_p = wp.vec3(0.0, 0.0, 0.0)
++            infl = float(0.0)
++            best_depth = float(0.0)
++            if wp.static(HFIELD_TRUE_DISTANCE):
++              best_depth = hfmargin
++            else:
++              infl = 0.5 * hfmargin
 +            nvert = geom2.vertnum
 +            if geomtype2 != int(GeomType.MESH) or nvert > 256:
 +              nvert = 1
@@ -166,7 +333,7 @@ index 1715c57..277e40d 100644
 +                pv = geom2.rot @ geom2.vert[geom2.vertadr + k] + geom2.pos
 +              else:
 +                pv = support(geom2, geomtype2, -tn).point
-+              depth = wp.dot(pv - v0, tn)
++              depth = wp.dot(pv - v0, tn) - infl
 +              if depth >= best_depth:
 +                continue
 +              # footprint test: xy of pv inside the triangle's xy projection (small tolerance so
@@ -178,11 +345,11 @@ index 1715c57..277e40d 100644
 +              if (e0 >= -tol and e1 >= -tol and e2 >= -tol) or (e0 <= tol and e1 <= tol and e2 <= tol):
 +                best_depth = depth
 +                best_p = pv
-+            if best_depth >= 0.0:
++            if best_depth >= wp.where(wp.static(HFIELD_TRUE_DISTANCE), hfmargin, 0.0):
 +              continue
 +            dist = best_depth
 +            hfield_contact_dist[count] = dist
-+            pos = hf_mat @ (best_p - 0.5 * dist * tn) + hf_pos
++            pos = hf_mat @ (best_p - (0.5 * dist + infl) * tn + org) + hf_pos
 +            hfield_contact_pos[count, 0] = pos[0]
 +            hfield_contact_pos[count, 1] = pos[1]
 +            hfield_contact_pos[count, 2] = pos[2]
@@ -216,14 +383,16 @@ index 1715c57..277e40d 100644
 +              overflow_out,
 +            )
 +
-+            if ncontact == 0:
++            if ncontact == 0 or dist >= 0.0:
 +              continue
++            if wp.static(HFIELD_TRUE_DISTANCE):
++              dist += hfmargin  # inflated shapes -> separation of the surfaces (both inflated by hfmargin / 2)
 +
 +            # cache contact information
 +            hfield_contact_dist[count] = dist
 +
 +            # transform contact to global frame
-+            pos_local = 0.5 * (w1 + w2)
++            pos_local = 0.5 * (w1 + w2) + org
 +            pos = hf_mat @ pos_local + hf_pos
 +            hfield_contact_pos[count, 0] = pos[0]
 +            hfield_contact_pos[count, 1] = pos[1]
@@ -238,7 +407,115 @@ index 1715c57..277e40d 100644
  
            # contact with minimum distance
            if dist < min_dist:
-@@ -733,6 +798,7 @@ def ccd_hfield_kernel_builder(
+@@ -519,6 +649,10 @@ def ccd_hfield_kernel_builder(
+ 
+           count += 1
+ 
++    # skip write when no prisms collide
++    if count == 0:
++      return
++
+     # contact 0: minimum distance
+     write_contact(
+       naconmax_in,
+@@ -555,8 +689,94 @@ def ccd_hfield_kernel_builder(
+       nacon_out,
+     )
+ 
+-    # TODO(team): routine for select subset of contacts
+-    if wp.static(True):
++    # MetalSim: contacts 1-3 by upstream's spread rules (1: furthest from contact 0; 2: furthest from the line
++    # contact 0 - contact 1; 3: furthest from the other triangle edges), skipping only duplicates of a selected
++    # contact (HFIELD_DUP_DIST, HFIELD_DUP_COS) instead of stopping at the first candidate within 1 mm
++    if wp.static(HFIELD_SELECT_DEDUP):
++      sel1 = int(-1)
++      sel2 = int(-1)
++      pos1 = wp.vec3(0.0)
++      pos2 = wp.vec3(0.0)
++      nrm1 = wp.vec3(0.0)
++      nrm2 = wp.vec3(0.0)
++      for k in range(1, 4):
++        best = int(-1)
++        best_score = float(-1.0)
++        line01 = wp.cross(min_normal, min_pos - pos1)
++        line02 = wp.cross(min_normal, min_pos - pos2)
++        line12 = wp.cross(min_normal, pos1 - pos2)
++        for j in range(count):
++          if j == min_id or j == sel1 or j == sel2:
++            continue
++          pj = wp.vec3(hfield_contact_pos[j, 0], hfield_contact_pos[j, 1], hfield_contact_pos[j, 2])
++          nj = wp.vec3(hfield_contact_normal[j, 0], hfield_contact_normal[j, 1], hfield_contact_normal[j, 2])
++          dup = wp.length(pj - min_pos) < wp.static(HFIELD_DUP_DIST) and wp.dot(nj, min_normal) > wp.static(HFIELD_DUP_COS)
++          if k > 1:
++            dup = dup or (wp.length(pj - pos1) < wp.static(HFIELD_DUP_DIST) and wp.dot(nj, nrm1) > wp.static(HFIELD_DUP_COS))
++          if k > 2:
++            dup = dup or (wp.length(pj - pos2) < wp.static(HFIELD_DUP_DIST) and wp.dot(nj, nrm2) > wp.static(HFIELD_DUP_COS))
++          if dup:
++            continue
++          score = float(0.0)
++          if k == 1:
++            score = wp.length(pj - min_pos)
++          elif k == 2:
++            score = wp.abs(wp.dot(pj - min_pos, line01))
++          else:
++            score = wp.abs(wp.dot(pj - min_pos, line02)) + wp.abs(wp.dot(pos1 - pj, line12))
++          if score > best_score:
++            best = j
++            best_score = score
++
++        if best == -1:
++          return
++
++        pk = wp.vec3(hfield_contact_pos[best, 0], hfield_contact_pos[best, 1], hfield_contact_pos[best, 2])
++        nk = wp.vec3(hfield_contact_normal[best, 0], hfield_contact_normal[best, 1], hfield_contact_normal[best, 2])
++        write_contact(
++          naconmax_in,
++          k,
++          hfield_contact_dist[best],
++          pk,
++          make_frame(nk),
++          margin,
++          gap,
++          condim,
++          friction,
++          solref,
++          solreffriction,
++          solimp,
++          adhesion,
++          geoms,
++          collision_pairid,
++          worldid,
++          contact_dist_out,
++          contact_pos_out,
++          contact_frame_out,
++          contact_includemargin_out,
++          contact_friction_out,
++          contact_solref_out,
++          contact_solreffriction_out,
++          contact_solimp_out,
++          contact_dim_out,
++          contact_geom_out,
++          contact_efc_address_out,
++          contact_worldid_out,
++          contact_type_out,
++          contact_geomcollisionid_out,
++          contact_adhesion_out,
++          nacon_out,
++        )
++        if k == 1:
++          sel1 = best
++          pos1 = pk
++          nrm1 = nk
++        elif k == 2:
++          sel2 = best
++          pos2 = pk
++          nrm2 = nk
++    else:
++      # upstream's selection (TODO(team): routine for select subset of contacts)
+       MIN_DIST_TO_NEXT_CONTACT = 1.0e-3
+ 
+       # contact 1: furthest from minimum distance contact
+@@ -733,6 +953,7 @@ def ccd_hfield_kernel_builder(
  
  
  _CCD_OVERSUBSCRIBE_WAVES = 2
@@ -246,7 +523,7 @@ index 1715c57..277e40d 100644
  _CCD_MIN_BLOCKS = 8
  
  
-@@ -1204,18 +1270,429 @@ def ccd_kernel_builder(
+@@ -1204,18 +1425,429 @@ def ccd_kernel_builder(
    return ccd_kernel
  
  
@@ -678,7 +955,7 @@ index 1715c57..277e40d 100644
  @event_scope
  def convex_narrowphase(m: Model, d: Data, ctx: CollisionContext, collision_table: list[tuple[GeomType, GeomType]]):
    """Runs narrowphase collision detection for convex geom pairs.
-@@ -1276,17 +1753,17 @@ def convex_narrowphase(m: Model, d: Data, ctx: CollisionContext, collision_table
+@@ -1276,17 +1908,17 @@ def convex_narrowphase(m: Model, d: Data, ctx: CollisionContext, collision_table
    nccd = wp.zeros(len(GeomType) * (len(GeomType) + 1) // 2, dtype=int)
  
    # epa_vert: vertices in EPA polytope
@@ -698,11 +975,11 @@ index 1715c57..277e40d 100644
 +  epa_norm2 = _ccd_scratch(d, "epa_norm2", (d.naccdmax, 6 + MJ_MAX_EPAFACES * epa_iterations), float)
    # epa_horizon: index pair (i j) of edges on horizon
 -  epa_horizon = wp.empty(shape=(d.naccdmax, MJ_MAX_EPAHORIZON), dtype=int)
-+  epa_horizon = _ccd_scratch(d, "epa_horizon", (d.naccdmax, MJ_MAX_EPAHORIZON), int)
++  epa_horizon = _ccd_scratch(d, "epa_horizon", (d.naccdmax, epa_horizon_size(epa_iterations)), int)
  
    # Contact outputs
    contact_outputs = [
-@@ -1308,12 +1785,25 @@ def convex_narrowphase(m: Model, d: Data, ctx: CollisionContext, collision_table
+@@ -1308,14 +1940,29 @@ def convex_narrowphase(m: Model, d: Data, ctx: CollisionContext, collision_table
      d.nacon,
    ]
  
@@ -719,16 +996,21 @@ index 1715c57..277e40d 100644
 +        # ccd_det_kernels_builder and is not split; only its plane path is repeatable. Meshes take the plane path
 +        # when they have at most 256 vertices, a per-geom runtime test (the caller checks it on the host model).
 +        other = g2 if g1 == GeomType.HFIELD else g1
-+        plane = HFIELD_PLANE_CONTACTS and (HFIELD_PLANE_CONTACTS_PRIMITIVES or other == GeomType.MESH)
++        plane = HFIELD_PLANE_CONTACTS_PRIMITIVES or other == GeomType.MESH
 +        if not plane:
 +          raise NotImplementedError(
 +            f"deterministic mode: heightfield-{GeomType(other).name.lower()} contacts go through GJK/EPA, which is not "
 +            "repeatable in Warp's deterministic mode (only meshes of at most 256 vertices take the repeatable plane path)"
 +          )
        wp.launch(
-         ccd_hfield_kernel_builder(g1, g2, m.opt.ccd_iterations, epa_iterations, geomgeomid, int(m.opt.warn_overflow)),
+-        ccd_hfield_kernel_builder(g1, g2, m.opt.ccd_iterations, epa_iterations, geomgeomid, int(m.opt.warn_overflow)),
++        ccd_hfield_kernel_builder(
++          g1, g2, m.opt.ccd_iterations, epa_iterations, geomgeomid, int(m.opt.warn_overflow), HFIELD_PLANE_CONTACTS or det_split
++        ),
          dim=d.naconmax,
-@@ -1380,34 +1870,59 @@ def convex_narrowphase(m: Model, d: Data, ctx: CollisionContext, collision_table
+         inputs=[
+           m.opt.ccd_tolerance,
+@@ -1380,34 +2027,59 @@ def convex_narrowphase(m: Model, d: Data, ctx: CollisionContext, collision_table
  
    # Allocate multiccd arrays only for non-heightfield collisions
    # multiccd_polygon: clipped contact surface
@@ -800,7 +1082,7 @@ index 1715c57..277e40d 100644
        ccd_k = ccd_kernel_builder(
          g1,
          g2,
-@@ -1489,3 +2004,92 @@ def convex_narrowphase(m: Model, d: Data, ctx: CollisionContext, collision_table
+@@ -1489,3 +2161,92 @@ def convex_narrowphase(m: Model, d: Data, ctx: CollisionContext, collision_table
          ],
          outputs=contact_outputs + [d.overflow],
        )
@@ -893,8 +1175,149 @@ index 1715c57..277e40d 100644
 +    ],
 +    outputs=contact_outputs,
 +  )
+diff --git a/mujoco_warp/_src/collision_driver_test.py b/mujoco_warp/_src/collision_driver_test.py
+index 7d03a9c..7ebeeb4 100644
+--- a/mujoco_warp/_src/collision_driver_test.py
++++ b/mujoco_warp/_src/collision_driver_test.py
+@@ -1014,6 +1014,136 @@ class CollisionTest(parameterized.TestCase):
+ 
+     np.testing.assert_equal(d.nacon.numpy()[0], 4)
+ 
++  # MetalSim: heightfield contacts against the exact geometry (MetalSim docs/research/hfield_contacts_2026-10-31.md)
++
++  def _hfield_contacts(self, xml):
++    _, _, m, d = test_data.fixture(xml=xml, keyframe=0)
++    mjw.collision(m, d)
++    n = d.nacon.numpy()[0]
++    return d.contact.dist.numpy()[:n], d.contact.frame.numpy()[:n, 0], d.contact.pos.numpy()[:n]
++
++  def test_hfield_sphere_crease(self):
++    """A 5 mm sphere in a shallow crease touches both faces 0.8 mm apart: two contacts, exact depth and normals."""
++    # faces rise 0.01 m over 0.1 m on both sides of the line x = 0 (slope 0.1); sphere centre 4.02 mm above it
++    dist, normal, _ = self._hfield_contacts("""
++    <mujoco>
++      <asset><hfield name="h" nrow="3" ncol="3" size=".1 .1 .01 .05" elevation="1 0 1 1 0 1 1 0 1"/></asset>
++      <worldbody>
++        <geom type="hfield" hfield="h"/>
++        <body><freejoint/><geom type="sphere" size=".005"/></body>
++      </worldbody>
++      <keyframe><key qpos="0 .05 .00402 1 0 0 0"/></keyframe>
++    </mujoco>
++    """)
++    c = 1.0 / np.sqrt(1.01)
++    depth = 0.005 - 0.00402 * c
++    self.assertEqual(len(dist), 2)
++    np.testing.assert_allclose(dist, -depth, atol=2e-6)
++    np.testing.assert_allclose(np.sort(normal[:, 0]), [-0.1 * c, 0.1 * c], atol=1e-4)
++    np.testing.assert_allclose(normal[:, 2], c, atol=1e-4)
++
++  def test_hfield_sphere_no_phantom(self):
++    """A sphere resting on a slope near prism side walls: one contact, no separated prism reported as penetrating."""
++    dist, normal, _ = self._hfield_contacts("""
++    <mujoco>
++      <asset><hfield name="h" nrow="3" ncol="3" size=".1 .1 .05 .05" elevation="0 .5 1 0 .5 1 0 .5 1"/></asset>
++      <worldbody>
++        <geom type="hfield" hfield="h"/>
++        <body><freejoint/><geom type="sphere" size=".005"/></body>
++      </worldbody>
++      <keyframe><key qpos=".02 .03 .0325 1 0 0 0"/></keyframe>
++    </mujoco>
++    """)
++    # plane z = 0.25 (x + 0.1) - 0.0; sphere centre distance to it
++    n = np.array([-0.25, 0.0, 1.0]) / np.sqrt(1.0625)
++    sd = (0.0325 - 0.25 * (0.02 + 0.1)) / np.sqrt(1.0625)
++    self.assertEqual(len(dist), 1)
++    np.testing.assert_allclose(dist[0], sd - 0.005, atol=2e-6)
++    np.testing.assert_allclose(normal[0], n, atol=1e-4)
++
++  def test_hfield_box_epa_depth(self):
++    """A tilted box with one corner 4 mm into a flat heightfield cell: the separating-axis depth (EPA must not stop at a
++    repeated prism vertex index)."""
++    q = np.array([0.8, 0.3, 0.4, 0.3]) / np.linalg.norm([0.8, 0.3, 0.4, 0.3])
++    mat = np.zeros(9)
++    mujoco.mju_quat2Mat(mat, q)
++    z = np.abs(mat.reshape(3, 3)[2] * np.array([0.05, 0.03, 0.02])).sum() - 0.004  # lowest corner 4 mm below z = 0
++    dist, normal, _ = self._hfield_contacts(f"""
++    <mujoco>
++      <asset><hfield name="h" nrow="3" ncol="3" size="1 1 .1 .1"/></asset>
++      <worldbody>
++        <geom type="hfield" hfield="h"/>
++        <body><freejoint/><geom type="box" size=".05 .03 .02"/></body>
++      </worldbody>
++      <keyframe><key qpos=".3 .4 {z:.9f} {q[0]:.9f} {q[1]:.9f} {q[2]:.9f} {q[3]:.9f}"/></keyframe>
++    </mujoco>
++    """)
++    self.assertGreaterEqual(len(dist), 1)
++    np.testing.assert_allclose(dist.min(), -0.004, atol=2e-6)
++    np.testing.assert_allclose(normal[np.argmin(dist)], [0.0, 0.0, 1.0], atol=1e-4)
++
++  def test_hfield_mesh_on_peak(self):
++    """A box mesh whose bottom face sits 2 mm below a terrain peak (no mesh vertex below any triangle): one contact
++    2 mm deep (the per-triangle plane path, HFIELD_PLANE_CONTACTS, found none)."""
++    dist, normal, _ = self._hfield_contacts("""
++    <mujoco>
++      <asset>
++        <hfield name="h" nrow="3" ncol="3" size=".1 .1 .02 .05" elevation="0 0 0 0 1 0 0 0 0"/>
++        <mesh name="b" vertex="-.03 -.03 0  .03 -.03 0  -.03 .03 0  .03 .03 0  -.03 -.03 .02  .03 -.03 .02  -.03 .03 .02  .03 .03 .02"/>
++      </asset>
++      <worldbody>
++        <geom type="hfield" hfield="h"/>
++        <body><freejoint/><geom type="mesh" mesh="b"/></body>
++      </worldbody>
++      <keyframe><key qpos="0 0 .018 1 0 0 0"/></keyframe>
++    </mujoco>
++    """)
++    self.assertGreaterEqual(len(dist), 1)
++    np.testing.assert_allclose(dist.min(), -0.002, atol=2e-6)
++    np.testing.assert_allclose(normal[np.argmin(dist)], [0.0, 0.0, 1.0], atol=1e-4)
++
++  def test_hfield_margin_gap(self):
++    """MuJoCo C main's MjcConvexTest.HFieldMarginAndGap (8626d3c): margin 0.02, gap 0.01, sphere 15 mm clear: dist is the
++    separation and the contact point is halfway."""
++    dist, _, pos = self._hfield_contacts("""
++    <mujoco>
++      <asset><hfield name="h" nrow="3" ncol="3" size="1 1 .1 .1"/></asset>
++      <worldbody>
++        <geom type="hfield" hfield="h" margin=".02" gap=".01"/>
++        <body><freejoint/><geom type="sphere" size=".05"/></body>
++      </worldbody>
++      <keyframe><key qpos=".03 .04 .065 1 0 0 0"/></keyframe>
++    </mujoco>
++    """)
++    i = np.argmin(dist)
++    np.testing.assert_allclose(dist[i], 0.015, atol=1e-6)
++    np.testing.assert_allclose(pos[i, 2], 0.0075, atol=1e-6)
++
++  def test_hfield_mesh_gap_distance(self):
++    """Box mesh corner 4 mm above a flat heightfield, gap 0.01 per geom: dist is the separation.
++
++    Isaac Lab 3.0's G1 setting; GJK on the uninflated shapes (HFIELD_MARGIN_SHRINK, as MuJoCo C's
++    mjc_ccd) gives it exactly, EPA on the inflated shapes only to its tolerance.
++    """
++    dist, normal, _ = self._hfield_contacts("""
++    <mujoco>
++      <asset>
++        <hfield name="h" nrow="11" ncol="11" size=".5 .5 .1 .1"/>
++        <mesh name="b" vertex="-.05 -.03 -.02  .05 -.03 -.02  -.05 .03 -.02  .05 .03 -.02
++                               -.05 -.03  .02  .05 -.03  .02  -.05 .03  .02  .05 .03  .02"/>
++      </asset>
++      <worldbody>
++        <geom type="hfield" hfield="h" gap=".01"/>
++        <body><freejoint/><geom type="mesh" mesh="b" gap=".01"/></body>
++      </worldbody>
++      <keyframe><key qpos=".0501 .0423 .035326693 .943714364 .189307857 .038134576 .268535823"/></keyframe>
++    </mujoco>
++    """)
++    i = np.argmin(dist)
++    # EPA on the inflated shapes (HFIELD_MARGIN_SHRINK False) returned 4.000172 mm here
++    np.testing.assert_allclose(dist[i], 0.004, atol=5e-8)
++    np.testing.assert_allclose(normal[i], [0.0, 0.0, 1.0], atol=1e-5)
++
+   def test_min_friction(self):
+     with self.assertWarns(UserWarning):
+       _, _, _, d = test_data.fixture(
 diff --git a/mujoco_warp/_src/collision_flex.py b/mujoco_warp/_src/collision_flex.py
-index f1ccb4c..3f1e936 100644
+index f1ccb4c..ac19634 100644
 --- a/mujoco_warp/_src/collision_flex.py
 +++ b/mujoco_warp/_src/collision_flex.py
 @@ -16,6 +16,8 @@
@@ -906,6 +1329,17 @@ index f1ccb4c..3f1e936 100644
  import warp as wp
  
  from mujoco_warp._src import collision_primitive_core
+@@ -23,9 +25,9 @@ from mujoco_warp._src.collision_core import Geom
+ from mujoco_warp._src.collision_core import sap_binary_search
+ from mujoco_warp._src.collision_core import sap_range
+ from mujoco_warp._src.collision_gjk import ccd
++from mujoco_warp._src.collision_gjk import epa_horizon_size
+ from mujoco_warp._src.math import make_frame
+ from mujoco_warp._src.types import MJ_MAX_EPAFACES
+-from mujoco_warp._src.types import MJ_MAX_EPAHORIZON
+ from mujoco_warp._src.types import MJ_MAXCONPAIR
+ from mujoco_warp._src.types import MJ_MAXVAL
+ from mujoco_warp._src.types import MJ_MINMU
 @@ -43,6 +45,42 @@ wp.set_module_options({"enable_backward": False, "default_grid_stride": False})
  
  _FPS_BLOCK_SIZE: int = 64
@@ -1502,7 +1936,13 @@ index f1ccb4c..3f1e936 100644
      flex_group_temp=flex_group_temp,
      flex_group_ids=flex_group_ids,
      flex_group_start_indices=flex_group_start_indices,
-@@ -3011,6 +3231,310 @@ def _allocate_flex_workspace(m: Model, d: Data) -> FlexWorkspace:
+@@ -3006,11 +3226,315 @@ def _allocate_flex_workspace(m: Model, d: Data) -> FlexWorkspace:
+     epa_face=wp.empty(shape=(capacity, 6 + MJ_MAX_EPAFACES * epa_iterations), dtype=int),
+     epa_pr=wp.empty(shape=(capacity, 6 + MJ_MAX_EPAFACES * epa_iterations), dtype=wp.vec3),
+     epa_norm2=wp.empty(shape=(capacity, 6 + MJ_MAX_EPAFACES * epa_iterations), dtype=float),
+-    epa_horizon=wp.empty(shape=(capacity, MJ_MAX_EPAHORIZON), dtype=int),
++    epa_horizon=wp.empty(shape=(capacity, epa_horizon_size(epa_iterations)), dtype=int),
+     nccd=nccd,
    )
  
  
@@ -2008,6 +2448,516 @@ index f1ccb4c..3f1e936 100644
  
  
  def _flex_sap_collision(
+diff --git a/mujoco_warp/_src/collision_gjk.py b/mujoco_warp/_src/collision_gjk.py
+index 861ae13..ff6ed49 100644
+--- a/mujoco_warp/_src/collision_gjk.py
++++ b/mujoco_warp/_src/collision_gjk.py
+@@ -19,6 +19,7 @@ from typing import Tuple
+ import warp as wp
+ 
+ from mujoco_warp._src.collision_core import Geom
++from mujoco_warp._src.types import MJ_MAX_EPAHORIZON
+ from mujoco_warp._src.types import GeomType
+ from mujoco_warp._src.types import OverflowType
+ from mujoco_warp._src.types import mat43
+@@ -35,6 +36,32 @@ MINVAL2 = 1e-30
+ MAXVAL = 1e15
+ MAXVAL2 = 1e30
+ 
++# MetalSim: a heightfield prism is a plain convex polytope in _inflate and _epa_witness, as in MuJoCo C (its
++# engine_collision_gjk.c has no heightfield case; mjc_ConvexHField runs plain GJK/EPA per prism). Upstream (#928,
++# f2f7957) replaces any result whose prism feature spans top and bottom vertices (a side wall) by a vertical contact
++# against the top triangle with dist = -|x1 - x2|: a penetration whatever the real separation (a 5 mm sphere 8.6 mm
++# clear of a prism came back 25.6 mm deep with normal (0, 0, 1); MetalSim docs/research/hfield_contacts_2026-10-31.md).
++# False restores upstream's override.
++# This flag and HFIELD_MARGIN_SHRINK are read by wp.static() when the kernels are defined, that is
++# when this module is imported (Warp's code_generation.rst: "The expression is evaluated immediately
++# at the time of kernel definition"). Change them by editing this file: assigning
++# collision_gjk.HFIELD_... = False after import has no effect.
++HFIELD_PRISM_POLYTOPE = True
++# MetalSim: a heightfield prism pair with a margin (HFIELD_TRUE_DISTANCE: prism and geom each
++# inflated by half of margin + gap) runs as MuJoCo C's mjc_ccd runs any pair with a margin ("special
++# handling for sphere, capsule, and margin (shrink to underlying geom)"): GJK on the uninflated,
++# discrete shapes; if they are apart, the contact is that distance less the margins (_inflate) and
++# EPA does not run; only overlapping shapes go on to GJK + EPA on the inflated shapes. Without it
++# every prism within margin + gap of the geom ran EPA on the inflated (smooth, non-discrete) shapes
++# to the tolerance (up to ccd_iterations iterations): Isaac Lab 3.0's 1 cm geom gap made the G1's
++# rough terrain contacts about 2x costlier and filled EPA's horizon. Upstream MuJoCo Warp does the
++# same for non-heightfield pairs (gdm/main 23efc9a, has_non_hfield_margin). No effect at margin =
++# gap = 0. False (edit this file; see HFIELD_PRISM_POLYTOPE): every margin case on EPA. Only with
++# HFIELD_PRISM_POLYTOPE: without it, _inflate's side-wall override (written for upstream's sphere
++# and capsule shrink, it takes the witness point as a support direction) would take the shrunk
++# prism pairs, so HFIELD_PRISM_POLYTOPE = False also turns the shrink off (upstream's behaviour).
++HFIELD_MARGIN_SHRINK = True
++
+ # polytope minimal interior distance to origin
+ MIN_DIST2 = 1e-10
+ MIN_DIST3 = 1e-10
+@@ -43,6 +70,23 @@ MIN_DIST4 = 1e-17
+ # minimal tolerance for EPA
+ MIN_EPATOL = 1e-7
+ 
++
++def epa_horizon_size(epa_iterations: int) -> int:
++  """Size of the EPA horizon edge buffer (MetalSim).
++
++  EPA's polytope holds at most 5 + epa_iterations vertices (the vertex buffer's size), so it has at
++  most 3 V - 6 edges, and the horizon (deleted faces' edges, a shared edge removed when its second
++  face is deleted) is a subset of them at every step. Upstream's fixed 24 (MJ_MAX_EPAHORIZON) can
++  fill while the scan deletes faces in index order; MuJoCo C sizes it 24 + max(0, iterations - 35).
++
++  E = 3 V - 6 holds while the polytope is a simplicial sphere, and it stays one only because _epa
++  attaches new faces over a disk: a deleted region that is not a disk ends EPA without a contact.
++  If EPA were allowed to continue past such a region, as MuJoCo C does (it does not test for
++  one), the polytope would no longer be a sphere and this would not bound the horizon.
++  """
++  return max(MJ_MAX_EPAHORIZON, 3 * (5 + epa_iterations) - 6)
++
++
+ FACE_TOL = wp.static(math.cos(0.0889))
+ EDGE_TOL = wp.static(math.sin(0.0889))
+ 
+@@ -55,6 +99,7 @@ INTERSECT_TOL = 0.0000003
+ _FACE_DELETED_BIT = wp.constant(wp.uint32(0x80000000))
+ _FACE_INVALID_BIT = wp.constant(wp.uint32(0x40000000))
+ _FACE_INVALID_OR_DELETED_MASK = wp.constant(wp.uint32(0xC0000000))
++_FACE_NOT_DELETED_MASK = wp.constant(wp.uint32(0x7FFFFFFF))
+ 
+ # Precomputed circle coordinates for 16-gon cylinder face approximation
+ _CYLINDER_COS_16 = tuple(math.cos(i * math.pi / 8.0) for i in range(16))
+@@ -202,13 +247,22 @@ def support(geom: Geom, geomtype: int, dir: wp.vec3) -> SupportPoint:
+   elif geomtype == GeomType.HFIELD:
+     max_dist = float(FLOAT_MIN)
+     # TODO(kbayes): Support edge prisms
+-    sp.vertex_index = wp.where(dir[2] < 0.0, -2, -3)
++    imax = int(0)
+     for i in range(6):
+       vert = geom.polyvert[i]
+       dist = wp.dot(vert, dir)
+       if dist > max_dist:
+         max_dist = dist
+         sp.point = vert
++        imax = i
++    if wp.static(HFIELD_PRISM_POLYTOPE):
++      # MetalSim: one index per prism vertex. EPA on discrete pairs (box, mesh) stops when a support point repeats an
++      # (index1, index2) pair already in the polytope; with -2 / -3 for all six vertices it stopped early and returned
++      # depths of 1-4 mm for a box 9 mm into a prism (MuJoCo C's mjc_prism_support never sets vertindex: the same
++      # defect, engine_collision_gjk.c epa() "repeated support point")
++      sp.vertex_index = imax
++    else:
++      sp.vertex_index = wp.where(dir[2] < 0.0, -2, -3)
+   elif geomtype == GeomType.TRIANGLE:
+     t1 = geom.rot[0, :]
+     t2 = geom.rot[1, :]
+@@ -965,6 +1019,52 @@ def _add_edge(pt: Polytope, e1: int, e2: int) -> int:
+   return n + 1
+ 
+ 
++@wp.func
++def _shares_horizon_edge(pt: Polytope, face: wp.vec3i) -> bool:
++  """True if an edge of the face is on the horizon."""
++  e01 = (wp.min(face[0], face[1]) << 10) | wp.max(face[0], face[1])
++  e12 = (wp.min(face[1], face[2]) << 10) | wp.max(face[1], face[2])
++  e20 = (wp.min(face[2], face[0]) << 10) | wp.max(face[2], face[0])
++  for i in range(pt.nhorizon):
++    e = pt.horizon[i]
++    if e == e01 or e == e12 or e == e20:
++      return True
++  return False
++
++
++@wp.func
++def _horizon_is_loop(pt: Polytope) -> bool:
++  """True if the horizon edges form one simple closed loop.
++
++  MetalSim: the deleted faces are then a disk, as MuJoCo C's recursive horizon guarantees.
++  """
++  n = pt.nhorizon
++  if n < 3:
++    return False
++  e0 = _get_edge(pt.horizon[0])
++  start = e0[0]
++  cur = e0[1]
++  prev = int(0)
++  for step in range(1, n):
++    nxt = int(-1)
++    for j in range(n):
++      if j == prev:
++        continue
++      e = _get_edge(pt.horizon[j])
++      if e[0] == cur or e[1] == cur:
++        if nxt != -1:
++          return False  # vertex shared by more than two horizon edges (regions touching at a vertex)
++        nxt = j
++    if nxt == -1:
++      return False
++    e = _get_edge(pt.horizon[nxt])
++    cur = wp.where(e[0] == cur, e[1], e[0])
++    prev = nxt
++    if cur == start:
++      return step == n - 1  # closed after all n edges, else more than one loop
++  return False
++
++
+ @wp.func
+ def _epa_witness(
+   pt: Polytope, geom1: Geom, geom2: Geom, geomtype1: int, geomtype2: int, face_idx: int
+@@ -993,7 +1093,7 @@ def _epa_witness(
+   i1 = pt.vert_index[2 * face[0]]
+   i2 = pt.vert_index[2 * face[1]]
+   i3 = pt.vert_index[2 * face[2]]
+-  if geomtype1 == GeomType.HFIELD and (i1 != i2 or i1 != i3):
++  if wp.static(not HFIELD_PRISM_POLYTOPE) and geomtype1 == GeomType.HFIELD and (i1 != i2 or i1 != i3):
+     # TODO(kbayes): Fix case where geom2 is near bottom of height field or "extreme" prism heights
+     n = wp.vec3(0.0, 0.0, 1.0)
+ 
+@@ -1337,6 +1437,12 @@ def _is_invalid_face(face: int) -> bool:
+   return bool(wp.uint32(face) & _FACE_INVALID_OR_DELETED_MASK)
+ 
+ 
++@wp.func
++def _undelete_face(face: int) -> int:
++  """Return the face with the deleted bit cleared."""
++  return int(wp.uint32(face) & _FACE_NOT_DELETED_MASK)
++
++
+ @wp.func
+ def _epa(
+   # In:
+@@ -1365,7 +1471,7 @@ def _epa(
+   # so iterations must be cap to limit the number of generated vertices
+   # (one new vertex per iteration)
+   epa_iterations = wp.min(epa_iterations, 1000)
+-  for _ in range(epa_iterations):
++  for k in range(epa_iterations):
+     pidx = idx
+     idx = int(-1)
+     lower2 = float(FLOAT_MAX)
+@@ -1432,27 +1538,90 @@ def _epa(
+       break
+ 
+     # compute horizon for w
+-    for i in range(pt.nface):
+-      if _is_face_deleted(pt.face[i]):
+-        continue
+-
+-      if wp.dot(pt.face_pr[i], w) - pt.face_norm2[i] > 1e-10:
++    # MetalSim: the first pass below is the original scan: it tests every face on its own. When w
++    # lies (to rounding) on the planes of several faces, it can delete faces that are not connected
++    # to the closest face: two regions touching at a vertex, or a ring. The horizon is then not one
++    # loop, the faces attached to it do not close the polytope, and the edge list can grow past its
++    # buffer (EPA_HORIZON: the contact was dropped). MuJoCo C deletes only the visible faces
++    # connected to the closest face (horizon / horizonRec, recursion through face adjacency). When
++    # the scan's horizon is not one loop, the scan is undone (its faces carry `mark` in face_norm2,
++    # which is not read for deleted faces) and the deleted region grows from the closest face by
++    # further passes over the face list, each deleting a visible face only when it shares an edge
++    # with the region. A scan whose horizon is one loop deleted a disk around the closest face, the
++    # region MuJoCo C deletes, and is kept as it is (bitwise as before). Up to three faces, each
++    # sharing an edge with the ones deleted before it, always form a disk; the loop test is skipped
++    # then.
++    mark = -float(k + 1)
++    ndel = int(1)
++    nonadj = int(0)  # faces deleted by the scan that shared no edge with the faces deleted before them
++    connected = bool(False)
++    for _pass in range(pt.nface + 1):
++      grown = bool(False)
++      for i in range(pt.nface):
++        if _is_face_deleted(pt.face[i]):
++          continue
++        if not (wp.dot(pt.face_pr[i], w) - pt.face_norm2[i] > 1e-10):
++          continue
++        face = _get_face_verts(pt.face[i])
++        if connected and not _shares_horizon_edge(pt, face):
++          continue
+         nvalid = wp.where(_is_invalid_face(pt.face[i]), nvalid, nvalid - 1)
+         pt.face[i] = _delete_face(pt.face[i])
+-        face = _get_face_verts(pt.face[i])
++        pt.face_norm2[i] = mark
++        ndel += 1
++        nprev = pt.nhorizon
+         pt.nhorizon = _add_edge(pt, face[0], face[1])
+         pt.nhorizon = _add_edge(pt, face[1], face[2])
+         pt.nhorizon = _add_edge(pt, face[2], face[0])
++        grown = bool(True)
+         if pt.nhorizon == -1:
+-          if warn_overflow:
+-            wp.printf(
+-              "Warning: EPA horizon = %d isn't large enough.\n"
+-              "To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)\n",
+-              pt.horizon.shape[0],
+-            )
+-          wp.atomic_or(overflow_out, worldid, OverflowType.EPA_HORIZON)
+-          idx = -1
+           break
++        if pt.nhorizon == nprev + 3:
++          nonadj += 1
++
++      if connected:
++        if not grown or pt.nhorizon == -1:
++          break
++      else:
++        if pt.nhorizon != -1 and not ((nonadj > 0 or ndel > 3) and not _horizon_is_loop(pt)):
++          break
++        # undo the scan; restart from the closest face
++        for i in range(pt.nface):
++          if _is_face_deleted(pt.face[i]) and pt.face_norm2[i] == mark:
++            pt.face[i] = _undelete_face(pt.face[i])
++            pt.face_norm2[i] = wp.dot(pt.face_pr[i], pt.face_pr[i])
++            nvalid = wp.where(_is_invalid_face(pt.face[i]), nvalid, nvalid + 1)
++        face = _get_face_verts(pt.face[idx])
++        pt.nhorizon = 0
++        pt.nhorizon = _add_edge(pt, face[0], face[1])
++        pt.nhorizon = _add_edge(pt, face[1], face[2])
++        pt.nhorizon = _add_edge(pt, face[2], face[0])
++        connected = bool(True)
++
++    # the horizon cannot be built: no contact, as MuJoCo C's epa (face = NULL when horizon() runs
++    # out of edges). The closest face is not a usable answer here: with the horizon buffer forced
++    # to 4 edges in test_box_box_horizon it was 4.6 % of the depth with a normal 90 deg off. A
++    # connected region that is still not a disk (not seen at the derived buffer size) ends the same
++    # way: MuJoCo C does not test for it, but faces attached along a horizon that is not one loop
++    # do not close the polytope, and C's other unrecoverable cases (fewer than 3 horizon edges, a
++    # degenerate attached face) also return no contact. Without the region being a disk the
++    # polytope is no longer a sphere and epa_horizon_size does not bound the horizon.
++    if connected and (pt.nhorizon == -1 or not _horizon_is_loop(pt)):
++      if pt.nhorizon == -1:
++        if warn_overflow:
++          wp.printf(
++            "Warning: EPA horizon = %d isn't large enough.\n"
++            "To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.EPA_HORIZON (or = 0 for all)\n",
++            pt.horizon.shape[0],
++          )
++        wp.atomic_or(overflow_out, worldid, OverflowType.EPA_HORIZON)
++      idx = -1
++      break
++
++    # MetalSim: as MuJoCo C's epa ("out of memory for faces"), stop with the closest face when the
++    # new faces do not fit, instead of failing in _attach_face and returning no contact
++    if pt.nface + pt.nhorizon > pt.face.shape[0]:
++      break
+ 
+     # insert w as new vertex and attach faces along the horizon
+     for i in range(pt.nhorizon):
+@@ -2459,7 +2628,7 @@ def _inflate(
+   x1 = result.x1
+   x2 = result.x2
+ 
+-  if geomtype1 == GeomType.HFIELD:
++  if wp.static(not HFIELD_PRISM_POLYTOPE) and geomtype1 == GeomType.HFIELD:
+     v = result.simplex_index1[0]
+     is_side = bool(False)
+     for i in range(result.dim):
+@@ -2525,22 +2694,40 @@ def gjk_phase(
+   # determine if the geoms being tested are discrete
+   is_discrete = _discrete_geoms(geomtype1, geomtype2) and (geom1.margin == 0.0 and geom2.margin == 0.0)
+ 
++  # MetalSim: heightfield prism pairs with a margin shrink to the underlying geoms
++  # (HFIELD_MARGIN_SHRINK; only with HFIELD_PRISM_POLYTOPE, as _inflate's side-wall override is not
++  # meant for them, and upstream excludes heightfields: has_non_hfield_margin)
++  shrink = (
++    wp.static(HFIELD_MARGIN_SHRINK and HFIELD_PRISM_POLYTOPE)
++    and geomtype1 == GeomType.HFIELD
++    and (orig_margin1 > 0.0 or orig_margin2 > 0.0)
++  )
++
+   # special handling for sphere and capsule (shrink to point and line respectively)
+   if geomtype1 == GeomType.SPHERE or geomtype1 == GeomType.CAPSULE:
+     size1 = geom1.size[0]
+     full_margin1 = size1 + 0.5 * orig_margin1
+     geom1.margin = 0.0
+     geom1.size = wp.vec3(0.0, geom1.size[1], geom1.size[2])
++  elif shrink:
++    full_margin1 = 0.5 * orig_margin1
++    geom1.margin = 0.0
+ 
+   if geomtype2 == GeomType.SPHERE or geomtype2 == GeomType.CAPSULE:
+     size2 = geom2.size[0]
+     full_margin2 = size2 + 0.5 * orig_margin2
+     geom2.margin = 0.0
+     geom2.size = wp.vec3(0.0, geom2.size[1], geom2.size[2])
++  elif shrink:
++    full_margin2 = 0.5 * orig_margin2
++    geom2.margin = 0.0
+ 
+-  if size1 + size2 > 0.0:
++  if size1 + size2 > 0.0 or shrink:
+     cutoff += full_margin1 + full_margin2
+-    result = gjk(tolerance, gjk_iterations, geom1, geom2, x_1, x_2, geomtype1, geomtype2, cutoff, is_discrete)
++    shrunk_discrete = bool(is_discrete)
++    if shrink:
++      shrunk_discrete = _discrete_geoms(geomtype1, geomtype2) and geom1.margin == 0.0 and geom2.margin == 0.0
++    result = gjk(tolerance, gjk_iterations, geom1, geom2, x_1, x_2, geomtype1, geomtype2, cutoff, shrunk_discrete)
+     geom1.index = result.index1
+     geom2.index = result.index2
+ 
+diff --git a/mujoco_warp/_src/collision_gjk_test.py b/mujoco_warp/_src/collision_gjk_test.py
+index f7972ea..1cc0d65 100644
+--- a/mujoco_warp/_src/collision_gjk_test.py
++++ b/mujoco_warp/_src/collision_gjk_test.py
+@@ -18,12 +18,16 @@ import warp as wp
+ from absl.testing import absltest
+ from absl.testing import parameterized
+ 
++import mujoco_warp as mjw
+ from mujoco_warp import Data
+ from mujoco_warp import GeomType
+ from mujoco_warp import Model
+ from mujoco_warp import test_data
+ from mujoco_warp._src.collision_core import Geom
++from mujoco_warp._src.collision_gjk import Polytope
++from mujoco_warp._src.collision_gjk import _horizon_is_loop
+ from mujoco_warp._src.collision_gjk import ccd
++from mujoco_warp._src.collision_gjk import epa_horizon_size
+ from mujoco_warp._src.collision_gjk import multicontact
+ from mujoco_warp._src.collision_gjk import support
+ from mujoco_warp._src.types import MJ_MAX_EPAFACES
+@@ -56,7 +60,7 @@ def _geom_dist(
+   epa_face = wp.empty(6 + MJ_MAX_EPAFACES * m.opt.ccd_iterations, dtype=int)
+   epa_pr = wp.empty(6 + MJ_MAX_EPAFACES * m.opt.ccd_iterations, dtype=wp.vec3)
+   epa_norm2 = wp.empty(6 + MJ_MAX_EPAFACES * m.opt.ccd_iterations, dtype=float)
+-  epa_horizon = wp.empty(MJ_MAX_EPAHORIZON if horizon_size is None else horizon_size, dtype=int)
++  epa_horizon = wp.empty(epa_horizon_size(m.opt.ccd_iterations) if horizon_size is None else horizon_size, dtype=int)
+   if overflow_out is None:
+     overflow_out = wp.zeros(1, dtype=int)
+   multiccd_polygon = wp.empty(2 * npolygonmax, dtype=wp.vec3)
+@@ -302,6 +306,22 @@ def _geom_dist(
+   return dist_out.numpy()[0], ncon_out.numpy()[0], pos_out.numpy()[0], pos_out.numpy()[1]
+ 
+ 
++@wp.kernel(module="unique", enable_backward=False)
++def _horizon_is_loop_kernel(horizon: wp.array[int], nhorizon: int, is_loop_out: wp.array[int]):
++  pt = Polytope()
++  pt.horizon = horizon
++  pt.nhorizon = nhorizon
++  is_loop_out[0] = wp.where(_horizon_is_loop(pt), 1, 0)
++
++
++def _horizon_is_loop_np(edges, nhorizon=None) -> bool:
++  """MetalSim: _horizon_is_loop on a horizon of vertex index pairs (EPA's edge encoding)."""
++  horizon = wp.array([(min(a, b) << 10) | max(a, b) for a, b in edges] or [0], dtype=int)
++  is_loop = wp.zeros(1, dtype=int)
++  wp.launch(_horizon_is_loop_kernel, dim=1, inputs=[horizon, len(edges) if nhorizon is None else nhorizon], outputs=[is_loop])
++  return bool(is_loop.numpy()[0])
++
++
+ class GJKTest(parameterized.TestCase):
+   """Tests for GJK/EPA."""
+ 
+@@ -815,9 +835,10 @@ class GJKTest(parameterized.TestCase):
+     dist, _, _, _ = _geom_dist(m, d, 0, 1, multiccd=False, pos1=pos1, mat1=rot1, pos2=pos2, mat2=rot2)
+     self.assertAlmostEqual(dist, -0.00011578822, 6)  # dist = -0.00011579410621457821 - MJC 64 bit precision
+ 
+-    # same configuration with an undersized horizon buffer sets the overflow bit
++    # MetalSim: the horizon grows as a connected region from the closest face (MuJoCo C's), so 5
++    # edges suffice here (the face-by-face scan needed 8)
+     overflow = wp.zeros(1, dtype=int)
+-    _geom_dist(
++    dist, _, _, _ = _geom_dist(
+       m,
+       d,
+       0,
+@@ -831,7 +852,100 @@ class GJKTest(parameterized.TestCase):
+       warn_overflow=False,
+       overflow_out=overflow,
+     )
+-    self.assertTrue(overflow.numpy()[0] & OverflowType.EPA_HORIZON)
++    self.assertFalse(overflow.numpy()[0] & OverflowType.EPA_HORIZON)
++    self.assertAlmostEqual(dist, -0.00011578822, 6)
++
++    # same configuration with an undersized horizon buffer sets the overflow bit and, as MuJoCo C
++    # (face = NULL when the horizon runs out of edges), returns no contact; MetalSim: the closest
++    # face returned here before was 4.6 % of the depth with a normal 90 deg off
++    for horizon_size in (3, 4):
++      overflow = wp.zeros(1, dtype=int)
++      dist, ncon, _, _ = _geom_dist(
++        m,
++        d,
++        0,
++        1,
++        multiccd=False,
++        pos1=pos1,
++        mat1=rot1,
++        pos2=pos2,
++        mat2=rot2,
++        horizon_size=horizon_size,
++        warn_overflow=False,
++        overflow_out=overflow,
++      )
++      self.assertTrue(overflow.numpy()[0] & OverflowType.EPA_HORIZON)
++      self.assertEqual(ncon, 0)
++      self.assertGreater(dist, 0.0)
++
++  def test_epa_horizon_size(self):
++    """MetalSim: the horizon buffer holds every edge of EPA's largest polytope (3 V - 6)."""
++    self.assertEqual(epa_horizon_size(35), 114)
++    self.assertEqual(epa_horizon_size(1), MJ_MAX_EPAHORIZON)
++
++  def test_horizon_is_loop(self):
++    """MetalSim: the horizon test that decides whether EPA's face scan deleted a disk."""
++    self.assertTrue(_horizon_is_loop_np([(0, 1), (1, 2), (2, 0)]))
++    self.assertTrue(_horizon_is_loop_np([(3, 4), (0, 1), (4, 0), (2, 3), (1, 2)]))  # any order and orientation
++    # two regions touching at a vertex: a figure-8 through the walk's start vertex (1) and through
++    # another vertex (2)
++    self.assertFalse(_horizon_is_loop_np([(0, 1), (0, 2), (2, 1), (1, 3), (3, 4), (4, 1)]))
++    self.assertFalse(_horizon_is_loop_np([(0, 1), (1, 2), (2, 0), (2, 3), (3, 4), (4, 2)]))
++    # loops 1-0-2-3 and 2-4-5 in an order where a walk that ignores the second edge at vertex 2 uses
++    # all 7 edges (0 -> 2 -> 4 -> 5 -> 2 -> 0) before it closes
++    self.assertFalse(_horizon_is_loop_np([(0, 1), (2, 3), (5, 2), (2, 4), (0, 2), (4, 5), (3, 1)]))
++    # two disjoint loops (a ring of deleted faces)
++    self.assertFalse(_horizon_is_loop_np([(0, 1), (1, 2), (2, 0), (3, 4), (4, 5), (5, 3)]))
++    self.assertFalse(_horizon_is_loop_np([(0, 1), (1, 2), (2, 3)]))  # open path
++    self.assertFalse(_horizon_is_loop_np([(0, 1), (1, 2)]))  # fewer than 3 edges
++    self.assertFalse(_horizon_is_loop_np([(0, 1), (1, 2), (2, 0)], nhorizon=-1))  # buffer overflow
++
++  @parameterized.parameters(
++    # boxstack world 1531 (MetalSim epa-review): MJW -4.538894e-05, MuJoCo C -4.538434e-05
++    (
++      '<geom type="box" size=".025 .025 .025"/><body><freejoint/><geom type="box" size=".025 .025 .025"/></body>',
++      "-2.1158824352e-02 -6.6878882263e-03 4.9974132254e-02 1.3436272695e-01 2.9754414064e-05 -5.2466821423e-04 "
++      "9.9093207711e-01",
++      2e-8,
++    ),
++    # boxstack world 3635: MJW -7.370859e-05, MuJoCo C -7.370276e-05
++    (
++      '<geom type="box" size=".025 .025 .025"/><body><freejoint/><geom type="box" size=".025 .025 .025"/></body>',
++      "1.1042433995e-02 1.7353867029e-02 4.9951583291e-02 2.6547766364e-01 -4.7347918626e-04 1.0911244443e-04 9.6411688815e-01",
++      2e-8,
++    ),
++    # boxstack seed 12 world 3681 (MetalSim epa-fixes): MJW -7.710978e-05, MuJoCo C -7.710650e-05;
++    # the undone scan had deleted faces that are candidates for the closest face, so the undo must
++    # restore their face_norm2
++    (
++      '<geom type="box" size=".025 .025 .025"/><body><freejoint/><geom type="box" size=".025 .025 .025"/></body>',
++      "5.2688197441e-03 -4.5746638777e-03 4.9999595380e-02 9.6642667520e-01 1.4869133534e-03 3.8914768146e-04 2.5693796744e-01",
++      2e-8,
++    ),
++    # ellipsoids world 320: MJW -2.778232e-05, MuJoCo C -2.755865e-05 (EPA to ccd_tolerance)
++    (
++      '<geom type="ellipsoid" size=".05 .03 .02"/><body><freejoint/><geom type="ellipsoid" size=".04 .025 .03"/></body>',
++      "0.0502827088 0.028716553 -0.0339722746 -0.049520108 0.2793360898 0.8799608347 0.3810354803",
++      1e-6,
++    ),
++  )
++  def test_epa_nonloop_horizon(self, bodies, qpos, tol):
++    """MetalSim: poses where EPA's face scan leaves a horizon that is not one loop (full buffer).
++
++    The scan is undone and the region grows from the closest face (MuJoCo C's horizon); the result
++    is the C contact. The scan's own answer happens to be the same on these poses, so this pins the
++    restart and its undo, not a change of result.
++    """
++    mjm, mjd, m, d = test_data.fixture(
++      xml=f"<mujoco><worldbody>{bodies}</worldbody><keyframe><key qpos='{qpos}'/></keyframe></mujoco>", keyframe=0
++    )
++    mjw.kinematics(m, d)
++    mjw.collision(m, d)
++    nacon = d.nacon.numpy()[0]
++    self.assertGreater(nacon, 0)
++    self.assertEqual(d.overflow.numpy()[0], 0)
++    self.assertGreater(mjd.ncon, 0)
++    self.assertAlmostEqual(d.contact.dist.numpy()[:nacon].min(), mjd.contact.dist[: mjd.ncon].min(), delta=tol)
+ 
+   def test_box_box_rotation(self):
+     """Test box-box with slight rotation which should give 4 contacts."""
 diff --git a/mujoco_warp/_src/collision_primitive.py b/mujoco_warp/_src/collision_primitive.py
 index c2824c6..4234786 100644
 --- a/mujoco_warp/_src/collision_primitive.py

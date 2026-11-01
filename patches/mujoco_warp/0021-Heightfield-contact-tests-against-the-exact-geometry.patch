@@ -1,0 +1,135 @@
+From dcb38f6f1746ea2fb05547f6b313b326d09cb074 Mon Sep 17 00:00:00 2001
+From: pulipakaa24 <adipu@utexas.edu>
+Date: Sat, 31 Oct 2026 16:36:48 -0700
+Subject: [PATCH 21/23] Heightfield contact tests against the exact geometry
+
+test_hfield_sphere_crease (two faces 0.8 mm apart), test_hfield_sphere_no_phantom,
+test_hfield_box_epa_depth (tilted box corner 4 mm deep), test_hfield_mesh_on_peak (terrain peak 2 mm
+into a mesh face, no mesh vertex below a triangle), test_hfield_margin_gap (MuJoCo C main's
+HFieldMarginAndGap). On 8eb51fe the crease, box, mesh and margin tests fail; the mesh test also fails
+with HFIELD_PLANE_CONTACTS True.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ mujoco_warp/_src/collision_driver_test.py | 105 ++++++++++++++++++++++
+ 1 file changed, 105 insertions(+)
+
+diff --git a/mujoco_warp/_src/collision_driver_test.py b/mujoco_warp/_src/collision_driver_test.py
+index 7d03a9c..a52cef2 100644
+--- a/mujoco_warp/_src/collision_driver_test.py
++++ b/mujoco_warp/_src/collision_driver_test.py
+@@ -1014,6 +1014,111 @@ class CollisionTest(parameterized.TestCase):
+ 
+     np.testing.assert_equal(d.nacon.numpy()[0], 4)
+ 
++  # MetalSim: heightfield contacts against the exact geometry (MetalSim docs/research/hfield_contacts_2026-10-31.md)
++
++  def _hfield_contacts(self, xml):
++    _, _, m, d = test_data.fixture(xml=xml, keyframe=0)
++    mjw.collision(m, d)
++    n = d.nacon.numpy()[0]
++    return d.contact.dist.numpy()[:n], d.contact.frame.numpy()[:n, 0], d.contact.pos.numpy()[:n]
++
++  def test_hfield_sphere_crease(self):
++    """A 5 mm sphere in a shallow crease touches both faces 0.8 mm apart: two contacts, exact depth and normals."""
++    # faces rise 0.01 m over 0.1 m on both sides of the line x = 0 (slope 0.1); sphere centre 4.02 mm above it
++    dist, normal, _ = self._hfield_contacts("""
++    <mujoco>
++      <asset><hfield name="h" nrow="3" ncol="3" size=".1 .1 .01 .05" elevation="1 0 1 1 0 1 1 0 1"/></asset>
++      <worldbody>
++        <geom type="hfield" hfield="h"/>
++        <body><freejoint/><geom type="sphere" size=".005"/></body>
++      </worldbody>
++      <keyframe><key qpos="0 .05 .00402 1 0 0 0"/></keyframe>
++    </mujoco>
++    """)
++    c = 1.0 / np.sqrt(1.01)
++    depth = 0.005 - 0.00402 * c
++    self.assertEqual(len(dist), 2)
++    np.testing.assert_allclose(dist, -depth, atol=2e-6)
++    np.testing.assert_allclose(np.sort(normal[:, 0]), [-0.1 * c, 0.1 * c], atol=1e-4)
++    np.testing.assert_allclose(normal[:, 2], c, atol=1e-4)
++
++  def test_hfield_sphere_no_phantom(self):
++    """A sphere resting on a slope near prism side walls: one contact, no separated prism reported as penetrating."""
++    dist, normal, _ = self._hfield_contacts("""
++    <mujoco>
++      <asset><hfield name="h" nrow="3" ncol="3" size=".1 .1 .05 .05" elevation="0 .5 1 0 .5 1 0 .5 1"/></asset>
++      <worldbody>
++        <geom type="hfield" hfield="h"/>
++        <body><freejoint/><geom type="sphere" size=".005"/></body>
++      </worldbody>
++      <keyframe><key qpos=".02 .03 .0325 1 0 0 0"/></keyframe>
++    </mujoco>
++    """)
++    # plane z = 0.25 (x + 0.1) - 0.0; sphere centre distance to it
++    n = np.array([-0.25, 0.0, 1.0]) / np.sqrt(1.0625)
++    sd = (0.0325 - 0.25 * (0.02 + 0.1)) / np.sqrt(1.0625)
++    self.assertEqual(len(dist), 1)
++    np.testing.assert_allclose(dist[0], sd - 0.005, atol=2e-6)
++    np.testing.assert_allclose(normal[0], n, atol=1e-4)
++
++  def test_hfield_box_epa_depth(self):
++    """A tilted box with one corner 4 mm into a flat heightfield cell: the separating-axis depth (EPA must not stop at a
++    repeated prism vertex index)."""
++    q = np.array([0.8, 0.3, 0.4, 0.3]) / np.linalg.norm([0.8, 0.3, 0.4, 0.3])
++    mat = np.zeros(9)
++    mujoco.mju_quat2Mat(mat, q)
++    z = np.abs(mat.reshape(3, 3)[2] * np.array([0.05, 0.03, 0.02])).sum() - 0.004  # lowest corner 4 mm below z = 0
++    dist, normal, _ = self._hfield_contacts(f"""
++    <mujoco>
++      <asset><hfield name="h" nrow="3" ncol="3" size="1 1 .1 .1"/></asset>
++      <worldbody>
++        <geom type="hfield" hfield="h"/>
++        <body><freejoint/><geom type="box" size=".05 .03 .02"/></body>
++      </worldbody>
++      <keyframe><key qpos=".3 .4 {z:.9f} {q[0]:.9f} {q[1]:.9f} {q[2]:.9f} {q[3]:.9f}"/></keyframe>
++    </mujoco>
++    """)
++    self.assertGreaterEqual(len(dist), 1)
++    np.testing.assert_allclose(dist.min(), -0.004, atol=2e-6)
++    np.testing.assert_allclose(normal[np.argmin(dist)], [0.0, 0.0, 1.0], atol=1e-4)
++
++  def test_hfield_mesh_on_peak(self):
++    """A box mesh whose bottom face sits 2 mm below a terrain peak (no mesh vertex below any triangle): one contact
++    2 mm deep (the per-triangle plane path, HFIELD_PLANE_CONTACTS, found none)."""
++    dist, normal, _ = self._hfield_contacts("""
++    <mujoco>
++      <asset>
++        <hfield name="h" nrow="3" ncol="3" size=".1 .1 .02 .05" elevation="0 0 0 0 1 0 0 0 0"/>
++        <mesh name="b" vertex="-.03 -.03 0  .03 -.03 0  -.03 .03 0  .03 .03 0  -.03 -.03 .02  .03 -.03 .02  -.03 .03 .02  .03 .03 .02"/>
++      </asset>
++      <worldbody>
++        <geom type="hfield" hfield="h"/>
++        <body><freejoint/><geom type="mesh" mesh="b"/></body>
++      </worldbody>
++      <keyframe><key qpos="0 0 .018 1 0 0 0"/></keyframe>
++    </mujoco>
++    """)
++    self.assertGreaterEqual(len(dist), 1)
++    np.testing.assert_allclose(dist.min(), -0.002, atol=2e-6)
++    np.testing.assert_allclose(normal[np.argmin(dist)], [0.0, 0.0, 1.0], atol=1e-4)
++
++  def test_hfield_margin_gap(self):
++    """MuJoCo C main's MjcConvexTest.HFieldMarginAndGap (8626d3c): margin 0.02, gap 0.01, sphere 15 mm clear: dist is the
++    separation and the contact point is halfway."""
++    dist, _, pos = self._hfield_contacts("""
++    <mujoco>
++      <asset><hfield name="h" nrow="3" ncol="3" size="1 1 .1 .1"/></asset>
++      <worldbody>
++        <geom type="hfield" hfield="h" margin=".02" gap=".01"/>
++        <body><freejoint/><geom type="sphere" size=".05"/></body>
++      </worldbody>
++      <keyframe><key qpos=".03 .04 .065 1 0 0 0"/></keyframe>
++    </mujoco>
++    """)
++    i = np.argmin(dist)
++    np.testing.assert_allclose(dist[i], 0.015, atol=1e-6)
++    np.testing.assert_allclose(pos[i, 2], 0.0075, atol=1e-6)
++
+   def test_min_friction(self):
+     with self.assertWarns(UserWarning):
+       _, _, _, d = test_data.fixture(
+-- 
+2.54.0
+

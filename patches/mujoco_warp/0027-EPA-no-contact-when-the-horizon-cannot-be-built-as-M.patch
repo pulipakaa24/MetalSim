@@ -1,0 +1,113 @@
+From d7a90fb635b90f3207e79ef222c3be12997d29bc Mon Sep 17 00:00:00 2001
+From: pulipakaa24 <adipu@utexas.edu>
+Date: Sat, 31 Oct 2026 20:07:21 -0700
+Subject: [PATCH 27/31] EPA: no contact when the horizon cannot be built, as
+ MuJoCo C
+
+439b808 ended EPA with its closest face when the horizon buffer filled even after the restart from the closest face, or when the connected region was still not a disk. MuJoCo C's epa returns no face when its horizon runs out of edges (face = NULL after "out of memory for horizon edges", engine_collision_gjk.c), and the closest face is not a usable contact there: on test_box_box_horizon's pose with the buffer forced to 3 or 4 edges it was 4.6 % of the depth with a normal 90 deg off. Both cases now return no contact; the overflow still sets EPA_HORIZON. MuJoCo C does not test for a region that is not a disk (it attaches faces along whatever horizon it built); here it ends EPA as C's other unrecoverable cases do (fewer than 3 horizon edges, a degenerate attached face). A full face buffer still ends EPA with its closest face, as in C.
+
+Neither case occurs at the derived buffer size: the buffer holds every edge of the largest polytope, and no connected region that is not a disk was seen in 72000 static placements. The epa_horizon_size docstring now says that its bound relies on this, since a region that is not a disk would leave a polytope that is not a sphere.
+
+test_box_box_horizon: horizon buffers of 3 and 4 edges set EPA_HORIZON and give no contact.
+---
+ mujoco_warp/_src/collision_gjk.py      | 16 ++++++++--
+ mujoco_warp/_src/collision_gjk_test.py | 42 ++++++++++++++------------
+ 2 files changed, 36 insertions(+), 22 deletions(-)
+
+diff --git a/mujoco_warp/_src/collision_gjk.py b/mujoco_warp/_src/collision_gjk.py
+index ed9dc7d..9976a61 100644
+--- a/mujoco_warp/_src/collision_gjk.py
++++ b/mujoco_warp/_src/collision_gjk.py
+@@ -71,6 +71,11 @@ def epa_horizon_size(epa_iterations: int) -> int:
+   most 3 V - 6 edges, and the horizon (deleted faces' edges, a shared edge removed when its second
+   face is deleted) is a subset of them at every step. Upstream's fixed 24 (MJ_MAX_EPAHORIZON) can
+   fill while the scan deletes faces in index order; MuJoCo C sizes it 24 + max(0, iterations - 35).
++
++  E = 3 V - 6 holds while the polytope is a simplicial sphere, and it stays one only because _epa
++  attaches new faces over a disk: a deleted region that is not a disk ends EPA without a contact.
++  If EPA were allowed to continue past such a region, as MuJoCo C does (it does not test for
++  one), the polytope would no longer be a sphere and this would not bound the horizon.
+   """
+   return max(MJ_MAX_EPAHORIZON, 3 * (5 + epa_iterations) - 6)
+ 
+@@ -1586,8 +1591,14 @@ def _epa(
+         pt.nhorizon = _add_edge(pt, face[2], face[0])
+         connected = bool(True)
+ 
+-    # the polytope cannot grow: return the closest face (a lower bound on the depth) instead of no
+-    # contact
++    # the horizon cannot be built: no contact, as MuJoCo C's epa (face = NULL when horizon() runs
++    # out of edges). The closest face is not a usable answer here: with the horizon buffer forced
++    # to 4 edges in test_box_box_horizon it was 4.6 % of the depth with a normal 90 deg off. A
++    # connected region that is still not a disk (not seen at the derived buffer size) ends the same
++    # way: MuJoCo C does not test for it, but faces attached along a horizon that is not one loop
++    # do not close the polytope, and C's other unrecoverable cases (fewer than 3 horizon edges, a
++    # degenerate attached face) also return no contact. Without the region being a disk the
++    # polytope is no longer a sphere and epa_horizon_size does not bound the horizon.
+     if connected and (pt.nhorizon == -1 or not _horizon_is_loop(pt)):
+       if pt.nhorizon == -1:
+         if warn_overflow:
+@@ -1597,6 +1608,7 @@ def _epa(
+             pt.horizon.shape[0],
+           )
+         wp.atomic_or(overflow_out, worldid, OverflowType.EPA_HORIZON)
++      idx = -1
+       break
+ 
+     # MetalSim: as MuJoCo C's epa ("out of memory for faces"), stop with the closest face when the
+diff --git a/mujoco_warp/_src/collision_gjk_test.py b/mujoco_warp/_src/collision_gjk_test.py
+index 5df72b1..f274b3b 100644
+--- a/mujoco_warp/_src/collision_gjk_test.py
++++ b/mujoco_warp/_src/collision_gjk_test.py
+@@ -836,26 +836,28 @@ class GJKTest(parameterized.TestCase):
+     self.assertFalse(overflow.numpy()[0] & OverflowType.EPA_HORIZON)
+     self.assertAlmostEqual(dist, -0.00011578822, 6)
+ 
+-    # same configuration with an undersized horizon buffer sets the overflow bit; MetalSim: EPA then
+-    # returns its closest face (a lower bound on the depth) instead of no contact
+-    overflow = wp.zeros(1, dtype=int)
+-    dist, _, _, _ = _geom_dist(
+-      m,
+-      d,
+-      0,
+-      1,
+-      multiccd=False,
+-      pos1=pos1,
+-      mat1=rot1,
+-      pos2=pos2,
+-      mat2=rot2,
+-      horizon_size=4,
+-      warn_overflow=False,
+-      overflow_out=overflow,
+-    )
+-    self.assertTrue(overflow.numpy()[0] & OverflowType.EPA_HORIZON)
+-    self.assertLess(dist, 0.0)
+-    self.assertGreater(dist, -0.00011578822 - 1e-6)
++    # same configuration with an undersized horizon buffer sets the overflow bit and, as MuJoCo C
++    # (face = NULL when the horizon runs out of edges), returns no contact; MetalSim: the closest
++    # face returned here before was 4.6 % of the depth with a normal 90 deg off
++    for horizon_size in (3, 4):
++      overflow = wp.zeros(1, dtype=int)
++      dist, ncon, _, _ = _geom_dist(
++        m,
++        d,
++        0,
++        1,
++        multiccd=False,
++        pos1=pos1,
++        mat1=rot1,
++        pos2=pos2,
++        mat2=rot2,
++        horizon_size=horizon_size,
++        warn_overflow=False,
++        overflow_out=overflow,
++      )
++      self.assertTrue(overflow.numpy()[0] & OverflowType.EPA_HORIZON)
++      self.assertEqual(ncon, 0)
++      self.assertGreater(dist, 0.0)
+ 
+   def test_epa_horizon_size(self):
+     """MetalSim: the horizon buffer holds every edge of EPA's largest polytope (3 V - 6)."""
+-- 
+2.54.0
+

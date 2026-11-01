@@ -106,7 +106,7 @@ git clone https://github.com/pulipakaa24/MetalSim && cd MetalSim
 python3.12 -m venv .venv && source .venv/bin/activate     # uv only: "$(uv python find 3.12)" -m venv .venv
 pip install -e ".[full]"                   # full = test + newton (MPM in BatchSim, Newton engine) + rslrl + tron1
 scripts/setup_warp.sh                      # replaces PyPI's warp-lang with the Warp fork (upstream/warp-metalsim)
-pip install -e "git+https://github.com/pulipakaa24/mujoco_warp@8eb51fe637437108185f5a4750b7f5f64ef26624#egg=mujoco-warp" "mujoco>=3.14,<3.15"
+pip install -e "git+https://github.com/pulipakaa24/mujoco_warp@787a5b3a37acc2551ffc8a2c1af1e9781d76723f#egg=mujoco-warp" "mujoco>=3.14,<3.15"
 scripts/fetch_isaac_assets.sh              # NVIDIA's G1 and Franka-Pour assets, fetched from NVIDIA, not redistributed
 git clone --depth 1 https://github.com/google-deepmind/mujoco_menagerie upstream/mujoco_menagerie   # robot models
 pytest tests -q
@@ -121,10 +121,12 @@ nothing in the code, tests or scripts assumes the author's machine (`tests/test_
 model and asset locations can be moved with `MENAGERIE` (default `upstream/mujoco_menagerie`), `POLYHAVEN` (default
 `assets/polyhaven`) and `METALSIM_SPLAT_DATA` (default `assets/splats`). The first steps of each demo, at small scale, are in [`docs/GUIDE.md`](docs/GUIDE.md) section 2.
 
-The MuJoCo Warp commit is pinned (the head of the fork's branch `metalsim` on 2026-10-13), as Warp's in
+The MuJoCo Warp commit is pinned (the head of the fork's branch `metalsim` on 2026-10-31), as Warp's in
 `scripts/setup_warp.sh` and Newton's in `pyproject.toml`. Without access to the fork: clone
 google-deepmind/mujoco_warp, `git checkout 88af9cc` (v3.14.0), `git apply` MetalSim's
-`patches/mujoco_warp/metalsim-8eb51fe.diff` (the whole branch as one diff) and `pip install -e` that checkout.
+`patches/mujoco_warp/metalsim-787a5b3.diff` (the whole branch as one diff) and `pip install -e` that checkout.
+After a pin change, run the pip line again, or `scripts/fork_sync.sh` for fork checkouts kept in `upstream/`;
+`tests/test_fork_pins.py` fails while the installed MuJoCo Warp or Warp checkout is not at its pin.
 The `mujoco<3.15` on that line keeps pip from moving MuJoCo past 3.14: the fork reads `MjModel.flex_internal`,
 which 3.15 removed (the fork alone asks only `mujoco>=3.12`, and its uv index offers 3.15 nightlies).
 
@@ -170,8 +172,8 @@ The evidence, test by test, is in [`docs/PARITY.md`](docs/PARITY.md); open and c
 | what | MetalSim | Isaac reference | details |
 |---|---|---|---|
 | G1 flat velocity task, training (Isaac's flat config and PPO settings) | **elliptic default (2026-09-26): return +26.8 / +26.9 / +26.6 at iteration 1000 (three seeds, mean 26.8 ± 0.2), full-length episodes by the same iteration**; the previous pyramidal default gave +28.4 / 26.3 / 26.0 (origin velocity point) and +27.1 (COM), all inside one seed spread of each other | Isaac Lab 2.3.2 + PhysX: +27.3 (one seed) | [§1.5](docs/PARITY.md#15-learning-on-the-g1-task) |
-| G1 rough velocity task, training (Isaac's terrain generator, ported exactly) | **elliptic default: +13.7 at iteration 1500, terrain level 6.10** (one seed; 25 K env-steps/s); the previous pyramidal default gave +16.4 / +22.6 / +19.1 at levels 6.0–6.1 (three seeds) | Isaac Lab 2.3.2 + PhysX: +14.1, level 5.9 (one seed) | [§1.5](docs/PARITY.md#15-learning-on-the-g1-task) |
-| Isaac Lab 3.0-EA G1 tasks (its extra push / mass / reset-velocity events), like-for-like on Isaac's own MuJoCo Warp numerics, both trainer fixes in | **flat, three seeds: +27.0 ± 1.4 at iteration 1499** (26.8 / 28.4 / 25.7), inside one standard deviation of Isaac's Newton run at every milestone from iteration 200 (mean +7.2 / +17.9 / +25.4 at 300 / 500 / 1000 vs +8.4 / +19.6 / +25.9); 0 blow-ups; **rough seed 0: +13.7 at 1499, terrain level 5.99** vs Isaac's +14.5 / 5.80 (was +8.4 with 1,010 blow-ups before the two fixes). Two trainer defects found and fixed on the way (no reset before the first episode; effort clamp placed where a saturated drive loses implicit damping) | flat +27.5 (Newton / MuJoCo Warp, 59.4 K on the L4), +28.9 (PhysX, 47.3 K); rough +14.5, level 5.8 (Newton) at iteration 1499, one seed each | [§1.8](docs/PARITY.md#18-isaac-lab-30-ea-reference-isaac-sim-61-measured-on-the-l4-2026-09-25) |
+| G1 rough velocity task, training (Isaac's terrain generator, ported exactly) | **elliptic default: +13.7 at iteration 1500, terrain level 6.10** (one seed; 25 K env-steps/s; plane-path heightfield kernel, re-run pending, [§1.6](docs/PARITY.md#16-rough-terrain-mujoco-warps-heightfield-contacts-found-defective-and-patched)); the previous pyramidal default gave +16.4 / +22.6 / +19.1 at levels 6.0–6.1 (seeds 0 / 2 / 1) on that kernel and **+16.0 / +17.4 / +20.6 at levels 6.11–6.13 re-run on the repaired kernel** (2026-10-31: inside the seed spread at iteration 1500; the curriculum climbs later) | Isaac Lab 2.3.2 + PhysX: +14.1, level 5.9 (one seed) | [§1.5](docs/PARITY.md#15-learning-on-the-g1-task) |
+| Isaac Lab 3.0-EA G1 tasks (its extra push / mass / reset-velocity events), like-for-like on Isaac's own MuJoCo Warp numerics, both trainer fixes in | **flat, three seeds: +27.0 ± 1.4 at iteration 1499** (26.8 / 28.4 / 25.7), inside one standard deviation of Isaac's Newton run at every milestone from iteration 200 (mean +7.2 / +17.9 / +25.4 at 300 / 500 / 1000 vs +8.4 / +19.6 / +25.9); 0 blow-ups; **rough seed 0: +13.7 at 1499, terrain level 5.99** (plane-path heightfield kernel; re-run pending) vs Isaac's +14.5 / 5.80 (was +8.4 with 1,010 blow-ups before the two fixes; that configuration with the reset fix, re-run on the repaired kernel on 2026-10-31: +12.0 / 5.93, 67 blow-ups, [§1.8](docs/PARITY.md#18-isaac-lab-30-ea-reference-isaac-sim-61-measured-on-the-l4-2026-09-25)). Two trainer defects found and fixed on the way (no reset before the first episode; effort clamp placed where a saturated drive loses implicit damping) | flat +27.5 (Newton / MuJoCo Warp, 59.4 K on the L4), +28.9 (PhysX, 47.3 K); rough +14.5, level 5.8 (Newton) at iteration 1499, one seed each | [§1.8](docs/PARITY.md#18-isaac-lab-30-ea-reference-isaac-sim-61-measured-on-the-l4-2026-09-25) |
 | G1 flat throughput, 4096 envs | **with the elliptic default (impratio 10, cap 20): full PPO loop 37.3–37.7 K env-steps/s, env step 41.8–42.0 K, physics alone 85.7–85.9 K** (measured 2026-09-26 afternoon after the elliptic-path fusion and Metal early exit, two interleaved repeats, `runs/ellip_ws/final.wrapper.log`). Pyramidal (`recommended_pyramidal`) in the same session: loop 56.9–57.5 K, env step 62.7 K, physics 102.7–103.2 K. The elliptic premium is 1.53× on the loop; the review (`docs/research/elliptic_cost_review_2026-09-26.md`) shows the rest is inherent to impratio 10 (MuJoCo C needs the same extra iterations). Rough, pyramidal: env step 49.1 K, loop 44.5 K | Isaac Lab 3.0 on the L4 (`isaaclab benchmark runtime`, env step alone): 72.0 K with its default Newton / MuJoCo Warp, 45.1 K PhysX; rough 51.2 K / 35.7 K. Isaac Lab 2.3.2 + PhysX on the L4: 45.9 K; RTX 4090, rough task (`Isaac-Velocity-Rough-G1`): 94 K env step, 82 K with training (published) | [§1.4](docs/PARITY.md#14-throughput-on-the-g1-task-isaacs-protocol-4096-envs), [§1.8](docs/PARITY.md#18-isaac-lab-30-ea-reference-isaac-sim-61-measured-on-the-l4-2026-09-25) |
 | Rendering vs RTX (G1 scene, identical states) | tier 2 + Open Image Denoise vs RTX path tracer: robot pixels 28.8 dB PSNR / SSIM 0.94, whole frame 45.6 dB | RTX real-time vs RTX path tracer on the robot: 25.9 dB apart | [§1.7](docs/PARITY.md#17-fidelity-protocol-against-isaac-sim-51-on-an-l4-recorded-2026-09-24-physx--rtx) |
 | Physics vs PhysX (same asset, open-loop protocol) | joints within 0.03–0.06 rad through hold and 1 m drop; contact impulses within 1–4 % of Isaac's; **default contacts since 2026-09-26: elliptic friction cones (PhysX's exact cone), impratio 10, Newton cap 20**, on top of the 10 ms impact-stiffened preset with hard joint limits: 20 ms impact forces 1.08× / 1.07× of PhysX's (pyramidal 1.70× / 1.23×), feet slide within noise of Isaac's; learning inside seed spread. **Open: peak foot penetration at the 1 m landing is 13 mm against PhysX's 0.5 mm** (measured like for like 2026-09-26): MuJoCo only builds a contact row once a foot corner is inside the surface, so at a 2.5 ms substep no stock setting gets below ~8 mm without losing slide or exceeding PhysX's force bound; a speculative-contact prototype in the fork reaches 1.6 mm but was not adopted (2026-09-27: it loses the slide match and costs 1.20×; archived behind `MJW_SPECULATIVE_GAP`, [GAPS](docs/GAPS.md)) | Isaac Sim 5.1 PhysX recording; Isaac Sim 6.1 / Isaac Lab 3.0 PhysX reproduces it within 0.002 rad, and 3.0's own MuJoCo Warp sits 0.002–0.005 rad from its PhysX | [§1.7](docs/PARITY.md#17-fidelity-protocol-against-isaac-sim-51-on-an-l4-recorded-2026-09-24-physx--rtx), [§1.8](docs/PARITY.md#18-isaac-lab-30-ea-reference-isaac-sim-61-measured-on-the-l4-2026-09-25) |
@@ -273,7 +275,9 @@ first four commits plus the graph-capture sort; merged into `metalsim`.
 
 [github.com/pulipakaa24/mujoco_warp](https://github.com/pulipakaa24/mujoco_warp), branch
 [`metalsim`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim), head
-[`8eb51fe`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624) (2026-10-13, the commit the install pins;
+[`787a5b3`](https://github.com/pulipakaa24/mujoco_warp/commit/787a5b3a37acc2551ffc8a2c1af1e9781d76723f) (2026-10-31, the commit the install pins;
+the results on heightfields before 2026-10-31 were produced with the plane-path kernel, up to
+[`8eb51fe`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624);
 the rigid-body results before the elliptic-cone work were produced at
 [`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc) / code
 [`8fbf965`](https://github.com/pulipakaa24/mujoco_warp/commit/8fbf965acb630aa32573dda802404d519c843a99)). Base: Google
@@ -282,7 +286,7 @@ DeepMind's MuJoCo Warp v3.14.0 (`88af9cc`) plus the Metal device patch by David 
 [`metal`](https://github.com/pulipakaa24/mujoco_warp/tree/metal) (`8ce5bb0`). Apache-2.0.
 
 - Heightfield contacts against each prism's top plane per triangle (`f2716b4`); upstream gave inverted normals and
-  launched robots on rough terrain.
+  launched robots on rough terrain. Superseded on 2026-10-31 (last bullet): the plane path is off by default.
 - Plane-to-convex contacts with MuJoCo C's contact set (4 contacts on a tilted foot where upstream kept 2),
   switchable back with `MJW_PLANE_CONVEX=legacy` (`284dcd1`, `a8e6485`).
 - Sparse L'DL factor and solve with one world per thread on Metal; no-op gravity-compensation and tendon-damping
@@ -313,10 +317,40 @@ DeepMind's MuJoCo Warp v3.14.0 (`88af9cc`) plus the Metal device patch by David 
   training at start-up; no result change.
 - Heightfield plane contacts restricted to meshes; primitives take upstream's GJK/EPA again (`b630530`; the fork's
   plane path missed contacts of primitives on heightfields smaller than the box; `HFIELD_PLANE_CONTACTS_PRIMITIVES=True`
-  archives the old form).
+  archives the old form). Superseded on 2026-10-31 (last bullet): meshes take GJK/EPA too.
 
 - Deterministic mode (Warp `RUN_TO_RUN`): non-heightfield CCD runs as a counter-free solve kernel and a contact-write kernel (`cfa290b`); the single kernel picked its EPA scratch row with a slot counter, so under Warp's two-pass counters a box-box contact could land in another world's slot. Default mode unchanged.
 - Deterministic mode: `_solve_done` keeps the solver's iteration count in a local (`8eb51fe`); it read back an in-place increment that Warp's counting pass suppresses, so a world reaching the iteration cap made the early exit's counter call in one pass only (the G1 task stopped on the counter check). The Newton update takes the unfused launches in deterministic mode: the fused kernel reads back its own change counter within the launch, and its deterministic plan at 1,024 worlds asked for more than 2^31 scratch elements.
+- Heightfield contacts against the exact prism geometry (`d514112` … `93e5ce1`, 2026-10-31;
+  [`docs/research/hfield_contacts_2026-10-31.md`](docs/research/hfield_contacts_2026-10-31.md)): the prism is a plain
+  convex polytope as in MuJoCo C (upstream's side-wall override returned penetrations for prisms clear of the geom),
+  the prism's support function returns distinct vertex indices (discrete EPA for boxes and meshes stopped early;
+  MuJoCo C has the same defect), only penetrating prisms are kept, contacts 1-3 skip duplicates instead of stopping
+  within 1 mm, and the margin follows MuJoCo C main. Meshes leave the plane path for GJK/EPA (the plane path missed
+  contacts in 178 of 1000 touching placements of Isaac's G1 foot). Against the exact contact sets on Isaac's rough
+  tile: spheres 88.8 → 99.97 %, boxes 76.6 → 99.9 %, the G1 foot mesh 52.9 → 99.9 %; Unitree's G1 on Isaac's bumps
+  falls as often as on CPU MuJoCo within the run-to-run spread (75.8 % of 240 robots vs 68.3–68.8 %; before 18.8 %).
+  Cost (indicative ratios from a laptop, research note §8.4 and §12): about 15 % of Isaac's G1 rough env step under
+  random actions; per PPO iteration at 4096 envs 1.2–1.3× the plane-path pin `8eb51fe` in the 2.3.2 rough configs and
+  1.68× in Isaac Lab 3.0's like-for-like config, whose 1 cm geom gap puts twice as many foot–terrain pairs on per-prism
+  GJK (2.05× on `93e5ce1`, which also dropped contacts there: `EPA_HORIZON`, next bullet); each change but
+  the penetrating-prisms filter is behind a module flag that restores the previous form (`HFIELD_PLANE_CONTACTS=True`:
+  the mesh plane path). Rough-terrain results of Isaac's G1 on MuJoCo Warp before this pin were re-run on 2026-10-31
+  where neither the L4 nor the timing machine is needed (research note §13: the 2.3.2 preset's three seeds end inside
+  their seed spread, the curriculum climbs later); the Isaac-side and throughput rows are pending
+  ([PARITY §1.6](docs/PARITY.md#16-rough-terrain-mujoco-warps-heightfield-contacts-found-defective-and-patched)).
+- EPA's horizon and the heightfield margin as in MuJoCo C (`439b808` … `787a5b3`, 2026-10-31; research note §12). With
+  a geom gap (Isaac Lab 3.0's like-for-like rough config, 1 cm per geom) the previous bullet's commits overflowed EPA's
+  24-edge horizon buffer in a few worlds per run (`EPA_HORIZON`, the contact dropped): EPA tested each face on its own,
+  so rounding could delete faces not connected to the closest one. Such a scan is now undone and the region grown from
+  the closest face through shared edges, as MuJoCo C does; the buffer holds every edge of EPA's largest polytope
+  (`3 (5 + ccd_iterations) - 6`); a horizon that still cannot be built gives no contact, as MuJoCo C on horizon
+  failure; a full face buffer keeps the closest face, as in C (it dropped the contact). Heightfield prisms with a
+  margin or gap run GJK on the uninflated shapes first and EPA only when they overlap, as MuJoCo C's `mjc_ccd`
+  (`collision_gjk.HFIELD_MARGIN_SHRINK`, read at import): in that config 6.5–6.8 → 1.2–1.3 EPA calls per G1 foot pair,
+  and exact distances for prisms within the gap. Without a margin or gap only scans whose horizon was not one loop and
+  full face buffers change: bitwise unchanged on the research note's §8.1 contact checks and on 20,000 G1-foot
+  placements on box stairs.
 
 Branch [`metalsim-flex`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-flex), head
 [`fc1d5ee`](https://github.com/pulipakaa24/mujoco_warp/commit/fc1d5eef8f9045309087bc822f36c1c62a7214a2) (code
@@ -406,6 +440,7 @@ Recordings, logs and benchmark JSON are under `runs/parity/`, `runs/parity3/` an
 - [`mpm_2026-10-09.md`](docs/research/mpm_2026-10-09.md): Isaac Lab 3.0-EA's MPM (Newton 1.5.2's implicit solver) and how to run it on Metal; follow-up rounds in [`reports/`](reports) and [`research_notes/`](research_notes) (Metal GPU primitives for MPM, CUDA and Metal float parity, scalable determinism and rigid scale, CUDA's approximate division / sqrt).
 - [`franka_pour_2026-10-11.md`](docs/research/franka_pour_2026-10-11.md): Isaac Lab 3.0-EA's Franka-Pour task read from Isaac's source, for the port.
 - [`ppowarp_checkpoint_load_2026-10-13.md`](docs/research/ppowarp_checkpoint_load_2026-10-13.md): checkpoints loaded into PPOWarp ran the untrained weights (fixed), and which results it touched.
+- [`hfield_contacts_2026-10-31.md`](docs/research/hfield_contacts_2026-10-31.md): heightfield contacts in the MuJoCo Warp fork against the exact geometry and MuJoCo C: three defects, the fix, its cost and the results it touches.
 - [`research_notes/`](research_notes): also the capacity overflow guard (`capacity_overflow_guard/`), Kit's dome-light orientation (`dome_light_azimuth/`) and transparency in the ray-traced sensors with true area lights (`Render sensor fidelity/`).
 
 ## Working rules

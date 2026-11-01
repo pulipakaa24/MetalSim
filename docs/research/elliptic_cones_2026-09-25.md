@@ -465,6 +465,11 @@ if a stale `ctrl` reached the physics. No change to `metalsim/learn/so101_lift.p
   own `collision_driver_test -k hfield` on Metal: 3 passed (`runs/competitors/hfield_gate_tests{,2}.log`).
   Not merged (coordinator's call; the G1 rough task uses mesh feet on the heightfield, so its contacts are
   unchanged; scenes with primitive geoms on heightfields go back to upstream's behaviour).
+  **Correction (2026-10-31):** it was merged into the fork's `metalsim` the same evening (`b630530` with its
+  METALSIM_CHANGES.md row `fe6fe71`, on the branch's first-parent line), and is in every MuJoCo Warp pin since the first,
+  `cf0f8ad` (2026-10-12), including `8eb51fe`; "not merged" above was the state when this section was written. The
+  heightfield path changed again on 2026-10-31 (pin `93e5ce1`): meshes leave the plane path for GJK/EPA, with
+  upstream's side-wall override removed and distinct prism support indices (`docs/research/hfield_contacts_2026-10-31.md`).
 - `io_test::test_put_data_nefc_zero_dense` (`AssertionError: 1 != 0` at `self.assertEqual(mjd.nefc, 0)`): the
   assertion is on MuJoCo C's own `MjData` before MuJoCo Warp is involved. In the installed MuJoCo 3.14.0 the
   fixture's tendon with `frictionloss="0.5"` instantiates one `mjCNSTR_FRICTION_TENDON` row (nefc = 1); the test

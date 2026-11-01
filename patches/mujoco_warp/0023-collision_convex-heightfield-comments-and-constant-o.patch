@@ -1,0 +1,49 @@
+From 93e5ce18e76854c430ce669314af00ddceb92147 Mon Sep 17 00:00:00 2001
+From: pulipakaa24 <adipu@utexas.edu>
+Date: Sat, 31 Oct 2026 16:37:20 -0700
+Subject: [PATCH 23/23] collision_convex: heightfield comments and constant
+ order
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ mujoco_warp/_src/collision_convex.py | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/mujoco_warp/_src/collision_convex.py b/mujoco_warp/_src/collision_convex.py
+index db0e45c..e6afecc 100644
+--- a/mujoco_warp/_src/collision_convex.py
++++ b/mujoco_warp/_src/collision_convex.py
+@@ -59,6 +59,8 @@ HFIELD_PLANE_CONTACTS_PRIMITIVES = False
+ # triangle feature reached from two prisms, e.g. a shared edge; float32 witness noise is ~2e-5 m on a 200 m field).
+ # HFIELD_SELECT_DEDUP False restores upstream's rule.
+ HFIELD_SELECT_DEDUP = True
++HFIELD_DUP_DIST = 1.0e-4
++HFIELD_DUP_COS = 0.99999962  # cos(0.05 deg)
+ # MetalSim: heightfield prisms are built relative to the other geom's position (in the heightfield frame), so GJK/EPA
+ # and the plane test run on small numbers. In absolute heightfield coordinates float32 witness points carry ~1e-5 m of
+ # noise 100 m from the centre (MetalSim's rough terrain is 200 m across), ~0.3 deg on a 5 mm sphere's normal, which the
+@@ -72,8 +74,6 @@ HFIELD_LOCAL_ORIGIN = True
+ # 1.5 (margin + gap), contact while the separation is below margin + gap (upstream MuJoCo Warp raises by margin only).
+ # Identical at margin = gap = 0.
+ HFIELD_TRUE_DISTANCE = True
+-HFIELD_DUP_DIST = 1.0e-4
+-HFIELD_DUP_COS = 0.99999962  # cos(0.05 deg)
+ from mujoco_warp._src.math import upper_trid_index
+ from mujoco_warp._src.types import MJ_MAX_EPAFACES
+ from mujoco_warp._src.types import MJ_MAX_EPAHORIZON
+@@ -455,9 +455,9 @@ def ccd_hfield_kernel_builder(
+     min_pos = wp.vec3(MJ_MAXVAL, MJ_MAXVAL, MJ_MAXVAL)
+     min_id = int(-1)
+ 
+-    # geom1 margin added to z-axis of hfield prism top points below. MetalSim: margin + gap, as MuJoCo C (its
+-    # mjc_ConvexHField receives margin + gap, raises the prism top by it and inflates geom2 by half of it); the
+-    # reported dist is therefore C's: separation - 1.5 * (margin + gap)
++    # MetalSim: margin + gap, as MuJoCo C (mjc_ConvexHField receives margin + gap). HFIELD_TRUE_DISTANCE: both the
++    # prism and geom2 are inflated by half of it and dist is corrected to the separation below (C main); otherwise the
++    # prism top is raised by it and geom2 inflated by half (C 3.14: dist = separation - 1.5 * (margin + gap))
+     hfmargin = margin + gap
+     geom2.margin = hfmargin
+     # prism top raise (MuJoCo C 3.14) or prism inflation (C main: support offset by half the margin, as geom2)
+-- 
+2.54.0
+
