@@ -90,7 +90,9 @@ def test_hfield_mesh_contacts_match_mujoco_c():
 
     Before the plane-contact patch to MuJoCo Warp's heightfield kernel (patches/mujoco_warp-hfield-
     plane-contacts.patch) this failed: an inverted normal (z = -1), a 2.05 m penetration, one world
-    launched to 2.3 m."""
+    launched to 2.3 m. Since the MuJoCo Warp pin 93e5ce1 (2026-10-31) the G1's mesh feet take the repaired
+    GJK/EPA path instead of that patch (docs/research/hfield_contacts_2026-10-31.md): min normal z 0.912,
+    max penetration 5.2 mm vs C's 4.6 mm, pelvis heights within 1 mm of C."""
     import mujoco
     from metalsim.learn.g1_velocity import G1VelocityTask
     task = G1VelocityTask(4, terrain="rough", seed=0, terrain_collision="hfield"); m = task.model   # the heightfield kernel

@@ -19,7 +19,7 @@ git clone https://github.com/pulipakaa24/MetalSim && cd MetalSim
 python3.12 -m venv .venv && source .venv/bin/activate     # uv only: "$(uv python find 3.12)" -m venv .venv
 pip install -e ".[full]"
 scripts/setup_warp.sh
-pip install -e "git+https://github.com/pulipakaa24/mujoco_warp@8eb51fe637437108185f5a4750b7f5f64ef26624#egg=mujoco-warp" "mujoco>=3.14,<3.15"      # pinned: README "Install"
+pip install -e "git+https://github.com/pulipakaa24/mujoco_warp@93e5ce18e76854c430ce669314af00ddceb92147#egg=mujoco-warp" "mujoco>=3.14,<3.15"      # pinned: README "Install"
 scripts/fetch_isaac_assets.sh
 git clone --depth 1 https://github.com/google-deepmind/mujoco_menagerie upstream/mujoco_menagerie
 pytest tests -q
@@ -101,9 +101,11 @@ from `fuse_fp`, GPU sort / BSR / NanoVDB builders, `fast_math` forms with `warp.
 default) are listed in the branch's `METALSIM_CHANGES.md` and in `metalsim/physics/mpm/MPM.md`.
 
 **MuJoCo Warp** ([pulipakaa24/mujoco_warp](https://github.com/pulipakaa24/mujoco_warp), branch
-`metalsim`, pinned commit `8eb51fe`, installed by the `pip install` line above; the commits since `8fbf965`, which
+`metalsim`, pinned commit `93e5ce1`, installed by the `pip install` line above; the commits since `8fbf965`, which
 this paragraph describes, are listed in the README's "MuJoCo Warp fork" section: elliptic cones on Metal, the fused and
-early-exiting Newton iterations, scratch reuse, the equality block at `njmax`). Google DeepMind's MuJoCo Warp v3.14.0
+early-exiting Newton iterations, scratch reuse, the equality block at `njmax`, deterministic mode, and since 2026-10-31
+heightfield contacts against the exact prism geometry, which replace the plane path below for meshes
+(`docs/research/hfield_contacts_2026-10-31.md`)). Google DeepMind's MuJoCo Warp v3.14.0
 (`88af9cc`) with, up to `8fbf965`, sixteen commits:
 the Metal device patch, heightfield contacts computed against each prism's top plane (upstream
 produced inverted normals and launched worlds on rough terrain), and the plane-to-convex contact set of
@@ -115,10 +117,15 @@ match MuJoCo C (per-pair contact cap and selection, box-triangle and cable-capsu
 every flex, active-layer volume contacts, mesh normals), order flex equality rows deterministically (the Metal
 `FlexConstraintTest` failures) and sort on the device on Metal; each behind a `collision_flex` flag
 (`scripts/diagnostics/deformable/UPSTREAM.md`). The same sixteen commits (flex ones rebased linearly after the
-throughput ones; identical tree to the merge `8fbf965`) are in `patches/mujoco_warp/0001-0016`. To build the pinned
+throughput ones; identical tree to the merge `8fbf965`) are in `patches/mujoco_warp/0001-0016`;
+`patches/mujoco_warp/0017` is the deterministic CCD split as a plain diff, and `0018-0023` are the six heightfield-contact
+commits of 2026-10-31 (`git am` on the previous pin `8eb51fe` gives the pinned tree). To build the pinned
 tree without the fork, clone google-deepmind/mujoco_warp at `88af9cc`, `git apply`
-`patches/mujoco_warp/metalsim-8eb51fe.diff` (the whole branch as one diff) and `pip install -e` the checkout (README
-"Install"). Superseded: "`git am` those patches" gives the `8fbf965` tree, not the pinned one.
+`patches/mujoco_warp/metalsim-93e5ce1.diff` (the whole branch as one diff, `git diff --abbrev=7 88af9cc 93e5ce1`)
+and `pip install -e` the checkout (README "Install"). Superseded: "`git am` those patches" (`0001-0016`) gives the
+`8fbf965` tree, not the pinned one. Shared fork checkouts in `upstream/` (`upstream/mujoco_warp`, `upstream/warp-metalsim`) are moved
+to the pins with `scripts/fork_sync.sh` (`-n` reports without changing anything); `tests/test_fork_pins.py` fails while
+one of them, or the checkout the installed package comes from, is off its pin.
 
 **Newton** ([pulipakaa24/newton](https://github.com/pulipakaa24/newton), branch `metalsim`, pinned commit
 `9f31739` = XPBD code `90e2332` plus the Metal fixes: HashTable, 64-bit atomics, mesh-SDF barrier, collision launches). Only needed for the experimental Newton XPBD engine. The fork fixes XPBD solver defects
