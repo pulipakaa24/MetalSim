@@ -14,7 +14,7 @@ TRAIN_HDRI=(poly_haven_studio lebombo brown_photostudio_02 artist_workshop small
             lythwood_room comfy_cafe reading_room pine_attic)
 HELDOUT_HDRI=(photo_studio_loft_hall empty_play_room machine_shop_02)
 TRAIN_TEX=(wood_table_001 plywood oak_veneer_01 laminate_floor_02)
-HELDOUT_TEX=(wood_table_worn)
+HELDOUT_TEX=(wood_table_worn concrete_floor_worn_001)   # concrete: the TRON1 film's floor (with machine_shop_02)
 fetch() {   # fetch <url> <dest>
   [ -s "$2" ] || { curl -fsSL -o "$2.part" "$1" && mv "$2.part" "$2"; }
 }

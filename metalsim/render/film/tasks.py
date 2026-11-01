@@ -613,6 +613,11 @@ G1_UNITREE = FilmTask(
 
 TASKS = {t.name: t for t in (FRANKA_POUR, G1_FLAT, G1_ROUGH, G1_UNITREE)}
 
+# LimX TRON1 with LimX's own RL policy: its entry lives with its adapter (no simulator import at module level)
+from metalsim.render.film.tron1 import TRON1  # noqa: E402
+
+TASKS[TRON1.name] = TRON1
+
 
 def get(name: str) -> FilmTask:
     if name not in TASKS:

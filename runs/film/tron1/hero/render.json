@@ -1,0 +1,110 @@
+{
+ "task": "tron1",
+ "grid": 1,
+ "slots": [
+  0
+ ],
+ "envs": [
+  8
+ ],
+ "frames": 351,
+ "fps": 50.0,
+ "width": 1280,
+ "height": 720,
+ "panel": [
+  1280,
+  720
+ ],
+ "tier": 2,
+ "passes": 16,
+ "spp": 4,
+ "samples_per_pixel": 64,
+ "bounces": 3,
+ "denoise": "oidn",
+ "exposure": 1.4,
+ "viewer": {
+  "eye": [
+   1.99,
+   -1.53,
+   0.18
+  ],
+  "lookat": [
+   0.0,
+   0.0,
+   -0.35
+  ],
+  "origin_type": "asset_body",
+  "env_index": 0,
+  "asset_name": null,
+  "body_name": "base_Link",
+  "resolution": [
+   1280,
+   720
+  ],
+  "fovy": 36.0,
+  "smooth_s": 1.0,
+  "orbit_deg_s": 0.0
+ },
+ "look": {
+  "hdri": "hdri/heldout/machine_shop_02.hdr",
+  "sun": false,
+  "ground_texture": "tex/heldout/concrete_floor_worn_001.png",
+  "grains_per_particle": 4,
+  "grain_radius": null
+ },
+ "particles_per_env": 0,
+ "particle_radius": 0.0,
+ "setup_s": 1.016023292000682,
+ "probe": {
+  "frame": 0,
+  "warmup_s": 0.15665974999865284,
+  "one_pass_s": 0.050882542000181274,
+  "full_s": 0.18038974999944912,
+  "per_pass_s": 0.008633813866617856
+ },
+ "twin_geoms": 21,
+ "frame_corrections": 4,
+ "env_grid": {
+  "margin": 6.892600258113737,
+  "cell": [
+   14.318413188661012,
+   14.263930531372695,
+   14.906283482465719
+  ],
+  "growths": 0
+ },
+ "cache_key": "e380feb638b0e45fd9f2",
+ "software": {
+  "metalsim": "ed66d8ef3e+dirty",
+  "warp": {
+   "version": "1.18.0.dev20260917",
+   "git": "4127c48183",
+   "checkout": "upstream/warp-metalsim"
+  },
+  "mujoco": {
+   "version": "3.14.0"
+  },
+  "numpy": {
+   "version": "2.5.3"
+  }
+ },
+ "hardware": {
+  "machine": "arm64",
+  "python": "3.13.7",
+  "power": {
+   "source": "Battery Power",
+   "battery_percent": 69,
+   "battery_state": "discharging",
+   "mode": "High Power",
+   "mode_setting": "powermode 2",
+   "at": "2026-10-31T16:05:17-0700"
+  },
+  "model": "Mac16,6",
+  "cpu": "Apple M4 Max",
+  "memory_gb": 64,
+  "macos": "27.0.1",
+  "macos_build": "26A434",
+  "gpu": "Apple M4 Max",
+  "gpu_cores": "40"
+ }
+}

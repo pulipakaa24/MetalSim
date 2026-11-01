@@ -133,3 +133,15 @@ def test_every_film_ground_has_its_size():
         if task.look.ground_texture:
             assert task.look.ground_tile_m and task.look.ground_tile_m > 0, name
 
+
+def test_cache_key_hashes_the_resolved_texrepeat():
+    """Keys hash the texrepeat a tile resolves to, under the field's earlier name: TRON1 (3 m concrete, texrepeat 2/3
+    before ground_tile_m existed) keeps its key; without a ground texture the old default 1.0 stands."""
+    from metalsim.render.film.tron1 import TRON1
+
+    old = dataclasses.asdict(TRON1.look)
+    old.pop("ground_tile_m")
+    old["ground_repeat"] = 2.0 / 3.0
+    assert RR._key_look(TRON1.look) == old
+    bare = C.LookCfg(hdri=None, ground_texture=None)
+    assert RR._key_look(bare)["ground_repeat"] == 1.0 and "ground_tile_m" not in RR._key_look(bare)
