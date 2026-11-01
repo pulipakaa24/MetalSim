@@ -46,9 +46,10 @@ spheres and capsules, the separating-axis penetration per prism for boxes and th
 0.02 deg (p99), depth errors 0.0 mm (p95); contact sets 99.9-100 % equal to the exact ones within the 4-contact cap
 (pinned fork: 53-89 %; MuJoCo C 3.14: 69-99.5 %, section 8.1). Unitree's G1 on Isaac's bumps now falls as often as on
 CPU MuJoCo within the run-to-run spread (75.8 % of 240 robots vs 68.3-68.8 %; pinned fork 18.8 %). Cost: about 15 % of
-Isaac's G1 rough-task env step (its feet are meshes and now take GJK/EPA); nothing for primitives. The heightfield
-margin now follows MuJoCo C main (section 7). Every rough-terrain result of Isaac's G1 on MuJoCo Warp (PARITY §1.5)
-needs a re-run (section 9).
+Isaac's G1 rough-task env step under random actions (its feet are meshes and now take GJK/EPA), 1.2-1.3x per PPO
+iteration in the 2.3.2 rough configs and, with Isaac Lab 3.0's geom gap, 1.7x after the follow-up of section 12
+(2.05x and dropped contacts before it); nothing for primitives. The heightfield margin now follows MuJoCo C main
+(section 7). Every rough-terrain result of Isaac's G1 on MuJoCo Warp (PARITY §1.5) needs a re-run (section 9).
 
 ## 2. Baseline, re-measured on the pinned fork (`8eb51fe`)
 
@@ -237,9 +238,10 @@ ratios are indicative only, the absolute numbers are not performance figures.**
 | fixed, default (meshes on GJK/EPA) | 52,073 / 52,820 / 53,234 / 53,499 | 0.85 |
 
 The primitive-path, selection, local-origin and margin changes cost nothing measurable; the whole cost, about 15 % of
-the env step, is the G1's feet (8-vertex meshes) on per-prism GJK/EPA instead of the plane test. Primitive geoms
-were already on GJK/EPA, so scenes like the Unitree G1 (sphere feet) pay nothing extra (the pinned fork had the same
-path, with wrong results).
+the env step, is the G1's feet (8-vertex meshes) on per-prism GJK/EPA instead of the plane test. That is the env step
+under random actions at margin = gap = 0; per PPO iteration and with a geom gap the ratio is larger (section 12).
+Primitive geoms were already on GJK/EPA, so scenes like the Unitree G1 (sphere feet) pay nothing extra (the pinned
+fork had the same path, with wrong results).
 
 ### 8.5 Stability under random actions (PARITY §1.6's protocol)
 

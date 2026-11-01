@@ -66,9 +66,11 @@ loaded through `metalsim.scene.usd_to_mjcf`.
 ### 1.4 Throughput on the G1 task (Isaac's protocol, 4096 envs)
 
 **2026-10-31:** every G1 rough-terrain number in this section was measured on MuJoCo Warp's plane-path heightfield
-kernel (fork pin `8eb51fe` and earlier, §1.6). The pin is now `787a5b3` (`93e5ce1` plus the EPA follow-up of the research note's §12), where the G1's mesh feet take the repaired
-GJK/EPA path; on the 14-inch MacBook Pro on battery that cost about 15 % of the rough env step (an indicative ratio,
-not a performance figure: `docs/research/hfield_contacts_2026-10-31.md` §8.4). The rough rows keep their numbers and
+kernel (fork pin `8eb51fe` and earlier, §1.6). The pin is now `787a5b3` (`93e5ce1` plus the EPA follow-up of the
+research note's §12), where the G1's mesh feet take the repaired GJK/EPA path; on the 14-inch MacBook Pro that cost
+about 15 % of the rough env step under random actions (on battery) and, per PPO iteration, 1.2–1.3× (2.3.2 configs)
+and 1.68× (`rough_il3`) the plane path (indicative ratios, not performance figures:
+`docs/research/hfield_contacts_2026-10-31.md` §8.4, §12). The rough rows keep their numbers and
 are marked "plane-path kernel; re-run pending (2026-10-31)"; flat rows are unaffected (no heightfield).
 
 | measurement (4096 envs unless stated; uncontended pass 2026-09-24, synchronized) | this stack (M4 Max, 18.4 TFLOPS) | Isaac Lab (RTX 4090, 82.6 TFLOPS), reported | raw ratio | per-TFLOPS ratio |
@@ -704,8 +706,10 @@ the new pin: min normal z 0.912, max penetration 5.2 mm (MuJoCo C 4.6 mm), pelvi
 0.5 s (`tests/test_terrain.py` 21 passed; previous pin `8eb51fe`: 0.913, 4.2 mm, within 3 mm). Unitree's G1 with
 its own policy on Isaac's bumps falls in 75.8 % of 240 robots (5 tile seeds × 3 runs × 16) against 68.3–68.8 % on CPU MuJoCo, inside the
 run-to-run spread (previous pin `8eb51fe`: 18.8 %; the Unitree G1's feet are spheres, so this
-is the GJK/EPA fix, not the plane path). Cost: about 15 % of the G1 rough env step, all of it the feet on per-prism
-GJK/EPA (an indicative ratio from the 14-inch MacBook Pro on battery, §8.4); primitives were already on GJK/EPA.
+is the GJK/EPA fix, not the plane path). Cost: about 15 % of the G1 rough env step under random actions, all of it
+the feet on per-prism GJK/EPA (§8.4, on battery); per PPO iteration 1.2–1.3× (2.3.2 configs) and 1.68× (`rough_il3`)
+the plane path (research note §12, on AC power); indicative ratios from the 14-inch MacBook Pro. Primitives were
+already on GJK/EPA.
 
 Difference that remains (2026-10-31):
 - **Side-wall contacts at centimetre depths**: MuJoCo's prism model (C's too) gives a near-horizontal contact through

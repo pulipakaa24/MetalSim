@@ -313,7 +313,10 @@ DeepMind's MuJoCo Warp v3.14.0 (`88af9cc`) plus the Metal device patch by David 
   contacts in 178 of 1000 touching placements of Isaac's G1 foot). Against the exact contact sets on Isaac's rough
   tile: spheres 88.8 → 99.97 %, boxes 76.6 → 99.9 %, the G1 foot mesh 52.9 → 99.9 %; Unitree's G1 on Isaac's bumps
   falls as often as on CPU MuJoCo within the run-to-run spread (75.8 % of 240 robots vs 68.3–68.8 %; before 18.8 %).
-  Cost about 15 % of Isaac's G1 rough env step (an indicative ratio from a laptop, research note §8.4); each change but
+  Cost (indicative ratios from a laptop, research note §8.4 and §12): about 15 % of Isaac's G1 rough env step under
+  random actions; per PPO iteration at 4096 envs 1.2–1.3× the plane-path pin `8eb51fe` in the 2.3.2 rough configs and
+  1.68× in Isaac Lab 3.0's like-for-like config, whose 1 cm geom gap puts twice as many foot–terrain pairs on per-prism
+  GJK (2.05× on `93e5ce1`, which also dropped contacts there: `EPA_HORIZON`, next bullet); each change but
   the penetrating-prisms filter is behind a module flag that restores the previous form (`HFIELD_PLANE_CONTACTS=True`:
   the mesh plane path). Rough-terrain results of Isaac's G1 on MuJoCo Warp before this pin are pending a re-run
   ([PARITY §1.6](docs/PARITY.md#16-rough-terrain-mujoco-warps-heightfield-contacts-found-defective-and-patched)).
