@@ -618,6 +618,12 @@ from metalsim.render.film.tron1 import TRON1  # noqa: E402
 
 TASKS[TRON1.name] = TRON1
 
+# so101Sim's SO-101 cube lift (its PPO teacher on three servo models; the deployment-style scripted expert on the
+# real-servo model): the entries live with their adapter (no simulator import at module level)
+from metalsim.render.film.so101 import SO101_TASKS  # noqa: E402
+
+TASKS.update({t.name: t for t in SO101_TASKS})
+
 
 def get(name: str) -> FilmTask:
     if name not in TASKS:

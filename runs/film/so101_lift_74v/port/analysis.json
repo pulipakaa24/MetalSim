@@ -1,0 +1,784 @@
+{
+ "script": "runs/film/so101_lift_74v/port/analysis.py",
+ "cpu": {
+  "12v": {
+   "summary": {
+    "episodes": 100,
+    "successes": 100,
+    "success_rate": 1.0,
+    "max_height_mean": 0.16975798210879298,
+    "max_height_min": 0.14750029774475532,
+    "time_to_lift_mean_s": 0.9520000000000001,
+    "lifted_at_end": 99,
+    "terminated": 0,
+    "note": "time_to_lift as eval_lift_native.py: the control step at which is_success first holds (10 ticks above 0.10 m), times 0.02 s; max height = the largest box-centre height reached"
+   },
+   "servo": null,
+   "wrapper": "runs/film/so101_lift/port/reference.py",
+   "categories": {
+    "success_held_at_6s": 99,
+    "success_then_dropped": 1,
+    "no_success_box_never_above_6cm": 0,
+    "no_success_box_6_to_10cm": 0,
+    "no_success_box_above_10cm_briefly": 0,
+    "box_left_workspace": 0
+   },
+   "grasp": {
+    "gripper_opening_at_first_jaw_contact_rad": {
+     "median_all": 0.9026390768112036,
+     "median_success": 0.9026390768112036,
+     "median_no_success": null
+    },
+    "box_tipped_over_60deg_before_lift": {
+     "all": 43,
+     "success": 43,
+     "no_success": 0
+    },
+    "hold_box_normal_force_median_N": 106.10437842362764
+   },
+   "no_success_seeds": [],
+   "dropped_seeds": [
+    10014
+   ]
+  },
+  "7v4": {
+   "summary": {
+    "episodes": 100,
+    "successes": 77,
+    "success_rate": 0.77,
+    "max_height_mean": 0.1478854303498086,
+    "max_height_min": 0.0359408038923798,
+    "time_to_lift_mean_s": 1.6171428571428572,
+    "lifted_at_end": 70,
+    "terminated": 1,
+    "note": "time_to_lift as eval_lift_native.py: the control step at which is_success first holds (10 ticks above 0.10 m), times 0.02 s; max height = the largest box-centre height reached"
+   },
+   "servo": {
+    "servo": "7v4",
+    "label": "STS3215 C001 7.4 V (SO-101 follower), gripper at LeRobot's 50 % torque limit",
+    "joints": [
+     "shoulder_pan",
+     "shoulder_lift",
+     "elbow_flex",
+     "wrist_flex",
+     "wrist_roll",
+     "gripper"
+    ],
+    "forcerange_Nm": [
+     1.9123,
+     1.9123,
+     1.9123,
+     1.9123,
+     1.9123,
+     0.9561
+    ],
+    "damping_Nms": [
+     0.3512,
+     0.3512,
+     0.3512,
+     0.3512,
+     0.3512,
+     0.3512
+    ],
+    "noload_line_rad_s": [
+     5.445,
+     5.445,
+     5.445,
+     5.445,
+     5.445,
+     2.723
+    ],
+    "kp": [
+     998.22,
+     998.22,
+     998.22,
+     998.22,
+     998.22,
+     998.22
+    ],
+    "kv": [
+     2.731,
+     2.731,
+     2.731,
+     2.731,
+     2.731,
+     2.731
+    ],
+    "armature": [
+     0.028,
+     0.028,
+     0.028,
+     0.028,
+     0.028,
+     0.028
+    ],
+    "frictionloss": [
+     0.052,
+     0.052,
+     0.052,
+     0.052,
+     0.052,
+     0.052
+    ]
+   },
+   "wrapper": "runs/film/so101_lift_74v/port/reference_servo.py",
+   "categories": {
+    "success_held_at_6s": 69,
+    "success_then_dropped": 8,
+    "no_success_box_never_above_6cm": 21,
+    "no_success_box_6_to_10cm": 1,
+    "no_success_box_above_10cm_briefly": 1,
+    "box_left_workspace": 1
+   },
+   "grasp": {
+    "gripper_opening_at_first_jaw_contact_rad": {
+     "median_all": 0.4724677092681045,
+     "median_success": 0.4719239359503102,
+     "median_no_success": 0.5218720270108423
+    },
+    "box_tipped_over_60deg_before_lift": {
+     "all": 76,
+     "success": 54,
+     "no_success": 22
+    },
+    "hold_box_normal_force_median_N": 27.37847299440066
+   },
+   "no_success_seeds": [
+    10010,
+    10011,
+    10017,
+    10024,
+    10026,
+    10027,
+    10032,
+    10037,
+    10040,
+    10041,
+    10045,
+    10046,
+    10047,
+    10054,
+    10058,
+    10065,
+    10077,
+    10081,
+    10089,
+    10090,
+    10091,
+    10092,
+    10098
+   ],
+   "dropped_seeds": [
+    10008,
+    10043,
+    10049,
+    10070,
+    10073,
+    10082,
+    10083,
+    10097
+   ]
+  },
+  "7v4_keep_damping_0.60 (sensitivity)": {
+   "summary": {
+    "episodes": 100,
+    "successes": 76,
+    "success_rate": 0.76,
+    "max_height_mean": 0.13901309435356682,
+    "max_height_min": 0.03536979595481117,
+    "time_to_lift_mean_s": 1.9102631578947367,
+    "lifted_at_end": 74,
+    "terminated": 1,
+    "note": "time_to_lift as eval_lift_native.py: the control step at which is_success first holds (10 ticks above 0.10 m), times 0.02 s; max height = the largest box-centre height reached"
+   },
+   "servo": {
+    "servo": "7v4",
+    "label": "STS3215 C001 7.4 V (SO-101 follower), gripper at LeRobot's 50 % torque limit",
+    "joints": [
+     "shoulder_pan",
+     "shoulder_lift",
+     "elbow_flex",
+     "wrist_flex",
+     "wrist_roll",
+     "gripper"
+    ],
+    "forcerange_Nm": [
+     1.9123,
+     1.9123,
+     1.9123,
+     1.9123,
+     1.9123,
+     0.9561
+    ],
+    "damping_Nms": [
+     0.6,
+     0.6,
+     0.6,
+     0.6,
+     0.6,
+     0.6
+    ],
+    "noload_line_rad_s": [
+     3.187,
+     3.187,
+     3.187,
+     3.187,
+     3.187,
+     1.593
+    ],
+    "kp": [
+     998.22,
+     998.22,
+     998.22,
+     998.22,
+     998.22,
+     998.22
+    ],
+    "kv": [
+     2.731,
+     2.731,
+     2.731,
+     2.731,
+     2.731,
+     2.731
+    ],
+    "armature": [
+     0.028,
+     0.028,
+     0.028,
+     0.028,
+     0.028,
+     0.028
+    ],
+    "frictionloss": [
+     0.052,
+     0.052,
+     0.052,
+     0.052,
+     0.052,
+     0.052
+    ],
+    "keep_damping": true
+   },
+   "wrapper": "runs/film/so101_lift_74v/port/reference_servo.py --keep-damping",
+   "categories": {
+    "success_held_at_6s": 74,
+    "success_then_dropped": 2,
+    "no_success_box_never_above_6cm": 23,
+    "no_success_box_6_to_10cm": 1,
+    "no_success_box_above_10cm_briefly": 0,
+    "box_left_workspace": 1
+   },
+   "grasp": {
+    "gripper_opening_at_first_jaw_contact_rad": {
+     "median_all": 0.3814992081701447,
+     "median_success": 0.3816013796135701,
+     "median_no_success": 0.38137416487549164
+    },
+    "box_tipped_over_60deg_before_lift": {
+     "all": 77,
+     "success": 54,
+     "no_success": 23
+    },
+    "hold_box_normal_force_median_N": 26.293740901272965
+   },
+   "no_success_seeds": [
+    10006,
+    10011,
+    10017,
+    10020,
+    10024,
+    10027,
+    10029,
+    10032,
+    10037,
+    10038,
+    10043,
+    10045,
+    10048,
+    10054,
+    10059,
+    10061,
+    10064,
+    10067,
+    10074,
+    10075,
+    10081,
+    10084,
+    10092,
+    10097
+   ],
+   "dropped_seeds": [
+    10016,
+    10071
+   ]
+  },
+  "7v4_gripper_full_torque (diagnostic)": {
+   "summary": {
+    "episodes": 100,
+    "successes": 98,
+    "success_rate": 0.98,
+    "max_height_mean": 0.17108067754056056,
+    "max_height_min": 0.03795150991263106,
+    "time_to_lift_mean_s": 1.0281632653061226,
+    "lifted_at_end": 96,
+    "terminated": 0,
+    "note": "time_to_lift as eval_lift_native.py: the control step at which is_success first holds (10 ticks above 0.10 m), times 0.02 s; max height = the largest box-centre height reached"
+   },
+   "servo": {
+    "servo": "7v4",
+    "label": "STS3215 C001 7.4 V (SO-101 follower), gripper at LeRobot's 50 % torque limit",
+    "joints": [
+     "shoulder_pan",
+     "shoulder_lift",
+     "elbow_flex",
+     "wrist_flex",
+     "wrist_roll",
+     "gripper"
+    ],
+    "forcerange_Nm": [
+     1.9123,
+     1.9123,
+     1.9123,
+     1.9123,
+     1.9123,
+     1.9123
+    ],
+    "damping_Nms": [
+     0.3512,
+     0.3512,
+     0.3512,
+     0.3512,
+     0.3512,
+     0.3512
+    ],
+    "noload_line_rad_s": [
+     5.445,
+     5.445,
+     5.445,
+     5.445,
+     5.445,
+     2.723
+    ],
+    "kp": [
+     998.22,
+     998.22,
+     998.22,
+     998.22,
+     998.22,
+     998.22
+    ],
+    "kv": [
+     2.731,
+     2.731,
+     2.731,
+     2.731,
+     2.731,
+     2.731
+    ],
+    "armature": [
+     0.028,
+     0.028,
+     0.028,
+     0.028,
+     0.028,
+     0.028
+    ],
+    "frictionloss": [
+     0.052,
+     0.052,
+     0.052,
+     0.052,
+     0.052,
+     0.052
+    ],
+    "gripper_full": true
+   },
+   "wrapper": "runs/film/so101_lift_74v/port/reference_servo.py --gripper-full",
+   "categories": {
+    "success_held_at_6s": 96,
+    "success_then_dropped": 2,
+    "no_success_box_never_above_6cm": 1,
+    "no_success_box_6_to_10cm": 0,
+    "no_success_box_above_10cm_briefly": 1,
+    "box_left_workspace": 0
+   },
+   "grasp": {
+    "gripper_opening_at_first_jaw_contact_rad": {
+     "median_all": 0.8715752310906695,
+     "median_success": 0.8713570282889602,
+     "median_no_success": 1.0097479272609864
+    },
+    "box_tipped_over_60deg_before_lift": {
+     "all": 59,
+     "success": 57,
+     "no_success": 2
+    },
+    "hold_box_normal_force_median_N": 63.721930556206225
+   },
+   "no_success_seeds": [
+    10010,
+    10029
+   ],
+   "dropped_seeds": [
+    10008,
+    10025
+   ]
+  }
+ },
+ "metalsim": {
+  "12v (re-run for saturation)": {
+   "summary": {
+    "successes": 98,
+    "max_height_mean": 0.16721841622143985,
+    "max_height_min": 0.04202232137322426,
+    "time_to_lift_mean_s": 0.9651020408163266,
+    "lifted_at_end": 94,
+    "terminated": 0
+   },
+   "servo": {
+    "servo": "12v",
+    "label": "STS3215 12 V (the scene as it is: Menagerie / SO-ARM100 PR #141)",
+    "joints": [
+     "shoulder_pan",
+     "shoulder_lift",
+     "elbow_flex",
+     "wrist_flex",
+     "wrist_roll",
+     "gripper"
+    ],
+    "forcerange_Nm": [
+     2.94,
+     2.94,
+     2.94,
+     2.94,
+     2.94,
+     2.94
+    ],
+    "damping_Nms": [
+     0.6,
+     0.6,
+     0.6,
+     0.6,
+     0.6,
+     0.6
+    ],
+    "noload_line_rad_s": [
+     4.9,
+     4.9,
+     4.9,
+     4.9,
+     4.9,
+     4.9
+    ],
+    "kp": [
+     998.22,
+     998.22,
+     998.22,
+     998.22,
+     998.22,
+     998.22
+    ],
+    "kv": [
+     2.731,
+     2.731,
+     2.731,
+     2.731,
+     2.731,
+     2.731
+    ],
+    "armature": [
+     0.028,
+     0.028,
+     0.028,
+     0.028,
+     0.028,
+     0.028
+    ],
+    "frictionloss": [
+     0.052,
+     0.052,
+     0.052,
+     0.052,
+     0.052,
+     0.052
+    ]
+   },
+   "per_seed": {
+    "agree": 98,
+    "only_metalsim": [],
+    "only_reference": [
+     10027,
+     10098
+    ],
+    "time_to_lift_abs_diff_s": {
+     "mean": 0.19102040816326532,
+     "max": 3.96
+    },
+    "max_height_abs_diff_m": {
+     "mean": 0.010671389793890792,
+     "max": 0.12202601241181166
+    }
+   },
+   "categories": {
+    "success_held_at_6s": 94,
+    "success_then_dropped": 4,
+    "no_success_box_never_above_6cm": 1,
+    "no_success_box_6_to_10cm": 0,
+    "no_success_box_above_10cm_briefly": 1,
+    "box_left_workspace": 0
+   },
+   "torque_saturation": {
+    "frac_per_joint": {
+     "shoulder_pan": 0.9888,
+     "shoulder_lift": 0.9696666666666667,
+     "elbow_flex": 0.9974333333333333,
+     "wrist_flex": 0.20023333333333335,
+     "wrist_roll": 0.9995,
+     "gripper": 0.9950666666666667
+    },
+    "forcerange_Nm": [
+     2.94,
+     2.94,
+     2.94,
+     2.94,
+     2.94,
+     2.94
+    ],
+    "note": "fraction of control steps (while the episode runs) at which |actuator_force| is at the force limit, sampled at the last of each control step's 4 physics steps (MuJoCo Warp actuator_force)"
+   },
+   "capacity_overflow": {
+    "ITERATIONS": 9,
+    "LS_ITERATIONS": 100
+   },
+   "no_success_seeds": [
+    10027,
+    10098
+   ],
+   "dropped_seeds": [
+    10003,
+    10039,
+    10048,
+    10053
+   ],
+   "seed_10013": {
+    "success_t_s": 0.76,
+    "max_height_m": 0.161,
+    "end_height_m": 0.149
+   }
+  },
+  "7v4": {
+   "summary": {
+    "successes": 78,
+    "max_height_mean": 0.14670703038573266,
+    "max_height_min": 0.03603869304060936,
+    "time_to_lift_mean_s": 1.5805128205128205,
+    "lifted_at_end": 65,
+    "terminated": 0
+   },
+   "servo": {
+    "servo": "7v4",
+    "label": "STS3215 C001 7.4 V (SO-101 follower), gripper at LeRobot's 50 % torque limit",
+    "joints": [
+     "shoulder_pan",
+     "shoulder_lift",
+     "elbow_flex",
+     "wrist_flex",
+     "wrist_roll",
+     "gripper"
+    ],
+    "forcerange_Nm": [
+     1.9123,
+     1.9123,
+     1.9123,
+     1.9123,
+     1.9123,
+     0.9561
+    ],
+    "damping_Nms": [
+     0.3512,
+     0.3512,
+     0.3512,
+     0.3512,
+     0.3512,
+     0.3512
+    ],
+    "noload_line_rad_s": [
+     5.445,
+     5.445,
+     5.445,
+     5.445,
+     5.445,
+     2.723
+    ],
+    "kp": [
+     998.22,
+     998.22,
+     998.22,
+     998.22,
+     998.22,
+     998.22
+    ],
+    "kv": [
+     2.731,
+     2.731,
+     2.731,
+     2.731,
+     2.731,
+     2.731
+    ],
+    "armature": [
+     0.028,
+     0.028,
+     0.028,
+     0.028,
+     0.028,
+     0.028
+    ],
+    "frictionloss": [
+     0.052,
+     0.052,
+     0.052,
+     0.052,
+     0.052,
+     0.052
+    ]
+   },
+   "per_seed": {
+    "agree": 81,
+    "only_metalsim": [
+     10011,
+     10017,
+     10024,
+     10040,
+     10045,
+     10046,
+     10054,
+     10065,
+     10081,
+     10092
+    ],
+    "only_reference": [
+     10007,
+     10012,
+     10038,
+     10053,
+     10064,
+     10075,
+     10082,
+     10086,
+     10099
+    ],
+    "time_to_lift_abs_diff_s": {
+     "mean": 0.6920588235294117,
+     "max": 4.84
+    },
+    "max_height_abs_diff_m": {
+     "mean": 0.03499609016664798,
+     "max": 0.19349599450229413
+    }
+   },
+   "categories": {
+    "success_held_at_6s": 65,
+    "success_then_dropped": 13,
+    "no_success_box_never_above_6cm": 22,
+    "no_success_box_6_to_10cm": 0,
+    "no_success_box_above_10cm_briefly": 0,
+    "box_left_workspace": 0
+   },
+   "torque_saturation": {
+    "frac_per_joint": {
+     "shoulder_pan": 0.9052,
+     "shoulder_lift": 0.9499333333333333,
+     "elbow_flex": 0.9984,
+     "wrist_flex": 0.5503,
+     "wrist_roll": 0.9995,
+     "gripper": 0.9840333333333333
+    },
+    "forcerange_Nm": [
+     1.9123,
+     1.9123,
+     1.9123,
+     1.9123,
+     1.9123,
+     0.9561
+    ],
+    "note": "fraction of control steps (while the episode runs) at which |actuator_force| is at the force limit, sampled at the last of each control step's 4 physics steps (MuJoCo Warp actuator_force)"
+   },
+   "capacity_overflow": {
+    "ITERATIONS": 16,
+    "LS_ITERATIONS": 100
+   },
+   "no_success_seeds": [
+    10007,
+    10010,
+    10012,
+    10026,
+    10027,
+    10032,
+    10037,
+    10038,
+    10041,
+    10047,
+    10053,
+    10058,
+    10064,
+    10075,
+    10077,
+    10082,
+    10086,
+    10089,
+    10090,
+    10091,
+    10098,
+    10099
+   ],
+   "dropped_seeds": [
+    10001,
+    10003,
+    10017,
+    10018,
+    10023,
+    10030,
+    10033,
+    10040,
+    10054,
+    10055,
+    10067,
+    10081,
+    10096
+   ],
+   "seed_10013": {
+    "success_t_s": 1.1,
+    "max_height_m": 0.153,
+    "end_height_m": 0.142
+   }
+  }
+ },
+ "metalsim_12v_film_stream": {
+  "successes": 98,
+  "max_height_mean": 0.16574526797980071,
+  "max_height_min": 0.03947725519537926,
+  "time_to_lift_mean_s": 0.9116326530612245,
+  "lifted_at_end": 94,
+  "terminated": 0
+ },
+ "cpu_torque_saturation": {
+  "12v": {
+   "shoulder_pan": 0.9972,
+   "shoulder_lift": 0.9838,
+   "elbow_flex": 0.9985,
+   "wrist_flex": 0.1956,
+   "wrist_roll": 0.9997,
+   "gripper": 0.9999
+  },
+  "7v4": {
+   "shoulder_pan": 0.9081,
+   "shoulder_lift": 0.9691,
+   "elbow_flex": 0.999,
+   "wrist_flex": 0.5335,
+   "wrist_roll": 0.9996,
+   "gripper": 0.9861
+  }
+ }
+}

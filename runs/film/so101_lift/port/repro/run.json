@@ -1,0 +1,18 @@
+{
+ "what": "so101Sim run 2 reproduced on this Mac's CPU with so101Sim's own code (no tracked file modified)",
+ "so101sim_commit": "d4c2990 (github.com/pulipakaa24/so101Sim)",
+ "start_checkpoint": {"dir": "rl/runs/lift_ppo_run1_backup (tracked in so101Sim, LFS)", "num_timesteps": 3004416,
+                      "model_zip_sha256": "95635ad1e32e6f034b7546ba5109ba54f4d532a85ff876d11f013e42c5f43fc7",
+                      "vecnorm_pkl_sha256": "9b999ab57bc712970bb5d96d3b2294e97441330570b5a761e3ba7ef079419534"},
+ "steps": ["cp -R rl/runs/lift_ppo_run1_backup rl/runs/lift_ppo   (the untracked layout continue_lift.py and eval_lift_native.py read; rl/runs/ is git-ignored there)",
+           "cd urlab_bridge && uv run --no-sync python ../rl/native/continue_lift.py 5000000   (12 SubprocVecEnv workers, device cpu; 2026-10-31 14:33:12 to 14:41:26 PDT)",
+           "cd urlab_bridge && uv run --no-sync python ../rl/native/eval_lift_native.py 100"],
+ "extra_steps": 5000000,
+ "extra_steps_source": "continue_lift.py default (EXTRA = 5_000_000) and so101Sim docs/AGENT_CONTEXT.md section 6: run 2 = 3-8M steps",
+ "result_checkpoint": {"num_timesteps": 8005632,
+                       "model_zip_sha256": "1ddf1bc34c06d8fa131be7135fbee51fdd1881bbc0bb4831093ebcd0b44d4c62",
+                       "vecnorm_pkl_sha256": "ce78ad440c178b86282283264f8fe9dea16ba9839ddca9bf35d69ec2bf10e69d"},
+ "progress": "progress.txt: run 1's lines (to 3.00M, success 0.13) then this run's (training success from the episode buffer: 0.94 at 3.10M, 0.95-1.00 from then on)",
+ "eval": "eval_lift_native.log: success 100/100, max height mean 0.170 m (min 0.148 m), time to lift mean 0.95 s; documented (so101Sim docs/AGENT_CONTEXT.md section 6): 100/100, 0.17 m, 0.95 s",
+ "software": {"python_env": "so101Sim urlab_bridge/.venv", "stable_baselines3": "2.9.0", "torch": "2.11.0", "mujoco": "3.10.0", "gymnasium": "1.3.0", "numpy": "2.2.6"}
+}
