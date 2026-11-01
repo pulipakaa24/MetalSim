@@ -6,8 +6,8 @@ which machine, every asset with its source and licence, and the commands to repr
 | film | what | doc |
 |---|---|---|
 | Franka-Pour | trained policy pours granular MPM media between two cups (Isaac Lab 3.0-EA task); one env and a 2 x 2 grid | [FRANKA_POUR.md](FRANKA_POUR.md) |
-| G1 flat walk | Isaac Lab's G1 flat velocity task with a policy trained here (`runs/g1regress/ckpt14/flat_main_s0.pt`); 6 s, 1280x720 hero and a 640x480 orbiting shot for the README, 64 spp | [G1_FLAT.md](G1_FLAT.md) |
-| G1 rough walk | Isaac Lab's G1 rough velocity task (stairs, slopes, boxes) with a policy trained here (`rough_main_s0.pt`); the G1 climbs out of a pit of inverted stairs; same two shots | [G1_ROUGH.md](G1_ROUGH.md) |
+| G1 flat walk | Isaac Lab's G1 flat velocity task with NVIDIA's published Isaac Lab 2.3 policy (rsl_rl, iteration 1499, trained in PhysX; fetched by `scripts/fetch_isaac_assets.sh`); 6 s, 1280x720 hero and a 640x480 orbiting shot for the README, 64 spp | [G1_FLAT.md](G1_FLAT.md) |
+| G1 rough walk | Isaac Lab's G1 rough velocity task (stairs, slopes, boxes) with NVIDIA's published policy (iteration 2999); the G1 climbs out of a pit of inverted stairs; same two shots | [G1_ROUGH.md](G1_ROUGH.md) |
 
 ## The README's media
 
@@ -20,8 +20,10 @@ source and the exact command. Those `.json` files, the frame directories and the
 command below, and the chart's, was re-run from its source and gave a byte-identical file; the commands that record
 or render were not re-run (`runs/readme_media/handoff/provenance-docs.md`). Paths are from the repository root.
 
-No timing figure comes from these media. The G1 films and the lidar clip were made on the 14-inch M4 Max on battery
-in Low Power Mode. The chart's numbers are measurements from the logs it cites.
+No timing figure comes from these media. The G1 films were recorded and rendered on the 14-inch MacBook Pro
+(Mac16,6), not in timing runs (MetalSim's timing runs are made on the 16-inch through `scripts/gpu_run.sh <name> timing
+...`); their docs give the power state each stage stamped. The lidar clip was made on the 14-inch on battery (the
+`pmset` log shows battery power at 02:14 on 2026-10-31, during its render); its power-mode setting was not recorded. The chart's numbers are measurements from the logs it cites.
 
 | README row | cells (left to right) |
 |---|---|
@@ -32,32 +34,51 @@ in Low Power Mode. The chart's numbers are measurements from the logs it cites.
 
 ### G1 flat (`g1_flat.webp`)
 
-- **Shows:** Unitree G1 walking on flat ground: Isaac Lab's G1 flat velocity task on MuJoCo Warp, a policy trained
-  here, path traced at tier 2; the camera tracks the pelvis and orbits at 10 deg/s, MuJoCo Warp's orbit rate.
-  0.5-5.5 s of a 6 s take, 150 frames at 33 ms, 0.79 MB.
+- **Shows:** Unitree G1 walking on flat ground: Isaac Lab's G1 flat velocity task on MuJoCo Warp, driven by NVIDIA's
+  published Isaac Lab 2.3 policy for the task (rsl_rl, iteration 1499, trained in PhysX, played without retraining),
+  path traced at tier 2; the camera tracks the pelvis and orbits at 10 deg/s, MuJoCo Warp's orbit rate. 0.5-5.5 s of a
+  6 s take, 150 frames at 33 ms, 0.74 MB. The quick, short steps (3.8 gait cycles per second in the filmed env, 7 cm
+  swing apex) are Isaac's own gait; MuJoCo Warp adds 3.4-5.9 % to the cadence of Isaac-trained G1 checkpoints
+  ([G1_FLAT.md](G1_FLAT.md), "Gait").
 - **Source:** the `readme` shot of the take in `runs/film/g1_flat/` (`readme/frames`, local; `rec/rec.json` and
   `readme/render.json` tracked).
-- **Reproduce:** this file from the take:
-  `python -m metalsim.render.film.encode webp runs/film/g1_flat/readme/frames docs/renders/g1_flat.webp --start 0.5 --seconds 5 --src-fps 50 --fps 30`.
-  A new take: `python -m metalsim.render.film g1_flat`, then the same command. The README caption's
-  `python -m metalsim.render.film g1_flat` records, renders and encodes the mp4s but does not write this WebP. A new
-  recording is not bitwise the same take.
-- **Provenance:** [G1_FLAT.md](G1_FLAT.md): checkpoint `runs/g1regress/ckpt14/flat_main_s0.pt` (sha256 `6fbfbfe8...`,
-  training log beside it, replay results in `docs/research/ppowarp_checkpoint_load_2026-10-13.md`), task settings, how
-  the env was chosen, camera, timings and where they come from. Hero video and stills: [g1_flat.mp4](g1_flat.mp4),
-  `g1_flat_still{1,2,3}.jpg`.
+- **Reproduce:** the checkpoint first, `scripts/fetch_isaac_assets.sh` (NVIDIA's file, SHA-256 checked, not in the
+  repository). The take, as made on 2026-10-31 (GPU-queue jobs of kind render, one at a time, then CPU stages):
+  ```
+  scripts/gpu_run.sh g1-switch-rec-flat render 15 -- .venv/bin/python -m metalsim.render.film g1_flat --stage record
+  scripts/gpu_run.sh g1-switch-render-flat render 20 -- .venv/bin/python -m metalsim.render.film g1_flat --stage render
+  .venv/bin/python -m metalsim.render.film g1_flat --stage encode --shots hero
+  python -m metalsim.render.film.encode webp runs/film/g1_flat/readme/frames docs/renders/g1_flat.webp --start 0.5 --seconds 5 --src-fps 50 --fps 30
+  .venv/bin/python -m metalsim.render.film g1_flat --stage doc
+  ```
+  The README caption's `python -m metalsim.render.film g1_flat` records, renders and encodes the mp4s but does not
+  write this WebP. A new recording is not bitwise the same take. Our own checkpoint instead of NVIDIA's: add
+  `--checkpoint runs/g1regress/ckpt14/flat_main_s0.pt` to the record stage (tracked, training log beside it).
+- **Provenance:** [G1_FLAT.md](G1_FLAT.md): checkpoint `assets/isaac/pretrained/rsl_rl/Isaac-Velocity-Flat-G1-v0/checkpoint.pt`
+  (NVIDIA Isaac Lab, iteration 1499, sha256 `fdf0f242...`; source URL and published hash also in `rec/rec.json`
+  `checkpoint`), task settings, how the env was chosen, gait, camera, timings and the power state each stage
+  stamped. Hero video and stills: [g1_flat.mp4](g1_flat.mp4), `g1_flat_still{1,2,3}.jpg`.
 
 ### G1 rough (`g1_rough.webp`)
 
 - **Shows:** the G1 on Isaac Lab's rough terrain (difficulty row 5 of rows 0-9) climbing out of a pit of inverted
-  stairs, risers 0.14-0.16 m, its pelvis up to 0.75 m above its start; a policy trained here with the height scan; same camera, orbit
-  and window as the flat cell; 1.37 MB.
+  stairs, risers 0.14-0.16 m, its pelvis up to 0.97 m above its start, about six risers; driven by NVIDIA's published
+  Isaac Lab 2.3 policy for the rough task (rsl_rl, iteration 2999, with the height scan; trained in PhysX, played
+  without retraining); same camera, orbit and window as the flat cell; 1.44 MB.
 - **Source:** the `readme` shot of `runs/film/g1_rough/`.
-- **Reproduce:**
-  `python -m metalsim.render.film.encode webp runs/film/g1_rough/readme/frames docs/renders/g1_rough.webp --start 0.5 --seconds 5 --src-fps 50 --fps 30`;
-  a new take: `python -m metalsim.render.film g1_rough` first.
-- **Provenance:** [G1_ROUGH.md](G1_ROUGH.md) (checkpoint `rough_main_s0.pt`, sha256 `b5b25ad3...`). Hero video and
-  stills: [g1_rough.mp4](g1_rough.mp4), `g1_rough_still{1,2,3}.jpg`.
+- **Reproduce:** `scripts/fetch_isaac_assets.sh` first (NVIDIA's checkpoint). The take, as made on 2026-10-31:
+  ```
+  scripts/gpu_run.sh g1-switch-rec-rough render 15 -- .venv/bin/python -m metalsim.render.film g1_rough --stage record
+  scripts/gpu_run.sh g1-switch-render-rough render 25 -- .venv/bin/python -m metalsim.render.film g1_rough --stage render
+  .venv/bin/python -m metalsim.render.film g1_rough --stage encode --shots hero
+  python -m metalsim.render.film.encode webp runs/film/g1_rough/readme/frames docs/renders/g1_rough.webp --start 0.5 --seconds 5 --src-fps 50 --fps 30
+  .venv/bin/python -m metalsim.render.film g1_rough --stage doc
+  ```
+  Our own checkpoint instead: add `--checkpoint runs/g1regress/ckpt14/rough_main_s0.pt` to the record stage.
+- **Provenance:** [G1_ROUGH.md](G1_ROUGH.md): checkpoint `assets/isaac/pretrained/rsl_rl/Isaac-Velocity-Rough-G1-v0/checkpoint.pt`
+  (NVIDIA Isaac Lab, iteration 2999, sha256 `d85a9ade...`; source URL and published hash also in `rec/rec.json`
+  `checkpoint`), terrain, how the env was chosen, gait, timings and the power state each stage stamped. Hero video
+  and stills: [g1_rough.mp4](g1_rough.mp4), `g1_rough_still{1,2,3}.jpg`.
 
 ### ANYmal C on sand (`anymal_sand.webp`)
 
@@ -137,7 +158,7 @@ in Low Power Mode. The chart's numbers are measurements from the logs it cites.
 - **Provenance:** sensor settings from `tests/test_sensor_transparency.py` and `docs/RENDER_COVERAGE.md` §3e;
   `hits_per_ray=1` and `min_echo_sep=0.1` differ from the defaults, for the reasons in the script's docstring. At frame
   75, the lidar gets 30,933 echoes with the panes (12,072 on glass, 8,438 beams with two returns) and 18,886 without
-  them. Rendered on the 14-inch on battery in Low Power Mode; its per-frame times are not timing figures.
+  them. Rendered on the 14-inch on battery (power-mode setting not recorded); its per-frame times are not timing figures.
 
 ### Throughput chart (`throughput_dark.svg`, `throughput_light.svg`)
 

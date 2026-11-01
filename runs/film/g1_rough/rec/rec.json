@@ -8,15 +8,22 @@
  "num_envs": 40,
  "envs": [
   8,
-  13,
   15,
-  14
+  14,
+  12
  ],
  "checkpoint": {
-  "path": "runs/g1regress/ckpt14/rough_main_s0.pt",
-  "in_repo": true,
-  "sha256": "b5b25ad377ba40dbacc18fd90462a64c20203ee7fb6b97b89c3110755cf9ca6f",
-  "bytes": 2614138
+  "path": "assets/isaac/pretrained/rsl_rl/Isaac-Velocity-Rough-G1-v0/checkpoint.pt",
+  "in_repo": false,
+  "sha256": "d85a9adea70e5476675f130cbc70f41bdef7a28d52f443fae902afc0e2358851",
+  "bytes": 7842530,
+  "format": "rsl_rl",
+  "iteration": 2999,
+  "source": "NVIDIA Isaac Lab 2.3 published pretrained checkpoint",
+  "task_id": "Isaac-Velocity-Rough-G1-v0",
+  "source_url": "https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.1/Isaac/IsaacLab/PretrainedCheckpoints/rsl_rl/Isaac-Velocity-Rough-G1-v0/checkpoint.pt",
+  "published_sha256": "d85a9adea70e5476675f130cbc70f41bdef7a28d52f443fae902afc0e2358851",
+  "licence": "NVIDIA Isaac Sim asset terms (fetched, not redistributed)"
  },
  "allow_early_end": false,
  "early_end_envs": [],
@@ -79,14 +86,6 @@
    "col": 0,
    "end_frame": -1
   },
-  "13": {
-   "terminated": false,
-   "time_out": false,
-   "base_z": 0.0,
-   "level": 0,
-   "col": 0,
-   "end_frame": -1
-  },
   "15": {
    "terminated": false,
    "time_out": false,
@@ -96,6 +95,14 @@
    "end_frame": -1
   },
   "14": {
+   "terminated": false,
+   "time_out": false,
+   "base_z": 0.0,
+   "level": 0,
+   "col": 0,
+   "end_frame": -1
+  },
+  "12": {
    "terminated": false,
    "time_out": false,
    "base_z": 0.0,
@@ -370,37 +377,37 @@
    "colliders_hidden": 3,
    "sites_hidden": 3
   },
-  "build_s": 0.8353137499943841,
-  "poses_s": 0.004259957997419406
+  "build_s": 0.5811326669936534,
+  "poses_s": 0.002909750008257106
  },
  "adapter": {
-  "policy": "runs/g1regress/ckpt14/rough_main_s0.pt",
-  "policy_iteration": 1000,
+  "policy": "assets/isaac/pretrained/rsl_rl/Isaac-Velocity-Rough-G1-v0/checkpoint.pt",
+  "policy_iteration": 2999,
+  "policy_format": "rsl_rl",
+  "policy_source": {
+   "source": "NVIDIA Isaac Lab 2.3 published pretrained checkpoint",
+   "task_id": "Isaac-Velocity-Rough-G1-v0",
+   "source_url": "https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.1/Isaac/IsaacLab/PretrainedCheckpoints/rsl_rl/Isaac-Velocity-Rough-G1-v0/checkpoint.pt",
+   "published_sha256": "d85a9adea70e5476675f130cbc70f41bdef7a28d52f443fae902afc0e2358851",
+   "iteration": 2999,
+   "licence": "NVIDIA Isaac Sim asset terms (fetched, not redistributed)"
+  },
+  "policy_joint_order": "Isaac's (ISAAC_G1_JOINTS), mapped by joint name",
+  "foot_geoms": [
+   "Cube",
+   "right_ankle_roll_link_Cube"
+  ],
   "note": "",
-  "env_build_s": 4.197673290997045,
+  "env_build_s": 3.0016483329964103,
   "physics": "MuJoCo Warp BatchSim (metalsim.learn.g1_velocity)",
   "terrain": "rough",
   "saved_task_settings": {
    "reward_cfg": "rough_isaac",
-   "scan_ordering": "xy",
-   "terrain_collision": "boxes_local",
-   "scan_surface": "exact",
-   "solver_cfg": null,
-   "il3_events": false,
-   "contact_cfg": "recommended",
-   "base_velocity": "com",
-   "feet_slide_velocity": "com"
+   "scan_ordering": "xy"
   },
   "task_settings": {
    "reward_cfg": "rough_isaac",
    "scan_ordering": "xy",
-   "terrain_collision": "boxes_local",
-   "scan_surface": "exact",
-   "solver_cfg": null,
-   "il3_events": false,
-   "contact_cfg": "recommended",
-   "base_velocity": "com",
-   "feet_slide_velocity": "com",
    "physics_dt": 0.0025
   },
   "task_resolved": {
@@ -617,72 +624,48 @@
     ]
    ],
    "path_m": [
-    1.958,
-    3.637,
-    1.476,
-    3.699,
-    2.339,
-    1.836,
-    3.64,
-    0.527,
-    4.12,
-    1.163,
-    2.214,
-    0.591,
-    1.397,
-    3.195,
-    2.28,
-    2.526,
-    1.061,
-    0.684,
-    2.447,
-    1.217,
-    3.344,
-    1.776,
-    2.135,
-    2.024,
-    2.297,
-    1.449,
-    4.667,
-    4.1,
-    1.939,
-    3.501,
-    3.471,
-    4.139,
-    0.251,
-    0.654,
-    4.488,
-    1.079,
-    1.266,
-    2.122,
-    4.416,
-    3.076
+    2.738,
+    4.481,
+    2.749,
+    4.247,
+    2.891,
+    2.803,
+    4.341,
+    1.071,
+    5.111,
+    1.451,
+    2.746,
+    1.567,
+    2.148,
+    3.402,
+    2.82,
+    2.824,
+    2.23,
+    1.734,
+    3.386,
+    1.971,
+    2.951,
+    2.742,
+    3.54,
+    2.954,
+    3.002,
+    2.614,
+    5.42,
+    5.119,
+    2.946,
+    4.161,
+    4.5,
+    5.09,
+    0.958,
+    1.592,
+    5.39,
+    2.411,
+    2.406,
+    3.102,
+    5.305,
+    3.939
    ],
    "climb_m": [
-    0.016,
-    0.007,
-    0.015,
-    0.008,
-    0.011,
-    0.005,
-    0.006,
-    0.042,
-    0.749,
-    0.141,
-    0.254,
-    0.022,
-    0.024,
-    0.666,
-    0.428,
-    0.634,
-    0.014,
-    0.013,
-    0.004,
-    0.011,
-    0.0,
-    0.017,
-    0.003,
-    0.01,
     0.0,
     0.0,
     0.0,
@@ -691,56 +674,80 @@
     0.0,
     0.0,
     0.0,
-    0.017,
-    0.015,
-    0.008,
-    0.013,
-    0.012,
-    0.063,
-    0.421,
-    0.225
+    0.966,
+    0.189,
+    0.417,
+    0.065,
+    0.425,
+    0.745,
+    0.654,
+    0.794,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.104,
+    0.165,
+    0.348,
+    0.285
    ],
    "descent_m": [
-    -0.014,
-    -0.868,
-    -0.121,
-    -0.596,
-    -0.745,
-    -0.076,
-    -0.819,
-    -0.018,
-    -0.013,
-    -0.005,
-    -0.005,
-    -0.006,
-    -0.006,
-    -0.012,
-    -0.006,
-    -0.009,
-    -0.013,
-    -0.011,
-    -0.116,
-    -0.019,
-    -0.215,
+    -0.391,
+    -1.222,
+    -0.878,
+    -1.092,
+    -0.998,
+    -0.666,
+    -1.157,
+    -0.249,
+    -0.089,
+    -0.136,
+    -0.114,
+    -0.153,
     -0.142,
-    -0.143,
-    -0.329,
-    -0.053,
-    -0.054,
-    -0.106,
-    -0.096,
-    -0.056,
-    -0.071,
-    -0.071,
-    -0.093,
-    -0.005,
-    -0.006,
-    -0.474,
-    -0.004,
-    -0.004,
-    -0.007,
-    -0.022,
-    -0.019
+    -0.125,
+    -0.137,
+    -0.15,
+    -0.315,
+    -0.293,
+    -0.34,
+    -0.253,
+    -0.33,
+    -0.314,
+    -0.346,
+    -0.328,
+    -0.179,
+    -0.181,
+    -0.216,
+    -0.227,
+    -0.184,
+    -0.228,
+    -0.217,
+    -0.203,
+    -0.144,
+    -0.242,
+    -0.585,
+    -0.387,
+    -0.137,
+    -0.138,
+    -0.137,
+    -0.129
    ]
   },
   "terrain_level": 5,
@@ -834,18 +841,1431 @@
    "collision": "boxes_local"
   }
  },
+ "gait": {
+  "definition": "Per env and foot over its window (from 1 s to the first episode's end or the clip's end). Foot: the centre of the foot collider (adapter's feet), its height taken above the task's collision surface (adapter.ground_height; 0 on flat ground): the highest surface point under the foot's footprint (adapter's feet_footprint: its bounding-box corners; else straight below the centre), so a foot standing across a step edge is on the upper tread. cadence_hz: peak of the Hann-windowed FFT of the mean-removed foot height (zero-padded to >= 16x, searched in 0.5-10 Hz), i.e. gait cycles per second of that foot. apex_m: 95th percentile of the foot height above its stance height (median height while in contact). slip_mps: median horizontal speed of the foot between consecutive frames that are both in contact. air_frac: fraction of frames not in contact. touchdowns_hz: contact onsets after at least 2 frames in the air, per second (a terrain-independent cross-check of the cadence; needs feet_contact). Contact: the adapter's feet_contact (the task's touch sensor > 1 N), else within 15 mm of the window's lowest height. speed_mps: pelvis horizontal path / window time; stride_m: speed / mean cadence (ground covered per gait cycle). Summary: medians over envs whose first episode did not terminate and that walk (speed >= 0.15 m/s).",
+  "t0_s": 1.0,
+  "contact": "adapter feet_contact",
+  "per_env": {
+   "0": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     4.053,
+     4.028
+    ],
+    "apex_m": [
+     0.0866,
+     0.0702
+    ],
+    "slip_mps": [
+     0.0351,
+     0.017
+    ],
+    "air_frac": [
+     0.474,
+     0.422
+    ],
+    "touchdowns_hz": [
+     3.586,
+     3.785
+    ],
+    "speed_mps": 0.465,
+    "stride_m": 0.1151,
+    "cmd_speed_mps": 0.373,
+    "cmd_yaw_rate": 0.48,
+    "terminated": false
+   },
+   "1": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     3.87,
+     3.821
+    ],
+    "apex_m": [
+     0.1204,
+     0.141
+    ],
+    "slip_mps": [
+     0.042,
+     0.0258
+    ],
+    "air_frac": [
+     0.498,
+     0.566
+    ],
+    "touchdowns_hz": [
+     3.586,
+     3.586
+    ],
+    "speed_mps": 0.777,
+    "stride_m": 0.2021,
+    "cmd_speed_mps": 0.689,
+    "cmd_yaw_rate": 0.035,
+    "terminated": false
+   },
+   "2": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     4.602,
+     4.346
+    ],
+    "apex_m": [
+     0.0682,
+     0.0887
+    ],
+    "slip_mps": [
+     0.0759,
+     0.0238
+    ],
+    "air_frac": [
+     0.367,
+     0.482
+    ],
+    "touchdowns_hz": [
+     3.586,
+     5.179
+    ],
+    "speed_mps": 0.479,
+    "stride_m": 0.1071,
+    "cmd_speed_mps": 0.257,
+    "cmd_yaw_rate": 0.158,
+    "terminated": false
+   },
+   "3": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     3.845,
+     3.845
+    ],
+    "apex_m": [
+     0.1105,
+     0.1359
+    ],
+    "slip_mps": [
+     0.0509,
+     0.0193
+    ],
+    "air_frac": [
+     0.534,
+     0.546
+    ],
+    "touchdowns_hz": [
+     3.785,
+     3.785
+    ],
+    "speed_mps": 0.725,
+    "stride_m": 0.1886,
+    "cmd_speed_mps": 0.733,
+    "cmd_yaw_rate": 0.054,
+    "terminated": false
+   },
+   "4": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     5.225,
+     5.249
+    ],
+    "apex_m": [
+     0.0921,
+     0.0996
+    ],
+    "slip_mps": [
+     0.0444,
+     0.0145
+    ],
+    "air_frac": [
+     0.414,
+     0.367
+    ],
+    "touchdowns_hz": [
+     3.785,
+     3.386
+    ],
+    "speed_mps": 0.488,
+    "stride_m": 0.0932,
+    "cmd_speed_mps": 0.391,
+    "cmd_yaw_rate": 0.214,
+    "terminated": false
+   },
+   "5": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     1.086,
+     4.309
+    ],
+    "apex_m": [
+     0.074,
+     0.0854
+    ],
+    "slip_mps": [
+     0.036,
+     0.038
+    ],
+    "air_frac": [
+     0.494,
+     0.402
+    ],
+    "touchdowns_hz": [
+     4.183,
+     3.785
+    ],
+    "speed_mps": 0.471,
+    "stride_m": 0.1746,
+    "cmd_speed_mps": 0.397,
+    "cmd_yaw_rate": 0.362,
+    "terminated": false
+   },
+   "6": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     4.419,
+     3.772
+    ],
+    "apex_m": [
+     0.0988,
+     0.1252
+    ],
+    "slip_mps": [
+     0.0433,
+     0.031
+    ],
+    "air_frac": [
+     0.562,
+     0.514
+    ],
+    "touchdowns_hz": [
+     3.984,
+     3.984
+    ],
+    "speed_mps": 0.755,
+    "stride_m": 0.1843,
+    "cmd_speed_mps": 0.621,
+    "cmd_yaw_rate": 0.07,
+    "terminated": false
+   },
+   "7": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     4.028,
+     0.574
+    ],
+    "apex_m": [
+     0.0283,
+     0.0372
+    ],
+    "slip_mps": [
+     0.0233,
+     0.0142
+    ],
+    "air_frac": [
+     0.139,
+     0.319
+    ],
+    "touchdowns_hz": [
+     1.394,
+     3.386
+    ],
+    "speed_mps": 0.164,
+    "stride_m": 0.0713,
+    "cmd_speed_mps": 0.034,
+    "cmd_yaw_rate": 0.271,
+    "terminated": false
+   },
+   "8": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     2.6,
+     2.612
+    ],
+    "apex_m": [
+     0.2789,
+     0.2651
+    ],
+    "slip_mps": [
+     0.0435,
+     0.0444
+    ],
+    "air_frac": [
+     0.57,
+     0.649
+    ],
+    "touchdowns_hz": [
+     3.187,
+     3.386
+    ],
+    "speed_mps": 0.881,
+    "stride_m": 0.3381,
+    "cmd_speed_mps": 0.889,
+    "cmd_yaw_rate": 0.324,
+    "terminated": false
+   },
+   "9": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     2.771,
+     2.734
+    ],
+    "apex_m": [
+     0.1747,
+     0.3177
+    ],
+    "slip_mps": [
+     0.047,
+     0.0516
+    ],
+    "air_frac": [
+     0.518,
+     0.637
+    ],
+    "touchdowns_hz": [
+     3.386,
+     2.988
+    ],
+    "speed_mps": 0.238,
+    "stride_m": 0.0865,
+    "cmd_speed_mps": 0.169,
+    "cmd_yaw_rate": 0.069,
+    "terminated": false
+   },
+   "10": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     2.795,
+     2.832
+    ],
+    "apex_m": [
+     0.2968,
+     0.2723
+    ],
+    "slip_mps": [
+     0.0399,
+     0.0587
+    ],
+    "air_frac": [
+     0.641,
+     0.649
+    ],
+    "touchdowns_hz": [
+     3.586,
+     3.586
+    ],
+    "speed_mps": 0.451,
+    "stride_m": 0.1603,
+    "cmd_speed_mps": 0.391,
+    "cmd_yaw_rate": 0.101,
+    "terminated": false
+   },
+   "11": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     3.699,
+     3.491
+    ],
+    "apex_m": [
+     0.085,
+     0.1418
+    ],
+    "slip_mps": [
+     0.059,
+     0.0236
+    ],
+    "air_frac": [
+     0.394,
+     0.582
+    ],
+    "touchdowns_hz": [
+     3.386,
+     3.785
+    ],
+    "speed_mps": 0.268,
+    "stride_m": 0.0745,
+    "cmd_speed_mps": 0.098,
+    "cmd_yaw_rate": 0.422,
+    "terminated": false
+   },
+   "12": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     2.82,
+     2.893
+    ],
+    "apex_m": [
+     0.2309,
+     0.1926
+    ],
+    "slip_mps": [
+     0.0397,
+     0.0278
+    ],
+    "air_frac": [
+     0.574,
+     0.566
+    ],
+    "touchdowns_hz": [
+     3.586,
+     3.586
+    ],
+    "speed_mps": 0.363,
+    "stride_m": 0.1271,
+    "cmd_speed_mps": 0.248,
+    "cmd_yaw_rate": 0.237,
+    "terminated": false
+   },
+   "13": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     2.759,
+     2.808
+    ],
+    "apex_m": [
+     0.3267,
+     0.3024
+    ],
+    "slip_mps": [
+     0.0492,
+     0.057
+    ],
+    "air_frac": [
+     0.629,
+     0.629
+    ],
+    "touchdowns_hz": [
+     3.187,
+     2.988
+    ],
+    "speed_mps": 0.568,
+    "stride_m": 0.2041,
+    "cmd_speed_mps": 0.622,
+    "cmd_yaw_rate": 0.256,
+    "terminated": false
+   },
+   "14": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     2.795,
+     2.783
+    ],
+    "apex_m": [
+     0.2575,
+     0.2464
+    ],
+    "slip_mps": [
+     0.0431,
+     0.0396
+    ],
+    "air_frac": [
+     0.518,
+     0.625
+    ],
+    "touchdowns_hz": [
+     2.988,
+     3.187
+    ],
+    "speed_mps": 0.474,
+    "stride_m": 0.17,
+    "cmd_speed_mps": 0.362,
+    "cmd_yaw_rate": 0.154,
+    "terminated": false
+   },
+   "15": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     2.771,
+     2.783
+    ],
+    "apex_m": [
+     0.2969,
+     0.2453
+    ],
+    "slip_mps": [
+     0.0324,
+     0.0325
+    ],
+    "air_frac": [
+     0.653,
+     0.594
+    ],
+    "touchdowns_hz": [
+     3.187,
+     3.386
+    ],
+    "speed_mps": 0.478,
+    "stride_m": 0.1721,
+    "cmd_speed_mps": 0.406,
+    "cmd_yaw_rate": 0.329,
+    "terminated": false
+   },
+   "16": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     1.294,
+     4.651
+    ],
+    "apex_m": [
+     0.0778,
+     0.0795
+    ],
+    "slip_mps": [
+     0.054,
+     0.0173
+    ],
+    "air_frac": [
+     0.335,
+     0.378
+    ],
+    "touchdowns_hz": [
+     3.187,
+     3.586
+    ],
+    "speed_mps": 0.383,
+    "stride_m": 0.1288,
+    "cmd_speed_mps": 0.223,
+    "cmd_yaw_rate": 0.123,
+    "terminated": false
+   },
+   "17": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     0.72,
+     1.477
+    ],
+    "apex_m": [
+     0.0963,
+     0.0795
+    ],
+    "slip_mps": [
+     0.0569,
+     0.0085
+    ],
+    "air_frac": [
+     0.295,
+     0.355
+    ],
+    "touchdowns_hz": [
+     3.187,
+     3.586
+    ],
+    "speed_mps": 0.29,
+    "stride_m": 0.264,
+    "cmd_speed_mps": 0.179,
+    "cmd_yaw_rate": 0.064,
+    "terminated": false
+   },
+   "18": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     3.381,
+     3.271
+    ],
+    "apex_m": [
+     0.1055,
+     0.1572
+    ],
+    "slip_mps": [
+     0.0645,
+     0.0185
+    ],
+    "air_frac": [
+     0.486,
+     0.502
+    ],
+    "touchdowns_hz": [
+     3.785,
+     3.785
+    ],
+    "speed_mps": 0.578,
+    "stride_m": 0.1738,
+    "cmd_speed_mps": 0.497,
+    "cmd_yaw_rate": 0.154,
+    "terminated": false
+   },
+   "19": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     3.87,
+     3.882
+    ],
+    "apex_m": [
+     0.1169,
+     0.076
+    ],
+    "slip_mps": [
+     0.0557,
+     0.0211
+    ],
+    "air_frac": [
+     0.454,
+     0.39
+    ],
+    "touchdowns_hz": [
+     3.586,
+     3.187
+    ],
+    "speed_mps": 0.326,
+    "stride_m": 0.0841,
+    "cmd_speed_mps": 0.248,
+    "cmd_yaw_rate": 0.329,
+    "terminated": false
+   },
+   "20": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     2.576,
+     3.394
+    ],
+    "apex_m": [
+     0.1873,
+     0.1688
+    ],
+    "slip_mps": [
+     0.074,
+     0.0589
+    ],
+    "air_frac": [
+     0.578,
+     0.486
+    ],
+    "touchdowns_hz": [
+     4.183,
+     2.988
+    ],
+    "speed_mps": 0.481,
+    "stride_m": 0.1611,
+    "cmd_speed_mps": 0.626,
+    "cmd_yaw_rate": 0.182,
+    "terminated": false
+   },
+   "21": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     4.199,
+     4.163
+    ],
+    "apex_m": [
+     0.114,
+     0.1203
+    ],
+    "slip_mps": [
+     0.0707,
+     0.0247
+    ],
+    "air_frac": [
+     0.398,
+     0.474
+    ],
+    "touchdowns_hz": [
+     3.187,
+     3.984
+    ],
+    "speed_mps": 0.478,
+    "stride_m": 0.1143,
+    "cmd_speed_mps": 0.345,
+    "cmd_yaw_rate": 0.129,
+    "terminated": false
+   },
+   "22": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     3.625,
+     3.589
+    ],
+    "apex_m": [
+     0.1257,
+     0.1386
+    ],
+    "slip_mps": [
+     0.0446,
+     0.0188
+    ],
+    "air_frac": [
+     0.534,
+     0.534
+    ],
+    "touchdowns_hz": [
+     3.785,
+     3.984
+    ],
+    "speed_mps": 0.613,
+    "stride_m": 0.1699,
+    "cmd_speed_mps": 0.484,
+    "cmd_yaw_rate": 0.194,
+    "terminated": false
+   },
+   "23": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     3.247,
+     3.223
+    ],
+    "apex_m": [
+     0.1695,
+     0.1021
+    ],
+    "slip_mps": [
+     0.0542,
+     0.0229
+    ],
+    "air_frac": [
+     0.614,
+     0.466
+    ],
+    "touchdowns_hz": [
+     3.785,
+     2.988
+    ],
+    "speed_mps": 0.497,
+    "stride_m": 0.1536,
+    "cmd_speed_mps": 0.442,
+    "cmd_yaw_rate": 0.249,
+    "terminated": false
+   },
+   "24": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     3.491,
+     3.491
+    ],
+    "apex_m": [
+     0.085,
+     0.1269
+    ],
+    "slip_mps": [
+     0.0696,
+     0.0421
+    ],
+    "air_frac": [
+     0.49,
+     0.546
+    ],
+    "touchdowns_hz": [
+     3.785,
+     3.386
+    ],
+    "speed_mps": 0.507,
+    "stride_m": 0.1452,
+    "cmd_speed_mps": 0.435,
+    "cmd_yaw_rate": 0.184,
+    "terminated": false
+   },
+   "25": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     3.992,
+     4.041
+    ],
+    "apex_m": [
+     0.0816,
+     0.079
+    ],
+    "slip_mps": [
+     0.0522,
+     0.0466
+    ],
+    "air_frac": [
+     0.462,
+     0.486
+    ],
+    "touchdowns_hz": [
+     4.183,
+     3.785
+    ],
+    "speed_mps": 0.449,
+    "stride_m": 0.1118,
+    "cmd_speed_mps": 0.242,
+    "cmd_yaw_rate": 0.1,
+    "terminated": false
+   },
+   "26": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     3.113,
+     3.113
+    ],
+    "apex_m": [
+     0.1568,
+     0.166
+    ],
+    "slip_mps": [
+     0.0772,
+     0.0526
+    ],
+    "air_frac": [
+     0.598,
+     0.625
+    ],
+    "touchdowns_hz": [
+     3.386,
+     2.988
+    ],
+    "speed_mps": 0.944,
+    "stride_m": 0.3032,
+    "cmd_speed_mps": 0.918,
+    "cmd_yaw_rate": 0.135,
+    "terminated": false
+   },
+   "27": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     3.137,
+     3.125
+    ],
+    "apex_m": [
+     0.1754,
+     0.1677
+    ],
+    "slip_mps": [
+     0.0606,
+     0.0588
+    ],
+    "air_frac": [
+     0.606,
+     0.61
+    ],
+    "touchdowns_hz": [
+     3.187,
+     3.187
+    ],
+    "speed_mps": 0.901,
+    "stride_m": 0.2878,
+    "cmd_speed_mps": 0.793,
+    "cmd_yaw_rate": 0.102,
+    "terminated": false
+   },
+   "28": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     3.552,
+     3.564
+    ],
+    "apex_m": [
+     0.0784,
+     0.114
+    ],
+    "slip_mps": [
+     0.0686,
+     0.0457
+    ],
+    "air_frac": [
+     0.486,
+     0.55
+    ],
+    "touchdowns_hz": [
+     3.586,
+     3.785
+    ],
+    "speed_mps": 0.518,
+    "stride_m": 0.1456,
+    "cmd_speed_mps": 0.4,
+    "cmd_yaw_rate": 0.419,
+    "terminated": false
+   },
+   "29": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     3.186,
+     3.174
+    ],
+    "apex_m": [
+     0.1274,
+     0.1373
+    ],
+    "slip_mps": [
+     0.0836,
+     0.0479
+    ],
+    "air_frac": [
+     0.566,
+     0.574
+    ],
+    "touchdowns_hz": [
+     3.187,
+     3.187
+    ],
+    "speed_mps": 0.729,
+    "stride_m": 0.2292,
+    "cmd_speed_mps": 0.676,
+    "cmd_yaw_rate": 0.09,
+    "terminated": false
+   },
+   "30": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     3.32,
+     3.32
+    ],
+    "apex_m": [
+     0.128,
+     0.1389
+    ],
+    "slip_mps": [
+     0.0637,
+     0.0569
+    ],
+    "air_frac": [
+     0.574,
+     0.586
+    ],
+    "touchdowns_hz": [
+     3.386,
+     3.386
+    ],
+    "speed_mps": 0.784,
+    "stride_m": 0.2361,
+    "cmd_speed_mps": 0.685,
+    "cmd_yaw_rate": 0.129,
+    "terminated": false
+   },
+   "31": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     3.113,
+     3.113
+    ],
+    "apex_m": [
+     0.1549,
+     0.1634
+    ],
+    "slip_mps": [
+     0.0701,
+     0.0459
+    ],
+    "air_frac": [
+     0.625,
+     0.598
+    ],
+    "touchdowns_hz": [
+     2.988,
+     2.988
+    ],
+    "speed_mps": 0.888,
+    "stride_m": 0.2853,
+    "cmd_speed_mps": 0.831,
+    "cmd_yaw_rate": 0.044,
+    "terminated": false
+   },
+   "32": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     4.529,
+     4.553
+    ],
+    "apex_m": [
+     0.0301,
+     0.0458
+    ],
+    "slip_mps": [
+     0.0372,
+     0.007
+    ],
+    "air_frac": [
+     0.235,
+     0.323
+    ],
+    "touchdowns_hz": [
+     2.59,
+     3.785
+    ],
+    "speed_mps": 0.157,
+    "stride_m": 0.0346,
+    "cmd_speed_mps": 0.003,
+    "cmd_yaw_rate": 0.037,
+    "terminated": false
+   },
+   "33": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     4.614,
+     4.614
+    ],
+    "apex_m": [
+     0.0335,
+     0.0442
+    ],
+    "slip_mps": [
+     0.0408,
+     0.0114
+    ],
+    "air_frac": [
+     0.351,
+     0.335
+    ],
+    "touchdowns_hz": [
+     3.386,
+     3.785
+    ],
+    "speed_mps": 0.27,
+    "stride_m": 0.0585,
+    "cmd_speed_mps": 0.13,
+    "cmd_yaw_rate": 0.106,
+    "terminated": false
+   },
+   "34": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     3.54,
+     3.528
+    ],
+    "apex_m": [
+     0.1347,
+     0.1615
+    ],
+    "slip_mps": [
+     0.0376,
+     0.023
+    ],
+    "air_frac": [
+     0.566,
+     0.618
+    ],
+    "touchdowns_hz": [
+     3.386,
+     3.187
+    ],
+    "speed_mps": 0.93,
+    "stride_m": 0.2632,
+    "cmd_speed_mps": 0.892,
+    "cmd_yaw_rate": 0.134,
+    "terminated": false
+   },
+   "35": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     4.565,
+     2.075
+    ],
+    "apex_m": [
+     0.0525,
+     0.0759
+    ],
+    "slip_mps": [
+     0.0496,
+     0.0158
+    ],
+    "air_frac": [
+     0.43,
+     0.398
+    ],
+    "touchdowns_hz": [
+     3.785,
+     3.386
+    ],
+    "speed_mps": 0.415,
+    "stride_m": 0.125,
+    "cmd_speed_mps": 0.217,
+    "cmd_yaw_rate": 0.077,
+    "terminated": false
+   },
+   "36": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     3.296,
+     3.223
+    ],
+    "apex_m": [
+     0.1146,
+     0.1075
+    ],
+    "slip_mps": [
+     0.0367,
+     0.0198
+    ],
+    "air_frac": [
+     0.486,
+     0.526
+    ],
+    "touchdowns_hz": [
+     3.187,
+     3.386
+    ],
+    "speed_mps": 0.408,
+    "stride_m": 0.1252,
+    "cmd_speed_mps": 0.243,
+    "cmd_yaw_rate": 0.071,
+    "terminated": false
+   },
+   "37": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     3.015,
+     3.064
+    ],
+    "apex_m": [
+     0.1496,
+     0.1245
+    ],
+    "slip_mps": [
+     0.0289,
+     0.0343
+    ],
+    "air_frac": [
+     0.566,
+     0.562
+    ],
+    "touchdowns_hz": [
+     3.187,
+     3.187
+    ],
+    "speed_mps": 0.53,
+    "stride_m": 0.1744,
+    "cmd_speed_mps": 0.382,
+    "cmd_yaw_rate": 0.111,
+    "terminated": false
+   },
+   "38": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     2.771,
+     2.783
+    ],
+    "apex_m": [
+     0.2086,
+     0.1951
+    ],
+    "slip_mps": [
+     0.051,
+     0.0375
+    ],
+    "air_frac": [
+     0.61,
+     0.598
+    ],
+    "touchdowns_hz": [
+     2.988,
+     2.988
+    ],
+    "speed_mps": 0.917,
+    "stride_m": 0.3302,
+    "cmd_speed_mps": 0.913,
+    "cmd_yaw_rate": 0.099,
+    "terminated": false
+   },
+   "39": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     2.82,
+     2.832
+    ],
+    "apex_m": [
+     0.1583,
+     0.1617
+    ],
+    "slip_mps": [
+     0.046,
+     0.0328
+    ],
+    "air_frac": [
+     0.598,
+     0.594
+    ],
+    "touchdowns_hz": [
+     2.988,
+     2.988
+    ],
+    "speed_mps": 0.681,
+    "stride_m": 0.241,
+    "cmd_speed_mps": 0.627,
+    "cmd_yaw_rate": 0.06,
+    "terminated": false
+   }
+  },
+  "summary": {
+   "envs": 40,
+   "envs_standing": 0,
+   "envs_terminated": 0,
+   "cadence_hz": [
+    3.308,
+    3.2955
+   ],
+   "touchdowns_hz": [
+    3.386,
+    3.386
+   ],
+   "apex_m": [
+    0.1187,
+    0.1366
+   ],
+   "slip_mps": [
+    0.0494,
+    0.0294
+   ],
+   "air_frac": [
+    0.518,
+    0.546
+   ],
+   "speed_mps": 0.4845,
+   "stride_m": 0.1655,
+   "cmd_speed_mps": 0.3985
+  },
+  "filmed": {
+   "8": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     2.6,
+     2.612
+    ],
+    "apex_m": [
+     0.2789,
+     0.2651
+    ],
+    "slip_mps": [
+     0.0435,
+     0.0444
+    ],
+    "air_frac": [
+     0.57,
+     0.649
+    ],
+    "touchdowns_hz": [
+     3.187,
+     3.386
+    ],
+    "speed_mps": 0.881,
+    "stride_m": 0.3381,
+    "cmd_speed_mps": 0.889,
+    "cmd_yaw_rate": 0.324,
+    "terminated": false
+   },
+   "15": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     2.771,
+     2.783
+    ],
+    "apex_m": [
+     0.2969,
+     0.2453
+    ],
+    "slip_mps": [
+     0.0324,
+     0.0325
+    ],
+    "air_frac": [
+     0.653,
+     0.594
+    ],
+    "touchdowns_hz": [
+     3.187,
+     3.386
+    ],
+    "speed_mps": 0.478,
+    "stride_m": 0.1721,
+    "cmd_speed_mps": 0.406,
+    "cmd_yaw_rate": 0.329,
+    "terminated": false
+   },
+   "14": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     2.795,
+     2.783
+    ],
+    "apex_m": [
+     0.2575,
+     0.2464
+    ],
+    "slip_mps": [
+     0.0431,
+     0.0396
+    ],
+    "air_frac": [
+     0.518,
+     0.625
+    ],
+    "touchdowns_hz": [
+     2.988,
+     3.187
+    ],
+    "speed_mps": 0.474,
+    "stride_m": 0.17,
+    "cmd_speed_mps": 0.362,
+    "cmd_yaw_rate": 0.154,
+    "terminated": false
+   },
+   "12": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     2.82,
+     2.893
+    ],
+    "apex_m": [
+     0.2309,
+     0.1926
+    ],
+    "slip_mps": [
+     0.0397,
+     0.0278
+    ],
+    "air_frac": [
+     0.574,
+     0.566
+    ],
+    "touchdowns_hz": [
+     3.586,
+     3.586
+    ],
+    "speed_mps": 0.363,
+    "stride_m": 0.1271,
+    "cmd_speed_mps": 0.248,
+    "cmd_yaw_rate": 0.237,
+    "terminated": false
+   }
+  },
+  "natural_gait_envs": [
+   1,
+   8,
+   12,
+   14,
+   15,
+   22,
+   34,
+   37,
+   38,
+   39
+  ]
+ },
  "timing": {
-  "sim_ms_mean": 77.12105619952204,
-  "sim_ms_median": 76.33258300484158,
-  "sim_ms_first": 114.24950000218814,
-  "sim_s_total": 23.213437916056137,
-  "rollout_s": 23.25931245800166,
-  "twin_s": 0.8395737079918035,
-  "record_wall_s": 33.46859387499717,
-  "env_build_s": 4.197673290997045
+  "sim_ms_mean": 67.2037882061847,
+  "sim_ms_median": 67.22062500193715,
+  "sim_ms_first": 86.92312501079869,
+  "sim_s_total": 20.228340250061592,
+  "rollout_s": 20.366265082993777,
+  "twin_s": 0.5840424170019105,
+  "record_wall_s": 27.672598916993593,
+  "env_build_s": 3.0016483329964103
  },
  "software": {
-  "metalsim": "687f3d7b1d+dirty",
+  "metalsim": "ef346e7efc+dirty",
   "warp": {
    "version": "1.18.0.dev20260917",
    "git": "4127c48183",
@@ -869,6 +2289,14 @@
  "hardware": {
   "machine": "arm64",
   "python": "3.13.7",
+  "power": {
+   "source": "Battery Power",
+   "battery_percent": 60,
+   "battery_state": "discharging",
+   "mode": "High Power",
+   "mode_setting": "powermode 2",
+   "at": "2026-10-31T04:54:44-0700"
+  },
   "model": "Mac16,6",
   "cpu": "Apple M4 Max",
   "memory_gb": 64,

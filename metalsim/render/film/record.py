@@ -8,7 +8,8 @@ virtual environment:
   (F, E, G, 9), in each env's own frame), the particles (``particles`` (F, E, P, 3) or empty), the tracked body
   (``track`` (F, E, 3)), each env's first-episode end frame (``ends``), and the twin's compiled geom frames.
 * ``rec.json``: task, envs and their outcomes, timings, provenance (the policy checkpoint's repo-relative path and
-  sha256 under ``checkpoint``).
+  sha256 under ``checkpoint``, plus its format, iteration and source URL when the adapter reports them), and, for
+  adapters whose frames carry feet (``gait_metrics``), per-env gait metrics under ``gait``.
 
 A filmed env whose first episode ends by a termination (the adapter's ``info["terminated"]``: a fall, not a time-out
 or a success) makes the recorder refuse the film unless ``FilmCfg.allow_early_end`` (``--allow-early-end``); with
@@ -179,10 +180,15 @@ def mujoco_visibility(spec) -> dict:
 
 
 def checkpoint_provenance(path: str | None) -> dict | None:
-    """Repo-relative path (``provenance.relpath``: no machine paths), size and sha256 of a policy checkpoint."""
+    """Repo-relative path (``provenance.relpath``: no machine paths), whether git tracks it, size and sha256 of a policy
+    checkpoint."""
     if not path:
         return None
-    out = dict(path=provenance.relpath(path), in_repo=os.path.abspath(path).startswith(provenance.ROOT + os.sep))
+    inside = os.path.abspath(path).startswith(provenance.ROOT + os.sep)
+    # tracked by git (a fetched, git-ignored file under the checkout, e.g. an NVIDIA checkpoint, is not in the repo)
+    rel = os.path.relpath(os.path.abspath(path), provenance.ROOT)
+    tracked = inside and bool(provenance._run(["git", "ls-files", "--", rel], cwd=provenance.ROOT))
+    out = dict(path=provenance.relpath(path), in_repo=tracked)
     if not os.path.exists(path):
         return out | dict(sha256=None, missing=True)
     h = hashlib.sha256()
@@ -295,6 +301,133 @@ def load_adapter(spec: str):
     return getattr(importlib.import_module(mod), cls)
 
 
+GAIT_T0 = 1.0            # s: gait windows start here (the start from the standing pose is left out)
+GAIT_MIN_S = 2.0         # s: shortest window that gets gait metrics
+GAIT_BAND = (0.5, 10.0)  # Hz: where the foot-height spectrum's peak is searched
+GAIT_FALLBACK_CONTACT = 0.015   # m: without contact data, a foot within this of its lowest height counts as in contact
+GAIT_STANDING = 0.15     # m/s: a pelvis slower than this over the window is standing, left out of the summary
+GAIT_DEFINITION = (
+    "Per env and foot over its window (from 1 s to the first episode's end or the clip's end). Foot: the centre of the "
+    "foot collider (adapter's feet), its height taken above the task's collision surface (adapter.ground_height; 0 on "
+    "flat ground): the highest surface point under the foot's footprint (adapter's feet_footprint: its bounding-box "
+    "corners; else straight below the centre), so a foot standing across a step edge is on the upper tread. "
+    "cadence_hz: peak of the Hann-windowed FFT of the mean-removed foot height (zero-padded to >= 16x, searched in "
+    "0.5-10 Hz), i.e. gait cycles per second of that foot. apex_m: 95th percentile of the foot height above its stance "
+    "height (median height while in contact). slip_mps: median horizontal speed of the foot between consecutive "
+    "frames that are both in contact. air_frac: fraction of frames not in contact. touchdowns_hz: contact onsets "
+    "after at least 2 frames in the air, per second (a terrain-independent cross-check of the cadence; needs "
+    "feet_contact). Contact: the adapter's feet_contact (the task's touch sensor > 1 N), else within 15 mm of the "
+    "window's lowest height. speed_mps: pelvis horizontal path / window time; stride_m: speed / mean cadence (ground "
+    "covered per gait cycle). Summary: medians over envs whose first episode did not terminate and that walk (speed "
+    ">= 0.15 m/s).")
+
+
+def _hz_peak(h: np.ndarray, dt: float) -> float:
+    """Dominant frequency [Hz] of a signal: peak of its Hann-windowed, zero-padded spectrum within ``GAIT_BAND``."""
+    x = (h - h.mean()) * np.hanning(len(h))
+    nfft = 1 << int(np.ceil(np.log2(16 * len(h))))
+    S = np.abs(np.fft.rfft(x, nfft))
+    f = np.fft.rfftfreq(nfft, dt)
+    band = (f >= GAIT_BAND[0]) & (f <= GAIT_BAND[1])
+    return float(f[band][np.argmax(S[band])])
+
+
+def gait_metrics(snaps, ends, terminated, frame_dt: float, ground=None, t0: float = GAIT_T0) -> dict | None:
+    """Per-env gait metrics (``GAIT_DEFINITION``) from frames whose snapshots carry ``feet`` ((N, 2, 3) world foot
+    points, left then right), optionally ``feet_contact`` ((N, 2) bool) and ``cmd`` ((N, 3)), and ``qpos`` (pelvis
+    xy). ``ground(x, y)``: terrain height straight below world points (None: 0). Returns None without feet."""
+    if not snaps or "feet" not in snaps[0]:
+        return None
+    P = np.stack([s["feet"] for s in snaps]).astype(np.float64)                  # (F, N, 2, 3)
+    C = np.stack([s["feet_contact"] for s in snaps]).astype(bool) if "feet_contact" in snaps[0] else None
+    B = np.stack([s["qpos"][:, :2] for s in snaps]).astype(np.float64) if "qpos" in snaps[0] else None
+    U = np.stack([s["cmd"] for s in snaps]).astype(np.float64) if "cmd" in snaps[0] else None
+    F, N = P.shape[:2]
+    if ground is None:
+        G = np.zeros(P.shape[:3])
+    elif "feet_footprint" in snaps[0]:                     # the highest terrain under the foot's footprint
+        FP = np.stack([s["feet_footprint"] for s in snaps]).astype(np.float64)     # (F, N, 2, K, 2)
+        G = np.asarray(ground(FP[..., 0], FP[..., 1]), np.float64).max(-1)
+    else:
+        G = np.asarray(ground(P[..., 0], P[..., 1]), np.float64)
+    H = P[..., 2] - G                                                              # foot height above the terrain
+    k0 = int(round(t0 / frame_dt))
+    per = {}
+    for e in range(N):
+        k1 = int(ends[e]) + 1 if ends[e] >= 0 else F                               # the end frame is the episode's last
+        if (k1 - k0) * frame_dt < GAIT_MIN_S:
+            per[str(e)] = None
+            continue
+        row = dict(window_s=[round(k0 * frame_dt, 3), round(k1 * frame_dt, 3)], cadence_hz=[], apex_m=[], slip_mps=[],
+                   air_frac=[], touchdowns_hz=[])
+        for f in range(2):
+            h = H[k0:k1, e, f]
+            c = C[k0:k1, e, f] if C is not None else (h - h.min() < GAIT_FALLBACK_CONTACT)
+            base = float(np.median(h[c])) if c.any() else float(h.min())
+            v = np.linalg.norm(np.diff(P[k0:k1, e, f, :2], axis=0), axis=1) / frame_dt
+            st = c[:-1] & c[1:]
+            row["cadence_hz"].append(round(_hz_peak(h, frame_dt), 3))
+            row["apex_m"].append(round(float(np.percentile(h - base, 95)), 4))
+            row["slip_mps"].append(round(float(np.median(v[st])), 4) if st.any() else None)
+            row["air_frac"].append(round(float(1.0 - c.mean()), 3))
+            if C is not None:                              # onsets of contact after >= 2 frames in the air
+                air2 = np.convolve(~c, [1, 1], "valid") == 2       # frames k, k+1 both airborne
+                td = np.flatnonzero(c[2:] & air2[:-1]) if len(c) > 2 else []
+                row["touchdowns_hz"].append(round(len(td) / ((k1 - k0) * frame_dt), 3))
+            else:
+                row["touchdowns_hz"].append(None)
+        if B is not None:
+            path = np.linalg.norm(np.diff(B[k0:k1, e], axis=0), axis=1).sum()
+            row["speed_mps"] = round(float(path / ((k1 - 1 - k0) * frame_dt)), 3)
+            row["stride_m"] = round(row["speed_mps"] / float(np.mean(row["cadence_hz"])), 4)
+        if U is not None:
+            row["cmd_speed_mps"] = round(float(np.linalg.norm(U[k0:k1, e, :2], axis=1).mean()), 3)
+            row["cmd_yaw_rate"] = round(float(np.abs(U[k0:k1, e, 2]).mean()), 3)
+        row["terminated"] = bool(terminated[e])
+        per[str(e)] = row
+    walk = [e for e, r in per.items() if r and not r["terminated"] and r.get("speed_mps", 1.0) >= GAIT_STANDING]
+
+    def med(key, i=None):
+        vals = [per[e][key][i] if i is not None else per[e].get(key) for e in walk]
+        vals = [x for x in vals if x is not None]
+        return round(float(np.median(vals)), 4) if vals else None
+
+    summary = dict(envs=len(walk), envs_standing=sum(1 for r in per.values() if r and not r["terminated"]
+                                                         and r.get("speed_mps", 1.0) < GAIT_STANDING),
+                   envs_terminated=int(np.asarray(terminated, bool).sum()))
+    for key in ("cadence_hz", "touchdowns_hz", "apex_m", "slip_mps", "air_frac"):
+        summary[key] = [med(key, 0), med(key, 1)]
+    for key in ("speed_mps", "stride_m", "cmd_speed_mps"):
+        summary[key] = med(key)
+    return dict(definition=GAIT_DEFINITION, t0_s=t0, contact="adapter feet_contact" if C is not None else
+                f"height within {GAIT_FALLBACK_CONTACT} m of the window's lowest", per_env=per, summary=summary)
+
+
+def gait_lines(g: dict, envs=()) -> list:
+    """Log lines: one per env (filmed ones marked *), then the summary."""
+    fmt = lambda v, d=2: "-" if v is None else f"{v:.{d}f}"
+    out = ["[gait] env  speed  cmd   cadence L/R Hz  touch-downs/s  apex L/R cm  slip L/R m/s  air L/R    stride m"]
+    for e, r in g["per_env"].items():
+        mark = "*" if int(e) in envs else " "
+        if r is None:
+            out.append(f"[gait] {mark}{e:>3}  (window shorter than {GAIT_MIN_S} s)")
+            continue
+        out.append(f"[gait] {mark}{e:>3}  {fmt(r.get('speed_mps'))}  {fmt(r.get('cmd_speed_mps'))}  "
+                   f"{fmt(r['cadence_hz'][0])} / {fmt(r['cadence_hz'][1])}   "
+                   f"{fmt(r['touchdowns_hz'][0])} / {fmt(r['touchdowns_hz'][1])}   "
+                   f"{fmt(100 * r['apex_m'][0], 1)} / {fmt(100 * r['apex_m'][1], 1)}   "
+                   f"{fmt(r['slip_mps'][0], 3)} / {fmt(r['slip_mps'][1], 3)}  "
+                   f"{fmt(r['air_frac'][0])} / {fmt(r['air_frac'][1])}  {fmt(r.get('stride_m'), 3)}"
+                   + ("  terminated" if r["terminated"] else ""))
+    s = g["summary"]
+    c = lambda k, d=2, m=1: " / ".join(fmt(None if x is None else m * x, d) for x in s[k])
+    out.append(f"[gait] median over {s['envs']} walking envs ({s['envs_standing']} standing, {s['envs_terminated']} "
+               f"terminated): speed {fmt(s['speed_mps'])} m/s (cmd {fmt(s['cmd_speed_mps'])}), cadence L/R "
+               f"{c('cadence_hz')} Hz (touch-downs {c('touchdowns_hz')} /s), apex {c('apex_m', 1, 100)} cm, "
+               f"slip {c('slip_mps', 3)} m/s, air {c('air_frac')}, stride {fmt(s['stride_m'], 3)} m")
+    return out
+
+
 class FilmEarlyEnd(RuntimeError):
     """A filmed env's first episode ended by a termination (e.g. the robot fell) inside the film."""
 
@@ -305,6 +438,16 @@ def record(task, film, viewer, out_dir: str, checkpoint: str | None, n_keep: int
     ck_prov = checkpoint_provenance(checkpoint)
     Adapter = load_adapter(task.adapter) if isinstance(task.adapter, str) else task.adapter
     adapter = Adapter(task, film, checkpoint, viewer)
+    if ck_prov is not None:                 # format, iteration and source, when the adapter reads them
+        if getattr(adapter, "ckpt_format", None):
+            ck_prov["format"] = adapter.ckpt_format
+        if getattr(adapter, "ckpt_iter", None) is not None:
+            ck_prov["iteration"] = adapter.ckpt_iter
+        ck_prov.update(getattr(adapter, "ckpt_source", None) or {})
+        pub = ck_prov.get("published_sha256")
+        if pub and ck_prov.get("sha256") and pub != ck_prov["sha256"]:
+            raise ValueError(f"{ck_prov['path']}: sha256 {ck_prov['sha256']} is not the published {pub} "
+                             f"(re-run scripts/fetch_isaac_assets.sh)")
     fps = film.fps or 1.0 / adapter.frame_dt
     if abs(fps * adapter.frame_dt - 1.0) > 1e-6:
         raise ValueError("the recorder films one frame per policy step: fps must be 1 / step_dt")
@@ -345,14 +488,22 @@ def record(task, film, viewer, out_dir: str, checkpoint: str | None, n_keep: int
         fell = np.flatnonzero(term)
         print(f"[record] first episodes ended by termination: {len(fell)}/{n}"
               + (f" (env:frame {', '.join(f'{e}:{int(ends[e])}' for e in fell)})" if len(fell) else ""), flush=True)
+    gait = gait_metrics(snaps, ends, term, adapter.frame_dt, getattr(adapter, "ground_height", None))
     if isinstance(film.envs, (list, tuple)):
         envs = [int(e) for e in film.envs]
     else:
-        ranked = [int(e) for e in adapter.rank({k: v for k, v in first.items()})]
+        import inspect
+        rk = dict(gait=gait) if "gait" in inspect.signature(adapter.rank).parameters else {}
+        ranked = [int(e) for e in adapter.rank({k: v for k, v in first.items()}, **rk)]
         ranked = [e for e in ranked if not term[e]] + [e for e in ranked if term[e]]    # stable: terminated last
         g2 = film.grid ** 2             # the slots the render stage films by default; the rest are spares
         envs = ranked[:g2] + [e for e in ranked[g2:max(n_keep, g2)] if not term[e]]
     print(f"[record] filmed envs {envs} (ends {[int(ends[e]) for e in envs]})", flush=True)
+    if gait is not None:
+        gait["filmed"] = {str(e): gait["per_env"].get(str(e)) for e in envs}
+        if getattr(adapter, "natural", None) is not None:
+            gait["natural_gait_envs"] = [int(e) for e in np.flatnonzero(adapter.natural)]
+        print("\n".join(gait_lines(gait, envs)), flush=True)
     early = [e for e in envs if term[e]]
     if early:
         msg = "; ".join(f"env {e} terminated at frame {int(ends[e])} ({ends[e] * adapter.frame_dt:.2f} s) of {frames}"
@@ -380,7 +531,7 @@ def record(task, film, viewer, out_dir: str, checkpoint: str | None, n_keep: int
                          | {"end_frame": int(ends[e])} for e in envs},
                all_first_episodes={k: np.asarray(v).tolist() for k, v in first.items()} | {"end_frame": ends.tolist()},
                particles_per_env=int(parts.shape[2]), particle_radius=float(getattr(adapter, "particle_radius", 0.0)),
-               twin=twin_info, adapter=adapter.meta(),
+               twin=twin_info, adapter=adapter.meta(), gait=gait,
                timing=dict(sim_ms_mean=float(sim.mean() * 1e3), sim_ms_median=float(np.median(sim) * 1e3),
                            sim_ms_first=float(sim[0] * 1e3), sim_s_total=float(sim.sum()), rollout_s=rollout_s,
                            twin_s=twin_info["build_s"] + twin_info["poses_s"],

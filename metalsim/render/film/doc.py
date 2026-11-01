@@ -38,6 +38,20 @@ def _rel(path, doc_dir):
     return os.path.relpath(os.path.join(provenance.ROOT, path), os.path.join(provenance.ROOT, doc_dir))
 
 
+def _power_line(stamps) -> str:
+    """The power state each stage stamped (``provenance.power`` in ``hardware.power``: rec.json's when the record stage
+    wrote it, at its end; each render.json's at the shot's first frame, kept on resume); "not recorded" for stage logs
+    written before 2026-10-31."""
+    parts = []
+    for name, hw in stamps:
+        pw = (hw or {}).get("power")
+        at = pw.get("at") if pw else None
+        parts.append(f"{name}: {provenance.power_text(pw)}" + (f", {at[:10]} {at[11:16]} ({at[19:]})" if at else ""))
+    return ("- Power as each stage stamped it (`pmset -g batt` and `pmset -g`; `hardware.power`: the record stage's "
+            "when it wrote rec.json, a render shot's at its first frame): "
+            + "; ".join(parts) + ".")
+
+
 def write_doc(task, rec_dir, shots, doc_path, commands, extra_md=""):
     rec = _load(os.path.join(rec_dir, "rec.json"))
     doc_dir = os.path.dirname(doc_path)
@@ -110,6 +124,7 @@ def write_doc(task, rec_dir, shots, doc_path, commands, extra_md=""):
         hw = rec["hardware"]
         L.append(f"- {hw.get('model', '')} ({hw.get('cpu', '')}, {hw.get('gpu_cores', '?')} GPU cores, "
                  f"{hw.get('memory_gb', '?')} GB), macOS {hw.get('macos', '')} ({hw.get('macos_build', '')}).")
+        L.append(_power_line([("record", hw)] + [(f"render {label}", r.get("hardware")) for label, r, *_ in shot_rows]))
         sw = rec["software"]
         L.append(f"- metalsim `{sw.get('metalsim')}`; record stage ({rec['venv']} venv): "
                  + ", ".join(f"{k} {v.get('version')}" + (f" (`{v['git']}`)" if v.get("git") else "")

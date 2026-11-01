@@ -219,6 +219,11 @@ power, `scripts/gpu_run.sh ... timing`.
   re-filmed with the tracked g1regress checkpoints (`runs/film/g1_{flat,rough}`, docs `docs/renders/G1_*.md`); the
   README's 3x3 table, chart and number corrections; `docs/gallery` trimmed (7 files). Render and sensor tests: 194
   passed, 0 failed, 8 skipped. Agent hand-offs: `runs/readme_media/handoff/`.
-- Open: `doc.py` records no power state, so the 14-inch / battery caveat sits in the G1 docs' prose; the doc lists
-  the top four ranked envs as "filmed" where one is; `docs/gallery/scripts/14_g1_policy_video.py` still writes the
+- Merged as PR #83 (2026-10-31 03:26). Follow-up the same day: the G1 clips shuffled (4.0 Hz steps, 5-7 cm foot
+  lift; our checkpoints were 500 and 1000 iterations). NVIDIA's published Isaac Lab 2.3 checkpoints (iterations 1499
+  and 2999) now drive both films: 3.78 Hz and 7 cm lift on flat, a real stair climb on rough. The quick steps are
+  Isaac's own gait (3.2-3.8 Hz in PhysX, `docs/research/speculative_contacts_2026-09-27.md`). The film tool now stamps
+  the power source and pmset's power-mode setting per stage. The first G1 docs said "on battery in Low Power Mode"
+  for renders made on AC; that came from a session-start reading never re-checked, and is corrected.
+- Open: the doc lists the top four ranked envs as "filmed" where one is; `docs/gallery/scripts/14_g1_policy_video.py` still writes the
   removed `g1_tier2_policy.mp4`; nothing seen on github.com yet (checked through GitHub's markdown API only).

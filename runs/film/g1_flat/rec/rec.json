@@ -7,16 +7,23 @@
  "frame_dt": 0.02,
  "num_envs": 16,
  "envs": [
-  6,
-  2,
   3,
-  0
+  1,
+  6,
+  2
  ],
  "checkpoint": {
-  "path": "runs/g1regress/ckpt14/flat_main_s0.pt",
-  "in_repo": true,
-  "sha256": "6fbfbfe8b950ab27e82afc912fbc3d5484c5b5050dc288cdecd32350b9917057",
-  "bytes": 675619
+  "path": "assets/isaac/pretrained/rsl_rl/Isaac-Velocity-Flat-G1-v0/checkpoint.pt",
+  "in_repo": false,
+  "sha256": "fdf0f242bb8f3bcfc1aa9b7ff2761af4c014cf1cdc7e49242c9b92f3581720e7",
+  "bytes": 2027170,
+  "format": "rsl_rl",
+  "iteration": 1499,
+  "source": "NVIDIA Isaac Lab 2.3 published pretrained checkpoint",
+  "task_id": "Isaac-Velocity-Flat-G1-v0",
+  "source_url": "https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.1/Isaac/IsaacLab/PretrainedCheckpoints/rsl_rl/Isaac-Velocity-Flat-G1-v0/checkpoint.pt",
+  "published_sha256": "fdf0f242bb8f3bcfc1aa9b7ff2761af4c014cf1cdc7e49242c9b92f3581720e7",
+  "licence": "NVIDIA Isaac Sim asset terms (fetched, not redistributed)"
  },
  "allow_early_end": false,
  "early_end_envs": [],
@@ -70,6 +77,22 @@
   "visuals_mesh_0_42"
  ],
  "episodes": {
+  "3": {
+   "terminated": false,
+   "time_out": false,
+   "base_z": 0.0,
+   "level": 0,
+   "col": 0,
+   "end_frame": -1
+  },
+  "1": {
+   "terminated": false,
+   "time_out": false,
+   "base_z": 0.0,
+   "level": 0,
+   "col": 0,
+   "end_frame": -1
+  },
   "6": {
    "terminated": false,
    "time_out": false,
@@ -79,22 +102,6 @@
    "end_frame": -1
   },
   "2": {
-   "terminated": false,
-   "time_out": false,
-   "base_z": 0.0,
-   "level": 0,
-   "col": 0,
-   "end_frame": -1
-  },
-  "3": {
-   "terminated": false,
-   "time_out": false,
-   "base_z": 0.0,
-   "level": 0,
-   "col": 0,
-   "end_frame": -1
-  },
-  "0": {
    "terminated": false,
    "time_out": false,
    "base_z": 0.0,
@@ -225,37 +232,35 @@
    "colliders_hidden": 3,
    "sites_hidden": 3
   },
-  "build_s": 0.513049166998826,
-  "poses_s": 0.004312457997002639
+  "build_s": 0.367115291999653,
+  "poses_s": 0.0029169169938541017
  },
  "adapter": {
-  "policy": "runs/g1regress/ckpt14/flat_main_s0.pt",
-  "policy_iteration": 500,
+  "policy": "assets/isaac/pretrained/rsl_rl/Isaac-Velocity-Flat-G1-v0/checkpoint.pt",
+  "policy_iteration": 1499,
+  "policy_format": "rsl_rl",
+  "policy_source": {
+   "source": "NVIDIA Isaac Lab 2.3 published pretrained checkpoint",
+   "task_id": "Isaac-Velocity-Flat-G1-v0",
+   "source_url": "https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.1/Isaac/IsaacLab/PretrainedCheckpoints/rsl_rl/Isaac-Velocity-Flat-G1-v0/checkpoint.pt",
+   "published_sha256": "fdf0f242bb8f3bcfc1aa9b7ff2761af4c014cf1cdc7e49242c9b92f3581720e7",
+   "iteration": 1499,
+   "licence": "NVIDIA Isaac Sim asset terms (fetched, not redistributed)"
+  },
+  "policy_joint_order": "Isaac's (ISAAC_G1_JOINTS), mapped by joint name",
+  "foot_geoms": [
+   "Cube",
+   "right_ankle_roll_link_Cube"
+  ],
   "note": "",
-  "env_build_s": 9.727746750002552,
+  "env_build_s": 1.2575325409998186,
   "physics": "MuJoCo Warp BatchSim (metalsim.learn.g1_velocity)",
   "terrain": "flat",
   "saved_task_settings": {
-   "reward_cfg": "flat",
-   "scan_ordering": null,
-   "terrain_collision": "hfield",
-   "scan_surface": "exact",
-   "solver_cfg": null,
-   "il3_events": false,
-   "contact_cfg": "recommended",
-   "base_velocity": "com",
-   "feet_slide_velocity": "com"
+   "reward_cfg": "flat"
   },
   "task_settings": {
    "reward_cfg": "flat",
-   "scan_ordering": null,
-   "terrain_collision": "hfield",
-   "scan_surface": "exact",
-   "solver_cfg": null,
-   "il3_events": false,
-   "contact_cfg": "recommended",
-   "base_velocity": "com",
-   "feet_slide_velocity": "com",
    "physics_dt": 0.0025
   },
   "task_resolved": {
@@ -352,22 +357,22 @@
     ]
    ],
    "path_m": [
-    4.796,
-    3.4,
-    5.147,
-    5.074,
-    1.915,
-    3.065,
-    5.61,
-    3.356,
-    2.844,
-    1.47,
-    2.123,
-    3.47,
-    2.739,
-    4.734,
-    1.163,
-    2.693
+    4.616,
+    3.176,
+    4.968,
+    4.844,
+    1.827,
+    2.906,
+    5.139,
+    3.207,
+    2.807,
+    1.435,
+    2.106,
+    3.224,
+    2.613,
+    4.586,
+    1.225,
+    2.498
    ],
    "climb_m": [
     0.0,
@@ -388,37 +393,698 @@
     0.0
    ],
    "descent_m": [
-    -0.1,
-    -0.086,
-    -0.102,
-    -0.105,
-    -0.065,
-    -0.091,
-    -0.098,
-    -0.087,
-    -0.093,
-    -0.081,
-    -0.062,
-    -0.073,
-    -0.092,
-    -0.109,
-    -0.072,
-    -0.069
+    -0.125,
+    -0.113,
+    -0.126,
+    -0.127,
+    -0.124,
+    -0.114,
+    -0.11,
+    -0.121,
+    -0.115,
+    -0.116,
+    -0.124,
+    -0.122,
+    -0.121,
+    -0.114,
+    -0.118,
+    -0.122
    ]
   }
  },
+ "gait": {
+  "definition": "Per env and foot over its window (from 1 s to the first episode's end or the clip's end). Foot: the centre of the foot collider (adapter's feet), its height taken above the task's collision surface (adapter.ground_height; 0 on flat ground): the highest surface point under the foot's footprint (adapter's feet_footprint: its bounding-box corners; else straight below the centre), so a foot standing across a step edge is on the upper tread. cadence_hz: peak of the Hann-windowed FFT of the mean-removed foot height (zero-padded to >= 16x, searched in 0.5-10 Hz), i.e. gait cycles per second of that foot. apex_m: 95th percentile of the foot height above its stance height (median height while in contact). slip_mps: median horizontal speed of the foot between consecutive frames that are both in contact. air_frac: fraction of frames not in contact. touchdowns_hz: contact onsets after at least 2 frames in the air, per second (a terrain-independent cross-check of the cadence; needs feet_contact). Contact: the adapter's feet_contact (the task's touch sensor > 1 N), else within 15 mm of the window's lowest height. speed_mps: pelvis horizontal path / window time; stride_m: speed / mean cadence (ground covered per gait cycle). Summary: medians over envs whose first episode did not terminate and that walk (speed >= 0.15 m/s).",
+  "t0_s": 1.0,
+  "contact": "adapter feet_contact",
+  "per_env": {
+   "0": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     3.87,
+     3.87
+    ],
+    "apex_m": [
+     0.0738,
+     0.0702
+    ],
+    "slip_mps": [
+     0.0359,
+     0.0141
+    ],
+    "air_frac": [
+     0.59,
+     0.438
+    ],
+    "touchdowns_hz": [
+     3.785,
+     3.984
+    ],
+    "speed_mps": 0.815,
+    "stride_m": 0.2106,
+    "cmd_speed_mps": 0.938,
+    "cmd_yaw_rate": 0.182,
+    "terminated": false
+   },
+   "1": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     3.796,
+     3.796
+    ],
+    "apex_m": [
+     0.0778,
+     0.0578
+    ],
+    "slip_mps": [
+     0.0156,
+     0.0163
+    ],
+    "air_frac": [
+     0.522,
+     0.53
+    ],
+    "touchdowns_hz": [
+     3.586,
+     3.785
+    ],
+    "speed_mps": 0.561,
+    "stride_m": 0.1478,
+    "cmd_speed_mps": 0.675,
+    "cmd_yaw_rate": 0.157,
+    "terminated": false
+   },
+   "2": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     3.699,
+     3.699
+    ],
+    "apex_m": [
+     0.07,
+     0.0676
+    ],
+    "slip_mps": [
+     0.0257,
+     0.0166
+    ],
+    "air_frac": [
+     0.574,
+     0.458
+    ],
+    "touchdowns_hz": [
+     3.586,
+     3.785
+    ],
+    "speed_mps": 0.874,
+    "stride_m": 0.2363,
+    "cmd_speed_mps": 1.002,
+    "cmd_yaw_rate": 0.032,
+    "terminated": false
+   },
+   "3": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     3.784,
+     3.784
+    ],
+    "apex_m": [
+     0.0712,
+     0.0699
+    ],
+    "slip_mps": [
+     0.0193,
+     0.0148
+    ],
+    "air_frac": [
+     0.558,
+     0.466
+    ],
+    "touchdowns_hz": [
+     3.586,
+     3.785
+    ],
+    "speed_mps": 0.853,
+    "stride_m": 0.2254,
+    "cmd_speed_mps": 0.982,
+    "cmd_yaw_rate": 0.08,
+    "terminated": false
+   },
+   "4": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     4.028,
+     4.016
+    ],
+    "apex_m": [
+     0.0659,
+     0.0483
+    ],
+    "slip_mps": [
+     0.012,
+     0.0092
+    ],
+    "air_frac": [
+     0.542,
+     0.462
+    ],
+    "touchdowns_hz": [
+     4.183,
+     3.984
+    ],
+    "speed_mps": 0.305,
+    "stride_m": 0.0758,
+    "cmd_speed_mps": 0.353,
+    "cmd_yaw_rate": 0.086,
+    "terminated": false
+   },
+   "5": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     3.906,
+     3.894
+    ],
+    "apex_m": [
+     0.0733,
+     0.0556
+    ],
+    "slip_mps": [
+     0.018,
+     0.0151
+    ],
+    "air_frac": [
+     0.546,
+     0.526
+    ],
+    "touchdowns_hz": [
+     3.984,
+     3.785
+    ],
+    "speed_mps": 0.51,
+    "stride_m": 0.1308,
+    "cmd_speed_mps": 0.597,
+    "cmd_yaw_rate": 0.006,
+    "terminated": false
+   },
+   "6": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     3.772,
+     3.772
+    ],
+    "apex_m": [
+     0.087,
+     0.0638
+    ],
+    "slip_mps": [
+     0.0201,
+     0.0242
+    ],
+    "air_frac": [
+     0.502,
+     0.57
+    ],
+    "touchdowns_hz": [
+     3.785,
+     3.586
+    ],
+    "speed_mps": 0.918,
+    "stride_m": 0.2434,
+    "cmd_speed_mps": 1.079,
+    "cmd_yaw_rate": 0.317,
+    "terminated": false
+   },
+   "7": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     3.906,
+     3.918
+    ],
+    "apex_m": [
+     0.0641,
+     0.0613
+    ],
+    "slip_mps": [
+     0.0195,
+     0.0156
+    ],
+    "air_frac": [
+     0.534,
+     0.478
+    ],
+    "touchdowns_hz": [
+     3.785,
+     3.984
+    ],
+    "speed_mps": 0.555,
+    "stride_m": 0.1419,
+    "cmd_speed_mps": 0.638,
+    "cmd_yaw_rate": 0.216,
+    "terminated": false
+   },
+   "8": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     3.918,
+     3.918
+    ],
+    "apex_m": [
+     0.0737,
+     0.0559
+    ],
+    "slip_mps": [
+     0.0193,
+     0.0118
+    ],
+    "air_frac": [
+     0.574,
+     0.47
+    ],
+    "touchdowns_hz": [
+     3.785,
+     3.785
+    ],
+    "speed_mps": 0.487,
+    "stride_m": 0.1243,
+    "cmd_speed_mps": 0.573,
+    "cmd_yaw_rate": 0.119,
+    "terminated": false
+   },
+   "9": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     4.077,
+     4.077
+    ],
+    "apex_m": [
+     0.0752,
+     0.0476
+    ],
+    "slip_mps": [
+     0.0181,
+     0.0105
+    ],
+    "air_frac": [
+     0.57,
+     0.462
+    ],
+    "touchdowns_hz": [
+     3.984,
+     4.183
+    ],
+    "speed_mps": 0.243,
+    "stride_m": 0.0596,
+    "cmd_speed_mps": 0.283,
+    "cmd_yaw_rate": 0.36,
+    "terminated": false
+   },
+   "10": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     4.26,
+     4.248
+    ],
+    "apex_m": [
+     0.0551,
+     0.0475
+    ],
+    "slip_mps": [
+     0.0115,
+     0.01
+    ],
+    "air_frac": [
+     0.542,
+     0.482
+    ],
+    "touchdowns_hz": [
+     4.183,
+     4.183
+    ],
+    "speed_mps": 0.357,
+    "stride_m": 0.0839,
+    "cmd_speed_mps": 0.383,
+    "cmd_yaw_rate": 0.102,
+    "terminated": false
+   },
+   "11": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     4.077,
+     4.077
+    ],
+    "apex_m": [
+     0.0647,
+     0.0578
+    ],
+    "slip_mps": [
+     0.034,
+     0.0102
+    ],
+    "air_frac": [
+     0.574,
+     0.454
+    ],
+    "touchdowns_hz": [
+     3.984,
+     4.183
+    ],
+    "speed_mps": 0.558,
+    "stride_m": 0.1369,
+    "cmd_speed_mps": 0.651,
+    "cmd_yaw_rate": 0.136,
+    "terminated": false
+   },
+   "12": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     3.857,
+     3.857
+    ],
+    "apex_m": [
+     0.0753,
+     0.0561
+    ],
+    "slip_mps": [
+     0.0194,
+     0.0118
+    ],
+    "air_frac": [
+     0.55,
+     0.494
+    ],
+    "touchdowns_hz": [
+     3.785,
+     3.984
+    ],
+    "speed_mps": 0.457,
+    "stride_m": 0.1185,
+    "cmd_speed_mps": 0.548,
+    "cmd_yaw_rate": 0.06,
+    "terminated": false
+   },
+   "13": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     3.735,
+     3.735
+    ],
+    "apex_m": [
+     0.0836,
+     0.0632
+    ],
+    "slip_mps": [
+     0.0196,
+     0.0135
+    ],
+    "air_frac": [
+     0.55,
+     0.534
+    ],
+    "touchdowns_hz": [
+     3.785,
+     3.785
+    ],
+    "speed_mps": 0.811,
+    "stride_m": 0.2171,
+    "cmd_speed_mps": 0.909,
+    "cmd_yaw_rate": 0.141,
+    "terminated": false
+   },
+   "14": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     4.077,
+     4.065
+    ],
+    "apex_m": [
+     0.0758,
+     0.0423
+    ],
+    "slip_mps": [
+     0.0224,
+     0.0083
+    ],
+    "air_frac": [
+     0.594,
+     0.426
+    ],
+    "touchdowns_hz": [
+     4.183,
+     3.984
+    ],
+    "speed_mps": 0.196,
+    "stride_m": 0.0481,
+    "cmd_speed_mps": 0.239,
+    "cmd_yaw_rate": 0.283,
+    "terminated": false
+   },
+   "15": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     4.138,
+     4.138
+    ],
+    "apex_m": [
+     0.0717,
+     0.0478
+    ],
+    "slip_mps": [
+     0.0244,
+     0.0077
+    ],
+    "air_frac": [
+     0.574,
+     0.45
+    ],
+    "touchdowns_hz": [
+     4.183,
+     3.984
+    ],
+    "speed_mps": 0.428,
+    "stride_m": 0.1034,
+    "cmd_speed_mps": 0.514,
+    "cmd_yaw_rate": 0.354,
+    "terminated": false
+   }
+  },
+  "summary": {
+   "envs": 16,
+   "envs_standing": 0,
+   "envs_terminated": 0,
+   "cadence_hz": [
+    3.906,
+    3.906
+   ],
+   "touchdowns_hz": [
+    3.785,
+    3.984
+   ],
+   "apex_m": [
+    0.0735,
+    0.057
+   ],
+   "slip_mps": [
+    0.0195,
+    0.0126
+   ],
+   "air_frac": [
+    0.554,
+    0.468
+   ],
+   "speed_mps": 0.5325,
+   "stride_m": 0.1338,
+   "cmd_speed_mps": 0.6175
+  },
+  "filmed": {
+   "3": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     3.784,
+     3.784
+    ],
+    "apex_m": [
+     0.0712,
+     0.0699
+    ],
+    "slip_mps": [
+     0.0193,
+     0.0148
+    ],
+    "air_frac": [
+     0.558,
+     0.466
+    ],
+    "touchdowns_hz": [
+     3.586,
+     3.785
+    ],
+    "speed_mps": 0.853,
+    "stride_m": 0.2254,
+    "cmd_speed_mps": 0.982,
+    "cmd_yaw_rate": 0.08,
+    "terminated": false
+   },
+   "1": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     3.796,
+     3.796
+    ],
+    "apex_m": [
+     0.0778,
+     0.0578
+    ],
+    "slip_mps": [
+     0.0156,
+     0.0163
+    ],
+    "air_frac": [
+     0.522,
+     0.53
+    ],
+    "touchdowns_hz": [
+     3.586,
+     3.785
+    ],
+    "speed_mps": 0.561,
+    "stride_m": 0.1478,
+    "cmd_speed_mps": 0.675,
+    "cmd_yaw_rate": 0.157,
+    "terminated": false
+   },
+   "6": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     3.772,
+     3.772
+    ],
+    "apex_m": [
+     0.087,
+     0.0638
+    ],
+    "slip_mps": [
+     0.0201,
+     0.0242
+    ],
+    "air_frac": [
+     0.502,
+     0.57
+    ],
+    "touchdowns_hz": [
+     3.785,
+     3.586
+    ],
+    "speed_mps": 0.918,
+    "stride_m": 0.2434,
+    "cmd_speed_mps": 1.079,
+    "cmd_yaw_rate": 0.317,
+    "terminated": false
+   },
+   "2": {
+    "window_s": [
+     1.0,
+     6.02
+    ],
+    "cadence_hz": [
+     3.699,
+     3.699
+    ],
+    "apex_m": [
+     0.07,
+     0.0676
+    ],
+    "slip_mps": [
+     0.0257,
+     0.0166
+    ],
+    "air_frac": [
+     0.574,
+     0.458
+    ],
+    "touchdowns_hz": [
+     3.586,
+     3.785
+    ],
+    "speed_mps": 0.874,
+    "stride_m": 0.2363,
+    "cmd_speed_mps": 1.002,
+    "cmd_yaw_rate": 0.032,
+    "terminated": false
+   }
+  },
+  "natural_gait_envs": [
+   1,
+   3
+  ]
+ },
  "timing": {
-  "sim_ms_mean": 42.37266123276265,
-  "sim_ms_median": 41.825749998679385,
-  "sim_ms_first": 95.65420899889432,
-  "sim_s_total": 12.75417103106156,
-  "rollout_s": 12.794464458005677,
-  "twin_s": 0.5173616249958286,
-  "record_wall_s": 26.543660791998263,
-  "env_build_s": 9.727746750002552
+  "sim_ms_mean": 41.26535573748189,
+  "sim_ms_median": 40.700582998397294,
+  "sim_ms_first": 65.61525000142865,
+  "sim_s_total": 12.42087207698205,
+  "rollout_s": 12.49636358400312,
+  "twin_s": 0.3700322089935071,
+  "record_wall_s": 16.455465917002584,
+  "env_build_s": 1.2575325409998186
  },
  "software": {
-  "metalsim": "687f3d7b1d+dirty",
+  "metalsim": "ef346e7efc+dirty",
   "warp": {
    "version": "1.18.0.dev20260917",
    "git": "4127c48183",
@@ -442,6 +1108,14 @@
  "hardware": {
   "machine": "arm64",
   "python": "3.13.7",
+  "power": {
+   "source": "Battery Power",
+   "battery_percent": 66,
+   "battery_state": "discharging",
+   "mode": "High Power",
+   "mode_setting": "powermode 2",
+   "at": "2026-10-31T04:51:18-0700"
+  },
   "model": "Mac16,6",
   "cpu": "Apple M4 Max",
   "memory_gb": 64,

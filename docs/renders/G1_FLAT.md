@@ -1,8 +1,8 @@
 # G1 flat-terrain walk: a metalsim render
 
-Unitree G1 walking on flat ground: Isaac Lab's G1 flat velocity task on metalsim (MuJoCo Warp on Metal), driven by a policy trained here with the task's PPO settings. This take was filmed on the 14-inch M4 Max on battery in Low Power Mode, so its Performance table is not a timing figure.
+Unitree G1 walking on flat ground: Isaac Lab's G1 flat velocity task on metalsim (MuJoCo Warp on Metal), driven by NVIDIA's published Isaac Lab 2.3 policy for the task (rsl_rl, iteration 1499, trained in PhysX), played without retraining. Rendered on the 14-inch MacBook Pro (Mac16,6), not in a timing run, so its Performance table is not a timing figure.
 
-**hero** (301 frames, 6.0 s at 50 fps): [video](g1_flat.mp4) (2.0 MB, H.264)
+**hero** (301 frames, 6.0 s at 50 fps): [video](g1_flat.mp4) (1.8 MB, H.264)
 
 ![hero, frame 75](g1_flat_still1.jpg)
 ![hero, frame 150](g1_flat_still2.jpg)
@@ -10,12 +10,12 @@ Unitree G1 walking on flat ground: Isaac Lab's G1 flat velocity task on metalsim
 
 ## What is shown
 
-- 16 envs simulated, filmed: 6, 2, 3, 0 (selection: automatic, the adapter ranking).
+- 16 envs simulated, filmed: 3, 1, 6, 2 (selection: automatic, the adapter ranking).
+  - env 3: terminated False, time_out False, base_z 0.000, level 0, col 0, end_frame -1
+  - env 1: terminated False, time_out False, base_z 0.000, level 0, col 0, end_frame -1
   - env 6: terminated False, time_out False, base_z 0.000, level 0, col 0, end_frame -1
   - env 2: terminated False, time_out False, base_z 0.000, level 0, col 0, end_frame -1
-  - env 3: terminated False, time_out False, base_z 0.000, level 0, col 0, end_frame -1
-  - env 0: terminated False, time_out False, base_z 0.000, level 0, col 0, end_frame -1
-- Policy: `runs/g1regress/ckpt14/flat_main_s0.pt` (iteration 500); physics: MuJoCo Warp BatchSim (metalsim.learn.g1_velocity).
+- Policy: `assets/isaac/pretrained/rsl_rl/Isaac-Velocity-Flat-G1-v0/checkpoint.pt` (iteration 1499); physics: MuJoCo Warp BatchSim (metalsim.learn.g1_velocity).
 
 ## Performance
 
@@ -23,17 +23,18 @@ Measured on the machine below; one frame = one policy step (Isaac Lab's `render_
 
 | stage | measurement |
 |---|---|
-| simulate (record) | 301 frames x 16 envs: 42 ms/frame mean (42 median, first 96 incl. graph capture), 12.8 s total; env build 9.7 s; stage wall 26.5 s |
-| render twin (CPU) | 47 geoms, 46 meshes, 0 textures; build 0.5 s, poses 0.0 s |
-| render: hero | 1280x720 (1x1 panels of 1280x720), tier 2 path tracing, 64 spp (16 passes x 4), 3 bounces, denoiser oidn; 0.24 s/frame mean (0.24 median, 0.26 max), 73.6 s for 301 frames; first frame: one pass 53 ms, 7 ms per further pass; set-up 1.0 s |
-| encode: hero | 3.1 s (master CRF 16 + docs copy CRF 22, libx264 slow) |
-| render: readme | 640x480 (1x1 panels of 640x480), tier 2 path tracing, 64 spp (16 passes x 4), 3 bounces, denoiser oidn; 0.11 s/frame mean (0.11 median, 0.12 max), 32.8 s for 301 frames; first frame: one pass 19 ms, 4 ms per further pass; set-up 0.8 s |
-| end to end | 2.3 min (record + render + encode, sum of stage walls) |
+| simulate (record) | 301 frames x 16 envs: 41 ms/frame mean (41 median, first 66 incl. graph capture), 12.4 s total; env build 1.3 s; stage wall 16.5 s |
+| render twin (CPU) | 47 geoms, 46 meshes, 0 textures; build 0.4 s, poses 0.0 s |
+| render: hero | 1280x720 (1x1 panels of 1280x720), tier 2 path tracing, 64 spp (16 passes x 4), 3 bounces, denoiser oidn; 0.25 s/frame mean (0.25 median, 0.28 max), 74.1 s for 301 frames; first frame: one pass 52 ms, 7 ms per further pass; set-up 1.0 s |
+| encode: hero | 4.7 s (master CRF 16 + docs copy CRF 22, libx264 slow) |
+| render: readme | 640x480 (1x1 panels of 640x480), tier 2 path tracing, 64 spp (16 passes x 4), 3 bounces, denoiser oidn; 0.11 s/frame mean (0.10 median, 0.13 max), 31.7 s for 301 frames; first frame: one pass 19 ms, 4 ms per further pass; set-up 0.9 s |
+| end to end | 2.1 min (record + render + encode, sum of stage walls) |
 
 ## Hardware and pins
 
 - Mac16,6 (Apple M4 Max, 40 GPU cores, 64 GB), macOS 27.0.1 (26A434).
-- metalsim `687f3d7b1d+dirty`; record stage (main venv): warp 1.18.0.dev20260917 (`4127c48183`), mujoco 3.14.0, mujoco_warp 3.14.0 (`07a51a63bc`), torch 2.14.0, numpy 2.5.3.
+- Power as each stage stamped it (`pmset -g batt` and `pmset -g`; `hardware.power`: the record stage's when it wrote rec.json, a render shot's at its first frame): record: on battery (66 %, discharging), power-mode setting High Power (pmset `powermode 2`), 2026-10-31 04:51 (-0700); render hero: on battery (66 %, discharging), power-mode setting High Power (pmset `powermode 2`), 2026-10-31 04:51 (-0700); render readme: on battery (62 %, discharging), power-mode setting High Power (pmset `powermode 2`), 2026-10-31 04:53 (-0700).
+- metalsim `ef346e7efc+dirty`; record stage (main venv): warp 1.18.0.dev20260917 (`4127c48183`), mujoco 3.14.0, mujoco_warp 3.14.0 (`07a51a63bc`), torch 2.14.0, numpy 2.5.3.
 - render stage (main venv): warp 1.18.0.dev20260917 (`4127c48183`), mujoco 3.14.0, numpy 2.5.3.
 
 ## Assets
@@ -43,46 +44,68 @@ Measured on the machine below; one frame = one policy step (Isaac Lab's `render_
 | Unitree G1 (g1_minimal.usd, Isaac 5.1 asset root) | NVIDIA Isaac Lab assets | NVIDIA Isaac Sim asset terms (fetched, not redistributed) | https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.1/Isaac/IsaacLab/Robots/Unitree/G1/g1_minimal.usd (`scripts/fetch_isaac_assets.sh`) |
 | Studio HDRI (poly_haven_studio, 2k) | Poly Haven | CC0 1.0 (Poly Haven; fetched, not committed) | https://polyhaven.com/a/poly_haven_studio (`scripts/fetch_polyhaven_assets.sh train`) |
 | Floor texture (laminate_floor_02, 1k diffuse) | Poly Haven | CC0 1.0 (Poly Haven; fetched, not committed) | https://polyhaven.com/a/laminate_floor_02 (`scripts/fetch_polyhaven_assets.sh train`) |
-| Policy checkpoint flat_main_s0.pt (trained on metalsim, 500 iterations; sha256 6fbfbfe8...) | this repository | this repository's licence | `runs/g1regress/ckpt14/flat_main_s0.pt` (`committed`) |
+| Policy: Isaac Lab 2.3 pretrained rsl_rl checkpoint (Isaac-Velocity-Flat-G1-v0, iteration 1499; sha256 fdf0f242...) | NVIDIA Isaac Lab | NVIDIA Isaac Sim asset terms (fetched, not redistributed) | https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.1/Isaac/IsaacLab/PretrainedCheckpoints/rsl_rl/Isaac-Velocity-Flat-G1-v0/checkpoint.pt (`scripts/fetch_isaac_assets.sh`) |
 
 ## How it was made
 
-**The policy.** `runs/g1regress/ckpt14/flat_main_s0.pt`, sha256
-`6fbfbfe8b950ab27e82afc912fbc3d5484c5b5050dc288cdecd32350b9917057` (675,619 bytes; the record stage writes the same
-hash into `rec.json`). Trained on main on 2026-10-13 on the 14-inch M4 Max with the documented G1 flat run's
-settings (`runs/ellip_default/run.sh`: `python -m metalsim.learn.g1_velocity 4096 flat train 500 <log> <checkpoint>
-0.0025 --reward_cfg flat --seed 0`): 4,096 envs, physics dt 2.5 ms with decimation 8 (50 Hz control), rollouts of 24
-steps, 500 iterations (49.2 M env steps), actor MLP 256-128-128 on a 123-dim observation, the elliptic contact
-default (`contact_cfg="recommended"`). Training log: `runs/g1regress/ckpt14/flat_main_s0.log` (its header has every
-setting; iteration 500: return +18.64, episode length 996 of 1,000 control steps).
-`docs/research/ppowarp_checkpoint_load_2026-10-13.md` compares the curve with the three documented elliptic-default
-seeds of 2026-09-26 (`runs/ellip_default/g1_flat_ellip_default_s{0,1,2}.log`, `docs/PARITY.md` §1.5: +17.0 to +17.4
-at iteration 500) and replays the policy on the 16-inch: 1,012 of 1,024 episodes run to the 20 s time-out, 17 falls
-over 1,200 control steps (`runs/g1regress/replay_main_flat_it500.log`; the replay checks that the loaded weights are
-the ones that run, after the PPOWarp load bug that note fixes; the film's adapter evaluates its own torch module and
-was never affected). The file is the training run's output, copied unchanged (the log's last line names it) and
-tracked so that a fresh clone can film. It replaces `runs/policies/g1_flat_1500.pt`, the earlier default, which has
-no training log and falls in 16 of 16 envs within 8 s (`docs/research/readme_media_plan_2026-10-31.md` section 2,
-defect 1).
+**The policy.** NVIDIA's published Isaac Lab 2.3 checkpoint for `Isaac-Velocity-Flat-G1-v0`: rsl_rl, iteration
+1499, the last of the task's 1,500 (`assets/isaac/g1_rsl_rl_ppo_cfg.py`, `G1FlatPPORunnerCfg`), trained by NVIDIA in
+Isaac Sim with PhysX. MetalSim plays it as published, without retraining or fine-tuning. Source:
+<https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.1/Isaac/IsaacLab/PretrainedCheckpoints/rsl_rl/Isaac-Velocity-Flat-G1-v0/checkpoint.pt>
+(the path Isaac Lab's `--use_pretrained_checkpoint` resolves, `isaaclab_rl/utils/pretrained_checkpoint.py`, under
+the Isaac 5.1 asset root), sha256 `fdf0f242bb8f3bcfc1aa9b7ff2761af4c014cf1cdc7e49242c9b92f3581720e7`, 2,027,170
+bytes. It is NVIDIA's file under NVIDIA's asset terms: `scripts/fetch_isaac_assets.sh` downloads it to
+`assets/isaac/pretrained/rsl_rl/Isaac-Velocity-Flat-G1-v0/checkpoint.pt` and checks the hash; `.gitignore` (`*.pt`)
+keeps it out of the repository. The record stage refuses a file whose sha256 is not the published one and writes the
+source URL, the published hash, the format and the iteration into `rec.json` `checkpoint` (`in_repo` false). The
+actor is an ELU MLP, 123 -> 256-128-128 -> 37 with no observation normaliser, read from the checkpoint's `actor.*`
+weights with `torch.load(weights_only=True)` (`adapters.load_g1_checkpoint`); the film plays the actor's mean.
 
-**Task settings.** `metalsim.learn.g1_velocity.G1VelocityTask(16, terrain="flat", seed=3)` with the settings saved
-in the checkpoint (`reward_cfg="flat"`, `contact_cfg="recommended"`, base and feet-slide velocities at the COM, no
-Isaac Lab 3 events; `rec.json` `adapter.saved_task_settings`) plus the one it does not
-save, physics dt 2.5 ms, from the training log's header (`G1_TRAIN_TASK_KW`). `rec.json` `adapter.task_resolved`
-lists what ran. The policy acts with its actor's mean. Commands are the task's own, as in training (Isaac's uniform
-velocity command with a heading target, resampled every 10 s). An episode ends on the task's terminations (torso
-contact above 1 N, a non-finite state) or its 20 s time-out. The film is 6 s: 301 frames, one per 20 ms policy step
-(50 fps).
+Our own checkpoint stays selectable and tracked: `--checkpoint runs/g1regress/ckpt14/flat_main_s0.pt` (500 iterations trained
+in MetalSim, its training log beside it) films it with the task settings that checkpoint saved, and this page's text
+then does not describe the policy that ran. The previous take of this page, in git history at `ef346e7e`, filmed it.
 
-**How the env was chosen.** 16 envs are simulated, and `envs="auto"` lets the adapter rank them (`G1Flat.rank`):
-first the envs whose first episode was not ended by a termination, then those whose pelvis never dropped more than
-0.25 m below its start (a robot down without torso contact, which the task does not terminate), then the longest
-path. The record stage refuses to film an env whose first episode terminated unless `--allow-early-end` is given.
-In this take none of the 16 terminated, the largest pelvis drop was 0.11 m, and env 6, filmed, walked the longest
-path: 5.61 m in 6 s (`rec.json` `adapter.first_episode`). Under "What is shown", `base_z`, `level` and `col` are
-written only when an episode ends; with `end_frame` -1 (still running when the film ends) their zeros are
-placeholders. That list is the top four of the ranking (the record keeps spares); both shots film one env, the first
-(`render.json` `envs`).
+**Task settings.** `metalsim.learn.g1_velocity.G1VelocityTask(16, terrain="flat", seed=3)` with the settings Isaac's
+checkpoint implies (`adapters.ISAAC_TASK_SETTINGS["flat"]`: `reward_cfg="flat"`, which carries `G1FlatEnvCfg`'s
+command ranges, sideways velocity within +-0.5 m/s) and the task's defaults (`contact_cfg="recommended"`, base and
+feet-slide velocities at the COM), plus physics dt 2.5 ms with decimation 8 (`G1_TRAIN_TASK_KW`). `rec.json`
+`adapter.task_resolved` lists what ran.
+The policy's observation is Isaac's policy group in Isaac's order (base linear and angular velocity, projected
+gravity, command, joint positions, joint velocities, last action; on rough terrain then the 187 height-scan rays in
+Isaac's "xy" order), computed by the task's own kernel. The joint blocks and the actions are in Isaac's joint order
+(PhysX's breadth-first articulation order, `adapters.ISAAC_G1_JOINTS`), mapped to MetalSim's by joint name as
+`metalsim/parity/side_by_side.py` does; the actions are Isaac's joint-position targets (scale 0.5 about the default
+pose). The task always applies Isaac's training observation noise, which Isaac's PLAY configuration turns off; on flat
+ground that changed no measured gait figure (`runs/readme_media/handoff/isaac-pretrained.md`, Verified B). Commands are the task's own, as in
+training (Isaac's uniform velocity command with a heading target, resampled every 10 s). An episode ends on the task's
+terminations (torso contact above 1 N, a non-finite state) or its 20 s time-out. The film is 6 s: 301 frames, one per
+20 ms policy step (50 fps).
+
+**How the env was chosen.** 16 envs are simulated, and `envs="auto"` lets the adapter rank them (`G1Flat.rank`).
+First come the envs whose first episode was not ended by a termination, then those whose pelvis never dropped more
+than 0.25 m below its start (a robot down without torso contact, which the task does not terminate). Next comes a
+natural-gait preference: envs whose lower swing apex of the two feet is at least the median of those candidates, and
+whose larger stance slip is at most their median (`adapters.natural_gait`; relative to the take's own envs, because no
+absolute reference exists). The longest path breaks ties. The record stage refuses to film an env whose first episode
+terminated unless `--allow-early-end` is given. In this take none of the 16 terminated and the largest pelvis drop was
+0.13 m. Envs 1 and 3 passed the gait preference (`rec.json` `gait.natural_gait_envs`), and env 3, filmed, walked the
+longer path: 4.84 m in 6 s (env 1: 3.18 m; `rec.json` `adapter.first_episode`). Under "What is shown", `base_z`,
+`level` and `col` are written only when an episode ends; with `end_frame` -1 (still running when the film ends) their
+zeros are placeholders. That list is the top four of the ranking (the record keeps spares); both shots film one env,
+the first (`render.json` `envs`).
+
+**Gait.** Measured by the record stage on every simulated env from 1 s to the end of the film (`rec.json` `gait`, with
+its definition; `record.GAIT_DEFINITION`). Env 3, filmed: 0.85 m/s at a commanded 0.98 m/s; 3.78 gait cycles per
+second on both feet (touch-downs 3.59 / 3.79 per second, left / right); swing apex 7.1 / 7.0 cm above the stance
+height; stance slip 0.019 / 0.015 m/s; airborne 56 / 47 % of the time; 0.225 m covered per gait cycle. Medians over
+the 16 envs: 0.53 m/s (commanded 0.62), 3.91 Hz, apex 7.3 / 5.7 cm, slip 0.019 / 0.013 m/s, 0.134 m per cycle.
+
+**The quick, short-stepping gait is Isaac's own.** Isaac Lab's G1 policies walk this way in PhysX too. Checkpoints of
+the flat task trained with Isaac Lab in Isaac Sim (this project's L4 training run, iterations 500 / 1000 / 1499,
+played in Isaac Sim at 0.5 m/s) step at 3.85 / 3.60 / 3.23 Hz with 0.108 / 0.110 / 0.123 m per gait cycle
+(`docs/research/speculative_contacts_2026-09-27.md`, Verdict 1 and the cadence table of §2). MuJoCo Warp adds 3.4 to
+5.9 % to the cadence of the same checkpoints under every contact setting measured (same note). NVIDIA's published
+checkpoint itself was not played in PhysX for this page: Isaac Sim does not run on this machine.
 
 **Camera.** Both shots track the pelvis as Isaac's `ViewerCfg(origin_type="asset_body", body_name="pelvis")` does,
 the tracked point smoothed by a centred 1 s moving average (`smooth_s`), with Kit's default perspective lens (36 deg
@@ -109,22 +132,23 @@ changes a pixel, so a re-recording into the same directory re-renders rather tha
 
 **README clip.** [g1_flat.webp](g1_flat.webp) is the `readme` shot from 0.5 s to 5.5 s (frames 25 to 274), resampled
 from 50 to 30 fps and written as MuJoCo Warp writes its README clips: 320x240 (Lanczos), lossy animated WebP from
-Pillow at quality 70, 33 ms per frame, looping; 150 frames. Command (re-run on 2026-10-31 from `runs/film/g1_flat`, byte
-for byte the same file):
-`python -m metalsim.render.film.encode webp runs/film/g1_flat/readme/frames docs/renders/g1_flat.webp --start 0.5
+Pillow at quality 70, 33 ms per frame, looping; 150 frames. Command, run from the repository root after the render
+stage: `python -m metalsim.render.film.encode webp runs/film/g1_flat/readme/frames docs/renders/g1_flat.webp --start 0.5
 --seconds 5 --src-fps 50 --fps 30`. The film tool's route, `python -m metalsim.render.film g1_flat --stage encode
 --shots readme --webp --webp-window 0.5:5`, uses the same encoder but names its output `g1_flat_readme.webp` and also
 writes a `g1_flat_readme.mp4` and a still.
 
-**This take, and where its timings come from.** Recorded, rendered and encoded on 2026-10-31 on the 14-inch M4 Max
-(Mac16,6) **on battery in Low Power Mode**, at metalsim `687f3d7b` plus the uncommitted film-tool fixes (hence
-`+dirty` in the pins). The Performance table above records how long each stage took there. It is not a timing figure:
-quote nothing on this page as MetalSim's speed. MetalSim's throughput figures are in `docs/PARITY.md` §1.4 and §1.8
-(16-inch, on power). Record and render ran as GPU-queue jobs of kind render, one at a time: `--stage record` into
-`runs/readme_media/film/g1_flat`, then `--stage render` for both shots there. The take was then moved to
-`runs/film/g1_flat` (the tool's default `--out`), where `--stage encode --shots hero` and `--stage doc` ran (CPU).
-Nothing was re-recorded. A new recording is another take of the same policy, not this one: the GPU rollout is not
-bitwise repeatable, so which env is filmed, and its path, can change.
+**This take, and where its timings come from.** Recorded, rendered and encoded on 2026-10-31 on the 14-inch MacBook
+Pro (Mac16,6), at metalsim `ef346e7e` plus the uncommitted switch to Isaac's checkpoints (hence `+dirty` in the pins).
+This was not a timing run: MetalSim's timing runs are made on the 16-inch through the GPU queue's timing kind
+(`scripts/gpu_run.sh <name> timing <minutes> -- <command>`, which waits for an idle device), and its throughput
+figures are in `docs/PARITY.md` §1.4 and §1.8. The Performance table above records how long each stage took here;
+quote nothing on this page as MetalSim's speed. Power, as the stages stamped it (`pmset -g batt` and `pmset -g`;
+"Hardware and pins" below): on battery and discharging at every stamp (66 % when the record stage wrote `rec.json` at 04:51, 66 % at the hero shot's first frame at 04:51 and 62 % at the readme shot's at 04:53, local time), with pmset's power-mode setting at High Power (`powermode 2`: the configured setting, which does not show that the machine ran in High Power Mode); the encode and doc stages stamp nothing. Record and render ran as GPU-queue jobs of kind render, one at a time,
+into `runs/film/g1_flat` (the tool's default `--out`): `--stage record`, then `--stage render` (both shots); then
+`--stage encode --shots hero`, the README WebP command above and `--stage doc` (CPU). A new recording is another take
+of the same policy, not this one: the GPU rollout is not bitwise repeatable, so which env is filmed, and its path, can
+change.
 
 ## Reproduce
 
