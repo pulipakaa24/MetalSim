@@ -49,7 +49,11 @@ CPU MuJoCo within the run-to-run spread (75.8 % of 240 robots vs 68.3-68.8 %; pi
 Isaac's G1 rough-task env step under random actions (its feet are meshes and now take GJK/EPA), 1.2-1.3x per PPO
 iteration in the 2.3.2 rough configs and, with Isaac Lab 3.0's geom gap, 1.7x after the follow-up of section 12
 (2.05x and dropped contacts before it); nothing for primitives. The heightfield margin now follows MuJoCo C main
-(section 7). Every rough-terrain result of Isaac's G1 on MuJoCo Warp (PARITY §1.5) needs a re-run (section 9).
+(section 7). Every rough-terrain result of Isaac's G1 on MuJoCo Warp (PARITY §1.5) needed a re-run (section 9). Re-run
+on the repaired kernel (section 13): the 2.3.2 rough preset's three seeds end within the seed spread of the old ones
+(+18.0 ± 2.4 at 1500, level 6.11, against +19.4 ± 3.1, 6.07; Isaac +14.1, 5.90) but climb the curriculum later
+(level 5.48 ± 0.09 at 1000 against 5.83 ± 0.21); `rough_il3` ends at +12.0, level 5.93 (was +8.4, 5.96; Isaac +14.5,
+5.80; one seed, initial reset added); transfer falls barely change. The Isaac-side and timing rows are pending.
 
 ## 2. Baseline, re-measured on the pinned fork (`8eb51fe`)
 
@@ -277,18 +281,24 @@ sends them through GJK/EPA. **Affected**: every rough-terrain number in PARITY �
 wall-cell transfer counts, the rough throughput rows, `test_hfield_mesh_contacts_match_mujoco_c`'s figures), the
 Isaac Lab 3.0 like-for-like rough runs (`docs/research/isaaclab3_like_for_like_2026-09-25.md` §6.8) and any film
 or evaluation of Isaac's G1 on the rough task. Not affected: flat-terrain results, Newton-backend results, the
-box-cell contacts, the terrain geometry and height scan. **estimated** size of the effect: unknown until re-run;
+box-cell contacts, the terrain geometry and height scan. **estimated** size of the effect (before the re-runs of
+section 13): unknown until re-run;
 the foot's contacts on random-rough and slope cells change in roughly one placement in five (missing contacts made
 the feet sink into bumps, which the policy may have learned to exploit or tolerate).
 
 Re-runs needed (after the pin bump), in order of cost:
 1. `tests/test_terrain.py` on the bumped pin (done here on the branch: 21 passed) and the rough rows of §1.4
-   (physics only / step / step + inference at 4096 envs; section 8.4 gives the relative cost).
+   (physics only / step / step + inference at 4096 envs; section 8.4 gives the relative cost). Tests: done again
+   in section 13; §1.4 rows: pending (the timing machine).
 2. Transfer of Isaac's rough checkpoints into MetalSim (`runs/g1_rough_transfer.jsonl` protocol; 7 / 24 falls before)
-   and the wall-cell transfer (14 / 96 before): no training needed, shows the size of the change first.
+   and the wall-cell transfer (14 / 96 before): no training needed, shows the size of the change first. Isaac's
+   checkpoints are not on this machine; section 13 measures the change on our old checkpoint and on NVIDIA's
+   pretrained rough policy instead.
 3. Rough training, three seeds x 1500 iterations on the 2.3.2 preset (+16.4 / +22.6 / +19.1 at 1500 before; Isaac
-   +14.1), then our checkpoints transferred to Isaac.
-4. The Isaac Lab 3.0 like-for-like rough run (`rough_il3`, +8.4 / level 5.96 before vs Isaac Newton +14.5).
+   +14.1), then our checkpoints transferred to Isaac. Training and the MetalSim-side transfers: done (section 13);
+   in Isaac: pending (the L4).
+4. The Isaac Lab 3.0 like-for-like rough run (`rough_il3`, +8.4 / level 5.96 before vs Isaac Newton +14.5). Done on
+   `787a5b3` (section 13).
 5. Films that put Isaac's G1 on rough terrain on MuJoCo Warp, and the g1_bumps cell's engine decision (MuJoCo Warp
    now falls like CPU MuJoCo there, so the cell could run on MetalSim's own physics).
 
@@ -449,3 +459,151 @@ commit. Still open: the fork's subgrid takes the mesh's tight horizontal bounds 
 margin (prisms beside a geom within the gap are not candidates; gap-zone contacts only, at MetalSim's margin 0);
 MuJoCo Warp's four-contact selection counts inactive gap-zone contacts against the cap; upstream issues not filed
 (MuJoCo Warp: horizon scan, face-buffer drop, heightfield margin shrink; #1845 covers the first).
+
+## 13. Re-runs on the repaired kernel (2026-10-31, night)
+
+The re-runs of section 9 that need neither the L4 nor the timing machine, run on the 14-inch MacBook Pro (Mac16,6)
+through the GPU queue, every job on AC power (battery 75-85 %, charging, powermode 2). The pipeline, the original
+commands and how each maps onto today's CLI: `runs/readme_media/handoff/rough-reruns.md`; job directory
+`runs/rough_rerun_2026-10-31/` (`status.jsonl`; `logs/<job>.out`, each with a provenance header; training logs
+`logs/<job>.log`; `transfer/`; checkpoints `ckpt/`; exports for Isaac `isaac_export/`); analysis
+`runs/readme_media/handoff/rough-parity.md` and `runs/readme_media/scratch/rough-parity/` (`analyze_training.py`,
+`analyze_transfer.py`). These paths are local to the machine that ran them. "Old" is the record PARITY cites
+(plane-path kernel, 2026-09-25/26 code), "new" these runs. **measured** unless marked.
+
+| job | MuJoCo Warp loaded (job header) | outcome |
+|---|---|---|
+| tests | `93e5ce1` | `tests/test_terrain.py` 21 passed (heightfield-mesh test: min normal z 0.912, max penetration 5.2 mm vs MuJoCo C 4.6 mm, pelvis within 1 mm, as section 8.2); `tests/test_solver_presets.py tests/test_g1_task_terms.py` 38 passed, 4 skipped |
+| transfers, the same checkpoints on both kernels | `8eb51fe` (git archive, plane path) and `93e5ce1` | all exit 0; overflow flags at exit: the line-search cap `LS_ITERATIONS` only, no capacity flag |
+| 2.3.2 rough preset, seeds 0 / 1 / 2, 1500 iterations each; seed 0's checkpoints through both transfer protocols | `93e5ce1` | all exit 0; 0 blow-ups, 0 dropped rows, no capacity flag, `EPA_HORIZON` 0; solver caps, as in the old seed-0 run: `LS_ITERATIONS` at every log point, `ITERATIONS` at 198-237 of 1500 (old seed 0: 82) |
+| exports of seeds 0-2 for Isaac | `93e5ce1` (seeds 0, 1), `787a5b3` (seed 2) | the shared checkout was synced to the pin at 21:48:28, 15 s after seed 2's training ended and 8 min before its export; the export reads only the checkpoint and MuJoCo C's model (`metalsim/parity/export_policy.py:2-3`), so MuJoCo Warp's version does not enter |
+| `rough_il3` seed 0, 1500 iterations | `787a5b3` (git archive) | exit 0; 67 blow-ups (below), no capacity flag, `EPA_HORIZON` 0 |
+
+The 2.3.2 seeds and the transfers ran on `93e5ce1`, not on the pin: without a margin or gap EPA never runs on
+inflated shapes, and `787a5b3` changes such contacts only at non-loop horizons and full face buffers (section 12), so
+these results stand for the pin (**estimated** from section 12's static and replay sets; not re-run on `787a5b3`).
+
+Deviations from the originals and limits of the comparison (the hand-off has the details):
+- Every training run starts from the task reset (`--initial_reset 1`). The originals started each env's first episode
+  at `qpos0` (PARITY §1.5, start-state defect), which on the repaired kernel overflows `njmax` on the box cells (`NEFC`
+  at iteration 1 of a 4096-env sizing run). The first ~12 iterations differ by design, and `rough_il3`'s early
+  transient (823 blow-ups at iterations 10-14, caused by that start) cannot recur.
+- `EPA_HORIZON` would have been reported instead of aborting the run (`runs/rough_rerun_2026-10-31/train_wrap.py`);
+  it never occurred.
+- Seed 1's feet-slide velocity point ("origin") is inferred from commit times, not proven.
+- Old logs against new runs is not a clean A/B: the code also changed at float level since 2026-09-25 (factorization,
+  fused launches, earlier pin moves), Metal training is not run-to-run deterministic (isaaclab3 note §6.4b), and no
+  plane-path training control was run. The transfer jobs carry their own A/B: the same checkpoints on both kernels on
+  today's code.
+- The transfers read the base velocity at the pelvis COM (today's default); the 2026-09-25 record predates that option
+  (frame origin, from the commit times). On the plane path today's protocol reproduces the record for our old
+  checkpoint to within 0.07 m (level 3) and 0.20 m (level 6) of travel per env, which bounds the effect.
+- `rough_il3` repeats the corrected run of isaaclab3 note §6.8 (`il3fix_rough_s0`, drive effort clamp on the actuator)
+  with the initial reset added. It is not the final run with both trainer fixes (PARITY §1.8: +13.7 / level 5.99),
+  whose log is not on this machine.
+
+**2.3.2 rough preset, three seeds** (old `runs/g1_rough_ppowarp_fixed.log`, `_seed1.log`, `_seed2.log`, seed 2 cut
+to its second start; Isaac `runs/parity/isaac/rough/isaac_train_g1_rough_terms.txt`; MetalSim values at the
+iteration, as PARITY's table; mean ± sample sd over the three seeds):
+
+| iteration | return, old: s0 / s1 / s2; mean ± sd | return, new | terrain level, old | terrain level, new | Isaac: return / level |
+|---|---|---|---|---|---|
+| 300 | +4.0 / −0.4 / −0.1; +1.2 ± 2.5 | +0.8 / −1.8 / −2.6; −1.2 ± 1.8 | 1.61 / 1.29 / 0.67; 1.19 ± 0.48 | 1.18 / 1.05 / 0.58; 0.94 ± 0.31 | +2.1 / 2.19 |
+| 500 | +8.4 / +4.2 / +5.0; +5.9 ± 2.3 | +5.4 / +3.7 / +2.9; +4.0 ± 1.3 | 4.41 / 3.41 / 3.05; 3.62 ± 0.70 | 3.53 / 3.25 / 2.46; 3.08 ± 0.56 | +5.8 / 4.83 |
+| 1000 | +11.3 / +11.0 / +14.3; +12.2 ± 1.8 | +9.7 / +11.4 / +10.3; +10.5 ± 0.9 | 6.01 / 5.60 / 5.88; 5.83 ± 0.21 | 5.51 / 5.56 / 5.38; **5.48 ± 0.09** | +5.4 / 5.96 |
+| 1500 | +16.4 / +19.1 / +22.6; +19.4 ± 3.1 | +16.0 / +20.6 / +17.4; **+18.0 ± 2.4** | 6.10 / 6.03 / 6.08; 6.07 ± 0.04 | 6.13 / 6.11 / 6.11; **6.11 ± 0.01** | +14.1 / 5.90 |
+
+- **At 1500 the result holds within the seed spread**: return −1.4 (inside either side's sd), level +0.05 at the
+  curriculum's ceiling of about 6.1; every seed stays above Isaac's +14.1 / 5.90. Episode lengths are 991-1000 at
+  1000 and 1500 on both kernels.
+- **The curriculum climbs later on the repaired kernel.** Every seed's level is lower at 300, 500 and 1000; at 1000 the
+  mean is 0.35 levels lower, more than either side's sd (Welch p = 0.09 with three seeds: suggestive, not shown).
+  First iteration after 100 at level 5.5: 983 / 956 / 1115 against 598 / 940 / 754; at 6.0: 1425 / 1237 / 1398
+  against 996 / 1342 / 1082; at 5.9, Isaac's level from iteration 1000 on: 1338 / 1197 / 1337 against 910 / 1257 /
+  1004. Seed 0 (heightfield on every cell, so the fix acts on all of them) and seed 2 (box cells
+  exact, the fix only on random rough and slopes) lag most, seed 1 least: three seeds cannot separate a terrain
+  effect from the seed spread.
+- Physics health, from the training monitor (`metalsim/learn/monitor.py:113-120`: deepest contact over all worlds at
+  each log point when deeper than 2 cm, as the kernel under test reports it): seed 0, iterations 1000-1500, median 5.4
+  cm and at most 8.4 cm against 8.0 and 21.8 cm on the plane path; seeds 1 and 2, whose stair and box cells collide
+  with exact boxes, unchanged (median 6.7 / 6.4 cm against 6.8 / 6.4 cm). No blow-ups in either version; touch forces
+  above 50× the robot's weight only on the box-cell seeds (282 / 306 log points against 602 / 440).
+
+**`rough_il3`, seed 0** (old `runs/il3/il3fix_rough_s0.log` and `runs/il3/curves_il3fix_rough.md`; new through
+`scripts/diagnostics/g1_learning_curves.py il3 rough <log> --at 1000,1499`; Isaac Lab 3.0 Newton / MuJoCo Warp
+`runs/parity3/isaac/train/train_rough_newton_mjwarp_terms.txt`; MetalSim ±5-iteration means in brackets):
+
+| at iteration 1499 unless stated | Isaac Newton | old: plane path, `qpos0` start | new: repaired kernel, task reset |
+|---|---|---|---|
+| return | +14.5 | +8.4 (+8.2) | **+12.0 (+11.5)** |
+| return at 1000 | +8.9 | +4.4 (+4.0) | +7.1 (+6.5) |
+| terrain level | 5.80 | 5.96 | 5.93 |
+| linear / yaw tracking | 0.811 / 0.808 | 0.745 / 0.681 | 0.780 / 0.730 |
+| joint-acceleration term (× Isaac's) | −0.0264 | −0.0600 (2.3×) | −0.0531 (2.0×) |
+| falls, share of episode ends | 2.9 % | 6.9 % | 3.3 % |
+| blow-ups (non-finite episodes) | none logged | 1,010: 823 at iterations 10-14, 187 from iteration 751 | 67, from iteration 1012 |
+
+The return gap to Isaac narrows from 6.1 to 2.5 points, falls come down to Isaac's rate and half the yaw-tracking gap
+closes. One seed on each side and a different start: the 3.6-point difference is about one seed sd of the 2.3.2 runs
+(2.4-3.1 at 1500), so it is not separable from seed spread or from the start-state change (**estimated**). The late
+blow-ups fall from 187 to 67; isaaclab3 note §6.10 traced late ones to the drive's effort clamp on the actuator, which
+both runs keep; these 67 are not classified.
+
+**Transfer** (`scripts/diagnostics/g1_rough_transfer.py`: levels 3 and 6, command 0.5 m/s, 400 control steps, mean
+action; fall = pelvis less than 0.3 m above the local ground at the end; mean travel x per cell over envs and levels,
+in m: pyramid stairs / inverted stairs / boxes / random rough). Protocol A, heightfield collision and grid scan on every
+cell, one env per cell and level (old record `runs/g1_rough_transfer.jsonl`):
+
+| checkpoint | kernel | falls | mean travel (m) |
+|---|---|---|---|
+| our seed 0, iteration 1500 (2026-09-25) | record | 0 / 8 | 4.09 / 2.72 / 3.64 / 3.74 |
+| | plane path, today's code | 0 / 8 | 4.12 / 2.72 / 3.73 / 3.72 |
+| | repaired | 0 / 8 | 2.84 / 2.70 / 3.10 / 2.94 |
+| NVIDIA's pretrained rough policy (iteration 2999), in place of Isaac's missing checkpoints | plane path | 0 / 8 | 4.40 / 2.59 / 2.96 / 4.17 |
+| | repaired | 0 / 8 | 3.30 / 3.74 / 3.47 / 3.84 |
+| our seed 0 (2026-09-25), iterations 500 / 1000 / 1500 | record | 0 / 24 | 3.86 / 1.76 / 2.80 / 2.94; 2.42 / 2.40 / 2.72 / 2.91; 4.09 / 2.72 / 3.64 / 3.74 |
+| seed 0 re-trained, iterations 500 / 1000 / 1500 | repaired | 0 / 24 | 0.30 / 1.63 / −0.93 / −0.32; 3.78 / 1.22 / 3.23 / 3.17; 3.86 / 2.61 / 3.27 / 3.12 |
+
+Protocol B, `boxes_local` collision and exact scan (stair and box cells collide with exact boxes; the heightfield remains
+under random rough), 8 starts per cell and level (old record `runs/terrain_walls/transfer_reps.jsonl`, rows with
+`boxes_local` and `exact`):
+
+| checkpoint | kernel | wall-cell falls (inverted stairs + boxes) | mean travel (m) |
+|---|---|---|---|
+| our seed 0, iteration 1500 (2026-09-25) | record | 1 / 32 | 2.28 / 3.79 / 3.71 / 3.72 |
+| | plane path, today's code | 0 / 32 | 2.34 / 4.11 / 3.76 / 3.71 |
+| | repaired | 1 / 32 | 2.18 / 4.01 / 3.91 / 2.97 |
+| NVIDIA's pretrained rough policy | plane path | 0 / 32 | 3.20 / 3.83 / 2.99 / 3.94 |
+| | repaired | 1 / 32 | 3.18 / 3.72 / 2.94 / 3.17 |
+| our seed 0 (2026-09-25), iterations 500 / 1000 / 1500 | record | 4 / 96 | 2.23 / 2.75 / 3.25 / 3.22 |
+| seed 0 re-trained, iterations 500 / 1000 / 1500 | repaired | 0 / 96 | 2.60 / 2.57 / 2.45 / 1.97 |
+
+No fall on pyramid stairs or random rough in any B row. Reading (small samples: report counts, not rates):
+- Falls barely move: none in protocol A on either kernel; in B one wall-cell fall per checkpoint on the repaired
+  kernel and none on the plane path. The re-trained seed 0 falls 0 / 24 in A (record 0 / 24) and 0 / 96 on the wall
+  cells in B (record 4 / 96).
+- Run-to-run spread: the same protocol run twice on `93e5ce1` (the pipeline's smoke and full runs, level 3) differs by
+  up to 0.51 m of travel per env, on the plane path by 0.03 m; the full protocol on `93e5ce1` and on the EPA fix
+  (gap-0 contacts the same but for non-loop horizons) differs by up to 0.33 m per cell mean
+  (`runs/readme_media/handoff/hfield-epa.md`, job V2). Changes beyond that: on heightfield cells the repaired contacts
+  shorten the travel of policies trained elsewhere, our old checkpoint by 1.28 m on pyramid stairs and 0.77 m on random
+  rough in A and 0.74 m on random rough in B, NVIDIA's by 1.10 m on pyramid stairs in A and 0.77 m on random rough in
+  B (its other A cells: random rough −0.33 m, boxes +0.51 m, inverted stairs +1.15 m). On B's box-built cells, which
+  the fix does not touch, the change is at most 0.16 m per cell, as expected.
+- The re-trained iteration 1500 on the repaired kernel (A) travels 3.86 m on pyramid stairs against the old
+  checkpoint's 2.84 m there (4.12 m on its own kernel); on the other three cells the two are within 0.2 m. The
+  re-trained iteration 500 hardly moves forward (−0.9 to +1.6 m per cell; the 2026-09-25 one walked
+  1.8-3.9 m), in line with its lower training level at 500 (3.53 against 4.41).
+
+**Not re-run here** (PARITY keeps these marked, with what each waits for):
+- Isaac's own checkpoints in MetalSim (A: 7 / 24 falls; B: 47 / 96 on the heightfield, 14 / 96 on the exact surface):
+  `model_500/1000/1499.pt` of Isaac's 2026-09-25 rough run are not on this machine (only `params/`); they may still be
+  on the L4.
+- Our checkpoints played in Isaac (12 / 24): needs the L4; the re-trained seeds' exports (iterations 500 / 1000 /
+  1500) are in `runs/rough_rerun_2026-10-31/isaac_export/metalsim_ckpts_rough/`.
+- The rough throughput rows of PARITY §1.4 and every training throughput: the timing machine (16-inch) only; the
+  14-inch figures in these logs are not performance figures. Section 12's per-iteration ratios remain the indicative
+  cost.
+- The per-term means at iteration 1000 of the 2.3.2 run (PARITY §1.5) and the 150-iteration smoke run.
+- The 2.3.2 rough run under the elliptic default (+13.7 / 6.10) and the final `rough_il3` run with both trainer fixes
+  (+13.7 / 5.99): not part of this pipeline.
