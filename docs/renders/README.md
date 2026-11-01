@@ -21,10 +21,11 @@ Warp does. Every cell is a lossy animated WebP, 320x240, looping, written by Pil
 the source, Lanczos downscale, one `.json` beside the output with the crop, window, frame count, PSNR against the
 source and the exact command. Those `.json` files, the frame directories and the scratch work are in
 `runs/readme_media/`, which stays local (gitignored); the commands are copied below. On 2026-10-31 every encode
-command below, and the chart's, was re-run from its source and gave a byte-identical file (the G1 Unitree, G1 bumps,
-TRON1 and SO-101 cells late that day, `runs/readme_media/handoff/readme-rework.md` and `readme-finish.md`; the others
-earlier, `runs/readme_media/handoff/provenance-docs.md`); the commands that record or render were not re-run. Paths
-are from the repository root.
+command below, and the chart's, was re-run from its source and gave a byte-identical file (for the cells made before
+that day, `runs/readme_media/handoff/provenance-docs.md`); the commands that record or render were not re-run. On
+2026-11-01 the TRON1 and SO-101 cells were rendered again from their recordings, after a film-tool fix: a look's colours (the
+ground texture's tint, `LookCfg.materials`) now replace a geom's own `rgba`, which MuJoCo otherwise draws instead.
+Their encode commands were then run twice, with byte-identical output. Paths are from the repository root.
 
 No timing figure comes from these media. The G1, TRON1 and SO-101 films were recorded and rendered on the 14-inch
 MacBook Pro (Mac16,6), not in timing runs (MetalSim's timing runs are made on the 16-inch through `scripts/gpu_run.sh <name> timing
@@ -52,7 +53,8 @@ Earlier cells, kept with their media in this directory but no longer on the fron
   150 frames at 33 ms, 0.63 MB.
 - **Source:** the `readme` shot of `runs/film/g1_unitree/` (`readme/frames`, local; `rec/rec.json` and
   `readme/render.json` tracked). The recording is the 15:52 re-take on the pinned MuJoCo Warp `8eb51fe`; the frames
-  are its 21:48 re-render at the floor's real size (`runs/readme_media/handoff/revalidate.md`, `rerender-1.md`).
+  are its 21:48 re-render at the floor's real size ([G1_UNITREE.md](G1_UNITREE.md), "This take";
+  `runs/readme_media/handoff/revalidate.md`).
 - **Reproduce:** Unitree's files first, `scripts/fetch_unitree_rl_gym.sh` (pinned commit, not in the repository). The
   take, as made on 2026-10-31 (GPU-queue jobs of kind render, then CPU stages):
   ```
@@ -139,12 +141,13 @@ Earlier cells, kept with their media in this directory but no longer on the fron
   nominal realism settings (command and sensor latency, quantized encoders, joint friction, IMU noise, a 1.5 kg sensor
   pack), unchanged: after a 3 s standing pre-roll, drive at 1.0 m/s, turn left, slow down, stop, each command change
   ramped over 0.5 s. 0 of 16 robots fell over 8 s; RMS tracking error 0.27 m/s and 0.14 rad/s; the filmed robot is the
-  most typical tracker. Path traced at tier 2 under Poly Haven's `machine_shop_02`, on `concrete_floor_worn_001` at
-  its real 3 m tile. 0.5-5.5 s of a 7 s take, 150 frames at 33 ms, 1.02 MB.
+  most typical tracker. The robot in its real colours (black; LimX's description files colour it white). Path traced
+  at tier 2 under Poly Haven's `machine_shop_02`, on `concrete_floor_worn_001` at its real 3 m tile and in its own
+  colours, at a grey card's exposure. 0.5-5.5 s of a 7 s take, 150 frames at 33 ms, 0.91 MB.
 - **Source:** the `readme` shot of `runs/film/tron1/` (`readme/frames`, local; `rec/rec.json` and `readme/render.json`
   tracked).
 - **Reproduce:** `pip install -e ".[tron1]"` (onnxruntime) and `scripts/fetch_polyhaven_assets.sh heldout`. The take,
-  as made on 2026-10-31:
+  as made (recorded on 2026-10-31, these frames rendered on 2026-11-01):
   ```
   scripts/gpu_run.sh <name> render 15 -- .venv/bin/python -m metalsim.render.film tron1 --stage record
   scripts/gpu_run.sh <name> render 15 -- .venv/bin/python -m metalsim.render.film tron1 --stage render
@@ -165,11 +168,12 @@ Earlier cells, kept with their media in this directory but no longer on the fron
   Warp. Scripted, not learned; the box pose comes from the simulator. 100/100 seeds lift on MuJoCo Warp and on CPU
   MuJoCo; the filmed seed, 10051, is typical (lifts at 2.26 s, no retry). The box tilts with the hand, which the lift
   pitches by about 36 deg, as real teleoperated lifts do; the grasp comes down 26-28 deg off vertical (real operators:
-  4-13 deg) and the closing jaw tips the box on the table. Path traced at tier 2. 0-5 s of a 6 s take, 150 frames at
-  33 ms, 0.66 MB.
+  4-13 deg) and the closing jaw tips the box on the table. Path traced at tier 2, the wooden table top in its
+  texture's own colours at its real size. 0-5 s of a 6 s take, 150 frames at 33 ms, 0.69 MB.
 - **Source:** the `readme` shot of `runs/film/so101_lift_deploy/` (`readme/frames`, local; `rec/rec.json` and
   `readme/render.json` tracked).
-- **Reproduce:** the take, as made on 2026-10-31 (record and render as GPU-queue jobs of kind render):
+- **Reproduce:** the take, as made (recorded on 2026-10-31, these frames rendered on 2026-11-01; record and render as
+  GPU-queue jobs of kind render):
   ```
   scripts/gpu_run.sh <name> render 20 -- .venv/bin/python -m metalsim.render.film so101_lift_deploy --stage record
   scripts/gpu_run.sh <name> render 20 -- .venv/bin/python -m metalsim.render.film so101_lift_deploy --stage render
