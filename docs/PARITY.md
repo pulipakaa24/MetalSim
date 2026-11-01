@@ -66,7 +66,7 @@ loaded through `metalsim.scene.usd_to_mjcf`.
 ### 1.4 Throughput on the G1 task (Isaac's protocol, 4096 envs)
 
 **2026-10-31:** every G1 rough-terrain number in this section was measured on MuJoCo Warp's plane-path heightfield
-kernel (fork pin `8eb51fe` and earlier, §1.6). The pin is now `93e5ce1`, where the G1's mesh feet take the repaired
+kernel (fork pin `8eb51fe` and earlier, §1.6). The pin is now `787a5b3` (`93e5ce1` plus the EPA follow-up of the research note's §12), where the G1's mesh feet take the repaired
 GJK/EPA path; on the 14-inch MacBook Pro on battery that cost about 15 % of the rough env step (an indicative ratio,
 not a performance figure: `docs/research/hfield_contacts_2026-10-31.md` §8.4). The rough rows keep their numbers and
 are marked "plane-path kernel; re-run pending (2026-10-31)"; flat rows are unaffected (no heightfield).
@@ -262,7 +262,7 @@ timing queue on the M4 Max, idle GPU logged, 4096 envs, 2.5 ms x 8, `contact_cfg
 like-for-like rough table and its three seeds, per-term means, the transfer tables in both directions and the
 wall-cell transfer counts) was measured on the plane-path heightfield kernel, which missed foot contacts on random-rough
 and slope cells (no contact in 178 of 1000 touching foot placements, §1.6; `docs/research/hfield_contacts_2026-10-31.md`
-§9). The MuJoCo Warp pin is now `93e5ce1`; these results keep their numbers, marked "plane-path kernel; re-run pending (2026-10-31)". Isaac's own
+§9). The MuJoCo Warp pin is now `787a5b3`; these results keep their numbers, marked "plane-path kernel; re-run pending (2026-10-31)". Isaac's own
 runs and the flat results are unaffected.
 
 **Two defects found by running Isaac's full 1,500 iterations, both now fixed.**

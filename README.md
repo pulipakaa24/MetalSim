@@ -91,7 +91,7 @@ git clone https://github.com/pulipakaa24/MetalSim && cd MetalSim
 python3.12 -m venv .venv && source .venv/bin/activate     # uv only: "$(uv python find 3.12)" -m venv .venv
 pip install -e ".[full]"                   # full = test + newton (MPM in BatchSim, Newton engine) + rslrl + tron1
 scripts/setup_warp.sh                      # replaces PyPI's warp-lang with the Warp fork (upstream/warp-metalsim)
-pip install -e "git+https://github.com/pulipakaa24/mujoco_warp@93e5ce18e76854c430ce669314af00ddceb92147#egg=mujoco-warp" "mujoco>=3.14,<3.15"
+pip install -e "git+https://github.com/pulipakaa24/mujoco_warp@787a5b3a37acc2551ffc8a2c1af1e9781d76723f#egg=mujoco-warp" "mujoco>=3.14,<3.15"
 scripts/fetch_isaac_assets.sh              # NVIDIA's G1 and Franka-Pour assets, fetched from NVIDIA, not redistributed
 git clone --depth 1 https://github.com/google-deepmind/mujoco_menagerie upstream/mujoco_menagerie   # robot models
 pytest tests -q
@@ -109,7 +109,7 @@ model and asset locations can be moved with `MENAGERIE` (default `upstream/mujoc
 The MuJoCo Warp commit is pinned (the head of the fork's branch `metalsim` on 2026-10-31), as Warp's in
 `scripts/setup_warp.sh` and Newton's in `pyproject.toml`. Without access to the fork: clone
 google-deepmind/mujoco_warp, `git checkout 88af9cc` (v3.14.0), `git apply` MetalSim's
-`patches/mujoco_warp/metalsim-93e5ce1.diff` (the whole branch as one diff) and `pip install -e` that checkout.
+`patches/mujoco_warp/metalsim-787a5b3.diff` (the whole branch as one diff) and `pip install -e` that checkout.
 After a pin change, run the pip line again, or `scripts/fork_sync.sh` for fork checkouts kept in `upstream/`;
 `tests/test_fork_pins.py` fails while the installed MuJoCo Warp or Warp checkout is not at its pin.
 The `mujoco<3.15` on that line keeps pip from moving MuJoCo past 3.14: the fork reads `MjModel.flex_internal`,
@@ -258,7 +258,7 @@ first four commits plus the graph-capture sort; merged into `metalsim`.
 
 [github.com/pulipakaa24/mujoco_warp](https://github.com/pulipakaa24/mujoco_warp), branch
 [`metalsim`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim), head
-[`93e5ce1`](https://github.com/pulipakaa24/mujoco_warp/commit/93e5ce18e76854c430ce669314af00ddceb92147) (2026-10-31, the commit the install pins;
+[`787a5b3`](https://github.com/pulipakaa24/mujoco_warp/commit/787a5b3a37acc2551ffc8a2c1af1e9781d76723f) (2026-10-31, the commit the install pins;
 the results on heightfields before 2026-10-31 were produced with the plane-path kernel, up to
 [`8eb51fe`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624);
 the rigid-body results before the elliptic-cone work were produced at
@@ -317,6 +317,18 @@ DeepMind's MuJoCo Warp v3.14.0 (`88af9cc`) plus the Metal device patch by David 
   the penetrating-prisms filter is behind a module flag that restores the previous form (`HFIELD_PLANE_CONTACTS=True`:
   the mesh plane path). Rough-terrain results of Isaac's G1 on MuJoCo Warp before this pin are pending a re-run
   ([PARITY §1.6](docs/PARITY.md#16-rough-terrain-mujoco-warps-heightfield-contacts-found-defective-and-patched)).
+- EPA's horizon and the heightfield margin as in MuJoCo C (`439b808` … `787a5b3`, 2026-10-31; research note §12). With
+  a geom gap (Isaac Lab 3.0's like-for-like rough config, 1 cm per geom) the previous bullet's commits overflowed EPA's
+  24-edge horizon buffer in a few worlds per run (`EPA_HORIZON`, the contact dropped): EPA tested each face on its own,
+  so rounding could delete faces not connected to the closest one. Such a scan is now undone and the region grown from
+  the closest face through shared edges, as MuJoCo C does; the buffer holds every edge of EPA's largest polytope
+  (`3 (5 + ccd_iterations) - 6`); a horizon that still cannot be built gives no contact, as MuJoCo C on horizon
+  failure; a full face buffer keeps the closest face, as in C (it dropped the contact). Heightfield prisms with a
+  margin or gap run GJK on the uninflated shapes first and EPA only when they overlap, as MuJoCo C's `mjc_ccd`
+  (`collision_gjk.HFIELD_MARGIN_SHRINK`, read at import): in that config 6.5–6.8 → 1.2–1.3 EPA calls per G1 foot pair,
+  and exact distances for prisms within the gap. Without a margin or gap only scans whose horizon was not one loop and
+  full face buffers change: bitwise unchanged on the research note's §8.1 contact checks and on 20,000 G1-foot
+  placements on box stairs.
 
 Branch [`metalsim-flex`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-flex), head
 [`fc1d5ee`](https://github.com/pulipakaa24/mujoco_warp/commit/fc1d5eef8f9045309087bc822f36c1c62a7214a2) (code

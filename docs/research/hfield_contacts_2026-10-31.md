@@ -9,9 +9,9 @@ from the cited source; **estimated** = our judgement.
 
 Code: fork branch `metalsim-hfield-contacts` (worktree `runs/readme_media/scratch/hfield-contacts/mjw`) on `8eb51fe`
 (the pinned `metalsim` head); full diff `runs/readme_media/handoff/hfield-contacts.patch`. **Landed 2026-10-31:** the
-fork's `metalsim` was fast-forwarded to it (`93e5ce1`) and MetalSim pins that commit; the six commits are
-`patches/mujoco_warp/0018-0023` (on `8eb51fe`), the whole branch `patches/mujoco_warp/metalsim-93e5ce1.diff` (on
-v3.14.0 `88af9cc`). The scratch paths cited below (`runs/readme_media/scratch/hfield-contacts/`) are local to the
+fork's `metalsim` was fast-forwarded to it (`93e5ce1`), then to the follow-up of section 12 (`787a5b3`), which
+MetalSim pins; the six commits are `patches/mujoco_warp/0018-0023` (on `8eb51fe`), the follow-up's eight `0024-0031`
+(on `93e5ce1`), the whole branch `patches/mujoco_warp/metalsim-787a5b3.diff` (on v3.14.0 `88af9cc`). The scratch paths cited below (`runs/readme_media/scratch/hfield-contacts/`) are local to the
 machine that ran them and are not in the repository. Sources:
 [MJW] MuJoCo Warp, the fork at `8eb51fe` and upstream `gdm/main` `d41a47c0` (2026-10-31);
 [C] MuJoCo C 3.14.0 sources (`runs/readme_media/scratch/hfield-contacts/src_c/`), the version installed here;

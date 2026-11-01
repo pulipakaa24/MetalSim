@@ -19,7 +19,7 @@ git clone https://github.com/pulipakaa24/MetalSim && cd MetalSim
 python3.12 -m venv .venv && source .venv/bin/activate     # uv only: "$(uv python find 3.12)" -m venv .venv
 pip install -e ".[full]"
 scripts/setup_warp.sh
-pip install -e "git+https://github.com/pulipakaa24/mujoco_warp@93e5ce18e76854c430ce669314af00ddceb92147#egg=mujoco-warp" "mujoco>=3.14,<3.15"      # pinned: README "Install"
+pip install -e "git+https://github.com/pulipakaa24/mujoco_warp@787a5b3a37acc2551ffc8a2c1af1e9781d76723f#egg=mujoco-warp" "mujoco>=3.14,<3.15"      # pinned: README "Install"
 scripts/fetch_isaac_assets.sh
 git clone --depth 1 https://github.com/google-deepmind/mujoco_menagerie upstream/mujoco_menagerie
 pytest tests -q
@@ -101,11 +101,11 @@ from `fuse_fp`, GPU sort / BSR / NanoVDB builders, `fast_math` forms with `warp.
 default) are listed in the branch's `METALSIM_CHANGES.md` and in `metalsim/physics/mpm/MPM.md`.
 
 **MuJoCo Warp** ([pulipakaa24/mujoco_warp](https://github.com/pulipakaa24/mujoco_warp), branch
-`metalsim`, pinned commit `93e5ce1`, installed by the `pip install` line above; the commits since `8fbf965`, which
+`metalsim`, pinned commit `787a5b3`, installed by the `pip install` line above; the commits since `8fbf965`, which
 this paragraph describes, are listed in the README's "MuJoCo Warp fork" section: elliptic cones on Metal, the fused and
 early-exiting Newton iterations, scratch reuse, the equality block at `njmax`, deterministic mode, and since 2026-10-31
-heightfield contacts against the exact prism geometry, which replace the plane path below for meshes
-(`docs/research/hfield_contacts_2026-10-31.md`)). Google DeepMind's MuJoCo Warp v3.14.0
+heightfield contacts against the exact prism geometry, which replace the plane path below for meshes,
+with EPA's horizon and the heightfield margin as in MuJoCo C (`docs/research/hfield_contacts_2026-10-31.md`, §12)). Google DeepMind's MuJoCo Warp v3.14.0
 (`88af9cc`) with, up to `8fbf965`, sixteen commits:
 the Metal device patch, heightfield contacts computed against each prism's top plane (upstream
 produced inverted normals and launched worlds on rough terrain), and the plane-to-convex contact set of
@@ -118,10 +118,11 @@ every flex, active-layer volume contacts, mesh normals), order flex equality row
 `FlexConstraintTest` failures) and sort on the device on Metal; each behind a `collision_flex` flag
 (`scripts/diagnostics/deformable/UPSTREAM.md`). The same sixteen commits (flex ones rebased linearly after the
 throughput ones; identical tree to the merge `8fbf965`) are in `patches/mujoco_warp/0001-0016`;
-`patches/mujoco_warp/0017` is the deterministic CCD split as a plain diff, and `0018-0023` are the six heightfield-contact
-commits of 2026-10-31 (`git am` on the previous pin `8eb51fe` gives the pinned tree). To build the pinned
+`patches/mujoco_warp/0017` is the deterministic CCD split as a plain diff, `0018-0023` are the six heightfield-contact
+commits of 2026-10-31 (`git am` on `8eb51fe` gives `93e5ce1`) and `0024-0031` the eight EPA-horizon and
+margin-shrink commits after them (`git am` of `0018-0031` on the previous pin `8eb51fe` gives the pinned tree). To build the pinned
 tree without the fork, clone google-deepmind/mujoco_warp at `88af9cc`, `git apply`
-`patches/mujoco_warp/metalsim-93e5ce1.diff` (the whole branch as one diff, `git diff --abbrev=7 88af9cc 93e5ce1`)
+`patches/mujoco_warp/metalsim-787a5b3.diff` (the whole branch as one diff, `git diff --abbrev=7 88af9cc 787a5b3`)
 and `pip install -e` the checkout (README "Install"). Superseded: "`git am` those patches" (`0001-0016`) gives the
 `8fbf965` tree, not the pinned one. Shared fork checkouts in `upstream/` (`upstream/mujoco_warp`, `upstream/warp-metalsim`) are moved
 to the pins with `scripts/fork_sync.sh` (`-n` reports without changing anything); `tests/test_fork_pins.py` fails while

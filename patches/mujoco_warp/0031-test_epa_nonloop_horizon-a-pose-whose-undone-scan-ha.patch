@@ -1,0 +1,42 @@
+From 787a5b3a37acc2551ffc8a2c1af1e9781d76723f Mon Sep 17 00:00:00 2001
+From: pulipakaa24 <adipu@utexas.edu>
+Date: Sat, 31 Oct 2026 20:15:30 -0700
+Subject: [PATCH 31/31] test_epa_nonloop_horizon: a pose whose undone scan had
+ deleted candidate faces
+
+On the three poses from the review, every face the undone scan had deleted was already invalid (outside the lower and upper bounds), so the undo's face_norm2 restore was never read: an undo that left the per-iteration mark in face_norm2 still passed. On this box-box pose (two stacked 5 cm boxes, found in a search over 80000 static poses with an instrumented copy) the undone scan had deleted candidate faces; without the restore their negative mark is taken as the closest face and the pair loses its contact. With the restore the deepest contact matches MuJoCo C's to 3.3e-9 m, as 93e5ce1's face scan does.
+---
+ mujoco_warp/_src/collision_gjk_test.py | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/mujoco_warp/_src/collision_gjk_test.py b/mujoco_warp/_src/collision_gjk_test.py
+index 5024c73..1cc0d65 100644
+--- a/mujoco_warp/_src/collision_gjk_test.py
++++ b/mujoco_warp/_src/collision_gjk_test.py
+@@ -914,6 +914,14 @@ class GJKTest(parameterized.TestCase):
+       "1.1042433995e-02 1.7353867029e-02 4.9951583291e-02 2.6547766364e-01 -4.7347918626e-04 1.0911244443e-04 9.6411688815e-01",
+       2e-8,
+     ),
++    # boxstack seed 12 world 3681 (MetalSim epa-fixes): MJW -7.710978e-05, MuJoCo C -7.710650e-05;
++    # the undone scan had deleted faces that are candidates for the closest face, so the undo must
++    # restore their face_norm2
++    (
++      '<geom type="box" size=".025 .025 .025"/><body><freejoint/><geom type="box" size=".025 .025 .025"/></body>',
++      "5.2688197441e-03 -4.5746638777e-03 4.9999595380e-02 9.6642667520e-01 1.4869133534e-03 3.8914768146e-04 2.5693796744e-01",
++      2e-8,
++    ),
+     # ellipsoids world 320: MJW -2.778232e-05, MuJoCo C -2.755865e-05 (EPA to ccd_tolerance)
+     (
+       '<geom type="ellipsoid" size=".05 .03 .02"/><body><freejoint/><geom type="ellipsoid" size=".04 .025 .03"/></body>',
+@@ -926,7 +934,7 @@ class GJKTest(parameterized.TestCase):
+ 
+     The scan is undone and the region grows from the closest face (MuJoCo C's horizon); the result
+     is the C contact. The scan's own answer happens to be the same on these poses, so this pins the
+-    restart, not a change of result.
++    restart and its undo, not a change of result.
+     """
+     mjm, mjd, m, d = test_data.fixture(
+       xml=f"<mujoco><worldbody>{bodies}</worldbody><keyframe><key qpos='{qpos}'/></keyframe></mujoco>", keyframe=0
+-- 
+2.54.0
+
