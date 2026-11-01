@@ -72,7 +72,9 @@ class FilmCfg:
     last frame of a finished episode is held; ``tier``: 2 = path tracer (Tier2Renderer), 0 = raster (Tier0Renderer);
     ``passes`` x ``spp`` samples per pixel (tier 2), ``bounces``, ``denoise`` ("oidn" or None). ``allow_early_end``:
     film an env whose first episode ends by a termination (an adapter's ``info["terminated"]``: a fall, not a time-out
-    or a success); by default the record stage refuses such a film."""
+    or a success); by default the record stage refuses such a film. ``after_end``: what the render shows after a
+    filmed episode's end: "hold" (its last frame, for ``hold_s``) or "play" (the recorded simulation goes on to the
+    end of the recording: for adapters that keep simulating an ended env, e.g. Unitree's playback after a fall)."""
 
     num_envs: int = 4
     envs: object = "auto"
@@ -91,6 +93,7 @@ class FilmCfg:
     stills: tuple = (0.25, 0.5, 0.8)
     output_filename_prefix: str = "film"
     allow_early_end: bool = False
+    after_end: str = "hold"
 
 
 @dataclass

@@ -1,0 +1,3272 @@
+{
+ "mode": "cpu",
+ "robots": 16,
+ "seconds": 8.0,
+ "cmd": [
+  0.5,
+  0.0,
+  0.0
+ ],
+ "starts": {
+  "x0": -2.0,
+  "y": [
+   -3.0,
+   3.0
+  ]
+ },
+ "tile_seed": 0,
+ "levels": {
+  "0.04": {
+   "noise_range": [
+    0.02,
+    0.04
+   ],
+   "exact_isaac": false,
+   "terrain": {
+    "isaac": "ROUGH_TERRAINS_CFG['random_rough'] (Isaac Lab v2.3.2 config/rough.py)",
+    "sub_terrain": {
+     "function": "hf_random_uniform",
+     "proportion": 0.2,
+     "noise_range": [
+      0.02,
+      0.04
+     ],
+     "noise_step": 0.02,
+     "downsampled_scale": null,
+     "border_width": 0.25
+    },
+    "isaac_noise_range": [
+     0.02,
+     0.1
+    ],
+    "exact_isaac": false,
+    "size": [
+     8.0,
+     8.0
+    ],
+    "border_width": 20.0,
+    "horizontal_scale": 0.1,
+    "vertical_scale": 0.005,
+    "slope_threshold": 0.75,
+    "seed": 0,
+    "generator_seed": 0,
+    "difficulty": 0.2698,
+    "difficulty_note": "drawn by the generator and ignored by random_uniform_terrain"
+   },
+   "terrain_stats": {
+    "hfield_samples": [
+     481,
+     481
+    ],
+    "extent_m": [
+     48.0,
+     48.0
+    ],
+    "tile_heights_m": [
+     0.02,
+     0.04
+    ],
+    "tile_max_m": 0.03999999910593033,
+    "grid_edges": 12960,
+    "wall_edges": 0,
+    "wall_note": "edges of Isaac's height field whose jump exceeds slope_threshold x horizontal_scale: vertical walls in Isaac's mesh, 0.1 m ramps in the heightfield"
+   },
+   "info": {
+    "engine": "CPU MuJoCo 3.14.0 (Unitree's loop per robot)",
+    "rollout_s": 1.9
+   },
+   "summary": {
+    "robots": 16,
+    "falls": 2,
+    "fall_s_first": 6.58,
+    "fall_s_median": 7.08,
+    "fall_s_all": [
+     6.58,
+     7.58
+    ],
+    "nonfoot_contacts": 2,
+    "forward_m_median": 3.418,
+    "forward_m_median_standing": 3.4625,
+    "forward_m_range": [
+     1.618,
+     3.744
+    ],
+    "gait_robots": 16,
+    "cadence_hz": [
+     1.251,
+     1.248
+    ],
+    "touchdowns_hz": [
+     1.286,
+     1.286
+    ],
+    "apex_m": [
+     0.0466,
+     0.0515
+    ],
+    "slip_mps": [
+     0.0126,
+     0.0108
+    ],
+    "speed_mps": 0.4685,
+    "sole_penetration_m": {
+     "p50": 0.0066,
+     "p95": 0.0165,
+     "max": 0.0357
+    }
+   },
+   "robots": [
+    {
+     "lane_y": -3.0,
+     "fell": false,
+     "fall_s": null,
+     "first_nonfoot_contact_s": null,
+     "forward_m": 3.288,
+     "lateral_m": -0.112,
+     "gait": {
+      "window_s": [
+       1.0,
+       8.0
+      ],
+      "cadence_hz": [
+       1.202,
+       1.233
+      ],
+      "apex_m": [
+       0.0477,
+       0.0523
+      ],
+      "slip_mps": [
+       0.0154,
+       0.0143
+      ],
+      "air_frac": [
+       0.437,
+       0.403
+      ],
+      "touchdowns_hz": [
+       1.0,
+       1.286
+      ],
+      "speed_mps": 0.457,
+      "stride_m": 0.3754,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": false
+     },
+     "sole_penetration_m": {
+      "p50": 0.0081,
+      "p95": 0.0168,
+      "max": 0.022
+     }
+    },
+    {
+     "lane_y": -2.6,
+     "fell": false,
+     "fall_s": null,
+     "first_nonfoot_contact_s": null,
+     "forward_m": 3.303,
+     "lateral_m": -0.194,
+     "gait": {
+      "window_s": [
+       1.0,
+       8.0
+      ],
+      "cadence_hz": [
+       1.239,
+       1.239
+      ],
+      "apex_m": [
+       0.0433,
+       0.0477
+      ],
+      "slip_mps": [
+       0.0149,
+       0.0075
+      ],
+      "air_frac": [
+       0.429,
+       0.414
+      ],
+      "touchdowns_hz": [
+       1.429,
+       1.286
+      ],
+      "speed_mps": 0.448,
+      "stride_m": 0.3616,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": false
+     },
+     "sole_penetration_m": {
+      "p50": 0.0061,
+      "p95": 0.0152,
+      "max": 0.0204
+     }
+    },
+    {
+     "lane_y": -2.2,
+     "fell": false,
+     "fall_s": null,
+     "first_nonfoot_contact_s": null,
+     "forward_m": 3.337,
+     "lateral_m": -0.081,
+     "gait": {
+      "window_s": [
+       1.0,
+       8.0
+      ],
+      "cadence_hz": [
+       1.251,
+       1.257
+      ],
+      "apex_m": [
+       0.0442,
+       0.0481
+      ],
+      "slip_mps": [
+       0.0116,
+       0.0116
+      ],
+      "air_frac": [
+       0.457,
+       0.426
+      ],
+      "touchdowns_hz": [
+       1.143,
+       1.286
+      ],
+      "speed_mps": 0.443,
+      "stride_m": 0.3533,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": false
+     },
+     "sole_penetration_m": {
+      "p50": 0.0065,
+      "p95": 0.0136,
+      "max": 0.0192
+     }
+    },
+    {
+     "lane_y": -1.8,
+     "fell": false,
+     "fall_s": null,
+     "first_nonfoot_contact_s": null,
+     "forward_m": 3.673,
+     "lateral_m": -0.54,
+     "gait": {
+      "window_s": [
+       1.0,
+       8.0
+      ],
+      "cadence_hz": [
+       1.257,
+       1.239
+      ],
+      "apex_m": [
+       0.0478,
+       0.0516
+      ],
+      "slip_mps": [
+       0.016,
+       0.0125
+      ],
+      "air_frac": [
+       0.44,
+       0.386
+      ],
+      "touchdowns_hz": [
+       1.286,
+       1.286
+      ],
+      "speed_mps": 0.508,
+      "stride_m": 0.4071,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": false
+     },
+     "sole_penetration_m": {
+      "p50": 0.0051,
+      "p95": 0.0132,
+      "max": 0.0167
+     }
+    },
+    {
+     "lane_y": -1.4,
+     "fell": false,
+     "fall_s": null,
+     "first_nonfoot_contact_s": null,
+     "forward_m": 3.465,
+     "lateral_m": -0.363,
+     "gait": {
+      "window_s": [
+       1.0,
+       8.0
+      ],
+      "cadence_hz": [
+       1.251,
+       1.251
+      ],
+      "apex_m": [
+       0.0466,
+       0.0478
+      ],
+      "slip_mps": [
+       0.0082,
+       0.008
+      ],
+      "air_frac": [
+       0.469,
+       0.423
+      ],
+      "touchdowns_hz": [
+       1.143,
+       1.286
+      ],
+      "speed_mps": 0.454,
+      "stride_m": 0.3629,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": false
+     },
+     "sole_penetration_m": {
+      "p50": 0.0066,
+      "p95": 0.0154,
+      "max": 0.017
+     }
+    },
+    {
+     "lane_y": -1.0,
+     "fell": true,
+     "fall_s": 6.58,
+     "first_nonfoot_contact_s": 6.54,
+     "forward_m": 1.618,
+     "lateral_m": 0.742,
+     "gait": {
+      "window_s": [
+       1.0,
+       6.58
+      ],
+      "cadence_hz": [
+       1.263,
+       1.257
+      ],
+      "apex_m": [
+       0.0481,
+       0.0546
+      ],
+      "slip_mps": [
+       0.0209,
+       0.0112
+      ],
+      "air_frac": [
+       0.33,
+       0.437
+      ],
+      "touchdowns_hz": [
+       1.434,
+       1.254
+      ],
+      "speed_mps": 0.551,
+      "stride_m": 0.4373,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": true
+     },
+     "sole_penetration_m": {
+      "p50": 0.0072,
+      "p95": 0.0189,
+      "max": 0.0355
+     }
+    },
+    {
+     "lane_y": -0.6,
+     "fell": false,
+     "fall_s": null,
+     "first_nonfoot_contact_s": null,
+     "forward_m": 3.471,
+     "lateral_m": -0.435,
+     "gait": {
+      "window_s": [
+       1.0,
+       8.0
+      ],
+      "cadence_hz": [
+       1.257,
+       1.263
+      ],
+      "apex_m": [
+       0.048,
+       0.0489
+      ],
+      "slip_mps": [
+       0.0136,
+       0.0104
+      ],
+      "air_frac": [
+       0.474,
+       0.409
+      ],
+      "touchdowns_hz": [
+       1.143,
+       1.286
+      ],
+      "speed_mps": 0.476,
+      "stride_m": 0.3778,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": false
+     },
+     "sole_penetration_m": {
+      "p50": 0.0068,
+      "p95": 0.0128,
+      "max": 0.0164
+     }
+    },
+    {
+     "lane_y": -0.2,
+     "fell": false,
+     "fall_s": null,
+     "first_nonfoot_contact_s": null,
+     "forward_m": 3.139,
+     "lateral_m": 0.158,
+     "gait": {
+      "window_s": [
+       1.0,
+       8.0
+      ],
+      "cadence_hz": [
+       1.239,
+       1.245
+      ],
+      "apex_m": [
+       0.0465,
+       0.0543
+      ],
+      "slip_mps": [
+       0.015,
+       0.0124
+      ],
+      "air_frac": [
+       0.374,
+       0.42
+      ],
+      "touchdowns_hz": [
+       1.286,
+       1.429
+      ],
+      "speed_mps": 0.435,
+      "stride_m": 0.3502,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": false
+     },
+     "sole_penetration_m": {
+      "p50": 0.0081,
+      "p95": 0.0172,
+      "max": 0.0203
+     }
+    },
+    {
+     "lane_y": 0.2,
+     "fell": true,
+     "fall_s": 7.58,
+     "first_nonfoot_contact_s": 7.6,
+     "forward_m": 3.126,
+     "lateral_m": 0.769,
+     "gait": {
+      "window_s": [
+       1.0,
+       7.58
+      ],
+      "cadence_hz": [
+       1.263,
+       1.208
+      ],
+      "apex_m": [
+       0.0526,
+       0.0753
+      ],
+      "slip_mps": [
+       0.021,
+       0.0179
+      ],
+      "air_frac": [
+       0.325,
+       0.392
+      ],
+      "touchdowns_hz": [
+       1.368,
+       1.368
+      ],
+      "speed_mps": 0.6,
+      "stride_m": 0.4856,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": true
+     },
+     "sole_penetration_m": {
+      "p50": 0.0095,
+      "p95": 0.0279,
+      "max": 0.0357
+     }
+    },
+    {
+     "lane_y": 0.6,
+     "fell": false,
+     "fall_s": null,
+     "first_nonfoot_contact_s": null,
+     "forward_m": 3.376,
+     "lateral_m": -0.34,
+     "gait": {
+      "window_s": [
+       1.0,
+       8.0
+      ],
+      "cadence_hz": [
+       1.276,
+       1.215
+      ],
+      "apex_m": [
+       0.0505,
+       0.0478
+      ],
+      "slip_mps": [
+       0.0166,
+       0.0091
+      ],
+      "air_frac": [
+       0.417,
+       0.323
+      ],
+      "touchdowns_hz": [
+       1.286,
+       1.286
+      ],
+      "speed_mps": 0.455,
+      "stride_m": 0.3653,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": false
+     },
+     "sole_penetration_m": {
+      "p50": 0.0086,
+      "p95": 0.0165,
+      "max": 0.0247
+     }
+    },
+    {
+     "lane_y": 1.0,
+     "fell": false,
+     "fall_s": null,
+     "first_nonfoot_contact_s": null,
+     "forward_m": 3.484,
+     "lateral_m": -0.42,
+     "gait": {
+      "window_s": [
+       1.0,
+       8.0
+      ],
+      "cadence_hz": [
+       1.239,
+       1.239
+      ],
+      "apex_m": [
+       0.0476,
+       0.0486
+      ],
+      "slip_mps": [
+       0.0108,
+       0.0086
+      ],
+      "air_frac": [
+       0.466,
+       0.426
+      ],
+      "touchdowns_hz": [
+       1.286,
+       1.286
+      ],
+      "speed_mps": 0.471,
+      "stride_m": 0.3801,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": false
+     },
+     "sole_penetration_m": {
+      "p50": 0.0076,
+      "p95": 0.0139,
+      "max": 0.0188
+     }
+    },
+    {
+     "lane_y": 1.4,
+     "fell": false,
+     "fall_s": null,
+     "first_nonfoot_contact_s": null,
+     "forward_m": 3.46,
+     "lateral_m": -0.842,
+     "gait": {
+      "window_s": [
+       1.0,
+       8.0
+      ],
+      "cadence_hz": [
+       1.263,
+       1.257
+      ],
+      "apex_m": [
+       0.0426,
+       0.0501
+      ],
+      "slip_mps": [
+       0.0079,
+       0.0104
+      ],
+      "air_frac": [
+       0.466,
+       0.414
+      ],
+      "touchdowns_hz": [
+       1.286,
+       1.286
+      ],
+      "speed_mps": 0.466,
+      "stride_m": 0.3698,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": false
+     },
+     "sole_penetration_m": {
+      "p50": 0.0057,
+      "p95": 0.0133,
+      "max": 0.0196
+     }
+    },
+    {
+     "lane_y": 1.8,
+     "fell": false,
+     "fall_s": null,
+     "first_nonfoot_contact_s": null,
+     "forward_m": 3.252,
+     "lateral_m": -0.405,
+     "gait": {
+      "window_s": [
+       1.0,
+       8.0
+      ],
+      "cadence_hz": [
+       1.245,
+       1.251
+      ],
+      "apex_m": [
+       0.0385,
+       0.0565
+      ],
+      "slip_mps": [
+       0.0088,
+       0.0082
+      ],
+      "air_frac": [
+       0.477,
+       0.414
+      ],
+      "touchdowns_hz": [
+       1.143,
+       1.286
+      ],
+      "speed_mps": 0.431,
+      "stride_m": 0.3454,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": false
+     },
+     "sole_penetration_m": {
+      "p50": 0.003,
+      "p95": 0.0145,
+      "max": 0.0187
+     }
+    },
+    {
+     "lane_y": 2.2,
+     "fell": false,
+     "fall_s": null,
+     "first_nonfoot_contact_s": null,
+     "forward_m": 3.543,
+     "lateral_m": -0.645,
+     "gait": {
+      "window_s": [
+       1.0,
+       8.0
+      ],
+      "cadence_hz": [
+       1.257,
+       1.215
+      ],
+      "apex_m": [
+       0.0458,
+       0.0516
+      ],
+      "slip_mps": [
+       0.0116,
+       0.0132
+      ],
+      "air_frac": [
+       0.42,
+       0.389
+      ],
+      "touchdowns_hz": [
+       1.286,
+       1.286
+      ],
+      "speed_mps": 0.481,
+      "stride_m": 0.3892,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": false
+     },
+     "sole_penetration_m": {
+      "p50": 0.0057,
+      "p95": 0.0165,
+      "max": 0.0208
+     }
+    },
+    {
+     "lane_y": 2.6,
+     "fell": false,
+     "fall_s": null,
+     "first_nonfoot_contact_s": null,
+     "forward_m": 3.744,
+     "lateral_m": -0.706,
+     "gait": {
+      "window_s": [
+       1.0,
+       8.0
+      ],
+      "cadence_hz": [
+       1.251,
+       1.251
+      ],
+      "apex_m": [
+       0.0418,
+       0.0521
+      ],
+      "slip_mps": [
+       0.0113,
+       0.0113
+      ],
+      "air_frac": [
+       0.466,
+       0.411
+      ],
+      "touchdowns_hz": [
+       1.143,
+       1.286
+      ],
+      "speed_mps": 0.51,
+      "stride_m": 0.4077,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": false
+     },
+     "sole_penetration_m": {
+      "p50": 0.0079,
+      "p95": 0.0159,
+      "max": 0.0228
+     }
+    },
+    {
+     "lane_y": 3.0,
+     "fell": false,
+     "fall_s": null,
+     "first_nonfoot_contact_s": null,
+     "forward_m": 3.597,
+     "lateral_m": -0.081,
+     "gait": {
+      "window_s": [
+       1.0,
+       8.0
+      ],
+      "cadence_hz": [
+       1.251,
+       1.251
+      ],
+      "apex_m": [
+       0.0419,
+       0.0515
+      ],
+      "slip_mps": [
+       0.0099,
+       0.0087
+      ],
+      "air_frac": [
+       0.431,
+       0.434
+      ],
+      "touchdowns_hz": [
+       1.143,
+       1.286
+      ],
+      "speed_mps": 0.483,
+      "stride_m": 0.3861,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": false
+     },
+     "sole_penetration_m": {
+      "p50": 0.0039,
+      "p95": 0.0101,
+      "max": 0.0109
+     }
+    }
+   ],
+   "gait_definition": "Per env and foot over its window (from 1 s to the first episode's end or the clip's end). Foot: the centre of the foot collider (adapter's feet), its height taken above the task's collision surface (adapter.ground_height; 0 on flat ground): the highest surface point under the foot's footprint (adapter's feet_footprint: its bounding-box corners; else straight below the centre), so a foot standing across a step edge is on the upper tread. cadence_hz: peak of the Hann-windowed FFT of the mean-removed foot height (zero-padded to >= 16x, searched in 0.5-10 Hz), i.e. gait cycles per second of that foot. apex_m: 95th percentile of the foot height above its stance height (median height while in contact). slip_mps: median horizontal speed of the foot between consecutive frames that are both in contact. air_frac: fraction of frames not in contact. touchdowns_hz: contact onsets after at least 2 frames in the air, per second (a terrain-independent cross-check of the cadence; needs feet_contact). Contact: the adapter's feet_contact (the task's touch sensor > 1 N), else within 15 mm of the window's lowest height. speed_mps: pelvis horizontal path / window time; stride_m: speed / mean cadence (ground covered per gait cycle). Summary: medians over envs whose first episode did not terminate and that walk (speed >= 0.15 m/s)."
+  },
+  "0.06": {
+   "noise_range": [
+    0.02,
+    0.06
+   ],
+   "exact_isaac": false,
+   "terrain": {
+    "isaac": "ROUGH_TERRAINS_CFG['random_rough'] (Isaac Lab v2.3.2 config/rough.py)",
+    "sub_terrain": {
+     "function": "hf_random_uniform",
+     "proportion": 0.2,
+     "noise_range": [
+      0.02,
+      0.06
+     ],
+     "noise_step": 0.02,
+     "downsampled_scale": null,
+     "border_width": 0.25
+    },
+    "isaac_noise_range": [
+     0.02,
+     0.1
+    ],
+    "exact_isaac": false,
+    "size": [
+     8.0,
+     8.0
+    ],
+    "border_width": 20.0,
+    "horizontal_scale": 0.1,
+    "vertical_scale": 0.005,
+    "slope_threshold": 0.75,
+    "seed": 0,
+    "generator_seed": 0,
+    "difficulty": 0.2698,
+    "difficulty_note": "drawn by the generator and ignored by random_uniform_terrain"
+   },
+   "terrain_stats": {
+    "hfield_samples": [
+     481,
+     481
+    ],
+    "extent_m": [
+     48.0,
+     48.0
+    ],
+    "tile_heights_m": [
+     0.02,
+     0.04,
+     0.06
+    ],
+    "tile_max_m": 0.05999999865889549,
+    "grid_edges": 12960,
+    "wall_edges": 0,
+    "wall_note": "edges of Isaac's height field whose jump exceeds slope_threshold x horizontal_scale: vertical walls in Isaac's mesh, 0.1 m ramps in the heightfield"
+   },
+   "info": {
+    "engine": "CPU MuJoCo 3.14.0 (Unitree's loop per robot)",
+    "rollout_s": 2.1
+   },
+   "summary": {
+    "robots": 16,
+    "falls": 6,
+    "fall_s_first": 3.34,
+    "fall_s_median": 6.78,
+    "fall_s_all": [
+     3.34,
+     4.06,
+     6.76,
+     6.8,
+     7.0,
+     8.0
+    ],
+    "nonfoot_contacts": 9,
+    "forward_m_median": 2.963,
+    "forward_m_median_standing": 3.257,
+    "forward_m_range": [
+     0.178,
+     4.251
+    ],
+    "gait_robots": 16,
+    "cadence_hz": [
+     1.257,
+     1.248
+    ],
+    "touchdowns_hz": [
+     1.361,
+     1.286
+    ],
+    "apex_m": [
+     0.0498,
+     0.0559
+    ],
+    "slip_mps": [
+     0.0232,
+     0.0178
+    ],
+    "speed_mps": 0.4915,
+    "sole_penetration_m": {
+     "p50": 0.0099,
+     "p95": 0.0295,
+     "max": 0.0685
+    }
+   },
+   "robots": [
+    {
+     "lane_y": -3.0,
+     "fell": false,
+     "fall_s": null,
+     "first_nonfoot_contact_s": null,
+     "forward_m": 3.323,
+     "lateral_m": -0.312,
+     "gait": {
+      "window_s": [
+       1.0,
+       8.0
+      ],
+      "cadence_hz": [
+       1.245,
+       1.239
+      ],
+      "apex_m": [
+       0.0466,
+       0.0518
+      ],
+      "slip_mps": [
+       0.0232,
+       0.0166
+      ],
+      "air_frac": [
+       0.454,
+       0.411
+      ],
+      "touchdowns_hz": [
+       1.429,
+       1.286
+      ],
+      "speed_mps": 0.456,
+      "stride_m": 0.3671,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": false
+     },
+     "sole_penetration_m": {
+      "p50": 0.0072,
+      "p95": 0.0224,
+      "max": 0.0256
+     }
+    },
+    {
+     "lane_y": -2.6,
+     "fell": true,
+     "fall_s": 8.0,
+     "first_nonfoot_contact_s": null,
+     "forward_m": 2.968,
+     "lateral_m": -1.425,
+     "gait": {
+      "window_s": [
+       1.0,
+       8.0
+      ],
+      "cadence_hz": [
+       1.257,
+       1.208
+      ],
+      "apex_m": [
+       0.054,
+       0.068
+      ],
+      "slip_mps": [
+       0.0489,
+       0.0529
+      ],
+      "air_frac": [
+       0.42,
+       0.314
+      ],
+      "touchdowns_hz": [
+       1.286,
+       1.286
+      ],
+      "speed_mps": 0.581,
+      "stride_m": 0.4714,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": true
+     },
+     "sole_penetration_m": {
+      "p50": 0.0092,
+      "p95": 0.0288,
+      "max": 0.0406
+     }
+    },
+    {
+     "lane_y": -2.2,
+     "fell": false,
+     "fall_s": null,
+     "first_nonfoot_contact_s": null,
+     "forward_m": 3.257,
+     "lateral_m": 0.053,
+     "gait": {
+      "window_s": [
+       1.0,
+       8.0
+      ],
+      "cadence_hz": [
+       1.233,
+       1.251
+      ],
+      "apex_m": [
+       0.0577,
+       0.056
+      ],
+      "slip_mps": [
+       0.0223,
+       0.015
+      ],
+      "air_frac": [
+       0.377,
+       0.446
+      ],
+      "touchdowns_hz": [
+       1.143,
+       1.286
+      ],
+      "speed_mps": 0.435,
+      "stride_m": 0.3502,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": false
+     },
+     "sole_penetration_m": {
+      "p50": 0.0097,
+      "p95": 0.0219,
+      "max": 0.0291
+     }
+    },
+    {
+     "lane_y": -1.8,
+     "fell": true,
+     "fall_s": 4.06,
+     "first_nonfoot_contact_s": 4.12,
+     "forward_m": 0.422,
+     "lateral_m": -0.563,
+     "gait": {
+      "window_s": [
+       1.0,
+       4.06
+      ],
+      "cadence_hz": [
+       1.331,
+       0.537
+      ],
+      "apex_m": [
+       0.0486,
+       0.0548
+      ],
+      "slip_mps": [
+       0.0465,
+       0.0732
+      ],
+      "air_frac": [
+       0.379,
+       0.209
+      ],
+      "touchdowns_hz": [
+       1.634,
+       0.98
+      ],
+      "speed_mps": 0.657,
+      "stride_m": 0.7034,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": true
+     },
+     "sole_penetration_m": {
+      "p50": 0.0124,
+      "p95": 0.0234,
+      "max": 0.031
+     }
+    },
+    {
+     "lane_y": -1.4,
+     "fell": true,
+     "fall_s": 7.0,
+     "first_nonfoot_contact_s": 5.64,
+     "forward_m": 1.29,
+     "lateral_m": 0.12,
+     "gait": {
+      "window_s": [
+       1.0,
+       7.0
+      ],
+      "cadence_hz": [
+       1.251,
+       1.288
+      ],
+      "apex_m": [
+       0.0584,
+       0.0496
+      ],
+      "slip_mps": [
+       0.0258,
+       0.0135
+      ],
+      "air_frac": [
+       0.373,
+       0.417
+      ],
+      "touchdowns_hz": [
+       1.333,
+       1.667
+      ],
+      "speed_mps": 0.499,
+      "stride_m": 0.3931,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": true
+     },
+     "sole_penetration_m": {
+      "p50": 0.0081,
+      "p95": 0.0223,
+      "max": 0.037
+     }
+    },
+    {
+     "lane_y": -1.0,
+     "fell": false,
+     "fall_s": null,
+     "first_nonfoot_contact_s": 4.44,
+     "forward_m": 2.958,
+     "lateral_m": -0.721,
+     "gait": {
+      "window_s": [
+       1.0,
+       8.0
+      ],
+      "cadence_hz": [
+       1.227,
+       1.233
+      ],
+      "apex_m": [
+       0.0444,
+       0.0562
+      ],
+      "slip_mps": [
+       0.0232,
+       0.011
+      ],
+      "air_frac": [
+       0.469,
+       0.391
+      ],
+      "touchdowns_hz": [
+       1.429,
+       1.286
+      ],
+      "speed_mps": 0.424,
+      "stride_m": 0.3447,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": false
+     },
+     "sole_penetration_m": {
+      "p50": 0.0086,
+      "p95": 0.0303,
+      "max": 0.0355
+     }
+    },
+    {
+     "lane_y": -0.6,
+     "fell": false,
+     "fall_s": null,
+     "first_nonfoot_contact_s": null,
+     "forward_m": 3.955,
+     "lateral_m": -0.26,
+     "gait": {
+      "window_s": [
+       1.0,
+       8.0
+      ],
+      "cadence_hz": [
+       1.233,
+       1.257
+      ],
+      "apex_m": [
+       0.0492,
+       0.059
+      ],
+      "slip_mps": [
+       0.0179,
+       0.0155
+      ],
+      "air_frac": [
+       0.451,
+       0.409
+      ],
+      "touchdowns_hz": [
+       1.286,
+       1.286
+      ],
+      "speed_mps": 0.537,
+      "stride_m": 0.4313,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": false
+     },
+     "sole_penetration_m": {
+      "p50": 0.0094,
+      "p95": 0.0223,
+      "max": 0.0247
+     }
+    },
+    {
+     "lane_y": -0.2,
+     "fell": false,
+     "fall_s": null,
+     "first_nonfoot_contact_s": 6.1,
+     "forward_m": 2.929,
+     "lateral_m": -0.735,
+     "gait": {
+      "window_s": [
+       1.0,
+       8.0
+      ],
+      "cadence_hz": [
+       1.257,
+       1.245
+      ],
+      "apex_m": [
+       0.0491,
+       0.0558
+      ],
+      "slip_mps": [
+       0.0199,
+       0.0145
+      ],
+      "air_frac": [
+       0.426,
+       0.391
+      ],
+      "touchdowns_hz": [
+       1.286,
+       1.143
+      ],
+      "speed_mps": 0.428,
+      "stride_m": 0.3421,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": false
+     },
+     "sole_penetration_m": {
+      "p50": 0.0085,
+      "p95": 0.0251,
+      "max": 0.0369
+     }
+    },
+    {
+     "lane_y": 0.2,
+     "fell": true,
+     "fall_s": 6.76,
+     "first_nonfoot_contact_s": 6.4,
+     "forward_m": 1.645,
+     "lateral_m": -0.221,
+     "gait": {
+      "window_s": [
+       1.0,
+       6.76
+      ],
+      "cadence_hz": [
+       1.276,
+       1.27
+      ],
+      "apex_m": [
+       0.0465,
+       0.0588
+      ],
+      "slip_mps": [
+       0.0501,
+       0.0366
+      ],
+      "air_frac": [
+       0.406,
+       0.26
+      ],
+      "touchdowns_hz": [
+       1.389,
+       1.042
+      ],
+      "speed_mps": 0.589,
+      "stride_m": 0.4627,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": true
+     },
+     "sole_penetration_m": {
+      "p50": 0.0116,
+      "p95": 0.0305,
+      "max": 0.041
+     }
+    },
+    {
+     "lane_y": 0.6,
+     "fell": false,
+     "fall_s": null,
+     "first_nonfoot_contact_s": null,
+     "forward_m": 2.845,
+     "lateral_m": -0.659,
+     "gait": {
+      "window_s": [
+       1.0,
+       8.0
+      ],
+      "cadence_hz": [
+       1.263,
+       1.227
+      ],
+      "apex_m": [
+       0.0504,
+       0.055
+      ],
+      "slip_mps": [
+       0.0159,
+       0.0147
+      ],
+      "air_frac": [
+       0.443,
+       0.4
+      ],
+      "touchdowns_hz": [
+       1.286,
+       1.286
+      ],
+      "speed_mps": 0.408,
+      "stride_m": 0.3277,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": false
+     },
+     "sole_penetration_m": {
+      "p50": 0.0127,
+      "p95": 0.0254,
+      "max": 0.0303
+     }
+    },
+    {
+     "lane_y": 1.0,
+     "fell": true,
+     "fall_s": 3.34,
+     "first_nonfoot_contact_s": 3.26,
+     "forward_m": 0.178,
+     "lateral_m": -0.053,
+     "gait": {
+      "window_s": [
+       1.0,
+       3.34
+      ],
+      "cadence_hz": [
+       1.318,
+       1.245
+      ],
+      "apex_m": [
+       0.0636,
+       0.0486
+      ],
+      "slip_mps": [
+       0.1129,
+       0.1179
+      ],
+      "air_frac": [
+       0.427,
+       0.137
+      ],
+      "touchdowns_hz": [
+       1.709,
+       0.855
+      ],
+      "speed_mps": 0.689,
+      "stride_m": 0.5377,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": true
+     },
+     "sole_penetration_m": {
+      "p50": 0.0193,
+      "p95": 0.0323,
+      "max": 0.0363
+     }
+    },
+    {
+     "lane_y": 1.4,
+     "fell": false,
+     "fall_s": null,
+     "first_nonfoot_contact_s": 2.1,
+     "forward_m": 3.257,
+     "lateral_m": -0.99,
+     "gait": {
+      "window_s": [
+       1.0,
+       8.0
+      ],
+      "cadence_hz": [
+       1.263,
+       1.227
+      ],
+      "apex_m": [
+       0.045,
+       0.0586
+      ],
+      "slip_mps": [
+       0.0203,
+       0.0246
+      ],
+      "air_frac": [
+       0.443,
+       0.386
+      ],
+      "touchdowns_hz": [
+       1.429,
+       1.286
+      ],
+      "speed_mps": 0.452,
+      "stride_m": 0.3631,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": false
+     },
+     "sole_penetration_m": {
+      "p50": 0.0077,
+      "p95": 0.028,
+      "max": 0.0354
+     }
+    },
+    {
+     "lane_y": 1.8,
+     "fell": false,
+     "fall_s": null,
+     "first_nonfoot_contact_s": 4.86,
+     "forward_m": 3.498,
+     "lateral_m": -0.413,
+     "gait": {
+      "window_s": [
+       1.0,
+       8.0
+      ],
+      "cadence_hz": [
+       1.239,
+       1.251
+      ],
+      "apex_m": [
+       0.0524,
+       0.049
+      ],
+      "slip_mps": [
+       0.0188,
+       0.0138
+      ],
+      "air_frac": [
+       0.443,
+       0.417
+      ],
+      "touchdowns_hz": [
+       1.286,
+       1.286
+      ],
+      "speed_mps": 0.484,
+      "stride_m": 0.3888,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": false
+     },
+     "sole_penetration_m": {
+      "p50": 0.0087,
+      "p95": 0.0331,
+      "max": 0.0371
+     }
+    },
+    {
+     "lane_y": 2.2,
+     "fell": true,
+     "fall_s": 6.8,
+     "first_nonfoot_contact_s": 6.82,
+     "forward_m": 4.251,
+     "lateral_m": -0.964,
+     "gait": {
+      "window_s": [
+       1.0,
+       6.8
+      ],
+      "cadence_hz": [
+       1.251,
+       1.27
+      ],
+      "apex_m": [
+       0.0563,
+       0.0994
+      ],
+      "slip_mps": [
+       0.0298,
+       0.0213
+      ],
+      "air_frac": [
+       0.434,
+       0.383
+      ],
+      "touchdowns_hz": [
+       1.552,
+       1.207
+      ],
+      "speed_mps": 0.738,
+      "stride_m": 0.5855,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": true
+     },
+     "sole_penetration_m": {
+      "p50": 0.0078,
+      "p95": 0.0191,
+      "max": 0.0227
+     }
+    },
+    {
+     "lane_y": 2.6,
+     "fell": false,
+     "fall_s": null,
+     "first_nonfoot_contact_s": null,
+     "forward_m": 3.582,
+     "lateral_m": -1.035,
+     "gait": {
+      "window_s": [
+       1.0,
+       8.0
+      ],
+      "cadence_hz": [
+       1.3,
+       1.276
+      ],
+      "apex_m": [
+       0.0469,
+       0.0577
+      ],
+      "slip_mps": [
+       0.0328,
+       0.0189
+      ],
+      "air_frac": [
+       0.434,
+       0.354
+      ],
+      "touchdowns_hz": [
+       1.429,
+       1.286
+      ],
+      "speed_mps": 0.513,
+      "stride_m": 0.3983,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": false
+     },
+     "sole_penetration_m": {
+      "p50": 0.0089,
+      "p95": 0.0291,
+      "max": 0.0359
+     }
+    },
+    {
+     "lane_y": 3.0,
+     "fell": false,
+     "fall_s": null,
+     "first_nonfoot_contact_s": null,
+     "forward_m": 2.806,
+     "lateral_m": -0.944,
+     "gait": {
+      "window_s": [
+       1.0,
+       8.0
+      ],
+      "cadence_hz": [
+       1.288,
+       1.294
+      ],
+      "apex_m": [
+       0.0531,
+       0.0505
+      ],
+      "slip_mps": [
+       0.0154,
+       0.0204
+      ],
+      "air_frac": [
+       0.451,
+       0.369
+      ],
+      "touchdowns_hz": [
+       1.143,
+       1.286
+      ],
+      "speed_mps": 0.417,
+      "stride_m": 0.323,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": false
+     },
+     "sole_penetration_m": {
+      "p50": 0.01,
+      "p95": 0.0196,
+      "max": 0.0218
+     }
+    }
+   ],
+   "gait_definition": "Per env and foot over its window (from 1 s to the first episode's end or the clip's end). Foot: the centre of the foot collider (adapter's feet), its height taken above the task's collision surface (adapter.ground_height; 0 on flat ground): the highest surface point under the foot's footprint (adapter's feet_footprint: its bounding-box corners; else straight below the centre), so a foot standing across a step edge is on the upper tread. cadence_hz: peak of the Hann-windowed FFT of the mean-removed foot height (zero-padded to >= 16x, searched in 0.5-10 Hz), i.e. gait cycles per second of that foot. apex_m: 95th percentile of the foot height above its stance height (median height while in contact). slip_mps: median horizontal speed of the foot between consecutive frames that are both in contact. air_frac: fraction of frames not in contact. touchdowns_hz: contact onsets after at least 2 frames in the air, per second (a terrain-independent cross-check of the cadence; needs feet_contact). Contact: the adapter's feet_contact (the task's touch sensor > 1 N), else within 15 mm of the window's lowest height. speed_mps: pelvis horizontal path / window time; stride_m: speed / mean cadence (ground covered per gait cycle). Summary: medians over envs whose first episode did not terminate and that walk (speed >= 0.15 m/s)."
+  },
+  "0.08": {
+   "noise_range": [
+    0.02,
+    0.08
+   ],
+   "exact_isaac": false,
+   "terrain": {
+    "isaac": "ROUGH_TERRAINS_CFG['random_rough'] (Isaac Lab v2.3.2 config/rough.py)",
+    "sub_terrain": {
+     "function": "hf_random_uniform",
+     "proportion": 0.2,
+     "noise_range": [
+      0.02,
+      0.08
+     ],
+     "noise_step": 0.02,
+     "downsampled_scale": null,
+     "border_width": 0.25
+    },
+    "isaac_noise_range": [
+     0.02,
+     0.1
+    ],
+    "exact_isaac": false,
+    "size": [
+     8.0,
+     8.0
+    ],
+    "border_width": 20.0,
+    "horizontal_scale": 0.1,
+    "vertical_scale": 0.005,
+    "slope_threshold": 0.75,
+    "seed": 0,
+    "generator_seed": 0,
+    "difficulty": 0.2698,
+    "difficulty_note": "drawn by the generator and ignored by random_uniform_terrain"
+   },
+   "terrain_stats": {
+    "hfield_samples": [
+     481,
+     481
+    ],
+    "extent_m": [
+     48.0,
+     48.0
+    ],
+    "tile_heights_m": [
+     0.02,
+     0.04,
+     0.06,
+     0.08
+    ],
+    "tile_max_m": 0.07999999821186066,
+    "grid_edges": 12960,
+    "wall_edges": 82,
+    "wall_note": "edges of Isaac's height field whose jump exceeds slope_threshold x horizontal_scale: vertical walls in Isaac's mesh, 0.1 m ramps in the heightfield"
+   },
+   "info": {
+    "engine": "CPU MuJoCo 3.14.0 (Unitree's loop per robot)",
+    "rollout_s": 2.3
+   },
+   "summary": {
+    "robots": 16,
+    "falls": 7,
+    "fall_s_first": 3.46,
+    "fall_s_median": 5.06,
+    "fall_s_all": [
+     3.46,
+     3.78,
+     4.44,
+     5.06,
+     6.54,
+     6.62,
+     7.8
+    ],
+    "nonfoot_contacts": 15,
+    "forward_m_median": 2.6305,
+    "forward_m_median_standing": 3.051,
+    "forward_m_range": [
+     0.584,
+     3.432
+    ],
+    "gait_robots": 16,
+    "cadence_hz": [
+     1.254,
+     1.26
+    ],
+    "touchdowns_hz": [
+     1.434,
+     1.286
+    ],
+    "apex_m": [
+     0.0644,
+     0.0615
+    ],
+    "slip_mps": [
+     0.0366,
+     0.0259
+    ],
+    "speed_mps": 0.503,
+    "sole_penetration_m": {
+     "p50": 0.0127,
+     "p95": 0.0355,
+     "max": 0.0678
+    }
+   },
+   "robots": [
+    {
+     "lane_y": -3.0,
+     "fell": false,
+     "fall_s": null,
+     "first_nonfoot_contact_s": 0.1,
+     "forward_m": 3.076,
+     "lateral_m": 0.446,
+     "gait": {
+      "window_s": [
+       1.0,
+       8.0
+      ],
+      "cadence_hz": [
+       1.294,
+       1.282
+      ],
+      "apex_m": [
+       0.066,
+       0.0627
+      ],
+      "slip_mps": [
+       0.0405,
+       0.0225
+      ],
+      "air_frac": [
+       0.426,
+       0.357
+      ],
+      "touchdowns_hz": [
+       1.714,
+       1.286
+      ],
+      "speed_mps": 0.442,
+      "stride_m": 0.3432,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": false
+     },
+     "sole_penetration_m": {
+      "p50": 0.0153,
+      "p95": 0.0316,
+      "max": 0.0367
+     }
+    },
+    {
+     "lane_y": -2.6,
+     "fell": true,
+     "fall_s": 5.06,
+     "first_nonfoot_contact_s": 5.02,
+     "forward_m": 2.206,
+     "lateral_m": 1.222,
+     "gait": {
+      "window_s": [
+       1.0,
+       5.06
+      ],
+      "cadence_hz": [
+       1.306,
+       1.282
+      ],
+      "apex_m": [
+       0.0656,
+       0.088
+      ],
+      "slip_mps": [
+       0.0446,
+       0.0345
+      ],
+      "air_frac": [
+       0.296,
+       0.409
+      ],
+      "touchdowns_hz": [
+       1.232,
+       1.478
+      ],
+      "speed_mps": 0.688,
+      "stride_m": 0.5317,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": true
+     },
+     "sole_penetration_m": {
+      "p50": 0.0125,
+      "p95": 0.0236,
+      "max": 0.0306
+     }
+    },
+    {
+     "lane_y": -2.2,
+     "fell": true,
+     "fall_s": 7.8,
+     "first_nonfoot_contact_s": 2.92,
+     "forward_m": 0.584,
+     "lateral_m": -2.177,
+     "gait": {
+      "window_s": [
+       1.0,
+       7.8
+      ],
+      "cadence_hz": [
+       1.227,
+       1.312
+      ],
+      "apex_m": [
+       0.0847,
+       0.0926
+      ],
+      "slip_mps": [
+       0.0715,
+       0.081
+      ],
+      "air_frac": [
+       0.435,
+       0.321
+      ],
+      "touchdowns_hz": [
+       1.912,
+       1.765
+      ],
+      "speed_mps": 0.711,
+      "stride_m": 0.5601,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": true
+     },
+     "sole_penetration_m": {
+      "p50": 0.0103,
+      "p95": 0.0333,
+      "max": 0.04
+     }
+    },
+    {
+     "lane_y": -1.8,
+     "fell": false,
+     "fall_s": null,
+     "first_nonfoot_contact_s": 0.86,
+     "forward_m": 3.432,
+     "lateral_m": -0.055,
+     "gait": {
+      "window_s": [
+       1.0,
+       8.0
+      ],
+      "cadence_hz": [
+       1.227,
+       1.257
+      ],
+      "apex_m": [
+       0.0499,
+       0.057
+      ],
+      "slip_mps": [
+       0.0225,
+       0.0262
+      ],
+      "air_frac": [
+       0.449,
+       0.423
+      ],
+      "touchdowns_hz": [
+       1.571,
+       1.286
+      ],
+      "speed_mps": 0.475,
+      "stride_m": 0.3824,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": false
+     },
+     "sole_penetration_m": {
+      "p50": 0.0077,
+      "p95": 0.0302,
+      "max": 0.0351
+     }
+    },
+    {
+     "lane_y": -1.4,
+     "fell": true,
+     "fall_s": 4.44,
+     "first_nonfoot_contact_s": 2.1,
+     "forward_m": 2.3,
+     "lateral_m": -0.426,
+     "gait": {
+      "window_s": [
+       1.0,
+       4.44
+      ],
+      "cadence_hz": [
+       1.294,
+       1.038
+      ],
+      "apex_m": [
+       0.0448,
+       0.0723
+      ],
+      "slip_mps": [
+       0.0229,
+       0.0421
+      ],
+      "air_frac": [
+       0.401,
+       0.279
+      ],
+      "touchdowns_hz": [
+       2.035,
+       1.163
+      ],
+      "speed_mps": 0.651,
+      "stride_m": 0.5583,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": true
+     },
+     "sole_penetration_m": {
+      "p50": 0.0124,
+      "p95": 0.0372,
+      "max": 0.0454
+     }
+    },
+    {
+     "lane_y": -1.0,
+     "fell": true,
+     "fall_s": 3.78,
+     "first_nonfoot_contact_s": 3.86,
+     "forward_m": 1.267,
+     "lateral_m": 0.664,
+     "gait": {
+      "window_s": [
+       1.0,
+       3.78
+      ],
+      "cadence_hz": [
+       0.952,
+       1.318
+      ],
+      "apex_m": [
+       0.0632,
+       0.0394
+      ],
+      "slip_mps": [
+       0.0582,
+       0.04
+      ],
+      "air_frac": [
+       0.36,
+       0.302
+      ],
+      "touchdowns_hz": [
+       1.439,
+       2.518
+      ],
+      "speed_mps": 0.636,
+      "stride_m": 0.5604,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": true
+     },
+     "sole_penetration_m": {
+      "p50": 0.0187,
+      "p95": 0.031,
+      "max": 0.0398
+     }
+    },
+    {
+     "lane_y": -0.6,
+     "fell": false,
+     "fall_s": null,
+     "first_nonfoot_contact_s": 2.14,
+     "forward_m": 2.629,
+     "lateral_m": -0.942,
+     "gait": {
+      "window_s": [
+       1.0,
+       8.0
+      ],
+      "cadence_hz": [
+       1.257,
+       1.263
+      ],
+      "apex_m": [
+       0.0441,
+       0.0575
+      ],
+      "slip_mps": [
+       0.0187,
+       0.0196
+      ],
+      "air_frac": [
+       0.491,
+       0.331
+      ],
+      "touchdowns_hz": [
+       1.286,
+       1.286
+      ],
+      "speed_mps": 0.383,
+      "stride_m": 0.304,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": false
+     },
+     "sole_penetration_m": {
+      "p50": 0.0127,
+      "p95": 0.0316,
+      "max": 0.0347
+     }
+    },
+    {
+     "lane_y": -0.2,
+     "fell": true,
+     "fall_s": 3.46,
+     "first_nonfoot_contact_s": 2.74,
+     "forward_m": 1.218,
+     "lateral_m": -1.458,
+     "gait": {
+      "window_s": [
+       1.0,
+       3.46
+      ],
+      "cadence_hz": [
+       1.27,
+       0.513
+      ],
+      "apex_m": [
+       0.1074,
+       0.1418
+      ],
+      "slip_mps": [
+       0.0472,
+       0.0594
+      ],
+      "air_frac": [
+       0.415,
+       0.325
+      ],
+      "touchdowns_hz": [
+       1.626,
+       1.626
+      ],
+      "speed_mps": 0.792,
+      "stride_m": 0.8884,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": true
+     },
+     "sole_penetration_m": {
+      "p50": 0.0135,
+      "p95": 0.0258,
+      "max": 0.0395
+     }
+    },
+    {
+     "lane_y": 0.2,
+     "fell": false,
+     "fall_s": null,
+     "first_nonfoot_contact_s": 0.4,
+     "forward_m": 3.271,
+     "lateral_m": -0.568,
+     "gait": {
+      "window_s": [
+       1.0,
+       8.0
+      ],
+      "cadence_hz": [
+       1.251,
+       1.27
+      ],
+      "apex_m": [
+       0.0602,
+       0.0481
+      ],
+      "slip_mps": [
+       0.0192,
+       0.0176
+      ],
+      "air_frac": [
+       0.457,
+       0.409
+      ],
+      "touchdowns_hz": [
+       1.429,
+       1.286
+      ],
+      "speed_mps": 0.468,
+      "stride_m": 0.3713,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": false
+     },
+     "sole_penetration_m": {
+      "p50": 0.009,
+      "p95": 0.0311,
+      "max": 0.0401
+     }
+    },
+    {
+     "lane_y": 0.6,
+     "fell": false,
+     "fall_s": null,
+     "first_nonfoot_contact_s": 1.14,
+     "forward_m": 2.608,
+     "lateral_m": -0.906,
+     "gait": {
+      "window_s": [
+       1.0,
+       8.0
+      ],
+      "cadence_hz": [
+       1.239,
+       1.251
+      ],
+      "apex_m": [
+       0.0446,
+       0.0616
+      ],
+      "slip_mps": [
+       0.0476,
+       0.0225
+      ],
+      "air_frac": [
+       0.48,
+       0.254
+      ],
+      "touchdowns_hz": [
+       1.714,
+       1.0
+      ],
+      "speed_mps": 0.524,
+      "stride_m": 0.4209,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": false
+     },
+     "sole_penetration_m": {
+      "p50": 0.0172,
+      "p95": 0.0361,
+      "max": 0.0505
+     }
+    },
+    {
+     "lane_y": 1.0,
+     "fell": false,
+     "fall_s": null,
+     "first_nonfoot_contact_s": 0.12,
+     "forward_m": 3.051,
+     "lateral_m": -1.072,
+     "gait": {
+      "window_s": [
+       1.0,
+       8.0
+      ],
+      "cadence_hz": [
+       1.227,
+       1.257
+      ],
+      "apex_m": [
+       0.0543,
+       0.0514
+      ],
+      "slip_mps": [
+       0.0327,
+       0.0412
+      ],
+      "air_frac": [
+       0.489,
+       0.371
+      ],
+      "touchdowns_hz": [
+       1.429,
+       1.714
+      ],
+      "speed_mps": 0.482,
+      "stride_m": 0.3881,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": false
+     },
+     "sole_penetration_m": {
+      "p50": 0.0096,
+      "p95": 0.0266,
+      "max": 0.0398
+     }
+    },
+    {
+     "lane_y": 1.4,
+     "fell": false,
+     "fall_s": null,
+     "first_nonfoot_contact_s": 5.98,
+     "forward_m": 2.632,
+     "lateral_m": -1.313,
+     "gait": {
+      "window_s": [
+       1.0,
+       8.0
+      ],
+      "cadence_hz": [
+       1.263,
+       0.623
+      ],
+      "apex_m": [
+       0.0714,
+       0.0431
+      ],
+      "slip_mps": [
+       0.02,
+       0.0226
+      ],
+      "air_frac": [
+       0.474,
+       0.369
+      ],
+      "touchdowns_hz": [
+       1.286,
+       1.286
+      ],
+      "speed_mps": 0.406,
+      "stride_m": 0.4305,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": false
+     },
+     "sole_penetration_m": {
+      "p50": 0.0128,
+      "p95": 0.0337,
+      "max": 0.0449
+     }
+    },
+    {
+     "lane_y": 1.8,
+     "fell": false,
+     "fall_s": null,
+     "first_nonfoot_contact_s": 5.04,
+     "forward_m": 3.048,
+     "lateral_m": -0.585,
+     "gait": {
+      "window_s": [
+       1.0,
+       8.0
+      ],
+      "cadence_hz": [
+       0.708,
+       1.27
+      ],
+      "apex_m": [
+       0.0489,
+       0.0614
+      ],
+      "slip_mps": [
+       0.0263,
+       0.0256
+      ],
+      "air_frac": [
+       0.46,
+       0.426
+      ],
+      "touchdowns_hz": [
+       1.286,
+       1.571
+      ],
+      "speed_mps": 0.417,
+      "stride_m": 0.4216,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": false
+     },
+     "sole_penetration_m": {
+      "p50": 0.0096,
+      "p95": 0.0325,
+      "max": 0.0404
+     }
+    },
+    {
+     "lane_y": 2.2,
+     "fell": true,
+     "fall_s": 6.62,
+     "first_nonfoot_contact_s": 1.94,
+     "forward_m": 3.055,
+     "lateral_m": -0.436,
+     "gait": {
+      "window_s": [
+       1.0,
+       6.62
+      ],
+      "cadence_hz": [
+       1.349,
+       1.233
+      ],
+      "apex_m": [
+       0.0725,
+       0.086
+      ],
+      "slip_mps": [
+       0.0488,
+       0.0154
+      ],
+      "air_frac": [
+       0.388,
+       0.345
+      ],
+      "touchdowns_hz": [
+       1.423,
+       2.135
+      ],
+      "speed_mps": 0.687,
+      "stride_m": 0.5321,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": true
+     },
+     "sole_penetration_m": {
+      "p50": 0.0067,
+      "p95": 0.0341,
+      "max": 0.0509
+     }
+    },
+    {
+     "lane_y": 2.6,
+     "fell": false,
+     "fall_s": null,
+     "first_nonfoot_contact_s": null,
+     "forward_m": 3.371,
+     "lateral_m": -0.111,
+     "gait": {
+      "window_s": [
+       1.0,
+       8.0
+      ],
+      "cadence_hz": [
+       1.263,
+       1.263
+      ],
+      "apex_m": [
+       0.0727,
+       0.0473
+      ],
+      "slip_mps": [
+       0.022,
+       0.0163
+      ],
+      "air_frac": [
+       0.44,
+       0.411
+      ],
+      "touchdowns_hz": [
+       1.286,
+       1.286
+      ],
+      "speed_mps": 0.476,
+      "stride_m": 0.3769,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": false
+     },
+     "sole_penetration_m": {
+      "p50": 0.0137,
+      "p95": 0.0276,
+      "max": 0.0309
+     }
+    },
+    {
+     "lane_y": 3.0,
+     "fell": true,
+     "fall_s": 6.54,
+     "first_nonfoot_contact_s": 0.46,
+     "forward_m": 1.233,
+     "lateral_m": -1.311,
+     "gait": {
+      "window_s": [
+       1.0,
+       6.54
+      ],
+      "cadence_hz": [
+       1.196,
+       0.61
+      ],
+      "apex_m": [
+       0.088,
+       0.0798
+      ],
+      "slip_mps": [
+       0.0612,
+       0.1016
+      ],
+      "air_frac": [
+       0.357,
+       0.318
+      ],
+      "touchdowns_hz": [
+       1.805,
+       1.264
+      ],
+      "speed_mps": 0.664,
+      "stride_m": 0.7353,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": true
+     },
+     "sole_penetration_m": {
+      "p50": 0.0153,
+      "p95": 0.0356,
+      "max": 0.0443
+     }
+    }
+   ],
+   "gait_definition": "Per env and foot over its window (from 1 s to the first episode's end or the clip's end). Foot: the centre of the foot collider (adapter's feet), its height taken above the task's collision surface (adapter.ground_height; 0 on flat ground): the highest surface point under the foot's footprint (adapter's feet_footprint: its bounding-box corners; else straight below the centre), so a foot standing across a step edge is on the upper tread. cadence_hz: peak of the Hann-windowed FFT of the mean-removed foot height (zero-padded to >= 16x, searched in 0.5-10 Hz), i.e. gait cycles per second of that foot. apex_m: 95th percentile of the foot height above its stance height (median height while in contact). slip_mps: median horizontal speed of the foot between consecutive frames that are both in contact. air_frac: fraction of frames not in contact. touchdowns_hz: contact onsets after at least 2 frames in the air, per second (a terrain-independent cross-check of the cadence; needs feet_contact). Contact: the adapter's feet_contact (the task's touch sensor > 1 N), else within 15 mm of the window's lowest height. speed_mps: pelvis horizontal path / window time; stride_m: speed / mean cadence (ground covered per gait cycle). Summary: medians over envs whose first episode did not terminate and that walk (speed >= 0.15 m/s)."
+  },
+  "0.10": {
+   "noise_range": [
+    0.02,
+    0.1
+   ],
+   "exact_isaac": true,
+   "terrain": {
+    "isaac": "ROUGH_TERRAINS_CFG['random_rough'] (Isaac Lab v2.3.2 config/rough.py)",
+    "sub_terrain": {
+     "function": "hf_random_uniform",
+     "proportion": 0.2,
+     "noise_range": [
+      0.02,
+      0.1
+     ],
+     "noise_step": 0.02,
+     "downsampled_scale": null,
+     "border_width": 0.25
+    },
+    "isaac_noise_range": [
+     0.02,
+     0.1
+    ],
+    "exact_isaac": true,
+    "size": [
+     8.0,
+     8.0
+    ],
+    "border_width": 20.0,
+    "horizontal_scale": 0.1,
+    "vertical_scale": 0.005,
+    "slope_threshold": 0.75,
+    "seed": 0,
+    "generator_seed": 0,
+    "difficulty": 0.2698,
+    "difficulty_note": "drawn by the generator and ignored by random_uniform_terrain"
+   },
+   "terrain_stats": {
+    "hfield_samples": [
+     481,
+     481
+    ],
+    "extent_m": [
+     48.0,
+     48.0
+    ],
+    "tile_heights_m": [
+     0.02,
+     0.04,
+     0.06,
+     0.08,
+     0.1
+    ],
+    "tile_max_m": 0.10000000149011612,
+    "grid_edges": 12960,
+    "wall_edges": 1014,
+    "wall_note": "edges of Isaac's height field whose jump exceeds slope_threshold x horizontal_scale: vertical walls in Isaac's mesh, 0.1 m ramps in the heightfield"
+   },
+   "info": {
+    "engine": "CPU MuJoCo 3.14.0 (Unitree's loop per robot)",
+    "rollout_s": 2.7
+   },
+   "summary": {
+    "robots": 16,
+    "falls": 11,
+    "fall_s_first": 3.02,
+    "fall_s_median": 4.62,
+    "fall_s_all": [
+     3.02,
+     3.76,
+     4.02,
+     4.06,
+     4.5,
+     4.62,
+     4.64,
+     4.88,
+     5.34,
+     5.82,
+     6.18
+    ],
+    "nonfoot_contacts": 15,
+    "forward_m_median": 1.948,
+    "forward_m_median_standing": 2.652,
+    "forward_m_range": [
+     -0.548,
+     3.866
+    ],
+    "gait_robots": 16,
+    "cadence_hz": [
+     1.169,
+     1.248
+    ],
+    "touchdowns_hz": [
+     1.714,
+     1.4405
+    ],
+    "apex_m": [
+     0.0696,
+     0.0646
+    ],
+    "slip_mps": [
+     0.0409,
+     0.0465
+    ],
+    "speed_mps": 0.554,
+    "sole_penetration_m": {
+     "p50": 0.0154,
+     "p95": 0.0494,
+     "max": 0.0771
+    }
+   },
+   "robots": [
+    {
+     "lane_y": -3.0,
+     "fell": true,
+     "fall_s": 3.02,
+     "first_nonfoot_contact_s": 0.1,
+     "forward_m": -0.548,
+     "lateral_m": -1.324,
+     "gait": {
+      "window_s": [
+       1.0,
+       3.02
+      ],
+      "cadence_hz": [
+       1.123,
+       0.537
+      ],
+      "apex_m": [
+       0.2005,
+       0.0952
+      ],
+      "slip_mps": [
+       0.0944,
+       0.2169
+      ],
+      "air_frac": [
+       0.564,
+       0.287
+      ],
+      "touchdowns_hz": [
+       2.97,
+       1.98
+      ],
+      "speed_mps": 0.985,
+      "stride_m": 1.1867,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": true
+     },
+     "sole_penetration_m": {
+      "p50": 0.0181,
+      "p95": 0.0341,
+      "max": 0.0436
+     }
+    },
+    {
+     "lane_y": -2.6,
+     "fell": false,
+     "fall_s": null,
+     "first_nonfoot_contact_s": 4.12,
+     "forward_m": 2.619,
+     "lateral_m": -0.569,
+     "gait": {
+      "window_s": [
+       1.0,
+       8.0
+      ],
+      "cadence_hz": [
+       1.263,
+       1.251
+      ],
+      "apex_m": [
+       0.0523,
+       0.0751
+      ],
+      "slip_mps": [
+       0.03,
+       0.0234
+      ],
+      "air_frac": [
+       0.457,
+       0.394
+      ],
+      "touchdowns_hz": [
+       1.714,
+       1.286
+      ],
+      "speed_mps": 0.373,
+      "stride_m": 0.2967,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": false
+     },
+     "sole_penetration_m": {
+      "p50": 0.0123,
+      "p95": 0.0327,
+      "max": 0.0363
+     }
+    },
+    {
+     "lane_y": -2.2,
+     "fell": true,
+     "fall_s": 4.5,
+     "first_nonfoot_contact_s": 4.48,
+     "forward_m": 1.33,
+     "lateral_m": -1.103,
+     "gait": {
+      "window_s": [
+       1.0,
+       4.5
+      ],
+      "cadence_hz": [
+       1.343,
+       1.367
+      ],
+      "apex_m": [
+       0.0815,
+       0.1766
+      ],
+      "slip_mps": [
+       0.1413,
+       0.0349
+      ],
+      "air_frac": [
+       0.349,
+       0.286
+      ],
+      "touchdowns_hz": [
+       1.143,
+       0.857
+      ],
+      "speed_mps": 0.627,
+      "stride_m": 0.4627,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": true
+     },
+     "sole_penetration_m": {
+      "p50": 0.0124,
+      "p95": 0.0233,
+      "max": 0.0254
+     }
+    },
+    {
+     "lane_y": -1.8,
+     "fell": false,
+     "fall_s": null,
+     "first_nonfoot_contact_s": 0.42,
+     "forward_m": 2.652,
+     "lateral_m": -0.195,
+     "gait": {
+      "window_s": [
+       1.0,
+       8.0
+      ],
+      "cadence_hz": [
+       1.202,
+       1.282
+      ],
+      "apex_m": [
+       0.0766,
+       0.0503
+      ],
+      "slip_mps": [
+       0.0208,
+       0.0188
+      ],
+      "air_frac": [
+       0.369,
+       0.349
+      ],
+      "touchdowns_hz": [
+       1.714,
+       1.286
+      ],
+      "speed_mps": 0.355,
+      "stride_m": 0.2858,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": false
+     },
+     "sole_penetration_m": {
+      "p50": 0.0107,
+      "p95": 0.033,
+      "max": 0.0365
+     }
+    },
+    {
+     "lane_y": -1.4,
+     "fell": false,
+     "fall_s": null,
+     "first_nonfoot_contact_s": 4.38,
+     "forward_m": 2.605,
+     "lateral_m": -0.162,
+     "gait": {
+      "window_s": [
+       1.0,
+       8.0
+      ],
+      "cadence_hz": [
+       1.239,
+       1.227
+      ],
+      "apex_m": [
+       0.0499,
+       0.0575
+      ],
+      "slip_mps": [
+       0.0266,
+       0.0295
+      ],
+      "air_frac": [
+       0.334,
+       0.414
+      ],
+      "touchdowns_hz": [
+       1.714,
+       1.429
+      ],
+      "speed_mps": 0.406,
+      "stride_m": 0.3293,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": false
+     },
+     "sole_penetration_m": {
+      "p50": 0.0097,
+      "p95": 0.0287,
+      "max": 0.0389
+     }
+    },
+    {
+     "lane_y": -1.0,
+     "fell": true,
+     "fall_s": 4.62,
+     "first_nonfoot_contact_s": 1.62,
+     "forward_m": 1.227,
+     "lateral_m": 0.762,
+     "gait": {
+      "window_s": [
+       1.0,
+       4.62
+      ],
+      "cadence_hz": [
+       1.172,
+       1.221
+      ],
+      "apex_m": [
+       0.0468,
+       0.04
+      ],
+      "slip_mps": [
+       0.0156,
+       0.0502
+      ],
+      "air_frac": [
+       0.249,
+       0.354
+      ],
+      "touchdowns_hz": [
+       1.657,
+       1.934
+      ],
+      "speed_mps": 0.48,
+      "stride_m": 0.4012,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": true
+     },
+     "sole_penetration_m": {
+      "p50": 0.008,
+      "p95": 0.0312,
+      "max": 0.0405
+     }
+    },
+    {
+     "lane_y": -0.6,
+     "fell": true,
+     "fall_s": 5.82,
+     "first_nonfoot_contact_s": 1.56,
+     "forward_m": 2.15,
+     "lateral_m": 1.155,
+     "gait": {
+      "window_s": [
+       1.0,
+       5.82
+      ],
+      "cadence_hz": [
+       1.282,
+       1.245
+      ],
+      "apex_m": [
+       0.072,
+       0.0641
+      ],
+      "slip_mps": [
+       0.0474,
+       0.0474
+      ],
+      "air_frac": [
+       0.249,
+       0.349
+      ],
+      "touchdowns_hz": [
+       1.452,
+       1.452
+      ],
+      "speed_mps": 0.55,
+      "stride_m": 0.4353,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": true
+     },
+     "sole_penetration_m": {
+      "p50": 0.0196,
+      "p95": 0.0457,
+      "max": 0.0518
+     }
+    },
+    {
+     "lane_y": -0.2,
+     "fell": true,
+     "fall_s": 5.34,
+     "first_nonfoot_contact_s": 5.26,
+     "forward_m": 1.491,
+     "lateral_m": -0.907,
+     "gait": {
+      "window_s": [
+       1.0,
+       5.34
+      ],
+      "cadence_hz": [
+       1.099,
+       1.257
+      ],
+      "apex_m": [
+       0.1456,
+       0.0606
+      ],
+      "slip_mps": [
+       0.0303,
+       0.0272
+      ],
+      "air_frac": [
+       0.392,
+       0.35
+      ],
+      "touchdowns_hz": [
+       1.843,
+       1.843
+      ],
+      "speed_mps": 0.455,
+      "stride_m": 0.3862,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": true
+     },
+     "sole_penetration_m": {
+      "p50": 0.0111,
+      "p95": 0.0255,
+      "max": 0.0442
+     }
+    },
+    {
+     "lane_y": 0.2,
+     "fell": false,
+     "fall_s": null,
+     "first_nonfoot_contact_s": 1.42,
+     "forward_m": 3.866,
+     "lateral_m": -0.908,
+     "gait": {
+      "window_s": [
+       1.0,
+       8.0
+      ],
+      "cadence_hz": [
+       1.166,
+       1.257
+      ],
+      "apex_m": [
+       0.0516,
+       0.08
+      ],
+      "slip_mps": [
+       0.076,
+       0.0455
+      ],
+      "air_frac": [
+       0.417,
+       0.371
+      ],
+      "touchdowns_hz": [
+       2.143,
+       1.429
+      ],
+      "speed_mps": 0.558,
+      "stride_m": 0.4606,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": false
+     },
+     "sole_penetration_m": {
+      "p50": 0.0088,
+      "p95": 0.0365,
+      "max": 0.0404
+     }
+    },
+    {
+     "lane_y": 0.6,
+     "fell": true,
+     "fall_s": 4.06,
+     "first_nonfoot_contact_s": 0.16,
+     "forward_m": 1.923,
+     "lateral_m": 0.088,
+     "gait": {
+      "window_s": [
+       1.0,
+       4.06
+      ],
+      "cadence_hz": [
+       0.5,
+       1.025
+      ],
+      "apex_m": [
+       0.0671,
+       0.0652
+      ],
+      "slip_mps": [
+       0.0553,
+       0.0577
+      ],
+      "air_frac": [
+       0.176,
+       0.255
+      ],
+      "touchdowns_hz": [
+       0.654,
+       1.307
+      ],
+      "speed_mps": 0.638,
+      "stride_m": 0.8367,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": true
+     },
+     "sole_penetration_m": {
+      "p50": 0.0222,
+      "p95": 0.0383,
+      "max": 0.0455
+     }
+    },
+    {
+     "lane_y": 1.0,
+     "fell": false,
+     "fall_s": null,
+     "first_nonfoot_contact_s": null,
+     "forward_m": 3.007,
+     "lateral_m": -0.723,
+     "gait": {
+      "window_s": [
+       1.0,
+       8.0
+      ],
+      "cadence_hz": [
+       0.635,
+       1.251
+      ],
+      "apex_m": [
+       0.0528,
+       0.0616
+      ],
+      "slip_mps": [
+       0.0331,
+       0.0241
+      ],
+      "air_frac": [
+       0.383,
+       0.28
+      ],
+      "touchdowns_hz": [
+       2.0,
+       1.286
+      ],
+      "speed_mps": 0.433,
+      "stride_m": 0.4592,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": false
+     },
+     "sole_penetration_m": {
+      "p50": 0.0071,
+      "p95": 0.0287,
+      "max": 0.0322
+     }
+    },
+    {
+     "lane_y": 1.4,
+     "fell": true,
+     "fall_s": 6.18,
+     "first_nonfoot_contact_s": 3.28,
+     "forward_m": 2.592,
+     "lateral_m": 0.111,
+     "gait": {
+      "window_s": [
+       1.0,
+       6.18
+      ],
+      "cadence_hz": [
+       1.013,
+       1.27
+      ],
+      "apex_m": [
+       0.0574,
+       0.0795
+      ],
+      "slip_mps": [
+       0.0571,
+       0.0729
+      ],
+      "air_frac": [
+       0.259,
+       0.355
+      ],
+      "touchdowns_hz": [
+       1.931,
+       1.544
+      ],
+      "speed_mps": 0.559,
+      "stride_m": 0.4897,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": true
+     },
+     "sole_penetration_m": {
+      "p50": 0.0141,
+      "p95": 0.0382,
+      "max": 0.0472
+     }
+    },
+    {
+     "lane_y": 1.8,
+     "fell": true,
+     "fall_s": 4.64,
+     "first_nonfoot_contact_s": 0.62,
+     "forward_m": 1.589,
+     "lateral_m": 1.836,
+     "gait": {
+      "window_s": [
+       1.0,
+       4.64
+      ],
+      "cadence_hz": [
+       0.757,
+       0.903
+      ],
+      "apex_m": [
+       0.0731,
+       0.0801
+      ],
+      "slip_mps": [
+       0.0618,
+       0.0864
+      ],
+      "air_frac": [
+       0.231,
+       0.451
+      ],
+      "touchdowns_hz": [
+       0.824,
+       1.923
+      ],
+      "speed_mps": 0.726,
+      "stride_m": 0.8747,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": true
+     },
+     "sole_penetration_m": {
+      "p50": 0.0219,
+      "p95": 0.0436,
+      "max": 0.0579
+     }
+    },
+    {
+     "lane_y": 2.2,
+     "fell": true,
+     "fall_s": 4.02,
+     "first_nonfoot_contact_s": 3.44,
+     "forward_m": 0.026,
+     "lateral_m": 0.683,
+     "gait": {
+      "window_s": [
+       1.0,
+       4.02
+      ],
+      "cadence_hz": [
+       1.086,
+       0.928
+      ],
+      "apex_m": [
+       0.0324,
+       0.0595
+      ],
+      "slip_mps": [
+       0.015,
+       0.1312
+      ],
+      "air_frac": [
+       0.066,
+       0.364
+      ],
+      "touchdowns_hz": [
+       0.331,
+       1.325
+      ],
+      "speed_mps": 0.536,
+      "stride_m": 0.5323,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": true
+     },
+     "sole_penetration_m": {
+      "p50": 0.0142,
+      "p95": 0.028,
+      "max": 0.0367
+     }
+    },
+    {
+     "lane_y": 2.6,
+     "fell": true,
+     "fall_s": 3.76,
+     "first_nonfoot_contact_s": 3.56,
+     "forward_m": 1.559,
+     "lateral_m": -0.764,
+     "gait": {
+      "window_s": [
+       1.0,
+       3.76
+      ],
+      "cadence_hz": [
+       1.331,
+       0.5
+      ],
+      "apex_m": [
+       0.0859,
+       0.0424
+      ],
+      "slip_mps": [
+       0.0715,
+       0.1069
+      ],
+      "air_frac": [
+       0.435,
+       0.275
+      ],
+      "touchdowns_hz": [
+       1.812,
+       2.174
+      ],
+      "speed_mps": 0.708,
+      "stride_m": 0.7733,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": true
+     },
+     "sole_penetration_m": {
+      "p50": 0.0109,
+      "p95": 0.0274,
+      "max": 0.03
+     }
+    },
+    {
+     "lane_y": 3.0,
+     "fell": true,
+     "fall_s": 4.88,
+     "first_nonfoot_contact_s": 0.84,
+     "forward_m": 1.973,
+     "lateral_m": 1.117,
+     "gait": {
+      "window_s": [
+       1.0,
+       4.88
+      ],
+      "cadence_hz": [
+       1.27,
+       1.306
+      ],
+      "apex_m": [
+       0.0736,
+       0.0661
+      ],
+      "slip_mps": [
+       0.0344,
+       0.0457
+      ],
+      "air_frac": [
+       0.33,
+       0.361
+      ],
+      "touchdowns_hz": [
+       1.031,
+       1.804
+      ],
+      "speed_mps": 0.621,
+      "stride_m": 0.4821,
+      "cmd_speed_mps": 0.5,
+      "cmd_yaw_rate": 0.0,
+      "terminated": true
+     },
+     "sole_penetration_m": {
+      "p50": 0.0135,
+      "p95": 0.0269,
+      "max": 0.0336
+     }
+    }
+   ],
+   "gait_definition": "Per env and foot over its window (from 1 s to the first episode's end or the clip's end). Foot: the centre of the foot collider (adapter's feet), its height taken above the task's collision surface (adapter.ground_height; 0 on flat ground): the highest surface point under the foot's footprint (adapter's feet_footprint: its bounding-box corners; else straight below the centre), so a foot standing across a step edge is on the upper tread. cadence_hz: peak of the Hann-windowed FFT of the mean-removed foot height (zero-padded to >= 16x, searched in 0.5-10 Hz), i.e. gait cycles per second of that foot. apex_m: 95th percentile of the foot height above its stance height (median height while in contact). slip_mps: median horizontal speed of the foot between consecutive frames that are both in contact. air_frac: fraction of frames not in contact. touchdowns_hz: contact onsets after at least 2 frames in the air, per second (a terrain-independent cross-check of the cadence; needs feet_contact). Contact: the adapter's feet_contact (the task's touch sensor > 1 N), else within 15 mm of the window's lowest height. speed_mps: pelvis horizontal path / window time; stride_m: speed / mean cadence (ground covered per gait cycle). Summary: medians over envs whose first episode did not terminate and that walk (speed >= 0.15 m/s)."
+  }
+ }
+}

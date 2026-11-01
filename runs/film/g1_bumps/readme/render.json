@@ -1,0 +1,112 @@
+{
+ "task": "g1_bumps",
+ "grid": 1,
+ "slots": [
+  0
+ ],
+ "envs": [
+  6
+ ],
+ "frames": 401,
+ "fps": 50.0,
+ "width": 640,
+ "height": 480,
+ "panel": [
+  640,
+  480
+ ],
+ "tier": 2,
+ "passes": 16,
+ "spp": 4,
+ "samples_per_pixel": 64,
+ "bounces": 3,
+ "denoise": "oidn",
+ "exposure": 0.2537154134188774,
+ "viewer": {
+  "eye": [
+   1.95,
+   -1.5,
+   0.675
+  ],
+  "lookat": [
+   0.0,
+   0.0,
+   -0.15
+  ],
+  "origin_type": "asset_body",
+  "env_index": 0,
+  "asset_name": null,
+  "body_name": "pelvis",
+  "resolution": [
+   640,
+   480
+  ],
+  "fovy": 36.0,
+  "smooth_s": 1.0,
+  "orbit_deg_s": 10.0
+ },
+ "look": {
+  "hdri": "hdri/demo/goegap_8k.hdr",
+  "sun": true,
+  "ground_texture": "tex/demo/sandy_gravel_02_diff_2k.png",
+  "ground_tile_m": 2.53,
+  "ground_texrepeat": 0.790513833992095,
+  "grains_per_particle": 4,
+  "grain_radius": null
+ },
+ "particles_per_env": 0,
+ "particle_radius": 0.0,
+ "setup_s": 1.315702500003681,
+ "probe": {
+  "frame": 0,
+  "warmup_s": 0.11288804200012237,
+  "one_pass_s": 0.02227537499857135,
+  "full_s": 0.13301604200387374,
+  "per_pass_s": 0.007382711133686826
+ },
+ "twin_geoms": 61,
+ "frame_corrections": 0,
+ "env_grid": {
+  "margin": 68.28254562109468,
+  "cell": [
+   184.56609124218937,
+   184.56609124218937,
+   146.61609124218936
+  ],
+  "growths": 0
+ },
+ "cache_key": "c5f72fda3cf7b8dd52b6",
+ "software": {
+  "metalsim": "e67efcb9f9+dirty",
+  "warp": {
+   "version": "1.18.0.dev20260917",
+   "git": "52c09cdd82",
+   "checkout": "upstream/warp-metalsim"
+  },
+  "mujoco": {
+   "version": "3.14.0"
+  },
+  "numpy": {
+   "version": "2.5.3"
+  }
+ },
+ "hardware": {
+  "machine": "arm64",
+  "python": "3.13.7",
+  "power": {
+   "source": "AC Power",
+   "battery_percent": 89,
+   "battery_state": "charging",
+   "mode": "High Power",
+   "mode_setting": "powermode 2",
+   "at": "2026-10-31T23:40:43-0700"
+  },
+  "model": "Mac16,6",
+  "cpu": "Apple M4 Max",
+  "memory_gb": 64,
+  "macos": "27.0.1",
+  "macos_build": "26A434",
+  "gpu": "Apple M4 Max",
+  "gpu_cores": "40"
+ }
+}

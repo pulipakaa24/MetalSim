@@ -158,6 +158,8 @@ def cache_key(rec_dir, film, look, viewer, grid, slots) -> str:
     settings = dict(tier=film.tier, passes=film.passes, spp=film.spp, bounces=film.bounces, denoise=film.denoise,
                     look=_key_look(look), viewer=_cfg_dict(viewer), resolution=list(viewer.resolution), grid=grid,
                     slots=list(slots))
+    if getattr(film, "after_end", "hold") != "hold":      # only when set, so the keys of existing takes are unchanged
+        settings["after_end"] = film.after_end
     h.update(json.dumps(settings, sort_keys=True, default=str).encode())
     return h.hexdigest()[:20]
 
@@ -263,7 +265,10 @@ def render(task, rec_dir, out_dir, frames_arg=None, skip_existing=True, grid=Non
     fps = rec["fps"]
     ends = R["ends"]
     F_rec = R["xpos"].shape[0]
-    last = [int(ends[s]) if ends[s] >= 0 else F_rec - 1 for s in slots]
+    if film.after_end not in ("hold", "play"):
+        raise ValueError(f"after_end must be 'hold' or 'play', not {film.after_end!r}")
+    # "play": the recording goes on after an episode's end (the adapter kept simulating it): film it to the end
+    last = [int(ends[s]) if ends[s] >= 0 and film.after_end == "hold" else F_rec - 1 for s in slots]
     hold = int(round(film.hold_s * fps))
     n_frames = min(max(last) + 1 + hold, film.video_length or 10**9)
     W, H = viewer.resolution
