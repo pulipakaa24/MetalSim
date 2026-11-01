@@ -320,3 +320,132 @@ All from the repository root with `.venv/bin/python`; MuJoCo Warp copy chosen by
 - Falls: `falls/measure_seeds.py cpu|gpu <tag> <seeds>`, `falls/repeat.sh <copy> <tag> <n> <seeds>`, `falls/summary.py`.
 - GPU batches: `gpu/batch_a.sh` (tests, falls), `gpu/batch_b.sh` (Metal tests, timing, `gpu/random_actions.py`),
   `gpu/batch_c.sh` (random actions with the MuJoCo C reference, cost split); logs next to them.
+
+## 12. Addendum (2026-10-31, evening): EPA horizon overflow and the cost of a geom gap
+
+The rough-terrain re-runs on `93e5ce1` (`runs/readme_media/handoff/rough-reruns.md`, items 2-3) found two problems
+this note's fix had exposed: Isaac Lab 3.0's like-for-like config (`rough_il3`) flagged MuJoCo Warp's `EPA_HORIZON`
+capacity overflow in a few of the 4096 worlds within the first iterations (3 in each 8-iteration smoke run; the
+pair's contact is dropped for that substep), and its PPO iteration took about 2.1x as long as on the plane-path pin
+`8eb51fe`, against the -15 % of section 8.4.
+Both come from the G1's mesh feet now being on per-prism GJK/EPA (section 6) together with `rough_il3`'s geom gap
+(Isaac Lab 3.0's 1 cm per geom; MuJoCo Warp sums a pair's gaps, so `margin + gap` = 0.02 m). Fork branch
+`metalsim-hfield-epa` (worktree `runs/readme_media/scratch/hfield-epa/mjw`, on `93e5ce1`; pushed, and the fork's
+`metalsim` fast-forwarded to it): `439b808`, `f85879c`, `1eb40d5`, then, after an independent review
+(`runs/readme_media/handoff/epa-review.md`), `d7a90fb`, `3d8f48c`, `ba9cfb7`, `489f421`, `787a5b3`, which MetalSim
+pins (`patches/mujoco_warp/0024-0031`); patch `runs/readme_media/handoff/hfield-epa.patch.v2`. Sources: [MJW] as
+above; [C-main] `engine_collision_gjk.c` read 2026-10-31 (`horizon` / `horizonRec`, `epa`, `mjc_ccd`); MuJoCo issue
+[google-deepmind/mujoco#3646](https://github.com/google-deepmind/mujoco/issues/3646) (C's horizon buffer, fixed in
+`6d662aed` by a bound check and `24 + max(0, ccd_iterations - 35)` edges); MuJoCo Warp PR
+[google-deepmind/mujoco_warp#1845](https://github.com/google-deepmind/mujoco_warp/pull/1845) (open: the same
+disconnected-horizon failure on aligned mesh plates). Scratch paths are local to the machine that ran them.
+
+**Mechanism (measured).** A substep hook on Metal stored the qpos of the first `EPA_HORIZON` event per world during
+12 `rough_il3` iterations on `93e5ce1` (3 events, iterations 7-10). Replayed on Warp's CPU device, all three
+overflow again, and so do 20 copies of each with the root position jittered by 1e-6 m. In each, a foot mesh against
+one prism ran EPA for 33-39 iterations on the *inflated* shapes, with upper and lower depth bounds converging at
+19.2-19.9 mm, i.e. the uninflated shapes 0.1-0.8 mm apart: EPA crawling over the rounded part of the inflated
+Minkowski difference, where the support point lies (to rounding) on the planes of many small faces. Two things in
+the fork made that fatal:
+1. **Horizon scan** [MJW `_epa`, since the first EPA port `66c2ebce`]: the visible faces are found by testing every
+   face on its own. MuJoCo C recurses through face adjacency from the closest face, so its deleted faces are always
+   connected [C-main `horizonRec`]. With the support point on several faces' planes, rounding can delete faces that
+   are not connected to the closest one; the horizon is then not one loop (two regions touching at a vertex, or a
+   ring), the faces attached to it do not close the polytope, and the edge list (`_add_edge` toggles an edge in and
+   out, so the buffer must hold the intermediate set, not just the final horizon) overflows its fixed 24 entries.
+   Static G1 foot and torso placements on the training terrain: 31-64 non-loop horizons per 40,000 placements (none
+   overflowing at 24; the training states did).
+2. **Margin handling** [MJW `gjk_phase`]: with a margin or gap, every prism within `margin + gap` of the foot went
+   through EPA on the inflated (smooth, hence non-discrete) shapes, iterating to the 1e-6 m tolerance. MuJoCo C's
+   `mjc_ccd` first runs GJK on the uninflated shapes and, when they are apart, returns that distance less the margins
+   without EPA ("special handling for sphere, capsule, and margin (shrink to underlying geom)"); upstream MuJoCo Warp
+   does the same since 2026-10-23 for every pair except heightfields (`gdm/main` `23efc9a`, `has_non_hfield_margin`),
+   because upstream's heightfield path uses the older margin convention that this fork replaced (section 7).
+
+A third, rarer drop: when EPA's face buffer (6 + 5 x ccd_iterations) fills, `_attach_face` fails and the contact is
+dropped without any flag; MuJoCo C stops with its closest face instead [C-main `epa`, "out of memory for faces"]
+(1 in 40,000 static foot placements).
+
+**Fix.**
+- `439b808` EPA: the original scan runs first; when its horizon is not one simple loop it is undone (each face it
+  deleted carries a per-iteration mark in `face_norm2`, which nothing reads for deleted faces) and the deleted
+  region grows from the closest face by passes over the face list, adding a visible face only when it shares an
+  edge with the region, MuJoCo C's region. A scan whose horizon is one loop is kept as it is, so results are bitwise
+  unchanged there. The horizon buffer holds every edge of EPA's largest polytope, `3 (5 + ccd_iterations) - 6` (114
+  at 35). If it still fills (`EPA_HORIZON`) or the grown region is still not a disk, EPA returns no contact, as
+  MuJoCo C's `epa` when its horizon runs out of edges (`d7a90fb`; C has no test for a region that is not a disk);
+  neither occurs at the derived size (0 in 351,278 worlds of the static sets and training-state replays, instrumented
+  copy). A full face buffer stops EPA with its closest face, as in C.
+- `f85879c` `collision_gjk.HFIELD_MARGIN_SHRINK` (default True): heightfield prism pairs with a margin or gap take
+  MuJoCo C's route: GJK on the uninflated shapes; EPA (on the inflated shapes, as C) only when they overlap. No effect
+  at margin = gap = 0. Setting it False in the fork's `collision_gjk.py` (read at import) restores the previous form;
+  the shrink is off whenever `HFIELD_PRISM_POLYTOPE` is False (`3d8f48c`).
+
+**Results (measured).**
+
+| check | `93e5ce1` | fix |
+|---|---|---|
+| captured `rough_il3` overflow states, CPU replay (3 states x 21) | 63 / 63 overflow | 0 / 63 (also 0 with the EPA fix alone) |
+| `rough_il3` smoke, 4096 envs x 8 it, `EPA_HORIZON` worlds (two runs) | 3, 3 | 0, 0 |
+| 12-iteration `rough_il3` run on Metal with the capture hook, first-flag events | 3 | 0 |
+| rough-transfer protocol (full: levels 3 and 6, protocols A and B), overflow flags at exit | `LS_ITERATIONS` only | `LS_ITERATIONS` only (falls 1 of 144 vs 2 of 144) |
+| heightfield contact checks of section 8.1 (3000 spheres; 1000 each capsule, box, cylinder, ellipsoid, G1 foot; gap 0) | | bitwise identical |
+| static G1 foot / torso placements on the training terrain, gap 0.01 per geom (5 x 40,000) and the g1_bumps tile (2 x 40,000), EPA fix alone | | bitwise identical in all but 2-7 worlds per set, every one a non-loop horizon; one dropped contact recovered, one face-buffer drop recovered |
+| G1 foot on box stairs (boxes_local-like, 20,000 placements incl. flat, grid-aligned soles) | | bitwise identical |
+| fork suites `collision_driver_test`, `collision_gjk_test`, `collision_primitive_core_test` (with the new tests) | | CPU and Metal: 127 passed, 2 skipped (`787a5b3`; 122 at `1eb40d5`) |
+| MetalSim `tests/test_terrain.py` (Metal) | 21 passed | 21 passed, the heightfield-mesh test's figures unchanged (min normal z 0.912, max penetration 5.2 mm) |
+
+The fix column was measured at `1eb40d5`. `787a5b3` changes only the fallbacks above, the shrink's condition and the
+tests. At the defaults it gives bitwise-identical contacts and overflow flags on the CPU sets above (the section 8.1
+checks, the static placements, box stairs, and 49,278 replayed `rough_il3` training states: 359,278 worlds); the suites
+and `tests/test_terrain.py` were re-run on it; the Metal smoke, capture and transfer rows were not
+(`runs/readme_media/handoff/epa-fixes.md`).
+
+With the shrink, prisms apart within the gap get GJK's exact distance (EPA on the inflated shapes had it to about
+2e-7 m, with normals of neighbouring prisms 0.3 deg apart, which the duplicate test of section 6 then kept as extra
+contacts): on 40,000 foot placements with the gap the contact count falls from 144,701 to 144,199 and the deepest
+contact per placement matches the exact float64 signed distance as before (3000 placements checked, p99 error
+0.005 mm). New tests:
+`test_hfield_mesh_gap_distance` (EPA on the inflated shapes returned 4.000172 mm for a 4 mm gap), the horizon-size
+test, `test_horizon_is_loop` (synthetic horizons: one loop, figure-8s, two loops, open paths),
+`test_epa_nonloop_horizon` (three box-stack poses and one ellipsoid pose whose scan is not one loop, deepest contact
+against MuJoCo C to 2e-8 m / 1e-6 m; the old scan gave the same contact on them, so it pins the restart, not a change
+of result), and `test_box_box_horizon` updated (its configuration now needs 5 horizon edges instead of 8; with 3 or 4
+it overflows and gives no contact, as MuJoCo C). In the three captured states the dropped contacts were inactive
+gap-zone contacts (MuJoCo Warp: detected below `margin + gap`, active below `margin`), and the four selected contacts
+per pair are the same with the fix; the `rough_il3` run's dynamics were affected only where a dropped candidate would
+have been among the four (not the case in the three captured states).
+
+**Cost (measured on the 14-inch MacBook Pro on AC power, powermode 2: not a timing machine, ratios only).** The
+rough-rerun smoke commands (`runs/rough_rerun_2026-10-31/train_wrap.py`, 4096 envs, 8 iterations, `--initial_reset
+1`), time per PPO iteration over iterations 4-8, forks interleaved in one queue job (the fix timed at `1eb40d5`;
+`787a5b3` was not re-timed):
+
+| config | `8eb51fe` (plane path) | `93e5ce1` | fix | `93e5ce1` / `8eb51fe` | fix / `8eb51fe` |
+|---|---|---|---|---|---|
+| `rough_il3` (2 rounds) | 1.870 / 1.874 s | 3.838 / 3.848 s | 3.145 / 3.151 s | 2.05 | 1.68 |
+| 2.3.2 seed-0 config, heightfield everywhere, no gap (2 / 6 / 6 runs, medians) | 1.910 s | 2.483 s | 2.509 s | 1.30 | 1.31 |
+| 2.3.2 seed-1 config, boxes_local + heightfield, no gap (1 / 4 / 4 runs, medians) | 2.129 s | 2.541 s | 2.569 s | 1.19 | 1.21 |
+
+Section 8.4's -15 % is the env step under random actions (on battery); a PPO iteration (rollout with the learning
+policy, plus the update) shows larger ratios: 1.30x / 1.19x the plane path in the 2.3.2 configs on `93e5ce1`, 1.31x /
+1.21x with this fix. The difference between the two protocols was not isolated. Where `rough_il3`'s cost goes
+(training states after iteration 12, 512 worlds, every prism the kernel processes classified by its exact float64
+signed distance, `probe/profile_counts.py`): with the 2 cm pair gap, 266 / 259 of the 512 left / right feet have
+prisms within reach (125 / 115 without the gap, same states); each such pair processes 13.4 prisms (GJK each), of
+which 1.25 penetrate and 5.3-5.5 are apart within the gap. EPA calls per foot pair: 6.5-6.8 on `93e5ce1` (all on the
+inflated shapes), 1.24-1.26 with the fix (-81 %). What remains of the 1.68x is the gap's semantics (twice the foot
+pairs, each with ~13 GJK calls, producing the inactive gap-zone contacts MuJoCo Warp's `gap` asks for) on per-prism
+GJK/EPA instead of the plane test. Not adopted (measured on CPU): EPA on the uninflated shapes for penetrating prisms
+too, plus the margins (another -36 % of CPU collision time on 40,000 foot placements, but one placement 0.95 mm off
+the exact depth, and it departs from MuJoCo C's algorithm).
+
+**Consequences.** The 2.3.2-config runs (no gap) never ran EPA on inflated shapes and showed no overflow (smoke and
+the 1500-iteration seed-0 run); the fix changes their contacts only where a scan's horizon was not one loop or EPA's
+face buffer filled, and adds about 1 % to their cost (medians of 4-6 interleaved runs; single runs spread by up to 7 %;
+CPU collision time +1 % on 40,000 foot placements). `rough_il3` on `93e5ce1` dropped inactive contacts and paid 2.05x;
+with the fix its gap-zone contacts are exact and it pays 1.68x the plane path, so its re-run belongs on the fix's
+commit. Still open: the fork's subgrid takes the mesh's tight horizontal bounds while MuJoCo C main grows them by the
+margin (prisms beside a geom within the gap are not candidates; gap-zone contacts only, at MetalSim's margin 0);
+MuJoCo Warp's four-contact selection counts inactive gap-zone contacts against the cap; upstream issues not filed
+(MuJoCo Warp: horizon scan, face-buffer drop, heightfield margin shrink; #1845 covers the first).
