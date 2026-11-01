@@ -491,8 +491,14 @@ A job refuses to start while the GPU shows runaway work (utilisation of 90 % or 
 minutes): the queue pauses and writes `runs/GPU_RUNAWAY_ALERT` (`scripts/gpu_run.sh`).
 
 **Updating the shared fork checkouts.** `scripts/fork_sync.sh` fast-forwards `upstream/mujoco_warp` and
-`upstream/warp-innate` to their `fork/metalsim` heads through the queue (timing class), so the working tree never
-changes under a job that is importing it. Agents work in worktrees and never touch the shared checkouts.
+`upstream/warp-metalsim` (`upstream/warp-innate` on older setups) to the commits the tree pins (MuJoCo Warp: the
+README's pip line; Warp: `PIN` in `scripts/setup_warp.sh`) through the queue (timing class), so the working tree never
+changes under a job that is importing it. It finds each fork's remote by URL, fetches only when the pinned commit is
+missing, leaves a checkout that is ahead of its pin, diverged or modified as it is (and says so), rebuilds libwarp
+when Warp's native sources changed, and ends with one `wp.init()`. `scripts/fork_sync.sh -n` reports without changing
+anything or using the queue. Run from a git worktree it reads that tree's pins and syncs the main checkout's
+`upstream/`. `tests/test_fork_pins.py` fails while a checkout is off its pin. Agents work in worktrees and never touch
+the shared checkouts.
 
 **Live dashboard.** `scripts/gpu_dashboard.sh` starts a local page at http://localhost:8765 (idempotent;
 `--restart` to restart; `python3 scripts/gpu_dashboard.py --watch` is the terminal form, `/json` the
