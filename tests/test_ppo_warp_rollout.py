@@ -23,7 +23,12 @@ def _rollout(algo):
     b = algo.bufs
     with torch.no_grad():
         z = (b.t_act - algo.net.actor_mean(b.t_obs)) / algo.net.log_std.exp()
-    return z.clone(), b.t_obs.clone(), b.t_act.clone()
+    out = z.clone(), b.t_obs.clone(), b.t_act.clone()
+    # Run these reads now: nothing orders the next rollout's Warp writes to the buffers after them (PPOWarp.update
+    # does, with _publish_weights). Before 2026-11-01 they stayed queued until the next rollout's torch wait was
+    # committed and raced that rollout; once rollout() waits for the GPU on the host, they read the next rollout.
+    torch.mps.synchronize()
+    return out
 
 
 def test_noise_fresh_each_rollout_and_no_phantom_action(algo):
@@ -109,3 +114,14 @@ def test_loaded_weights_reach_the_warp_policy():
         mean_ref = ref.actor_mean(torch.as_tensor(obs)).numpy()
     np.testing.assert_allclose(algo.pol.actor_act[-1].numpy(), mean_ref, atol=1e-4, rtol=1e-3)
     np.testing.assert_allclose(algo.pol.actor_layers[0][0].numpy(), ref.actor[0].weight.detach().numpy())
+
+
+def test_rollout_hands_over_after_the_host_waited(algo):
+    """rollout() returns only after the rollout finished on the GPU, so PyTorch's first update command buffer never
+    waits for the rollout on the GPU. A GPU-side wait alone held that buffer for the whole rollout (2.5 s for G1 flat
+    at 4,096 envs alone), past macOS's GPU watchdog (about 4-5 s) when other processes loaded the GPU: the buffer
+    was killed and the update silently trained on zeros (2026-11-01; test_interop.test_watchdog_killed_torch_buffer_raises)."""
+    algo.rollout()
+    ev = algo.task.sim.event
+    assert ev.signaled_value >= ev.value, (ev.signaled_value, ev.value)
+    torch.mps.synchronize()

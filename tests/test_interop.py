@@ -205,3 +205,50 @@ def test_ping_pong_round_trip():
     dt = time.perf_counter() - t0
     assert np.allclose(obs.numpy(), 1.0 + steps)
     print(f"round trip: {dt / steps * 1e3:.3f} ms/step host time, {steps / dt:.0f} steps/s")
+
+
+_WATCHDOG_CHILD = r"""
+import sys, time, torch, warp as wp
+wp.config.quiet = True
+wp.init()
+from metalsim.interop import torch_bridge as tb, warp_metal as wm
+ev = wm.SharedEvent("metal:0", "watchdog")
+x = torch.arange(1 << 20, device="mps", dtype=torch.float32)
+y = torch.full_like(x, -1.0)
+torch.mps.synchronize()
+# control: a short wait is fine and reports nothing
+tb.wait_event(ev, 1); y.copy_(x * 2); tb.commit(); time.sleep(0.3); ev.obj.setSignaledValue_(1)
+torch.mps.synchronize(); tb.check_errors()
+assert torch.equal(y, x * 2)
+y.fill_(-1.0); torch.mps.synchronize()
+# a wait held on the GPU longer than the watchdog: the copy behind it never runs
+tb.wait_event(ev, 2); y.copy_(x * 2); tb.commit(); time.sleep(float(sys.argv[1])); ev.obj.setSignaledValue_(2)
+torch.mps.synchronize()
+untouched = bool((y == -1).all())
+try:
+    tb.check_errors()
+except tb.MPSCommandBufferError as e:
+    print("RAISED", "Timeout" in str(e), "UNTOUCHED", untouched, flush=True)
+    sys.exit(0)
+print("NOT RAISED", "UNTOUCHED", untouched, flush=True)
+sys.exit(1)
+"""
+
+
+def test_watchdog_killed_torch_buffer_raises():
+    """A PyTorch command buffer that waits on the GPU longer than macOS's GPU watchdog (about 4-5 s on an M4 Max,
+    2026-11-01) is aborted and the kernels behind the wait never run; PyTorch 2.14 does not report it, the bridge does
+    (check_errors). This is what silently zeroed the first G1 PPO update when other processes loaded the GPU and the
+    rollout outlasted the watchdog. Runs in a child process: after an abort the driver may ignore that process's
+    next submissions."""
+    import os
+    import subprocess
+    import sys
+    from pathlib import Path
+
+    env = dict(os.environ)
+    env["PYTHONPATH"] = str(Path(__file__).resolve().parents[1]) + os.pathsep + env.get("PYTHONPATH", "")
+    r = subprocess.run([sys.executable, "-c", _WATCHDOG_CHILD, "8"], capture_output=True, text=True, timeout=180, env=env)
+    out = r.stdout + r.stderr
+    assert r.returncode == 0, out
+    assert "RAISED True UNTOUCHED True" in out, out

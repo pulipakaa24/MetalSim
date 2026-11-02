@@ -8,6 +8,13 @@
 //  * torch::mps::get_command_buffer() ends the open kernel-coalescing encoder and returns the
 //    stream's current command buffer; torch::mps::commit() submits it. Both must run on the
 //    stream's serial dispatch queue (torch::mps::get_dispatch_queue()).
+//  * PyTorch 2.14's MPSStream never reads a command buffer's status or error: a buffer the driver aborts
+//    (GPU watchdog timeout, out of memory, "ignored for prior errors") is skipped and its outputs are never
+//    written, silently (https://github.com/pytorch/pytorch/pull/198883, in PyTorch 2.15.0, raises for the buffers
+//    MPSStream commits; https://github.com/pytorch/pytorch/pull/200398, after 2.15.0, for those MPSGraph commits
+//    itself). The command buffers this bridge encodes a cross-queue wait
+//    or signal into are the ones a slow producer can get killed (a wait counts against the watchdog, ~4-5 s on
+//    an M4 Max), so they are watched here and poll_failures() reports the first one that failed.
 #include <torch/extension.h>
 #include <torch/mps.h>
 #include <ATen/mps/MPSDevice.h>
@@ -15,7 +22,57 @@
 #include <Metal/Metal.h>
 #include <dispatch/dispatch.h>
 
+#include <mutex>
+#include <string>
+#include <vector>
+
 namespace {
+
+// Command buffers holding a cross-queue wait or signal, until they complete (see poll_failures).
+std::mutex g_watch_mutex;
+std::vector<id<MTLCommandBuffer>> g_watched;
+std::string g_failure;
+
+// The MTLCommandBuffer the next encode lands in: PyTorch's MPSCommandBuffer wraps one and replaces it on every
+// commitAndContinue, so the wrapper itself has no single status to read.
+id<MTLCommandBuffer> underlying(id<MTLCommandBuffer> cb)
+{
+    if ([(id)cb respondsToSelector:@selector(commandBuffer)]) {
+        id<MTLCommandBuffer> inner = [(MPSCommandBuffer*)cb commandBuffer];
+        if (inner)
+            return inner;
+    }
+    return cb;
+}
+
+void watch(id<MTLCommandBuffer> cb)
+{
+    std::lock_guard<std::mutex> lock(g_watch_mutex);
+    g_watched.push_back(underlying(cb));
+}
+
+// Drops the watched command buffers that finished; returns the first failure since the last call ("" if none).
+std::string poll_failures()
+{
+    std::lock_guard<std::mutex> lock(g_watch_mutex);
+    for (auto it = g_watched.begin(); it != g_watched.end();) {
+        const MTLCommandBufferStatus status = (*it).status;
+        if (status == MTLCommandBufferStatusError) {
+            if (g_failure.empty()) {
+                NSError* error = (*it).error;
+                g_failure = error ? error.localizedDescription.UTF8String : "unknown error";
+            }
+            it = g_watched.erase(it);
+        } else if (status == MTLCommandBufferStatusCompleted) {
+            it = g_watched.erase(it);
+        } else {
+            ++it;
+        }
+    }
+    std::string failure;
+    failure.swap(g_failure);
+    return failure;
+}
 
 id<MTLEvent> as_event(int64_t ptr)
 {
@@ -41,6 +98,7 @@ void wait_event(int64_t event, int64_t value)
     dispatch_sync(torch::mps::get_dispatch_queue(), ^{
         id<MTLCommandBuffer> cb = torch::mps::get_command_buffer();
         [cb encodeWaitForEvent:ev value:(uint64_t)value];
+        watch(cb);
     });
 }
 
@@ -51,6 +109,7 @@ void signal_event(int64_t event, int64_t value)
     dispatch_sync(torch::mps::get_dispatch_queue(), ^{
         id<MTLCommandBuffer> cb = torch::mps::get_command_buffer();
         [cb encodeSignalEvent:ev value:(uint64_t)value];
+        watch(cb);
         torch::mps::commit();
     });
 }
@@ -103,6 +162,8 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m)
     m.def("wait_event", &wait_event, "encode a wait for (event, value) on PyTorch's command buffer");
     m.def("signal_event", &signal_event, "commit PyTorch's command buffer, signaling (event, value) on completion");
     m.def("commit", &commit, "commit PyTorch's command buffer without waiting");
+    m.def("poll_failures", &poll_failures,
+          "first failure of a watched PyTorch command buffer (one holding a bridge wait/signal) since the last call, or ''");
     m.def("tensor_from_mtlbuffer", &tensor_from_mtlbuffer, "zero-copy MPS tensor over an id<MTLBuffer>");
     m.def("mtlbuffer_of", &mtlbuffer_of, "(id<MTLBuffer>, byte offset) of an MPS tensor");
 }

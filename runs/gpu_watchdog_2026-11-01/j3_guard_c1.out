@@ -1,0 +1,103 @@
+[probe] ppo_warp from <worktree>/metalsim/learn/ppo_warp.py, old hand-over True
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     ~/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth d82236f load on device 'metal:0' took 61.96 ms  (cached)
+Module _nxn_broadphase__locals__kernel_da6e4d10 da6e4d1 load on device 'metal:0' took 41.60 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_8e4c260d 8e4c260 load on device 'metal:0' took 59.64 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_906e6369 906e636 load on device 'metal:0' took 46.27 ms  (cached)
+Module mujoco_warp._src.constraint 5a9ac8b load on device 'metal:0' took 39.36 ms  (cached)
+Module _friction_dof__locals__kernel_1995a4ce 1995a4c load on device 'metal:0' took 38.01 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_77231784 7723178 load on device 'metal:0' took 38.12 ms  (cached)
+Module _efc_contact_init__locals__kernel_2ed5252b 2ed5252 load on device 'metal:0' took 37.54 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_bdbf4070 2989408 load on device 'metal:0' took 38.78 ms  (cached)
+Module _efc_contact_update__locals__kernel_a0834196 a083419 load on device 'metal:0' took 39.12 ms  (cached)
+Module mujoco_warp._src.forward f50e6f5 load on device 'metal:0' took 51.46 ms  (cached)
+Module mujoco_warp._src.passive b076fe0 load on device 'metal:0' took 49.74 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_54b31bb5 54b31bb load on device 'metal:0' took 36.29 ms  (cached)
+Module mujoco_warp._src.forward 5f45167 load on device 'metal:0' took 52.21 ms  (cached)
+Module _qfrc_smooth__locals__kernel_775cdd1e 775cdd1 load on device 'metal:0' took 37.97 ms  (cached)
+Module mujoco_warp._src.support c23ce19 load on device 'metal:0' took 38.58 ms  (cached)
+Module _factor_i_sparse_unrolled__locals__kernel_a8496364 6ffbc2b load on device 'metal:0' took 40.69 ms  (cached)
+Module _solve_LD_sparse_serial__locals__kernel_b34b951d 3485934 load on device 'metal:0' took 39.23 ms  (cached)
+Module _solve_init_dof__locals__kernel_f7fe7ccd f7fe7cc load on device 'metal:0' took 37.41 ms  (cached)
+Module _solve_init_efc__locals__kernel_496de172 496de17 load on device 'metal:0' took 38.31 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_38697a22 38697a2 load on device 'metal:0' took 39.14 ms  (cached)
+Module mul_m_kernel__locals___mul_m_cc4a8159 cc4a815 load on device 'metal:0' took 39.00 ms  (cached)
+Module _update_constraint_efc__locals__kernel_816b370a 816b370 load on device 'metal:0' took 39.71 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_ede08278 ede0827 load on device 'metal:0' took 39.14 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_62bc6e88 62bc6e8 load on device 'metal:0' took 37.77 ms  (cached)
+Module _update_gradient_grad__locals__kernel_68e6ef6f 68e6ef6 load on device 'metal:0' took 37.60 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_31c263f9 0b24a28 load on device 'metal:0' took 38.31 ms  (cached)
+Module mujoco_warp._src.solver 7d36d0b load on device 'metal:0' took 42.91 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_57ee5bcf 99576e9 load on device 'metal:0' took 39.41 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_fada6861 b4d8d90 load on device 'metal:0' took 42.87 ms  (cached)
+Module _update_constraint_gradient_fused__locals__kernel_976f9051 7420d71 load on device 'metal:0' took 38.86 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_04a78b22 1a9e917 load on device 'metal:0' took 37.11 ms  (cached)
+Module _solve_done__locals__kernel_a5b8319b a5b8319 load on device 'metal:0' took 37.33 ms  (cached)
+Module mujoco_warp._src.sensor 9b332ca load on device 'metal:0' took 61.96 ms  (cached)
+Module mujoco_warp._src.derivative cb91251 load on device 'metal:0' took 44.27 ms  (cached)
+Module _next_time_builder__locals___next_time_9bdc285a 9bdc285 load on device 'metal:0' took 37.53 ms  (cached)
+Module metalsim.physics.batch 74a3c65 load on device 'metal:0' took 37.55 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_753bbeab 753bbea load on device 'metal:0' took 41.42 ms  (cached)
+Module reset_data__locals__reset_M_94b7ab81 94b7ab8 load on device 'metal:0' took 38.32 ms  (cached)
+Module reset_data__locals__reset_mocap_ffcfb2c4 ffcfb2c load on device 'metal:0' took 38.60 ms  (cached)
+Module reset_data__locals__reset_contact_41eafef4 41eafef load on device 'metal:0' took 37.32 ms  (cached)
+Module reset_data__locals__reset_sleep_38f94185 38f9418 load on device 'metal:0' took 39.02 ms  (cached)
+Module reset_data__locals__reset_nworld_5d2d5901 5d2d590 load on device 'metal:0' took 39.01 ms  (cached)
+Module metalsim.sensors.contact 5dea6fd load on device 'metal:0' took 44.31 ms  (cached)
+G1 flat PPO: N=4096 obs_dim 123 act_dim 37 rollout 24 x 1 iterations, engine mjwarp, physics dt 0.0025 (decimation 8), seed 0, reward_cfg flat, height-scan ray order -, terrain collision hfield, height scan exact, solver_cfg None, contact_cfg recommended, base velocity com, feet-slide velocity com, initial reset True, effort limit on the joint
+Error: command buffer exited with error status.
+	The Metal Performance Shaders operations encoded on it may not have completed.
+	Error: 
+	(null)
+	Caused GPU Timeout Error (00000002:kIOGPUCommandBufferCallbackErrorTimeout)
+	<AGXG16XFamilyCommandBuffer: 0x7510a62a00>
+    label = <none> 
+    device = <AGXG16CDevice: 0x7511f84000>
+        name = Apple M4 Max 
+    commandQueue = <AGXG16XFamilyCommandQueue: 0x751149f200>
+        label = <none> 
+        device = <AGXG16CDevice: 0x7511f84000>
+            name = Apple M4 Max 
+    retainedReferences = 1
+Module __main__ d51a450 load on device 'metal:0' took 53.80 ms  (cached)
+Module _solve_init_efc__locals__kernel_81f2525b 81f2525 load on device 'metal:0' took 37.87 ms  (cached)
+Module _solve_done__locals__kernel_eea46921 eea4692 load on device 'metal:0' took 38.78 ms  (cached)
+Module metalsim.learn.warp_policy 00a83dd load on device 'metal:0' took 47.36 ms  (cached)
+Traceback (most recent call last):
+  File "runs/gpu_watchdog_2026-11-01/g1_probe.py", line 83, in <module>
+    runpy.run_module("metalsim.learn.g1_velocity", run_name="__main__", alter_sys=True)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen runpy>", line 226, in run_module
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "<worktree>/metalsim/learn/g1_velocity.py", line 1066, in <module>
+    train_g1(n, terrain, int(sys.argv[4]) if len(sys.argv) > 4 else 1500, log_path=sys.argv[5] if len(sys.argv) > 5 else None,
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+             checkpoint=sys.argv[6] if len(sys.argv) > 6 and sys.argv[6] != "-" else None,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+             base_velocity=opts["--base_velocity"], feet_slide_velocity=opts["--feet_slide_velocity"],
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+             initial_reset=opts["--initial_reset"] not in ("0", "false", "False"), effort_limit=opts["--effort_limit"] or None, **ekw)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<worktree>/metalsim/learn/g1_velocity.py", line 1041, in train_g1
+    algo.train(log=log, callback=cb, monitor=mon)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<worktree>/metalsim/learn/ppo_warp.py", line 323, in train
+    stats = self.update()
+  File "runs/gpu_watchdog_2026-11-01/g1_probe.py", line 70, in update
+    out = _orig_update(self)
+  File "<worktree>/metalsim/learn/ppo_warp.py", line 262, in update
+    tb.check_errors()       # the buffers above (GAE, clones, rollout mean) ran: raise if the driver aborted one
+    ~~~~~~~~~~~~~~~^^
+  File "<worktree>/metalsim/interop/torch_bridge.py", line 232, in check_errors
+    raise MPSCommandBufferError(
+    ...<4 lines>...
+           "wait for a long producer on the host before encoding the wait." if timeout else ""))
+metalsim.interop.torch_bridge.MPSCommandBufferError: PyTorch MPS command buffer failed: Caused GPU Timeout Error (00000002:kIOGPUCommandBufferCallbackErrorTimeout). Its kernels did not run, so the tensors they write hold stale data (PyTorch 2.14 does not raise for this). A command buffer that waits for another queue counts the wait against the GPU watchdog (about 4-5 s on an M4 Max): the producer took longer than that, typically because other processes load the GPU; wait for a long producer on the host before encoding the wait.

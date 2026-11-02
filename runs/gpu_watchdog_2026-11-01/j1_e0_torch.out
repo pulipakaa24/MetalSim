@@ -1,0 +1,12 @@
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     ~/Library/Caches/warp/1.18.0.dev20260917
+[E0 torch] wait   1.0 s: output correct=True untouched(-1)=False elapsed 1.01 s
+[E0 torch] wait   2.0 s: output correct=True untouched(-1)=False elapsed 2.01 s
+[E0 torch] wait   4.0 s: output correct=True untouched(-1)=False elapsed 4.01 s
+[E0 torch] wait   8.0 s: output correct=False untouched(-1)=True elapsed 8.00 s
+[E0 torch] wait  16.0 s: output correct=False untouched(-1)=False elapsed 16.01 s

@@ -1,7 +1,8 @@
 """PPO with the rollout in Warp (Isaac Lab pattern): the whole rollout of T steps is T replays of
 one captured graph (observation gather, Warp MLP policy, buffer store, physics substeps, reward and
 termination kernels); PyTorch touches the GPU once per update (GAE + minibatch epochs on the
-zero-copy rollout buffers). One host synchronization per rollout.
+zero-copy rollout buffers). One host synchronization per rollout, at the hand-over from the rollout to the
+update (see ``rollout``).
 
 Tasks plug in by duck typing (there is no base class): ``n``, ``obs_dim``, ``act_dim``, ``ctrl_lo`` /
 ``ctrl_hi``, an ``obs`` array, a ``sim`` (``BatchSim``), ``launch_obs()``, ``launch_reward_done_reset(pol,
@@ -226,6 +227,14 @@ class PPOWarp:
         task = self.task
         self.pol.act(task.obs, task.action_scratch if hasattr(task, "launch_apply_action") else task.sim.d.ctrl)
         v = self.task.sim._signal()
+        # Wait for the rollout on the host before PyTorch encodes anything that reads it. The host queues the whole
+        # rollout in ~0.1 s, so a GPU-side wait alone (after(v)) put PyTorch's first update command buffer on the GPU
+        # for the rollout's entire duration (2.5 s for G1 flat at 4,096 envs alone). macOS's GPU watchdog kills a
+        # command buffer after about 4-5 s on the GPU, waiting included; with other processes loading the GPU the
+        # rollout took longer, the buffer (GAE, the clones of obs/act/logp) was killed and, PyTorch 2.14 ignoring
+        # command buffer errors, the update trained on zeros (KL 34.4; found 2026-11-01). The update synchronizes the host
+        # right away anyway, so this costs no overlap; it also raises Warp's own GPU errors here.
+        self.task.sim.synchronize()
         self.task.sim.after(v)
 
     def update(self):
@@ -250,6 +259,7 @@ class PPOWarp:
         # rollout before the task's guard reset it) are dropped from the update instead of crashing it
         ok = torch.isfinite(o).all(-1) & torch.isfinite(a).all(-1) & torch.isfinite(lp0) & torch.isfinite(ret.reshape(N)) & torch.isfinite(adv.reshape(N))
         self.dropped_rows = int((~ok).sum().item())
+        tb.check_errors()       # the buffers above (GAE, clones, rollout mean) ran: raise if the driver aborted one
         if self.dropped_rows:
             keep = ok.nonzero().squeeze(-1); o = o[keep]; a = a[keep]; lp0 = lp0[keep]; adv = adv.reshape(N)[keep]; ret = ret.reshape(N)[keep]; val = val.reshape(N)[keep]; N = int(keep.numel())
             self._mean0 = self._mean0[keep]
@@ -313,6 +323,7 @@ class PPOWarp:
             stats = self.update()
             if it % cfg.log_every == 0 or it == cfg.iterations:
                 torch.mps.synchronize()
+                tb.check_errors()               # an aborted PyTorch command buffer raises; never silent
                 sim = getattr(self.task, "sim", None)
                 if hasattr(sim, "check_overflow"):
                     sim.check_overflow()        # capacity overflow (dropped rows / contacts) raises; never silent

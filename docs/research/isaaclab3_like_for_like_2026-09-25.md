@@ -497,7 +497,9 @@ not blow up in any variant (300 steps). 20-iteration trainings per single item (
 | + MuJoCo default contact solref (0.02 / 1) and no gap (Isaac's limits and caps kept) | **0** |
 | contact_cfg "default" only (MuJoCo defaults) | **0** |
 | contact_cfg "recommended" only | 2 |
-| rough_isaac task (exact boxes) with Isaac's settings | 0, but 2 GPU timeouts, 379 kN contact forces, KL 34–53: unstable too |
+| rough_isaac task (exact boxes) with Isaac's settings | 0 (379 kN contact forces at iteration 1; the KL 34–53 was an artefact, see the correction below) |
+
+**Correction (2026-11-01).** The rough_isaac row's GPU timeouts and KL 34–53 were not the physics: a rollout slower than macOS's GPU watchdog (about 4-5 s; this one ran at 14.7 K env-steps/s) got PyTorch's first update command buffer aborted, and PyTorch 2.14 trained on the zeros it left ([`gpu_watchdog_handover_2026-11-01.md`](gpu_watchdog_handover_2026-11-01.md)). So "unstable too" is withdrawn. The "recommended" row's 2 blow-ups came in iteration 11's rollout, before that iteration's update was aborted the same way. Re-run on 2026-11-01 with the fix, on the tree of that date (the MuJoCo Warp fork has changed since; same commands as `runs/il3/run_early_ab.sh`, with `--terrain_collision boxes_local` and that date's "recommended", now `recommended_pyramidal`): rough_isaac with Isaac's settings 0 blow-ups, KL 0.010–0.016 over iterations 2–20, no contact-force anomaly, return -5.93 at iteration 20; "recommended" only 0 blow-ups, KL 0.009–0.017 (`runs/gpu_watchdog_2026-11-01/rerun_*.log`). The solref conclusion below rests on the other rows and stands.
 
 Only the contact solref separates: Isaac's (1.82 ms → 5 ms after refsafe, damping ratio 1.375) on MuJoCo Warp's
 heightfield (and box) contacts. Under it no episode ends for the first ~10 iterations: no torso contacts, value loss rising
@@ -506,7 +508,7 @@ worlds over. On flat terrain the same settings are stable. Contact counts per fo
 on the heightfield vs 2 on the plane, so contact multiplicity alone is not a demonstrated mechanism. **Mechanism
 unconfirmed**. What it establishes: Isaac's contact stiffness is not transferable to MuJoCo Warp's rough-terrain collision
 (Newton's own collision pipeline, which Isaac uses, is not reproduced; §2.1). The policy side (action statistics) of the
-2.3.2-task comparison could not be taken: that 12-iteration run hit GPU timeouts.
+2.3.2-task comparison could not be taken: that 12-iteration run hit GPU timeouts (the watchdog artefact in the correction above, not the physics; not re-taken).
 
 **A known early handicap of the like-for-like rough comparison.** The transient is a property of Isaac's contact
 stiffness on MuJoCo Warp's collision pipeline. Isaac's own Newton pipeline does not show it: its rough log has no NaN or
