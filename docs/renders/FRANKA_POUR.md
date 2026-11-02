@@ -1,6 +1,6 @@
 # Franka-Pour: a metalsim render
 
-A Franka Panda grasps a cup holding 735 MPM particles of granular media and pours them into a second cup: Isaac Lab 3.0-EA's `IsaacContrib-Franka-Pour` task on metalsim (Newton 1.5.2 coupled MuJoCo Warp + implicit MPM on Metal), driven by a policy trained here with Isaac's PPO configuration.
+A Franka Panda grasps a cup holding 735 MPM particles of granular media and pours them into a second cup: [Isaac Lab](https://github.com/isaac-sim/IsaacLab) 3.0-EA's `IsaacContrib-Franka-Pour` task on metalsim ([Newton](https://github.com/newton-physics/newton) 1.5.2 coupled [MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp) + implicit MPM on Metal), driven by a policy trained here with Isaac's PPO configuration.
 
 **hero** (105 frames, 3.5 s at 30 fps): [video](franka_pour.mp4) (0.4 MB, H.264)
 
@@ -22,7 +22,7 @@ A Franka Panda grasps a cup holding 735 MPM particles of granular media and pour
 
 ## Performance
 
-Measured on the machine below; one frame = one policy step (Isaac Lab's `render_fps` = 1 / step_dt).
+Measured on the machine below; one frame = one policy step ([Isaac Lab](https://github.com/isaac-sim/IsaacLab)'s `render_fps` = 1 / step_dt).
 
 | stage | measurement |
 |---|---|
@@ -39,8 +39,8 @@ Measured on the machine below; one frame = one policy step (Isaac Lab's `render_
 
 - Mac16,5 (Apple M4 Max, 40 GPU cores, 64 GB), macOS 26.7.1 (25G241).
 - Power as each stage stamped it (`pmset -g batt` and `pmset -g`; `hardware.power`: the record stage's when it wrote rec.json, a render shot's at its first frame): record: not recorded; render hero: not recorded; render grid: not recorded.
-- metalsim `cb76304fe6`; record stage (newton152 venv): warp 1.18.0.dev20260917 (`52c09cdd82`), newton 1.5.2 (`addd10cbeb`), mujoco 3.11.0, mujoco_warp 3.11.0, torch 2.14.0, numpy 2.5.3.
-- render stage (main venv): warp 1.18.0.dev20260917 (`52c09cdd82`), mujoco 3.14.0, numpy 2.5.3.
+- metalsim [`68c478bba2`](https://github.com/pulipakaa24/MetalSim/commit/68c478bba217a0edd89e7ffa521eed26ba3fbf09); record stage (newton152 venv): warp 1.18.0.dev20260917 ([`52c09cdd82`](https://github.com/pulipakaa24/warp/commit/52c09cdd82f79e8564b5ae17cdcee7b52d10d075)), newton 1.5.2 ([`addd10cbeb`](https://github.com/pulipakaa24/newton/commit/addd10cbeb)), mujoco 3.11.0, mujoco_warp 3.11.0, torch 2.14.0, numpy 2.5.3.
+- render stage (main venv): warp 1.18.0.dev20260917 ([`52c09cdd82`](https://github.com/pulipakaa24/warp/commit/52c09cdd82f79e8564b5ae17cdcee7b52d10d075)), mujoco 3.14.0, numpy 2.5.3.
 
 ## Assets
 
@@ -58,23 +58,25 @@ Measured on the machine below; one frame = one policy step (Isaac Lab's `render_
 
 ## How it was made
 
-**The policy.** Trained on metalsim on the 14-inch M4 Max: 2,048 envs, 300 iterations of the task's rsl_rl PPO
-configuration (96 steps per env per iteration, MLP 512-256-128-64, learning rate 1.5e-4; 59.0 M env steps, about
-16.4 h at ~945 env-steps/s; `runs/franka_pour/logs/m414_2048_config.json`, `m414_2048_log.jsonl`). Logged training
-success over the last iteration's 1,704 episodes: 63 %. Evaluated over 2,048 first episodes (seed 7, uniform reset
-rows as in Isaac's play mode, the actor's mean action): **47.7 % success**, 82.2 % for episodes that start with the
-cup already grasped and 15.2 % for those that start before the grasp
-(`runs/franka_pour/eval/eval_2048_isaac_budget.json`). Learning against Isaac Lab on the L4 at matched settings:
-`docs/PARITY.md` §1b.5. The film simulates 24 envs with the evaluation's seed and films the best-ranked: successful
-episodes that start before the grasp first (approach, grasp, lift and pour in one take), then successful ones that
-start with the cup in hand.
+**The policy.** Trained on metalsim on the 14-inch MacBook Pro (M4 Max): 2,048 envs, 300 iterations of the task's
+[rsl_rl](https://github.com/leggedrobotics/rsl_rl) PPO configuration (96 steps per env per iteration, MLP
+512-256-128-64, learning rate 1.5e-4; 59.0 M env steps, about 16.4 h at ~945 env-steps/s;
+`runs/franka_pour/logs/m414_2048_config.json`, `m414_2048_log.jsonl`). Logged training success over the last iteration's
+1,704 episodes: 63 %. Evaluated over 2,048 first episodes (seed 7, uniform reset rows as in Isaac's play mode, the
+actor's mean action): **47.7 % success**, 82.2 % for episodes that start with the cup already grasped and 15.2 % for
+those that start before the grasp (`runs/franka_pour/eval/eval_2048_isaac_budget.json`). Learning against Isaac Lab on
+an NVIDIA L4 GPU at matched settings: `docs/PARITY.md` §1b.5. The film simulates 24 envs with the evaluation's seed and
+films the best-ranked: successful episodes that start before the grasp first (approach, grasp, lift and pour in one
+take), then successful ones that start with the cup in hand.
 
-**How Isaac Lab presents the task** (research, `upstream/IsaacLab3` at `ae37b028`). `pour_env_cfg.py` sets a default
-viewer at eye (1.4, 1.4, 0.9) looking at (0.5, 0, 0.1) in env 0's frame, and its play mode (one env) a closer camera
-at eye (0.9, 0.65, 0.5) with the Newton RTX visualizer drawing the media as particles of the media's `visual_color`
-(0.85, 0.72, 0.45). Videos come from `VideoRecorderCfg` at `render_fps` = 1 / step_dt = 30 fps. The scene is lit by a
-grey dome light (colour 0.75, intensity 3000). The hero shot here uses the play-mode camera, the grid shot the default
-viewer, both with Kit's default perspective lens (36 deg vertical at 16:9) and one frame per policy step (30 fps).
+**How Isaac Lab presents the task** (research on Isaac Lab at
+[`ae37b028`](https://github.com/isaac-sim/IsaacLab/commit/ae37b028ea415c91ea2bc32609efcd759ed2b974), cloned as
+`upstream/IsaacLab3`). `pour_env_cfg.py` sets a default viewer at eye (1.4, 1.4, 0.9) looking at (0.5, 0, 0.1) in env
+0's frame, and its play mode (one env) a closer camera at eye (0.9, 0.65, 0.5) with the Newton RTX visualizer drawing
+the media as particles of the media's `visual_color` (0.85, 0.72, 0.45). Videos come from `VideoRecorderCfg` at
+`render_fps` = 1 / step_dt = 30 fps. The scene is lit by a grey dome light (colour 0.75, intensity 3000). The hero shot
+here uses the play-mode camera, the grid shot the default viewer, both with Kit's default perspective lens (36 deg
+vertical at 16:9) and one frame per policy step (30 fps).
 
 **Rendering.** As the ANYmal-on-sand demo (`scripts/particle_demo/`): simulate first, render offline. Tier 2 (the path
 tracer) is the best tier that draws MPM particles with full lighting (tier 1 draws them without ray-traced shadows,
@@ -83,9 +85,10 @@ twin is built by the same scene builder with Isaac's USD visual meshes loaded (N
 bodies matched one to one to the simulated world's; a body that has visual meshes hides its colliders. Each MPM
 particle (radius 2.5 mm) is drawn as 4 render grains (`metalsim/render/PARTICLES.md`). Lighting is a Poly Haven studio
 HDRI as an importance-sampled dome instead of Isaac's plain grey dome (it gives the metal and plastic reflections);
-the floor texture sits on Isaac's ground plane 1.05 m below the tabletop. OIDN denoiser, ACES tone map, sRGB.
-The tool is generic: `python -m metalsim.render.film <task>`; a task adds a `FilmTask` entry and a small recorder
-adapter (`metalsim/render/film/`).
+the floor texture sits on Isaac's ground plane 1.05 m below the tabletop.
+[Open Image Denoise](https://www.openimagedenoise.org) (OIDN) denoiser, ACES tone map, sRGB. The tool is generic:
+`python -m metalsim.render.film <task>`; a task adds a `FilmTask` entry and a small recorder adapter
+(`metalsim/render/film/`).
 
 ## Reproduce
 

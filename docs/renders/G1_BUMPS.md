@@ -1,6 +1,6 @@
 # G1 on rough ground, Unitree's policy: a metalsim render
 
-Unitree G1 walking onto Isaac Lab's random rough ground (the `random_rough` sub-terrain of `ROUGH_TERRAINS_CFG`: bumps of 2 to 10 cm every 0.1 m) with Unitree's own pretrained walking policy, which is blind and was trained on flat ground (unitree_rl_gym, `deploy/pre_train/g1/motion.pt`, BSD-3-Clause), played by Unitree's MuJoCo sim2sim loop ported to metalsim's MuJoCo Warp on Metal (fork `787a5b3`, whose heightfield contacts match the exact geometry), on Unitree's own G1 model, and rendered by metalsim's path tracer. Rendered on the 14-inch MacBook Pro (Mac16,6), not in a timing run, so its Performance table is not a timing figure.
+Unitree G1 walking onto [Isaac Lab](https://github.com/isaac-sim/IsaacLab)'s random rough ground (the `random_rough` sub-terrain of `ROUGH_TERRAINS_CFG`: bumps of 2 to 10 cm every 0.1 m) with Unitree's own pretrained walking policy, which is blind and was trained on flat ground ([unitree_rl_gym](https://github.com/unitreerobotics/unitree_rl_gym), `deploy/pre_train/g1/motion.pt`, BSD-3-Clause), played by Unitree's [MuJoCo](https://github.com/google-deepmind/mujoco) sim2sim loop ported to [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) on Metal (whose heightfield contacts match the exact geometry), on Unitree's own G1 model, and rendered by metalsim's path tracer. Rendered on the 14-inch MacBook Pro (Mac16,6), not in a timing run, so its Performance table is not a timing figure.
 
 **hero** (401 frames, 8.0 s at 50 fps): [video](g1_bumps.mp4) (4.7 MB, H.264)
 
@@ -16,7 +16,7 @@ Unitree G1 walking onto Isaac Lab's random rough ground (the `random_rough` sub-
 
 ## Performance
 
-Measured on the machine below; one frame = one policy step (Isaac Lab's `render_fps` = 1 / step_dt).
+Measured on the machine below; one frame = one policy step ([Isaac Lab](https://github.com/isaac-sim/IsaacLab)'s `render_fps` = 1 / step_dt).
 
 | stage | measurement |
 |---|---|
@@ -31,8 +31,8 @@ Measured on the machine below; one frame = one policy step (Isaac Lab's `render_
 
 - Mac16,6 (Apple M4 Max, 40 GPU cores, 64 GB), macOS 27.0.1 (26A434).
 - Power as each stage stamped it (`pmset -g batt` and `pmset -g`; `hardware.power`: the record stage's when it wrote rec.json, a render shot's at its first frame): record: on AC power (89 %, charging), power-mode setting High Power (pmset `powermode 2`), 2026-10-31 23:37 (-0700); render hero: on AC power (89 %, charging), power-mode setting High Power (pmset `powermode 2`), 2026-10-31 23:37 (-0700); render readme: on AC power (89 %, charging), power-mode setting High Power (pmset `powermode 2`), 2026-10-31 23:40 (-0700).
-- metalsim `e67efcb9f9+dirty`; record stage (main venv): warp 1.18.0.dev20260917 (`52c09cdd82`), mujoco 3.14.0, mujoco_warp 3.14.0 (`787a5b3a37`), torch 2.14.0, numpy 2.5.3.
-- render stage (main venv): warp 1.18.0.dev20260917 (`52c09cdd82`), mujoco 3.14.0, numpy 2.5.3.
+- metalsim [`e67efcb9f9+dirty`](https://github.com/pulipakaa24/MetalSim/commit/e67efcb9f92455f1dc723b3f9c7d7ba2ad85856e); record stage (main venv): warp 1.18.0.dev20260917 ([`52c09cdd82`](https://github.com/pulipakaa24/warp/commit/52c09cdd82f79e8564b5ae17cdcee7b52d10d075)), mujoco 3.14.0, mujoco_warp 3.14.0 ([`787a5b3a37`](https://github.com/pulipakaa24/mujoco_warp/commit/787a5b3a37acc2551ffc8a2c1af1e9781d76723f)), torch 2.14.0, numpy 2.5.3.
+- render stage (main venv): warp 1.18.0.dev20260917 ([`52c09cdd82`](https://github.com/pulipakaa24/warp/commit/52c09cdd82f79e8564b5ae17cdcee7b52d10d075)), mujoco 3.14.0, numpy 2.5.3.
 
 ## Assets
 
@@ -48,14 +48,16 @@ Measured on the machine below; one frame = one policy step (Isaac Lab's `render_
 ## How it was made
 
 **What this film is.** The policy of the G1 flat film ([G1_UNITREE.md](G1_UNITREE.md)): Unitree's own pretrained G1
-walking policy, `deploy/pre_train/g1/motion.pt` from `unitree_rl_gym` (<https://github.com/unitreerobotics/unitree_rl_gym>, BSD-3-Clause, commit
-`276801e46c5d433564f24658bac64f254b7d2d4b`, sha256 `cf668f75b90d1abf73d2b87612a6e76bccc61ff7e083b63582d3f6aaa3c1759d`), played by Unitree's MuJoCo sim2sim loop
-(`deploy/deploy_mujoco/deploy_mujoco.py`, `configs/g1.yaml`, command (0.5, 0, 0)) ported to MetalSim's MuJoCo Warp, as
-in the G1 flat film, with one change: Unitree's floor plane is Isaac Lab's random rough ground. The policy is blind (47
-observations: body rates, gravity, command, joint state, last action, gait clock; no height scan) and Unitree trained
-it on flat ground only (`legged_gym`, `legged_robot_config.py` line 15 `mesh_type = 'plane'`, not overridden by
-`g1_config.py`), with pushes, friction and mass randomization. Nothing is tuned, and the robot falls: this page shows
-what happens.
+walking policy, `deploy/pre_train/g1/motion.pt` from `unitree_rl_gym`
+(<https://github.com/unitreerobotics/unitree_rl_gym>, BSD-3-Clause, commit
+[`276801e`](https://github.com/unitreerobotics/unitree_rl_gym/commit/276801e46c5d433564f24658bac64f254b7d2d4b), sha256
+`cf668f75b90d1abf73d2b87612a6e76bccc61ff7e083b63582d3f6aaa3c1759d`), played by Unitree's MuJoCo sim2sim loop
+(`deploy/deploy_mujoco/deploy_mujoco.py`, `configs/g1.yaml`, command (0.5, 0, 0)) ported to [my fork of MuJoCo
+Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim), as in the G1 flat film, with one change: Unitree's
+floor plane is Isaac Lab's random rough ground. The policy is blind (47 observations: body rates, gravity, command,
+joint state, last action, gait clock; no height scan) and Unitree trained it on flat ground only (`legged_gym`,
+`legged_robot_config.py` line 15 `mesh_type = 'plane'`, not overridden by `g1_config.py`), with pushes, friction and
+mass randomization. Nothing is tuned, and the robot falls: this page shows what happens.
 
 **Terrain.** Isaac Lab 2.3.2's `ROUGH_TERRAINS_CFG["random_rough"]` (`isaaclab/terrains/config/rough.py`):
 `HfRandomUniformTerrainCfg(proportion=0.2, noise_range=(0.02, 0.10), noise_step=0.02, border_width=0.25)`, on one 8 x 8
@@ -86,34 +88,38 @@ square's edge (|y| > 3.75 m) at 2.38 s and fell 0.3 s later in the MetalSim meas
 outermost robots did (at 2.34 and 4.64 s; down 0.7 and 0.2 s later), near the tile's 0.25 m flat rim. (The outer
 lanes were a poor choice; `measure.py` keeps them so the takes and the measurements stay comparable.)
 
-**Physics: MetalSim's MuJoCo Warp.** The film plays Unitree's loop on MetalSim's MuJoCo Warp
-(`metalsim.physics.batch.BatchSim`, 16 worlds of Unitree's model with the heightfield; `unitree.UnitreeG1`: the PD
-torque before every 2 ms physics step, the policy every tenth), the port the G1 flat film plays. On flat ground it
-matches Unitree's own CPU MuJoCo run: re-checked on this fork, the pelvis agrees to the printed 0.1 mm at every
-checkpoint from 0.02 to 8 s and every gait figure is equal (`runs/film/g1_bumps/measure/mjw_787a5b3/flat_sim2sim_compare.json`,
-G1_UNITREE.md). The MuJoCo Warp fork is MetalSim's `metalsim` branch at `787a5b3`: heightfield contacts checked
-against the exact geometry (fork `93e5ce1`, docs/research/hfield_contacts_2026-10-31.md) and EPA's horizon built as
-MuJoCo C builds it (`787a5b3`). Those fixes are why this film can run on MetalSim's physics. The G1's feet collide
-through four 5 mm spheres each, and on this tile a sphere in a crease between two bumps touches two faces at once.
-Before the fixes the fork lost such contacts and kept most robots walking (54 of 288 robots fell, 18.8 %, fork
-`8eb51fe` over tile seeds 0 to 4; research note section 8.3), so the first take of this film (2026-10-31, afternoon)
-ran Unitree's loop on CPU MuJoCo instead (`adapter_kw["engine"] = "mujoco_c"`). A static check on this tile
+**Physics: MetalSim's MuJoCo Warp.** The film plays Unitree's loop on [my fork of MuJoCo
+Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) (`metalsim.physics.batch.BatchSim`, 16 worlds of
+Unitree's model with the heightfield; `unitree.UnitreeG1`: the PD torque before every 2 ms physics step, the policy
+every tenth), the port the G1 flat film plays. On flat ground it matches Unitree's own CPU MuJoCo run: re-checked on my
+fork, the pelvis agrees to the printed 0.1 mm at every checkpoint from 0.02 to 8 s and every gait figure is equal
+(`runs/film/g1_bumps/measure/mjw_787a5b3/flat_sim2sim_compare.json`, G1_UNITREE.md). My fork's `metalsim` branch has
+heightfield contacts checked against the exact geometry
+([`93e5ce1`](https://github.com/pulipakaa24/mujoco_warp/commit/93e5ce18e76854c430ce669314af00ddceb92147),
+docs/research/hfield_contacts_2026-10-31.md) and EPA's horizon built as MuJoCo C builds it. Those fixes are why this
+film can run on MetalSim's physics. The G1's feet collide through four 5 mm spheres each, and on this tile a sphere in a
+crease between two bumps touches two faces at once. Before the fixes my fork lost such contacts and kept most robots
+walking (54 of 288 robots fell, 18.8 %, at
+[`8eb51fe`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624), over tile seeds
+0 to 4; research note section 8.3), so the first take of this film (2026-10-31, afternoon) ran Unitree's loop on CPU
+MuJoCo instead (`adapter_kw["engine"] = "mujoco_c"`). A static check on this tile
 (`runs/film/g1_bumps/measure/contact_check.py`; `mjw_787a5b3/contact_check.json`; the "before" row from the first take's
 `contact_check.json`): 3,000 spheres pressed 0.5 to 3 mm into the triangulated surface at random spots, each engine's
-contacts compared with the exact contact set (every distinct closest point of the surface's triangles within the
-sphere; 661 of the 3,000 touch two or more faces).
+contacts compared with the exact contact set (every distinct closest point of the surface's triangles within the sphere;
+661 of the 3,000 touch two or more faces).
 
 | | contacts per sphere equal to the exact set | spheres with fewer contacts | spheres with no contact | contacts more than 10 deg off the nearest true normal |
 |---|---|---|---|---|
 | CPU MuJoCo 3.14 | 99.6 % (11 spheres get a duplicate) | 0 | 0 | 0 of 3,736 |
-| MetalSim's MuJoCo Warp, fork `787a5b3` (this film) | 99.5 % | 14 (13 of them touch 5 or 6 faces, more than the 4 contacts MuJoCo keeps per pair) | 0 | 1 of 3,707 |
-| MetalSim's MuJoCo Warp before the fixes (fork `8eb51fe`) | 88.8 % (211 spheres get extra contacts) | 126 | 0 | 6.1 % of 3,781 |
+| MetalSim's MuJoCo Warp, my fork (this film) | 99.5 % | 14 (13 of them touch 5 or 6 faces, more than the 4 contacts MuJoCo keeps per pair) | 0 | 1 of 3,707 |
+| MetalSim's MuJoCo Warp before the fixes (my fork at [`8eb51fe`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624)) | 88.8 % (211 spheres get extra contacts) | 126 | 0 | 6.1 % of 3,781 |
 
-(The first take's page listed 81.9 % for "MetalSim's MuJoCo Warp"; that run had imported a stale fork checkout,
-`07a51a6`: research note section 2.)
+(The first take's page listed 81.9 % for "MetalSim's MuJoCo Warp"; that run had imported a stale checkout of my fork,
+[`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc): research note
+section 2.)
 
 **Measured before filming** (`runs/film/g1_bumps/measure/measure.py`: `cpu_levels.json`, the first take's CPU MuJoCo
-run; `mjw_787a5b3/gpu_levels.json`, MetalSim on fork `787a5b3`). Per level 16 robots for 8 s, the lanes above,
+run; `mjw_787a5b3/gpu_levels.json`, MetalSim on my fork). Per level 16 robots for 8 s, the lanes above,
 command (0.5, 0, 0), tile seed 0. A fall: the pelvis below 0.4 m (`unitree.FALLEN_Z`; the robot is on the ground;
 Unitree's training ends an episode on pelvis contact). Gait per robot from 1 s to its fall or to 8 s
 (`record.gait_metrics`), the foot's height taken above the highest terrain under its sole (a 1 cm grid over the
@@ -150,8 +156,8 @@ start joints by 1e-6 rad.
 |---|---|---|---|---|
 | CPU MuJoCo 3.14 | 1 | 11 / 10 / 14 / 12 / 8 | 55 | 55 / 80 = 68.8 % |
 | CPU MuJoCo, start joints + N(0, 1e-6 rad) | 3 | 12, 11, 10 / 13, 12, 11 / 13, 11, 11 / 11, 11, 10 / 10, 13, 5 | 59, 58, 47 | 164 / 240 = 68.3 % |
-| MetalSim's MuJoCo Warp, fork `787a5b3` (this film) | 3 | 11, 11, 11 / 13, 15, 15 / 12, 12, 12 / 15, 11, 11 / 9, 11, 11 | 60, 60, 60 | 180 / 240 = 75.0 % |
-| MetalSim's MuJoCo Warp before the fixes (fork `8eb51fe`) | 3 to 6 | 2, 5, 4, 3, 1, 3 / 3, 3, 6 / 1, 6, 5 / 3, 1, 4 / 1, 1, 2 | 10, 12, 20 | 54 / 288 = 18.8 % |
+| MetalSim's MuJoCo Warp, my fork (this film) | 3 | 11, 11, 11 / 13, 15, 15 / 12, 12, 12 / 15, 11, 11 / 9, 11, 11 | 60, 60, 60 | 180 / 240 = 75.0 % |
+| MetalSim's MuJoCo Warp before the fixes (my fork at [`8eb51fe`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624)) | 3 to 6 | 2, 5, 4, 3, 1, 3 / 3, 3, 6 / 1, 6, 5 / 3, 1, 4 / 1, 1, 2 | 10, 12, 20 | 54 / 288 = 18.8 % |
 
 MetalSim's robots fall a little more often than CPU MuJoCo's over the five tiles (60 against 55 per 80 robots, less
 than one standard deviation of CPU MuJoCo's own nudged runs, 6.7) and as often on the film's tile (seed 0: 10 to 12 of
@@ -160,23 +166,25 @@ float64 and MuJoCo C's duplicate contacts at shared edges as candidates for the 
 
 **The take.** The level is Isaac's own terrain because it is the only one Isaac Lab defines, not because of its outcome;
 its bumps (2 to 10 cm) are clearly visible. The record stage is one more run of the 16 lanes on MetalSim's MuJoCo Warp
-(fork `787a5b3`), so its outcome is one draw from the spread above: 12 of 16 robots fall in it (the four measurement
-runs of this tile: 10, 11, 11 and 11). The film shows the record's typical outcome (`adapter_kw["pick"] = "typical"`,
-`UnitreeG1._rank_typical`): as at least half of the 16 fell, the fallen robot whose fall time is nearest the median fall
-time of all 12 (5.27 s), among the lanes from y = -1.4 to 1.0 m (`film_lanes`: there the camera, which stands 2 m to the
-robot's right, sees the rough tile around the robot rather than its flat border; the lane decides which bumps a robot
-meets, not how hard they are). That is the robot on lane y = -0.6 m, which walks 0.87 m forward over the bumps while
-veering 1.29 m to its left (2.88 m of path) and is down at 5.34 s (frame 266), falling backwards. The film does not stop
-at the fall: Unitree's playback has no termination or reset, so the policy keeps acting on the ground (in the clip one
-leg swings up about 0.3 s after it lands), and the render plays the recorded simulation to 8 s (`FilmCfg.after_end =
-"play"`). Whether the filmed robot itself is typical was checked before rendering, against a rule set before this record
-ran: re-record only if its own outcome contradicts its lane's outcome in every one of the four MetalSim measurement runs
-of this tile (`measure.py` and the three seed-0 runs above). Its lane, y = -0.6 m, fell in 1 of those 4 runs (and in CPU
-MuJoCo, at 5.82 s) and walked in the other 3: a lane where falling and walking both happen, not one that always walks.
-An earlier record, also 12 falls of 16, was not rendered: a first, stricter rule (the record's fall count within the
-four measurement runs' 10 to 11) rejected it, and was then replaced by the rule above because a count range from four
-runs is narrower than the spread between runs; under the rule above that record would have passed too (its filmed robot,
-lane y = 0.2 m, fell in all four measurement runs). The rejected record is not kept in the repository.
+([my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) at the commit the top-level
+README.md's `pip install` line pins), so its outcome is one draw from the spread above: 12 of 16 robots fall in it (the
+four measurement runs of this tile: 10, 11, 11 and 11). The film shows the record's typical outcome (`adapter_kw["pick"]
+= "typical"`, `UnitreeG1._rank_typical`): as at least half of the 16 fell, the fallen robot whose fall time is nearest
+the median fall time of all 12 (5.27 s), among the lanes from y = -1.4 to 1.0 m (`film_lanes`: there the camera, which
+stands 2 m to the robot's right, sees the rough tile around the robot rather than its flat border; the lane decides
+which bumps a robot meets, not how hard they are). That is the robot on lane y = -0.6 m, which walks 0.87 m forward over
+the bumps while veering 1.29 m to its left (2.88 m of path) and is down at 5.34 s (frame 266), falling backwards. The
+film does not stop at the fall: Unitree's playback has no termination or reset, so the policy keeps acting on the ground
+(in the clip one leg swings up about 0.3 s after it lands), and the render plays the recorded simulation to 8 s
+(`FilmCfg.after_end = "play"`). Whether the filmed robot itself is typical was checked before rendering, against a rule
+set before this record ran: re-record only if its own outcome contradicts its lane's outcome in every one of the four
+MetalSim measurement runs of this tile (`measure.py` and the three seed-0 runs above). Its lane, y = -0.6 m, fell in 1
+of those 4 runs (and in CPU MuJoCo, at 5.82 s) and walked in the other 3: a lane where falling and walking both happen,
+not one that always walks. An earlier record, also 12 falls of 16, was not rendered: a first, stricter rule (the
+record's fall count within the four measurement runs' 10 to 11) rejected it, and was then replaced by the rule above
+because a count range from four runs is narrower than the spread between runs; under the rule above that record would
+have passed too (its filmed robot, lane y = 0.2 m, fell in all four measurement runs). The rejected record is not kept
+in the repository.
 
 **Gait of the filmed robot** (`rec.json` `gait`, 1 s to its fall at 5.34 s): 0.57 m/s along its path at a commanded
 0.50; 1.10 / 1.23 gait cycles per second (touch-downs 1.84 / 1.61 per s, left / right); swing apex 10.4 / 10.3 cm above
@@ -212,34 +220,39 @@ view), as in the G1 films (G1_UNITREE.md), but lower. `hero` (1280x720; the vide
 the README grid): the same direction and elevation at 0.75 times the distance (2.60 m), looking at (0, 0, -0.15) m so
 the standing robot fits the 4:3 frame, plus MuJoCo Warp's README orbit of 10 deg/s about the vertical through the
 look-at point, symmetric about the middle of the 8 s film: -40 deg at 0 s, 0 at 4 s (the hero's direction), +40 deg at
-8 s, counter-clockwise seen from above (`mujoco_warp/record.py` at `d41a47c0`, lines 43 and 142: 0.05 deg per 5 ms
-physics step). When the robot falls the tracked pelvis drops with it, and so does the camera.
+8 s, counter-clockwise seen from above (`mujoco_warp/record.py` in upstream MuJoCo Warp at
+[`d41a47c0`](https://github.com/google-deepmind/mujoco_warp/commit/d41a47c0837fc71abb44d7d4799bf85ca19ff7ab), lines 43
+and 142: 0.05 deg per 5 ms physics step). When the robot falls the tracked pelvis drops with it, and so does the camera.
 
-**Rendering.** Tier 2 (the path tracer), 64 samples per pixel (16 passes x 4), 3 bounces, Open Image Denoise, ACES
-tone map, sRGB. The render twin is Unitree's `scene.xml` with the heightfield and the backdrop plane, its STL meshes
-posed per frame from the recorded joint state; the colliding copies and the foot spheres are hidden (`rec.json`
-`twin.visibility`), and the meshes keep Unitree's two greys.
+**Rendering.** Tier 2 (the path tracer), 64 samples per pixel (16 passes x 4), 3 bounces, [Open Image
+Denoise](https://www.openimagedenoise.org), ACES tone map, sRGB. The render twin is Unitree's `scene.xml` with the
+heightfield and the backdrop plane, its STL meshes posed per frame from the recorded joint state; the colliding copies
+and the foot spheres are hidden (`rec.json` `twin.visibility`), and the meshes keep Unitree's two greys.
 
 **README clip.** [g1_bumps.webp](g1_bumps.webp) is the `readme` shot from 1.0 s to 6.0 s (frames 50 to 299), so that the
 clip holds the fall at 5.34 s and the robot on the ground after it (the first take's clip ran from 0.5 s, its fall being
 earlier), resampled from 50 to 30 fps and written as MuJoCo Warp writes its README clips: 320x240 (Lanczos), lossy
-animated WebP from Pillow at quality 70, 33 ms per frame, looping; 150 frames. Command, run from the repository root
-after the render stage: `python -m metalsim.render.film.encode webp runs/film/g1_bumps/readme/frames
-docs/renders/g1_bumps.webp --start 1.0 --seconds 5 --src-fps 50 --fps 30`.
+animated WebP from [Pillow](https://github.com/python-pillow/Pillow) at quality 70, 33 ms per frame, looping; 150
+frames. Command, run from the repository root after the render stage: `python -m metalsim.render.film.encode webp
+runs/film/g1_bumps/readme/frames docs/renders/g1_bumps.webp --start 1.0 --seconds 5 --src-fps 50 --fps 30`.
 
 **This take, and where its timings come from.** Recorded, rendered and encoded on 2026-10-31 on the 14-inch MacBook Pro
-(Mac16,6), at metalsim `e67efcb9` plus the uncommitted G1 bumps work (hence `+dirty` in the pins), on the MuJoCo Warp
-fork commit `787a5b3`, not this tree's pin `8eb51fe` (Warp at its pin `52c09cdd`). This was not a timing run: MetalSim's
-timing runs are made on the 16-inch through the GPU queue's timing kind, and its throughput figures are in
-`docs/PARITY.md` §1.4 and §1.8; quote nothing on this page as MetalSim's speed. Power, as the stages stamped it
-("Hardware and pins" below): on AC power and charging at every stamp (89 % when the record stage wrote `rec.json` at
-23:37, 89 % at the hero shot's first frame at 23:37 and 89 % at the readme shot's at 23:40, local time), with pmset's
-power-mode setting at High Power (`powermode 2`: the configured setting, which does not show that the machine ran in
-High Power Mode); the encode and doc stages stamp nothing. The measurements, the record stage and the render stage (both
-shots) ran as GPU-queue jobs of kind render into `runs/film/g1_bumps`, one at a time, the record and the render in one
-job after the take check; then `--stage encode --shots hero`, the README WebP command above and `--stage doc` (CPU). A
-new recording is another take, not this one: the GPU rollout is not bitwise repeatable, so how many robots fall, which
-one is filmed, and its path can change.
+(Mac16,6), at metalsim
+[`e67efcb9`](https://github.com/pulipakaa24/MetalSim/commit/e67efcb9f92455f1dc723b3f9c7d7ba2ad85856e) plus the
+uncommitted G1 bumps work (hence `+dirty` in the pins), on [my fork of MuJoCo
+Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) at the commit the top-level README.md's `pip install`
+line pins (with [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) at the commit
+`scripts/setup_warp.sh` pins). This was not a timing run: MetalSim's timing runs are made on the 16-inch MacBook Pro
+through the GPU queue's timing kind (`scripts/gpu_run.sh`), and its throughput figures are in `docs/PARITY.md` §1.4 and
+§1.8; quote nothing on this page as MetalSim's speed. Power, as the stages stamped it ("Hardware and pins" below): on AC
+power and charging at every stamp (89 % when the record stage wrote `rec.json` at 23:37, 89 % at the hero shot's first
+frame at 23:37 and 89 % at the readme shot's at 23:40, local time), with pmset's power-mode setting at High Power
+(`powermode 2`: the configured setting, which does not show that the machine ran in High Power Mode); the encode and doc
+stages stamp nothing. The measurements, the record stage and the render stage (both shots) ran as GPU-queue jobs of kind
+render into `runs/film/g1_bumps`, one at a time, the record and the render in one job after the take check; then
+`--stage encode --shots hero`, the README WebP command above and `--stage doc` (CPU). A new recording is another take,
+not this one: the GPU rollout is not bitwise repeatable, so how many robots fall, which one is filmed, and its path can
+change.
 
 ## Reproduce
 

@@ -417,38 +417,39 @@ TRON1_MATERIALS = {_visual_geoms("base", "abad", "hip", "knee"): TRON1_SHELL, _v
 
 LIMX_SHA = LIMX_POLICY["sha256"]
 TRON1_STORY = f"""
-**The policy.** LimX's RL policy for the wheel-foot TRON1 (WF_TRON1A), from LimX's
-`tron1-rl-deploy-python` (<{LIMX_DEPLOY}>, Apache-2.0, commit `{LIMX_COMMIT}`):
+**The policy.** LimX's RL policy for the wheel-foot TRON1 (WF_TRON1A), from LimX's `tron1-rl-deploy-python`
+(<{LIMX_DEPLOY}>, Apache-2.0, commit
+[`{LIMX_COMMIT[:7]}`]({LIMX_DEPLOY}/commit/{LIMX_COMMIT})):
 `controllers/model/WF_TRON1A/policy/isaacgym/encoder.onnx` and `policy.onnx` with `params.yaml`. The copies in
-`assets/tron1/limx_policy/WF_TRON1A/` are byte-identical to LimX's at that commit (fetched and compared on
-2026-10-31; sha256 `{LIMX_SHA['policy/isaacgym/policy.onnx']}` for the policy,
-`{LIMX_SHA['policy/isaacgym/encoder.onnx']}` for the encoder), and the adapter checks the hashes before it runs. That
-repository is LimX's Python controller for its robots: `main.py` connects through LimX's SDK to LimX's MuJoCo
-simulator by default, or to the robot when given its IP address (`main.py` lines 27-39), and loads
+`assets/tron1/limx_policy/WF_TRON1A/` are byte-identical to LimX's at that commit (fetched and compared on 2026-10-31;
+sha256 `{LIMX_SHA['policy/isaacgym/policy.onnx']}` for the policy,
+`{LIMX_SHA['policy/isaacgym/encoder.onnx']}` for the encoder), and the adapter checks the hashes
+before it runs. That repository is LimX's Python controller for its robots: `main.py` connects through LimX's SDK to
+LimX's MuJoCo simulator by default, or to the robot when given its IP address (`main.py` lines 27-39), and loads
 `policy/$RL_TYPE/` with `RL_TYPE` isaacgym or isaaclab (the README's example is isaacgym; the isaaclab export uses
-another joint order, which the port does not handle). It is LimX's open policy, not the closed controller of the
-robot's Remote Control Mode, which is not documented (docs/TRON1.md, "What runs the robot today"). It is played by
+another joint order, which the port does not handle). It is LimX's open policy, not the closed controller of the robot's
+Remote Control Mode, which is not documented (docs/TRON1.md, "What runs the robot today"). It is played by
 `metalsim/tron1/limx_policy.py`, a port of LimX's `controllers/WheelfootController.py` at the same commit: 28
 observations (gyro x 0.25, projected gravity, six leg joint angles, eight joint velocities x 0.05, last actions), a
 10-frame history into the encoder (3 outputs), then the policy on [encoder, observation, command x (2, 2, 0.25)] to 8
 actions at 50 Hz; legs to `q = 0.25 a` with Kp 42 and Kd 2.5, wheels to `dq = 0.8 a` through Kd 0.8, with LimX's
-torque-bound action clips (80 / 40 N m). Two differences from LimX's script, both in the port's docstring: commands
-are scaled as in LimX's training rather than its joystick mapping, and LimX's stand mode (leg targets blended toward a
-fixed pose before the policy takes over) is skipped, so the policy itself stands the robot up (see "Commands"). Nothing
-is tuned for the film.
+torque-bound action clips (80 / 40 N m). Two differences from LimX's script, both in the port's docstring: commands are
+scaled as in LimX's training rather than its joystick mapping, and LimX's stand mode (leg targets blended toward a fixed
+pose before the policy takes over) is skipped, so the policy itself stands the robot up (see "Commands"). Nothing is
+tuned for the film.
 
 **MetalSim's TRON1 simulation, nominal settings.** The rollout is the TRON1 evaluation's own path
 (`metalsim/tron1/evaluate.py`, `episode`): one `Tron1Sim` per robot (`metalsim/tron1/sim.py`), LimX's WF_TRON1A MJCF
-on CPU MuJoCo with a 0.5 ms physics step, stepped by `Tron1Sim.run` with the controller at 500 Hz. Between the policy
-and the physics is MetalSim's realism layer at its `nominal` level (`SimParams.nominal()`,
-`metalsim/tron1/realism.py`; docs/TRON1.md, "Realism layer"), unchanged: commands reach the drives 4 ms late plus
-0.5 ms mean jitter, with 0.2 % packet loss; sensor messages 1 ms late; drives run LimX's mode-0 law on 17-bit encoder
-angles and 1 kHz finite-difference velocities, with a torque-speed envelope and a 0.5 ms current lag; joint Coulomb
-friction 0.3 N m (legs) and 0.1 N m (wheels), viscous damping and rotor armature; IMU white noise, bias random walk
-and AHRS tilt wander and yaw drift; a 1.5 kg sensor pack 8 cm above the base (drawn: the black box and the aluminium
-lidar cylinder on top); ground friction 0.8; and the tyre as a smooth fit to the real 5 cm rounded tread instead of the
-1 cm disc of LimX's MuJoCo file. The full parameter set is in `rec.json` `adapter.sim_params`. Each robot gets its
-own noise seed (0 to 15), as each evaluation episode does; no pushes.
+on CPU [MuJoCo](https://github.com/google-deepmind/mujoco) with a 0.5 ms physics step, stepped by `Tron1Sim.run` with
+the controller at 500 Hz. Between the policy and the physics is MetalSim's realism layer at its `nominal` level
+(`SimParams.nominal()`, `metalsim/tron1/realism.py`; docs/TRON1.md, "Realism layer"), unchanged: commands reach the
+drives 4 ms late plus 0.5 ms mean jitter, with 0.2 % packet loss; sensor messages 1 ms late; drives run LimX's mode-0
+law on 17-bit encoder angles and 1 kHz finite-difference velocities, with a torque-speed envelope and a 0.5 ms current
+lag; joint Coulomb friction 0.3 N m (legs) and 0.1 N m (wheels), viscous damping and rotor armature; IMU white noise,
+bias random walk and AHRS tilt wander and yaw drift; a 1.5 kg sensor pack 8 cm above the base (drawn: the black box and
+the aluminium lidar cylinder on top); ground friction 0.8; and the tyre as a smooth fit to the real 5 cm rounded tread
+instead of the 1 cm disc of LimX's MuJoCo file. The full parameter set is in `rec.json` `adapter.sim_params`. Each robot
+gets its own noise seed (0 to 15), as each evaluation episode does; no pushes.
 
 **Commands.** The same schedule for every robot, within the evaluation's ranges (vx in [-1, 1] m/s, yaw rate in
 [-0.6, 0.6] rad/s): stand until 0.5 s, then vx 1.0 m/s; at 2.0 s vx 0.8 m/s with a 0.6 rad/s left turn; at 3.5 s vx
@@ -506,23 +507,20 @@ def tron1_notes(take) -> str:
         "texture once per 2 / `texrepeat` m: an infinite\nplane's texture coordinates are half its world position, "
         "MuJoCo's `makePlane`, mirrored in\n`metalsim/render/builtin_geoms.py`; `metalsim/render/film/render.py`, "
         "`ground_texrepeat`)")
-    mjw, warp = take.commit("mujoco_warp", n=7), take.commit("warp")
-    mjw = (f"at its pinned commit `{mjw}`" if take.at_pin("mujoco_warp") else
-           f"at `{mjw}`, not its pin `{take.pin('mujoco_warp', 7)}`")
-    warp = f"Warp at its pin `{warp}`" if take.at_pin("warp") else f"Warp at `{warp}`, not its pin `{take.pin('warp')}`"
-    rendered_at = f"`{take.commit('metalsim', 'hero')}`" + (
+    mjw, warp = take.fork_at("mujoco_warp"), take.fork_at("warp", n=8)
+    rendered_at = take.commit_md("metalsim", "hero") + (
         " plus uncommitted files, this film's colours and exposure among them" if take.dirty("hero") else "")
     this_take = take.fill(f"""
 **This take, and where its timings come from.** Recorded, rendered and encoded on {take.day} on the {take.machine}; the
 record stage ran at metalsim {take.metalsim_at("this film's uncommitted pre-roll and ramps and other films' uncommitted film-tool "
                                 "work, whose new settings (`after_end`, `rank_keeps_terminated`) stay at their defaults "
-                                "here")}, with the main venv's MuJoCo Warp checkout {mjw}
+                                "here")}, with the main venv's checkout of {mjw}
 ({warp}; the physics here is CPU MuJoCo, which neither checkout touches). This was not a timing run: quote
 nothing on this page as MetalSim's speed (MetalSim's throughput figures are in `docs/PARITY.md` §1.4 and §1.8). The
 record stage simulates on the CPU (one CPU MuJoCo `Tron1Sim` per robot, run one after another) and runs LimX's ONNX
-files with onnxruntime 1.31.0 (CPU, one thread; the `tron1` extra of `pyproject.toml`, which the record stage needs:
+files with [onnxruntime](https://github.com/microsoft/onnxruntime) 1.31.0 (CPU, one thread; the `tron1` extra of `pyproject.toml`, which the record stage needs:
 `pip install -e '.[tron1]'`; the pins below list a fixed set of modules and omit it). Power, as the stages stamped it
-("Hardware and pins" below): {take.power_prose()}. The record ran with a first render as one GPU-queue job of kind
+("Hardware and pins" below): {take.power_prose()}. The record ran with a first render as one GPU-queue job (`scripts/gpu_run.sh`) of kind
 render, into `runs/film/tron1`: `--stage record`, then a check that the recording was new and made with the pre-roll and
 ramps, then `--stage render`. That render drew the robot in the MJCF's colours, white. A second `--stage render` of
 the same recording drew it in the robot's real colours, once the film tool wrote a `look.materials` colour into the
@@ -532,14 +530,15 @@ a GPU-queue job of kind render of its own), at metalsim {rendered_at}: the film 
 into the floor's `rgba`, so the concrete is in its own colours, and the exposure is the grey card's 0.9 ("Exposure"
 above); the render cache key records the `rgba` writes (`render.geoms_recoloured`), so every frame was redrawn. Then
 `--stage encode --shots hero`, the README WebP command above and `--stage doc` (CPU). The recording replaces the
-film's earlier take (`rec.json` written 2026-10-31 at 16:05, at `ed66d8ef` plus the uncommitted TRON1 film code),
+film's earlier take (`rec.json` written 2026-10-31 at 16:05, at [`ed66d8ef`](https://github.com/pulipakaa24/MetalSim/commit/ed66d8ef3ecd7f17aa16207231000b1d22ff7812) plus the uncommitted TRON1 film code),
 which started each robot from straight legs with stepped commands.""")
     return TRON1_STORY + f"""
-**Rendering.** Tier 2 (the path tracer), 64 samples per pixel (16 passes x 4), 3 bounces, Open Image Denoise, ACES tone
-map, sRGB; lit by Poly Haven's `machine_shop_02` (an industrial hall, 2k) as an importance-sampled dome, with Poly
-Haven's `concrete_floor_worn_001` (1k diffuse) on LimX's `floor` plane in place of its checker, in the texture's own
-colours (the film tool writes the look's ground tint, white here, into the plane's `rgba`, which LimX sets to
-0.5 / 0.6 / 0.7 and MuJoCo would otherwise multiply into the texture). The texture is {dims}
+**Rendering.** Tier 2 (the path tracer), 64 samples per pixel (16 passes x 4), 3 bounces,
+[Open Image Denoise](https://www.openimagedenoise.org), ACES tone map, sRGB; lit by Poly Haven's `machine_shop_02` (an
+industrial hall, 2k) as an importance-sampled dome, with Poly Haven's `concrete_floor_worn_001` (1k diffuse) on
+LimX's `floor` plane in place of its checker, in the texture's own colours (the film tool writes the look's ground tint,
+white here, into the plane's `rgba`, which LimX sets to 0.5 / 0.6 / 0.7 and MuJoCo would otherwise multiply into the
+texture). The texture is {dims}
 of real floor (Poly Haven's dimensions){laid}. The render twin is the
 simulated model itself (`build_spec` at the nominal level), posed per frame from the recorded state: LimX's STL meshes,
 the sensor pack's two geoms, and the colliders hidden (`rec.json` `twin.visibility`).
@@ -552,9 +551,10 @@ treaded tyres on dark hubs. LimX's description files carry other colours: the MJ
 draws the robot white. This film's earlier renders used the MJCF's `rgba` as linear albedo, so the robot was white.
 Here the film's look sets each part (`look.materials`, `metalsim/render/film/tron1.py`), as linear albedo: the base
 colour of the renderer's OmniPBR-style material, under a dielectric coat that reflects 4 % at normal incidence.
-- The shells: 0.03, roughness 0.5, not metallic. Black ABS measures 1.5 to 3 % (USGS spectral library splib06, GDS341,
-  black ABS pipe), blackboard paint 0.039 (<https://physicallybased.info>, "Blackboard"). The satin roughness is read
-  from the photos, not measured. A painted or anodised metal part is a dielectric coat, so not metallic either.
+- The shells: 0.03, roughness 0.5, not metallic. Black ABS measures 1.5 to 3 %
+  ([USGS spectral library splib06](https://doi.org/10.3133/ds231), GDS341, black ABS pipe), blackboard paint 0.039
+  (<https://physicallybased.info>, "Blackboard"). The satin roughness is read from the photos, not measured. A painted
+  or anodised metal part is a dielectric coat, so not metallic either.
 - The wheels: 0.023, roughness 0.7 (physicallybased.info, "Tire"). LimX's wheel is one mesh, so the hub is drawn in
   the tyre's rubber.
 - The sensor pack's enclosure: as the shells. Its colour is assumed: the enclosure is a generic estimate, not LimX's.
@@ -571,11 +571,11 @@ grey (1.68 x 0.095 / 0.18). In hero frame 175 the body's side shows at about a q
 coat reflects about as much of the bright hall as its 0.03 base colour adds. The earlier renders used 1.4: the same
 rule, on frames whose concrete the film tool drew times LimX's floor `rgba`, darker and bluer than it is.
 
-**README clip.** [tron1.webp](tron1.webp) is the `readme` shot from 0.5 s to 5.5 s (frames 25 to 274: drive, turn,
-slow down, stop), resampled from 50 to 30 fps and written as MuJoCo Warp writes its README clips: 320x240 (Lanczos),
-lossy animated WebP from Pillow at quality 70, 33 ms per frame, looping; 150 frames. Command, run from the repository
-root after the render stage: `python -m metalsim.render.film.encode webp runs/film/tron1/readme/frames
-docs/renders/tron1.webp --start 0.5 --seconds 5 --src-fps 50 --fps 30`.
+**README clip.** [tron1.webp](tron1.webp) is the `readme` shot from 0.5 s to 5.5 s (frames 25 to 274: drive, turn, slow
+down, stop), resampled from 50 to 30 fps and written as MuJoCo Warp writes its README clips: 320x240 (Lanczos), lossy
+animated WebP from [Pillow](https://github.com/python-pillow/Pillow) at quality 70, 33 ms per frame, looping; 150
+frames. Command, run from the repository root after the render stage: `python -m metalsim.render.film.encode webp
+runs/film/tron1/readme/frames docs/renders/tron1.webp --start 0.5 --seconds 5 --src-fps 50 --fps 30`.
 
 **Checked by eye.** The robot starts standing: in hero frames 0 to 11 it holds one crouched stance with both tyres on
 their contact shadows, and in hero frames every 0.2 s from 0 to 3 s the top of the sensor pack stays on one line. The
@@ -605,7 +605,7 @@ TRON1 = FilmTask(
     adapter_kw={"params": "nominal", "pre_roll_s": PRE_ROLL_S, "ramp_s": RAMP_S},
     title="TRON1 wheel-legged drive, LimX's policy",
     summary=("LimX's TRON1 wheel-legged robot (WF_TRON1A) driven by LimX's own RL policy (the ONNX policy of LimX's "
-             "`tron1-rl-deploy-python`, Apache-2.0) in MetalSim's TRON1 simulation at its nominal realism settings "
+             "[`tron1-rl-deploy-python`](https://github.com/limxdynamics/tron1-rl-deploy-python), Apache-2.0) in MetalSim's TRON1 simulation at its nominal realism settings "
              "(latency, drive model, sensor noise, joint friction, sensor pack), on LimX's own model and meshes: "
              "drive forward, turn, slow down, stop. Rendered on the 14-inch MacBook Pro (Mac16,6), not in a timing run, "
              "so its Performance table is not a timing figure."),

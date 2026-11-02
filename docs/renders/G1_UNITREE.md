@@ -1,6 +1,6 @@
 # G1 walk, Unitree's policy: a metalsim render
 
-Unitree G1 walking on flat ground with Unitree's own pretrained walking policy (unitree_rl_gym, `deploy/pre_train/g1/motion.pt`, BSD-3-Clause), played by Unitree's MuJoCo sim2sim loop (`deploy_mujoco.py`, `configs/g1.yaml`) ported to metalsim's MuJoCo Warp on Metal, on Unitree's own G1 model and meshes. Rendered on the 14-inch MacBook Pro (Mac16,6), not in a timing run, so its Performance table is not a timing figure.
+Unitree G1 walking on flat ground with Unitree's own pretrained walking policy ([unitree_rl_gym](https://github.com/unitreerobotics/unitree_rl_gym), `deploy/pre_train/g1/motion.pt`, BSD-3-Clause), played by Unitree's [MuJoCo](https://github.com/google-deepmind/mujoco) sim2sim loop (`deploy_mujoco.py`, `configs/g1.yaml`) ported to [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) on Metal, on Unitree's own G1 model and meshes. Rendered on the 14-inch MacBook Pro (Mac16,6), not in a timing run, so its Performance table is not a timing figure.
 
 **hero** (301 frames, 6.0 s at 50 fps): [video](g1_unitree.mp4) (1.5 MB, H.264)
 
@@ -19,7 +19,7 @@ Unitree G1 walking on flat ground with Unitree's own pretrained walking policy (
 
 ## Performance
 
-Measured on the machine below; one frame = one policy step (Isaac Lab's `render_fps` = 1 / step_dt).
+Measured on the machine below; one frame = one policy step ([Isaac Lab](https://github.com/isaac-sim/IsaacLab)'s `render_fps` = 1 / step_dt).
 
 | stage | measurement |
 |---|---|
@@ -34,8 +34,8 @@ Measured on the machine below; one frame = one policy step (Isaac Lab's `render_
 
 - Mac16,6 (Apple M4 Max, 40 GPU cores, 64 GB), macOS 27.0.1 (26A434).
 - Power as each stage stamped it (`pmset -g batt` and `pmset -g`; `hardware.power`: the record stage's when it wrote rec.json, a render shot's at its first frame): record: on battery (86 %, discharging), power-mode setting High Power (pmset `powermode 2`), 2026-10-31 15:52 (-0700); render hero: on AC power (79 %, charging), power-mode setting High Power (pmset `powermode 2`), 2026-10-31 21:48 (-0700); render readme: on AC power (79 %, charging), power-mode setting High Power (pmset `powermode 2`), 2026-10-31 21:50 (-0700).
-- metalsim `ed66d8ef3e+dirty`; record stage (main venv): warp 1.18.0.dev20260917 (`4127c48183`), mujoco 3.14.0, mujoco_warp 3.14.0 (`8eb51fe637`), torch 2.14.0, numpy 2.5.3.
-- render stage (main venv): warp 1.18.0.dev20260917 (`52c09cdd82`), mujoco 3.14.0, numpy 2.5.3.
+- metalsim [`ed66d8ef3e+dirty`](https://github.com/pulipakaa24/MetalSim/commit/ed66d8ef3ecd7f17aa16207231000b1d22ff7812); record stage (main venv): warp 1.18.0.dev20260917 ([`4127c48183`](https://github.com/pulipakaa24/warp/commit/4127c4818334080de6f3d23aef522e582ff6a2a7)), mujoco 3.14.0, mujoco_warp 3.14.0 ([`8eb51fe637`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624)), torch 2.14.0, numpy 2.5.3.
+- render stage (main venv): warp 1.18.0.dev20260917 ([`52c09cdd82`](https://github.com/pulipakaa24/warp/commit/52c09cdd82f79e8564b5ae17cdcee7b52d10d075)), mujoco 3.14.0, numpy 2.5.3.
 
 ## Assets
 
@@ -50,19 +50,22 @@ Measured on the machine below; one frame = one policy step (Isaac Lab's `render_
 ## How it was made
 
 **The policy.** Unitree's own pretrained G1 walking policy from Unitree's `unitree_rl_gym`
-(<https://github.com/unitreerobotics/unitree_rl_gym>, BSD-3-Clause, commit `276801e46c5d433564f24658bac64f254b7d2d4b`): `deploy/pre_train/g1/motion.pt`, the file both of
-Unitree's playback scripts load, the MuJoCo sim2sim one (`deploy/deploy_mujoco/configs/g1.yaml`, `policy_path`) and the
-one for the real robot (`deploy/deploy_real/configs/g1.yaml`, line 10). sha256
-`cf668f75b90d1abf73d2b87612a6e76bccc61ff7e083b63582d3f6aaa3c1759d`, 145,745 bytes, as fetched. It is a TorchScript module: an LSTM (47 inputs, 64
-hidden) and an ELU MLP 64 -> 32 -> 12, loaded with `torch.jit.load` and played as published. Unitree trained it with
-`legged_gym` on Isaac Gym (`legged_gym/envs/g1/g1_config.py`, `G1RoughCfg` / `G1RoughCfgPPO`: `ActorCriticRecurrent`,
-plane terrain, friction and added-mass randomization, pushes every 5 s; physics 5 ms x decimation 4, so 50 Hz). Its
-gait is set by the training task, not left to the policy: `g1_env.py` feeds a fixed gait clock (period 0.8 s, so
-1.25 gait cycles per second; the right leg half a cycle behind the left) to the policy as sin / cos of the phase, and
-rewards foot contact in the stance part of each leg's cycle (phase < 0.55, `_reward_contact`) and an 8 cm swing
-height of the ankle-roll link (`_reward_feet_swing_height`). `scripts/fetch_unitree_rl_gym.sh` fetches the repository
-at that commit into `assets/unitree_rl_gym/` (git-ignored, not committed); the record stage checks the policy's
-sha256 and writes the repository, commit, file, licence and hash into `rec.json` `checkpoint` and `adapter`.
+(<https://github.com/unitreerobotics/unitree_rl_gym>, BSD-3-Clause, commit
+[`276801e`](https://github.com/unitreerobotics/unitree_rl_gym/commit/276801e46c5d433564f24658bac64f254b7d2d4b)):
+`deploy/pre_train/g1/motion.pt`, the file both of Unitree's playback scripts load, the MuJoCo sim2sim one
+(`deploy/deploy_mujoco/configs/g1.yaml`, `policy_path`) and the one for the real robot
+(`deploy/deploy_real/configs/g1.yaml`, line 10). sha256
+`cf668f75b90d1abf73d2b87612a6e76bccc61ff7e083b63582d3f6aaa3c1759d`, 145,745 bytes, as fetched. It is a TorchScript
+module: an LSTM (47 inputs, 64 hidden) and an ELU MLP 64 -> 32 -> 12, loaded with `torch.jit.load` and played as
+published. Unitree trained it with `legged_gym` on [Isaac Gym](https://developer.nvidia.com/isaac-gym)
+(`legged_gym/envs/g1/g1_config.py`, `G1RoughCfg` / `G1RoughCfgPPO`: `ActorCriticRecurrent`, plane terrain, friction and
+added-mass randomization, pushes every 5 s; physics 5 ms x decimation 4, so 50 Hz). Its gait is set by the training
+task, not left to the policy: `g1_env.py` feeds a fixed gait clock (period 0.8 s, so 1.25 gait cycles per second; the
+right leg half a cycle behind the left) to the policy as sin / cos of the phase, and rewards foot contact in the stance
+part of each leg's cycle (phase < 0.55, `_reward_contact`) and an 8 cm swing height of the ankle-roll link
+(`_reward_feet_swing_height`). `scripts/fetch_unitree_rl_gym.sh` fetches the repository at that commit into
+`assets/unitree_rl_gym/` (git-ignored, not committed); the record stage checks the policy's sha256 and writes the
+repository, commit, file, licence and hash into `rec.json` `checkpoint` and `adapter`.
 
 **Unitree's loop, on MuJoCo Warp.** Unitree plays the policy in MuJoCo with `deploy/deploy_mujoco/deploy_mujoco.py`
 and `configs/g1.yaml`: physics step 2 ms, a policy step every 10 physics steps (50 Hz), PD gains kp (100, 100, 100,
@@ -126,43 +129,52 @@ looking at (0, 0, -0.05) m, 3.55 m away. `readme` (640x480, 4:3, for the README 
 look-at at 0.75 times the distance (eye (1.95, -1.5, 0.98) m, 2.66 m), so the robot fills about three quarters of the
 frame height, plus a slow orbit of 10 deg/s about the vertical through the look-at point, symmetric about the middle
 of the film: -30 deg at 0 s, 0 at 3 s (the hero's direction), +30 deg at 6 s, counter-clockwise seen from above, as
-MuJoCo's azimuth grows. The orbit copies MuJoCo Warp's README clips: `mujoco_warp/record.py` (google-deepmind/
-mujoco_warp at `d41a47c0`, lines 43 and 142) sets `cam.azimuth = 90 + (step - nstep / 2) * cam_azimuth_speed` with
-0.05 deg per physics step, and its G1 scenes step at 5 ms (`benchmarks/unitree_g1/unitree_g1_mjlab.xml`, line 14),
-so 10 deg/s.
+MuJoCo's azimuth grows. The orbit copies MuJoCo Warp's README clips: `mujoco_warp/record.py` (upstream MuJoCo Warp at
+[`d41a47c0`](https://github.com/google-deepmind/mujoco_warp/commit/d41a47c0837fc71abb44d7d4799bf85ca19ff7ab), lines 43
+and 142) sets `cam.azimuth = 90 + (step - nstep / 2) * cam_azimuth_speed` with 0.05 deg per physics step, and its G1
+scenes step at 5 ms (`benchmarks/unitree_g1/unitree_g1_mjlab.xml`, line 14), so 10 deg/s.
 
-**Rendering.** Tier 2 (the path tracer), 64 samples per pixel (16 passes x 4), 3 bounces, Open Image Denoise, ACES
-tone map, sRGB; lit by the Poly Haven studio HDRI as an importance-sampled dome, with the laminate floor texture on
-the scene's `floor` plane in place of Unitree's checker, at its real size (Poly Haven's `laminate_floor_02`: 1.70 m
-per image, eight 21 cm planks; `ground_tile_m`), the same look as the G1 flat film. The render twin is
-Unitree's own `scene.xml` with its STL meshes, posed per frame from the recorded joint state. Unitree's model gives
-each link a visual mesh and a colliding copy; the colliding copies and the foot spheres are hidden (`rec.json`
-`twin.visibility`), and the meshes keep Unitree's two greys. The scene's own lights, sky and checker floor are
-replaced by the film's look.
+**Rendering.** Tier 2 (the path tracer), 64 samples per pixel (16 passes x 4), 3 bounces,
+[Open Image Denoise](https://www.openimagedenoise.org), ACES tone map, sRGB; lit by the Poly Haven studio HDRI as an
+importance-sampled dome, with the laminate floor texture on the scene's `floor` plane in place of Unitree's
+checker, at its real size (Poly Haven's `laminate_floor_02`: 1.70 m
+per image, eight 21 cm planks; `ground_tile_m`), the same look as the G1 flat film.
+The render twin is Unitree's own `scene.xml` with its STL meshes, posed per frame from the recorded joint state.
+Unitree's model gives each link a visual mesh and a colliding copy; the colliding copies and the foot spheres are hidden
+(`rec.json` `twin.visibility`), and the meshes keep Unitree's two greys. The scene's own lights, sky and checker floor
+are replaced by the film's look.
 
 **README clip.** [g1_unitree.webp](g1_unitree.webp) is the `readme` shot from 0.5 s to 5.5 s (frames 25 to 274),
 resampled from 50 to 30 fps and written as MuJoCo Warp writes its README clips: 320x240 (Lanczos), lossy animated
-WebP from Pillow at quality 70, 33 ms per frame, looping; 150 frames. Command, run from the repository root after the
-render stage: `python -m metalsim.render.film.encode webp runs/film/g1_unitree/readme/frames
-docs/renders/g1_unitree.webp --start 0.5 --seconds 5 --src-fps 50 --fps 30`.
+WebP from [Pillow](https://github.com/python-pillow/Pillow) at quality 70, 33 ms per frame, looping; 150 frames.
+Command, run from the repository root after the render stage: `python -m metalsim.render.film.encode webp
+runs/film/g1_unitree/readme/frames docs/renders/g1_unitree.webp --start 0.5 --seconds 5 --src-fps 50 --fps 30`.
 
 **This take, and where its timings come from.** Recorded, rendered and encoded on 2026-10-31 on the 14-inch MacBook Pro
-(Mac16,6), at metalsim `ed66d8ef` plus uncommitted changes (hence `+dirty` in the pins), on the pinned MuJoCo Warp fork
-commit `8eb51fe` (Warp itself at `4127c481`, not its pin `52c09cdd`). It replaces a take recorded at 13:55 the same day
-on a stale fork checkout (`07a51a6`); the two recordings differ by at most 2 um in any body position. The frames on this
-page were rendered again on 2026-10-31 at 21:48 from that same recording (`rec.npz`, `rec.json` and `twin.xml`
-unchanged; that render ran on Warp `52c09cdd`, its pin, as the render stage's pins above say), after the film tool
-started laying the floor texture at its real size (`ground_tile_m`; the earlier frames drew it 2.35 times too large, as
-50 cm planks). This was not a timing run: MetalSim's timing runs are made on the 16-inch through the GPU queue's timing
-kind, and its throughput figures are in `docs/PARITY.md` §1.4 and §1.8; quote nothing on this page as MetalSim's speed.
-Power, as the stages stamped it ("Hardware and pins" below): on battery, 86 %, discharging, when the record stage wrote
-`rec.json` at 15:52; on AC power, 79 %, charging, at the hero shot's first frame at 21:48 and on AC power, 79 %,
-charging, at the readme shot's at 21:50 (local time; the two render stamps are the re-render's), with pmset's power-mode
-setting at High Power at every stamp (`powermode 2`: the configured setting, which does not show that the machine ran in
-High Power Mode); the encode and doc stages stamp nothing. Record and render ran as GPU-queue jobs of kind render, one
-at a time, into `runs/film/g1_unitree`: `--stage record`, then `--stage render` (both shots); later a second `--stage
-render` job (both shots, the real-size floor); then `--stage encode --shots hero`, the README WebP command above and
-`--stage doc` (CPU).
+(Mac16,6), at metalsim
+[`ed66d8ef`](https://github.com/pulipakaa24/MetalSim/commit/ed66d8ef3ecd7f17aa16207231000b1d22ff7812) plus uncommitted
+changes (hence `+dirty` in the pins), on [my fork of MuJoCo
+Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) at
+[`8eb51fe`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624), not the commit
+the top-level README.md's `pip install` line pins (with [my fork of
+Warp](https://github.com/pulipakaa24/warp/tree/metalsim) at
+[`4127c481`](https://github.com/pulipakaa24/warp/commit/4127c4818334080de6f3d23aef522e582ff6a2a7), not the commit
+`scripts/setup_warp.sh` pins). It replaces a take recorded at 13:55 the same day on a stale checkout of my fork
+([`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc)); the two
+recordings differ by at most 2 um in any body position. The frames on this page were rendered again on 2026-10-31 at
+21:48 from that same recording (`rec.npz`, `rec.json` and `twin.xml` unchanged; that render ran on my fork of Warp at
+the commit `scripts/setup_warp.sh` pins, as the render stage's pins above say), after the film tool started laying the
+floor texture at its real size (`ground_tile_m`; the earlier frames drew it 2.35 times too large, as 50 cm planks). This
+was not a timing run: MetalSim's timing runs are made on the 16-inch MacBook Pro through the GPU queue's timing kind
+(`scripts/gpu_run.sh`), and its throughput figures are in `docs/PARITY.md` §1.4 and §1.8; quote nothing on this page as
+MetalSim's speed. Power, as the stages stamped it ("Hardware and pins" below): on battery, 86 %, discharging, when the
+record stage wrote `rec.json` at 15:52; on AC power, 79 %, charging, at the hero shot's first frame at 21:48 and on AC
+power, 79 %, charging, at the readme shot's at 21:50 (local time; the two render stamps are the re-render's), with
+pmset's power-mode setting at High Power at every stamp (`powermode 2`: the configured setting, which does not show that
+the machine ran in High Power Mode); the encode and doc stages stamp nothing. Record and render ran as GPU-queue jobs of
+kind render, one at a time, into `runs/film/g1_unitree`: `--stage record`, then `--stage render` (both shots); later a
+second `--stage render` job (both shots, the real-size floor); then `--stage encode --shots hero`, the README WebP
+command above and `--stage doc` (CPU).
 
 ## Reproduce
 

@@ -77,6 +77,80 @@ def fork_pins() -> dict:
     return out
 
 
+# Where a doc links MetalSim and the forks it runs on: the GitHub repository of each module a stage logs a commit of,
+# and the forks by their work branch, `metalsim` (runs/readme_media/PROTOCOL.md, "Doc-link sweep (2026-11-01)")
+GITHUB = {"metalsim": "pulipakaa24/MetalSim", "mujoco_warp": "pulipakaa24/mujoco_warp", "warp": "pulipakaa24/warp",
+          "newton": "pulipakaa24/newton"}
+FORK_NAMES = {"mujoco_warp": "my fork of MuJoCo Warp", "warp": "my fork of Warp", "newton": "my fork of Newton"}
+FORK_LINKS = {k: f"[{v}](https://github.com/{GITHUB[k]}/tree/metalsim)" for k, v in FORK_NAMES.items()}
+# The forks' clones, relative to a checkout (scripts/setup_warp.sh, scripts/fork_sync.sh; tests/test_fork_pins.py)
+FORK_CLONES = {"mujoco_warp": ("upstream/mujoco_warp",), "warp": ("upstream/warp-metalsim", "upstream/warp-innate")}
+# MetalSim commits a stage logged under another SHA than GitHub shows for them: logged abbreviated SHA -> GitHub's full
+# SHA. A doc names and links GitHub's.
+METALSIM_GITHUB_SHA = {"cb76304fe6": "68c478bba217a0edd89e7ffa521eed26ba3fbf09"}
+# Where each pin of ``fork_pins`` is set, as the notes name it
+PIN_SOURCES = {"mujoco_warp": "the commit the top-level README.md's `pip install` line pins",
+               "warp": "the commit `scripts/setup_warp.sh` pins"}
+
+
+def _github_sha(module: str, sha: str) -> str:
+    """``sha`` (no "+dirty") as GitHub shows the commit: ``METALSIM_GITHUB_SHA``'s SHA for a metalsim commit listed
+    there, abbreviated to the logged length; else ``sha`` itself."""
+    for k, v in (METALSIM_GITHUB_SHA.items() if module == "metalsim" and sha else ()):
+        if k.startswith(sha) or sha.startswith(k):
+            return v[:len(sha)]
+    return sha
+
+
+def _main_checkout() -> str:
+    """The main checkout of a git worktree (this checkout when it is not a worktree)."""
+    common = provenance._run(["git", "rev-parse", "--path-format=absolute", "--git-common-dir"], cwd=provenance.ROOT)
+    return os.path.dirname(common) if common and os.path.basename(common) == ".git" else provenance.ROOT
+
+
+@functools.lru_cache(maxsize=None)
+def commit_url(module: str, sha: str) -> str | None:
+    """The GitHub page of commit ``sha`` (as a stage logged it; "+dirty" ignored) of ``module`` (``GITHUB``), or None
+    when a reader cannot reach it. The full SHA, and whether the commit is on GitHub, come from a local clone: this
+    repository for metalsim; for a fork, its clone (``FORK_CLONES``) in this checkout or in the main checkout of a git
+    worktree. A commit counts as on GitHub when a branch of the clone's ``origin`` remote contains it. A fork commit no
+    local clone holds is linked by the logged abbreviated SHA, which GitHub resolves."""
+    sha = _github_sha(module, (sha or "").split("+")[0])
+    if module not in GITHUB or not re.fullmatch(r"[0-9a-f]{7,40}", sha):
+        return None
+    roots = dict.fromkeys((provenance.ROOT, _main_checkout()))
+    clones = [provenance.ROOT] if module == "metalsim" else [os.path.join(r, c) for r in roots
+                                                            for c in FORK_CLONES.get(module, ())]
+    for d in clones:
+        if not os.path.exists(os.path.join(d, ".git")):
+            continue
+        full = provenance._run(["git", "rev-parse", "--verify", "-q", f"{sha}^{{commit}}"], cwd=d)
+        if full:
+            on_origin = provenance._run(["git", "branch", "-r", "--list", "origin/*", "--contains", full], cwd=d)
+            return f"https://github.com/{GITHUB[module]}/commit/{full}" if on_origin else None
+    return None if module == "metalsim" else f"https://github.com/{GITHUB[module]}/commit/{sha}"
+
+
+def commit_md(module: str, sha: str) -> str:
+    """Commit ``sha`` of ``module`` as a markdown link to its GitHub page (``commit_url``), the logged text ("+dirty"
+    included; the SHA as GitHub shows it, ``_github_sha``) as the link text; "" when a reader cannot reach the commit,
+    so the doc leaves the hash out."""
+    url = commit_url(module, sha)
+    base, plus, rest = (sha or "").partition("+")
+    return f"[`{_github_sha(module, base)}{plus}{rest}`]({url})" if url else ""
+
+
+def _software(sw: dict) -> str:
+    """A stage's ``software`` modules, "warp 1.18.0 ([`52c09cdd82`](...)), mujoco 3.14.0, ...": each version, with the
+    commit linked for a module run from a git checkout whose commit a reader can reach."""
+    out = []
+    for k, v in sw.items():
+        if isinstance(v, dict):
+            c = commit_md(k, v["git"]) if v.get("git") else ""
+            out.append(f"{k} {v.get('version')}" + (f" ({c})" if c else ""))
+    return ", ".join(out)
+
+
 def _join(xs):
     return xs[0] if len(xs) == 1 else ", ".join(xs[:-1]) + " and " + xs[-1]
 
@@ -102,10 +176,15 @@ class Take:
         """metalsim's checkout had uncommitted changes when the stage ran ("+dirty" in its pin)."""
         return "+dirty" in ((self._log(stage).get("software") or {}).get("metalsim") or "")
 
-    def metalsim_at(self, uncommitted: str) -> str:
-        """"`ed66d8ef` plus <uncommitted> (hence `+dirty` in the pins)": metalsim's commit as the record stage logged
-        it, with ``uncommitted`` (what the uncommitted changes were) when its checkout was dirty."""
-        return f"`{self.commit()}`" + (f" plus {uncommitted} (hence `+dirty` in the pins)" if self.dirty() else "")
+    def commit_md(self, module="metalsim", stage="record", n=8) -> str:
+        """``commit`` linked to its GitHub page (``commit_md``); "" when a reader cannot reach it."""
+        return commit_md(module, self.commit(module, stage, n))
+
+    def metalsim_at(self, uncommitted: str, stage="record") -> str:
+        """"[`ed66d8ef`](...) plus <uncommitted> (hence `+dirty` in the pins)": metalsim's commit as the stage logged it,
+        linked, with ``uncommitted`` (what the uncommitted changes were) when its checkout was dirty."""
+        c = self.commit_md("metalsim", stage)
+        return c + (f"{' ' if c else ''}plus {uncommitted} (hence `+dirty` in the pins)" if self.dirty(stage) else "")
 
     def at_pin(self, module, stage="record") -> bool | None:
         """The stage ran ``module`` (mujoco_warp or warp) at the commit this tree pins (``fork_pins``); None if
@@ -113,9 +192,16 @@ class Take:
         sha, pin = self.commit(module, stage, 40), fork_pins().get(module)
         return (len(sha) >= 7 and pin.startswith(sha)) if sha and pin else None
 
-    @staticmethod
-    def pin(module, n=8) -> str:
-        return (fork_pins().get(module) or "")[:n]
+    def fork_at(self, module, stage="record", link=True, n=7) -> str:
+        """Which commit of the fork of ``module`` (mujoco_warp or warp) the stage ran, as prose: "[my fork of MuJoCo
+        Warp](...) at the commit the top-level README.md's `pip install` line pins" when it is this tree's pin
+        (``fork_pins``), else "... at [`8eb51fe`](...), not the commit the top-level README.md's `pip install` line
+        pins". ``link`` False: the fork's name without its link (a later mention in the same section)."""
+        name = FORK_LINKS[module] if link else FORK_NAMES[module]
+        if self.at_pin(module, stage):
+            return f"{name} at {PIN_SOURCES[module]}"
+        c = self.commit_md(module, stage, n)
+        return f"{name} at {c}, not {PIN_SOURCES[module]}" if c else f"{name}, not at {PIN_SOURCES[module]}"
 
     @staticmethod
     def fill(paragraph: str, width: int = 120) -> str:
@@ -252,7 +338,8 @@ def write_doc(task, rec_dir, shots, doc_path, commands, extra_md=""):
     if extra_md:
         L += ["", extra_md.strip()]
     L += ["", "## Performance", "",
-          "Measured on the machine below; one frame = one policy step (Isaac Lab's `render_fps` = 1 / step_dt).", "",
+          "Measured on the machine below; one frame = one policy step ([Isaac Lab](https://github.com/isaac-sim/IsaacLab)'s "
+          "`render_fps` = 1 / step_dt).", "",
           "| stage | measurement |", "|---|---|"]
     if rec:
         t = rec["timing"]
@@ -286,15 +373,12 @@ def write_doc(task, rec_dir, shots, doc_path, commands, extra_md=""):
                  f"{hw.get('memory_gb', '?')} GB), macOS {hw.get('macos', '')} ({hw.get('macos_build', '')}).")
         L.append(_power_line([("record", hw)] + [(f"render {label}", r.get("hardware")) for label, r, *_ in shot_rows]))
         sw = rec["software"]
-        L.append(f"- metalsim `{sw.get('metalsim')}`; record stage ({rec['venv']} venv): "
-                 + ", ".join(f"{k} {v.get('version')}" + (f" (`{v['git']}`)" if v.get("git") else "")
-                             for k, v in sw.items() if isinstance(v, dict)) + ".")
+        ms = commit_md("metalsim", sw.get("metalsim"))
+        L.append((f"- metalsim {ms}; record stage" if ms else "- record stage")
+                 + f" ({rec['venv']} venv): {_software(sw)}.")
         r0 = shot_rows[0][1] if shot_rows else None
         if r0:
-            sw2 = r0.get("software", {})
-            L.append("- render stage (main venv): " + ", ".join(
-                f"{k} {v.get('version')}" + (f" (`{v['git']}`)" if v.get("git") else "")
-                for k, v in sw2.items() if isinstance(v, dict)) + ".")
+            L.append(f"- render stage (main venv): {_software(r0.get('software', {}))}.")
     L += ["", "## Assets", "", "| asset | source | licence | where from |", "|---|---|---|---|"]
     for a in task.assets:
         url = a.url if a.url.startswith("http") else f"`{a.url}`"

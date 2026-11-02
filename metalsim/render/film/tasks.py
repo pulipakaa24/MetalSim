@@ -69,23 +69,25 @@ def _franka_pour_notes(take) -> str:
     floor = (f" (Poly Haven's `laminate_floor_02` at {'its real size, ' if real else ''}{t:.2f} m per image; "
              "`ground_tile_m`) sits on\n" if t else " sits on ")
     return f"""
-**The policy.** Trained on metalsim on the 14-inch M4 Max: 2,048 envs, 300 iterations of the task's rsl_rl PPO
-configuration (96 steps per env per iteration, MLP 512-256-128-64, learning rate 1.5e-4; 59.0 M env steps, about
-16.4 h at ~945 env-steps/s; `runs/franka_pour/logs/m414_2048_config.json`, `m414_2048_log.jsonl`). Logged training
-success over the last iteration's 1,704 episodes: 63 %. Evaluated over 2,048 first episodes (seed 7, uniform reset
-rows as in Isaac's play mode, the actor's mean action): **47.7 % success**, 82.2 % for episodes that start with the
-cup already grasped and 15.2 % for those that start before the grasp
-(`runs/franka_pour/eval/eval_2048_isaac_budget.json`). Learning against Isaac Lab on the L4 at matched settings:
-`docs/PARITY.md` §1b.5. The film simulates 24 envs with the evaluation's seed and films the best-ranked: successful
-episodes that start before the grasp first (approach, grasp, lift and pour in one take), then successful ones that
-start with the cup in hand.
+**The policy.** Trained on metalsim on the 14-inch MacBook Pro (M4 Max): 2,048 envs, 300 iterations of the task's
+[rsl_rl](https://github.com/leggedrobotics/rsl_rl) PPO configuration (96 steps per env per iteration, MLP
+512-256-128-64, learning rate 1.5e-4; 59.0 M env steps, about 16.4 h at ~945 env-steps/s;
+`runs/franka_pour/logs/m414_2048_config.json`, `m414_2048_log.jsonl`). Logged training success over the last iteration's
+1,704 episodes: 63 %. Evaluated over 2,048 first episodes (seed 7, uniform reset rows as in Isaac's play mode, the
+actor's mean action): **47.7 % success**, 82.2 % for episodes that start with the cup already grasped and 15.2 % for
+those that start before the grasp (`runs/franka_pour/eval/eval_2048_isaac_budget.json`). Learning against Isaac Lab on
+an NVIDIA L4 GPU at matched settings: `docs/PARITY.md` §1b.5. The film simulates 24 envs with the evaluation's seed and
+films the best-ranked: successful episodes that start before the grasp first (approach, grasp, lift and pour in one
+take), then successful ones that start with the cup in hand.
 
-**How Isaac Lab presents the task** (research, `upstream/IsaacLab3` at `ae37b028`). `pour_env_cfg.py` sets a default
-viewer at eye (1.4, 1.4, 0.9) looking at (0.5, 0, 0.1) in env 0's frame, and its play mode (one env) a closer camera
-at eye (0.9, 0.65, 0.5) with the Newton RTX visualizer drawing the media as particles of the media's `visual_color`
-(0.85, 0.72, 0.45). Videos come from `VideoRecorderCfg` at `render_fps` = 1 / step_dt = 30 fps. The scene is lit by a
-grey dome light (colour 0.75, intensity 3000). The hero shot here uses the play-mode camera, the grid shot the default
-viewer, both with Kit's default perspective lens (36 deg vertical at 16:9) and one frame per policy step (30 fps).
+**How Isaac Lab presents the task** (research on Isaac Lab at
+[`ae37b028`](https://github.com/isaac-sim/IsaacLab/commit/ae37b028ea415c91ea2bc32609efcd759ed2b974), cloned as
+`upstream/IsaacLab3`). `pour_env_cfg.py` sets a default viewer at eye (1.4, 1.4, 0.9) looking at (0.5, 0, 0.1) in env
+0's frame, and its play mode (one env) a closer camera at eye (0.9, 0.65, 0.5) with the Newton RTX visualizer drawing
+the media as particles of the media's `visual_color` (0.85, 0.72, 0.45). Videos come from `VideoRecorderCfg` at
+`render_fps` = 1 / step_dt = 30 fps. The scene is lit by a grey dome light (colour 0.75, intensity 3000). The hero shot
+here uses the play-mode camera, the grid shot the default viewer, both with Kit's default perspective lens (36 deg
+vertical at 16:9) and one frame per policy step (30 fps).
 
 **Rendering.** As the ANYmal-on-sand demo (`scripts/particle_demo/`): simulate first, render offline. Tier 2 (the path
 tracer) is the best tier that draws MPM particles with full lighting (tier 1 draws them without ray-traced shadows,
@@ -94,9 +96,10 @@ twin is built by the same scene builder with Isaac's USD visual meshes loaded (N
 bodies matched one to one to the simulated world's; a body that has visual meshes hides its colliders. Each MPM
 particle (radius 2.5 mm) is drawn as 4 render grains (`metalsim/render/PARTICLES.md`). Lighting is a Poly Haven studio
 HDRI as an importance-sampled dome instead of Isaac's plain grey dome (it gives the metal and plastic reflections);
-the floor texture{floor}Isaac's ground plane 1.05 m below the tabletop. OIDN denoiser, ACES tone map, sRGB.
-The tool is generic: `python -m metalsim.render.film <task>`; a task adds a `FilmTask` entry and a small recorder
-adapter (`metalsim/render/film/`).
+the floor texture{floor}Isaac's ground plane 1.05 m below the tabletop.
+[Open Image Denoise](https://www.openimagedenoise.org) (OIDN) denoiser, ACES tone map, sRGB. The tool is generic:
+`python -m metalsim.render.film <task>`; a task adds a `FilmTask` entry and a small recorder adapter
+(`metalsim/render/film/`).
 """
 
 
@@ -107,8 +110,9 @@ FRANKA_POUR = FilmTask(
     checkpoint="runs/franka_pour/logs/m414_2048_model_299.pt",
     title="Franka-Pour",
     summary=("A Franka Panda grasps a cup holding 735 MPM particles of granular media and pours them into a second "
-             "cup: Isaac Lab 3.0-EA's `IsaacContrib-Franka-Pour` task on metalsim (Newton 1.5.2 coupled MuJoCo Warp + "
-             "implicit MPM on Metal), driven by a policy trained here with Isaac's PPO configuration."),
+             "cup: [Isaac Lab](https://github.com/isaac-sim/IsaacLab) 3.0-EA's `IsaacContrib-Franka-Pour` task on metalsim "
+             "([Newton](https://github.com/newton-physics/newton) 1.5.2 coupled [MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp) + implicit MPM on Metal), "
+             "driven by a policy trained here with Isaac's PPO configuration."),
     notes=_franka_pour_notes,
     # Isaac Lab's play-mode camera for this task (pour_env_cfg.py:821-833: NewtonRTXVisualizerCfg eye (0.9, 0.65, 0.5),
     # lookat (0.5, 0, 0.1), env frame)
@@ -189,10 +193,10 @@ looking at (0, 0, -0.05) m, 3.55 m away. `readme` (640x480, 4:3, for the README 
 look-at at 0.75 times the distance (eye (1.95, -1.5, 0.98) m, 2.66 m), so the robot fills about three quarters of the
 frame height, plus a slow orbit of 10 deg/s about the vertical through the look-at point, symmetric about the middle
 of the film: -30 deg at 0 s, 0 at 3 s (the hero's direction), +30 deg at 6 s, counter-clockwise seen from above, as
-MuJoCo's azimuth grows. The orbit copies MuJoCo Warp's README clips: `mujoco_warp/record.py` (google-deepmind/
-mujoco_warp at `d41a47c0`, lines 43 and 142) sets `cam.azimuth = 90 + (step - nstep / 2) * cam_azimuth_speed` with
-0.05 deg per physics step, and its G1 scenes step at 5 ms (`benchmarks/unitree_g1/unitree_g1_mjlab.xml`, line 14),
-so 10 deg/s.
+MuJoCo's azimuth grows. The orbit copies MuJoCo Warp's README clips: `mujoco_warp/record.py` (upstream MuJoCo Warp at
+[`d41a47c0`](https://github.com/google-deepmind/mujoco_warp/commit/d41a47c0837fc71abb44d7d4799bf85ca19ff7ab), lines 43
+and 142) sets `cam.azimuth = 90 + (step - nstep / 2) * cam_azimuth_speed` with 0.05 deg per physics step, and its G1
+scenes step at 5 ms (`benchmarks/unitree_g1/unitree_g1_mjlab.xml`, line 14), so 10 deg/s.
 """
 
 
@@ -207,16 +211,17 @@ def _g1_render_notes(take) -> str:
     else:
         size = f", at {t:.2f} m per image (`ground_tile_m`; `laminate_floor_02` is {LAMINATE_TILE_M:.2f} m across)"
     return f"""
-**Rendering.** Tier 2 (the path tracer), 64 samples per pixel (16 passes x 4), 3 bounces, Open Image Denoise, ACES
-tone map, sRGB; lit by a Poly Haven studio HDRI as an importance-sampled dome, with a laminate floor texture on the
-task's ground instead of Isaac's grey ground{size}. The render twin is the task's own G1 model with Isaac's visual meshes
-(`build_g1_model(visuals=True)`), posed per frame from the recorded joint state. On bodies that have visual meshes the
-colliders are hidden (the three `*Cube` boxes, `rec.json` `twin.visibility`), and the touch-sensor sites are hidden:
-one of them, `torso_link_touch`, was the grey box of the earlier G1 film. The ray tracer's env cell is sized up front
-from the recorded geometry and the whole camera path, so the floor is drawn complete to the horizon (`render.json`
-`env_grid.growths` 0). Each `render.json` carries a `cache_key`, a hash of the recording and of every setting that
-changes a pixel, so a re-recording into the same directory re-renders rather than reusing old frames
-(`docs/research/readme_media_plan_2026-10-31.md` section 2, defects 2, 3 and 5).
+**Rendering.** Tier 2 (the path tracer), 64 samples per pixel (16 passes x 4), 3 bounces,
+[Open Image Denoise](https://www.openimagedenoise.org), ACES tone map, sRGB; lit by a Poly Haven studio HDRI as an
+importance-sampled dome, with a laminate floor texture on the task's ground instead of Isaac's grey ground{size}.
+The render twin is the task's own G1 model with Isaac's visual meshes (`build_g1_model(visuals=True)`), posed per frame
+from the recorded joint state. On bodies that have visual meshes the colliders are hidden (the three `*Cube` boxes,
+`rec.json` `twin.visibility`), and the touch-sensor sites are hidden: one of them, `torso_link_touch`, was the grey box
+of the earlier G1 film. The ray tracer's env cell is sized up front from the recorded geometry and the whole camera
+path, so the floor is drawn complete to the horizon (`render.json` `env_grid.growths` 0). Each `render.json` carries a
+`cache_key`, a hash of the recording and of every setting that changes a pixel, so a re-recording into the same
+directory re-renders rather than reusing old frames (`docs/research/readme_media_plan_2026-10-31.md` section 2, defects
+2, 3 and 5).
 """
 
 
@@ -227,7 +232,7 @@ def _g1_take_notes(take, name: str, uncommitted: str) -> str:
     this_take = take.fill(f"""
 **This take, and where its timings come from.** Recorded, rendered and encoded on {take.day} on the {take.machine},
 at metalsim {take.metalsim_at(uncommitted)}. This was not a timing run: MetalSim's timing runs are made on the 16-inch
-through the GPU queue's timing kind (`scripts/gpu_run.sh <name> timing <minutes> -- <command>`, which waits for an idle
+MacBook Pro through the GPU queue's timing kind (`scripts/gpu_run.sh <name> timing <minutes> -- <command>`, which waits for an idle
 device), and its throughput figures are in `docs/PARITY.md` §1.4 and §1.8. The Performance table above records how
 long each stage took here; quote nothing on this page as MetalSim's speed. Power, as the stages stamped it (`pmset -g
 batt` and `pmset -g`; "Hardware and pins" below): {take.power_prose()}. Record and render ran as GPU-queue jobs of kind
@@ -238,11 +243,11 @@ filmed, and its path, can change.""")
     return f"""
 **README clip.** [{name}.webp]({name}.webp) is the `readme` shot from 0.5 s to 5.5 s (frames 25 to 274), resampled
 from 50 to 30 fps and written as MuJoCo Warp writes its README clips: 320x240 (Lanczos), lossy animated WebP from
-Pillow at quality 70, 33 ms per frame, looping; 150 frames. Command, run from the repository root after the render
-stage: `python -m metalsim.render.film.encode webp runs/film/{name}/readme/frames docs/renders/{name}.webp --start 0.5
---seconds 5 --src-fps 50 --fps 30`. The film tool's route, `python -m metalsim.render.film {name} --stage encode
---shots readme --webp --webp-window 0.5:5`, uses the same encoder but names its output `{name}_readme.webp` and also
-writes a `{name}_readme.mp4` and a still.
+[Pillow](https://github.com/python-pillow/Pillow) at quality 70, 33 ms per frame, looping; 150 frames. Command, run
+from the repository root after the render stage: `python -m metalsim.render.film.encode webp
+runs/film/{name}/readme/frames docs/renders/{name}.webp --start 0.5 --seconds 5 --src-fps 50 --fps 30`. The film
+tool's route, `python -m metalsim.render.film {name} --stage encode --shots readme --webp --webp-window 0.5:5`, uses the
+same encoder but names its output `{name}_readme.webp` and also writes a `{name}_readme.mp4` and a still.
 
 {this_take}
 """
@@ -258,7 +263,8 @@ def _g1_notes(story: str, name: str, uncommitted: str = "the uncommitted switch 
 G1_OURS_NOTE = """
 Our own checkpoint stays selectable and tracked: `--checkpoint runs/g1regress/ckpt14/{ckpt}` ({it} iterations trained
 in MetalSim, its training log beside it) films it with the task settings that checkpoint saved, and this page's text
-then does not describe the policy that ran. The previous take of this page, in git history at `ef346e7e`, filmed it.
+then does not describe the policy that ran. The previous take of this page, in git history at
+[`ef346e7e`](https://github.com/pulipakaa24/MetalSim/commit/ef346e7efcad59dcd951dabd305ca18a5c0513c0), filmed it.
 """
 G1_ISAAC_IO_NOTE = """The policy's observation is Isaac's policy group in Isaac's order (base linear and angular velocity, projected
 gravity, command, joint positions, joint velocities, last action; on rough terrain then the 187 height-scan rays in
@@ -269,8 +275,8 @@ pose). The task always applies Isaac's training observation noise, which Isaac's
 ground that changed no measured gait figure (`runs/readme_media/handoff/isaac-pretrained.md`, Verified B)."""
 G1_ISAAC_GAIT_NOTE = """
 **The quick, short-stepping gait is Isaac's own.** Isaac Lab's G1 policies walk this way in PhysX too. Checkpoints of
-the flat task trained with Isaac Lab in Isaac Sim (this project's L4 training run, iterations 500 / 1000 / 1499,
-played in Isaac Sim at 0.5 m/s) step at 3.85 / 3.60 / 3.23 Hz with 0.108 / 0.110 / 0.123 m per gait cycle
+the flat task trained with Isaac Lab in Isaac Sim (this project's training run on an NVIDIA L4 GPU, iterations 500 /
+1000 / 1499, played in Isaac Sim at 0.5 m/s) step at 3.85 / 3.60 / 3.23 Hz with 0.108 / 0.110 / 0.123 m per gait cycle
 (`docs/research/speculative_contacts_2026-09-27.md`, Verdict 1 and the cadence table of §2). MuJoCo Warp adds 3.4 to
 5.9 % to the cadence of the same checkpoints under every contact setting measured (same note). NVIDIA's published
 checkpoint itself was not played in PhysX for this page: Isaac Sim does not run on this machine.
@@ -285,14 +291,16 @@ G1_FLAT = FilmTask(
     checkpoint=ISAAC_PRETRAINED["Isaac-Velocity-Flat-G1-v0"]["path"],
     adapter_kw={"task": G1_TRAIN_TASK_KW},
     title="G1 flat-terrain walk",
-    summary=("Unitree G1 walking on flat ground: Isaac Lab's G1 flat velocity task on metalsim (MuJoCo Warp on Metal), "
-             "driven by NVIDIA's published Isaac Lab 2.3 policy for the task (rsl_rl, iteration 1499, trained in "
-             "PhysX), played without retraining. Rendered on the 14-inch MacBook Pro (Mac16,6), not in a timing run, so "
+    summary=("Unitree G1 walking on flat ground: [Isaac Lab](https://github.com/isaac-sim/IsaacLab)'s G1 flat velocity task on "
+             "metalsim ([MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp) on Metal), driven by NVIDIA's published Isaac Lab "
+             "2.3 policy for the task ([rsl_rl](https://github.com/leggedrobotics/rsl_rl), iteration 1499, trained in "
+             "[PhysX](https://github.com/NVIDIA-Omniverse/PhysX)), played without retraining. Rendered on the 14-inch MacBook Pro (Mac16,6), not in a timing run, so "
              "its Performance table is not a timing figure."),
     notes=_g1_notes("""
 **The policy.** NVIDIA's published Isaac Lab 2.3 checkpoint for `Isaac-Velocity-Flat-G1-v0`: rsl_rl, iteration
 1499, the last of the task's 1,500 (`assets/isaac/g1_rsl_rl_ppo_cfg.py`, `G1FlatPPORunnerCfg`), trained by NVIDIA in
-Isaac Sim with PhysX. MetalSim plays it as published, without retraining or fine-tuning. Source:
+[Isaac Sim](https://github.com/isaac-sim/IsaacSim) with PhysX. MetalSim plays it as published, without retraining or
+fine-tuning. Source:
 <https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.1/Isaac/IsaacLab/PretrainedCheckpoints/rsl_rl/Isaac-Velocity-Flat-G1-v0/checkpoint.pt>
 (the path Isaac Lab's `--use_pretrained_checkpoint` resolves, `isaaclab_rl/utils/pretrained_checkpoint.py`, under
 the Isaac 5.1 asset root), sha256 `fdf0f242bb8f3bcfc1aa9b7ff2761af4c014cf1cdc7e49242c9b92f3581720e7`, 2,027,170
@@ -358,14 +366,16 @@ G1_ROUGH = FilmTask(
     # own training of this task holds a mean terrain level of 5.9-6.0 from iteration ~750 (docs/PARITY.md §1.5)
     adapter_kw={"task": G1_TRAIN_TASK_KW, "terrain_level": 5},
     title="G1 rough-terrain walk",
-    summary=("Unitree G1 climbing Isaac Lab's rough terrain: the G1 rough velocity task (stairs, slopes, boxes, height "
-             "scan) on metalsim (MuJoCo Warp on Metal), driven by NVIDIA's published Isaac Lab 2.3 policy for the task "
-             "(rsl_rl, iteration 2999, trained in PhysX), played without retraining. Rendered on the 14-inch MacBook "
+    summary=("Unitree G1 climbing [Isaac Lab](https://github.com/isaac-sim/IsaacLab)'s rough terrain: the G1 rough velocity task "
+             "(stairs, slopes, boxes, height scan) on metalsim ([MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp) on "
+             "Metal), driven by NVIDIA's published Isaac Lab 2.3 policy for the task ([rsl_rl](https://github.com/leggedrobotics/rsl_rl), "
+             "iteration 2999, trained in [PhysX](https://github.com/NVIDIA-Omniverse/PhysX)), played without retraining. Rendered on the 14-inch MacBook "
              "Pro (Mac16,6), not in a timing run, so its Performance table is not a timing figure."),
     notes=_g1_notes("""
 **The policy.** NVIDIA's published Isaac Lab 2.3 checkpoint for `Isaac-Velocity-Rough-G1-v0`: rsl_rl, iteration
 2999, the last of the task's 3,000 (`assets/isaac/g1_rsl_rl_ppo_cfg.py`, `G1RoughPPORunnerCfg`), trained by NVIDIA in
-Isaac Sim with PhysX on Isaac's terrain curriculum. MetalSim plays it as published, without retraining or fine-tuning.
+[Isaac Sim](https://github.com/isaac-sim/IsaacSim) with PhysX on Isaac's terrain curriculum. MetalSim plays it as
+published, without retraining or fine-tuning.
 Source:
 <https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.1/Isaac/IsaacLab/PretrainedCheckpoints/rsl_rl/Isaac-Velocity-Rough-G1-v0/checkpoint.pt>
 (the path Isaac Lab's `--use_pretrained_checkpoint` resolves, `isaaclab_rl/utils/pretrained_checkpoint.py`, under
@@ -386,8 +396,9 @@ for an Isaac policy) and the task's defaults (exact height scan, terrain collisi
 `contact_cfg="recommended"`, velocities at the COM), plus physics dt 2.5 ms with decimation 8 (`G1_TRAIN_TASK_KW`).
 The exact scan and `boxes_local` collision are what `scripts/diagnostics/g1_rough_transfer.py` played Isaac's rough
 checkpoints with (that tool read the base velocity at the pelvis origin, the film at the COM as Isaac Lab 2.3.2 does):
-the final one of the project's L4 run fell 0 times in 32 wall-cell episodes (`docs/PARITY.md` §1.5, "Transfer of
-Isaac's checkpoints on the wall cells"). `rec.json` `adapter.task_resolved` lists what ran.
+the final one of the project's training run on an NVIDIA L4 GPU fell 0 times in 32 wall-cell episodes
+(`docs/PARITY.md` §1.5, "Transfer of Isaac's checkpoints on the wall cells"). `rec.json` `adapter.task_resolved` lists
+what ran.
 """ + G1_ISAAC_IO_NOTE + """ The terrain is Isaac Lab 2.3.2's
 `ROUGH_TERRAINS_CFG` (10 difficulty rows by 20 columns of 8 m sub-terrains; by column, pyramid stairs, inverted
 pyramid stairs, random boxes, random rough ground, slopes and inverted slopes), generated from task seed 0, whose
@@ -451,19 +462,22 @@ UNITREE_BLOB = f"{UNITREE_REPO}/blob/{UNITREE_COMMIT}"
 # not in the take's files for the doc stage to read.
 G1_UNITREE_STORY = f"""
 **The policy.** Unitree's own pretrained G1 walking policy from Unitree's `unitree_rl_gym`
-(<{UNITREE_REPO}>, BSD-3-Clause, commit `{UNITREE_COMMIT}`): `deploy/pre_train/g1/motion.pt`, the file both of
-Unitree's playback scripts load, the MuJoCo sim2sim one (`deploy/deploy_mujoco/configs/g1.yaml`, `policy_path`) and the
-one for the real robot (`deploy/deploy_real/configs/g1.yaml`, line 10). sha256
-`{UNITREE_RL_GYM['policy_sha256']}`, 145,745 bytes, as fetched. It is a TorchScript module: an LSTM (47 inputs, 64
-hidden) and an ELU MLP 64 -> 32 -> 12, loaded with `torch.jit.load` and played as published. Unitree trained it with
-`legged_gym` on Isaac Gym (`legged_gym/envs/g1/g1_config.py`, `G1RoughCfg` / `G1RoughCfgPPO`: `ActorCriticRecurrent`,
-plane terrain, friction and added-mass randomization, pushes every 5 s; physics 5 ms x decimation 4, so 50 Hz). Its
-gait is set by the training task, not left to the policy: `g1_env.py` feeds a fixed gait clock (period 0.8 s, so
-1.25 gait cycles per second; the right leg half a cycle behind the left) to the policy as sin / cos of the phase, and
-rewards foot contact in the stance part of each leg's cycle (phase < 0.55, `_reward_contact`) and an 8 cm swing
-height of the ankle-roll link (`_reward_feet_swing_height`). `scripts/fetch_unitree_rl_gym.sh` fetches the repository
-at that commit into `assets/unitree_rl_gym/` (git-ignored, not committed); the record stage checks the policy's
-sha256 and writes the repository, commit, file, licence and hash into `rec.json` `checkpoint` and `adapter`.
+(<{UNITREE_REPO}>, BSD-3-Clause, commit
+[`{UNITREE_COMMIT[:7]}`]({UNITREE_REPO}/commit/{UNITREE_COMMIT})):
+`deploy/pre_train/g1/motion.pt`, the file both of Unitree's playback scripts load, the MuJoCo sim2sim one
+(`deploy/deploy_mujoco/configs/g1.yaml`, `policy_path`) and the one for the real robot
+(`deploy/deploy_real/configs/g1.yaml`, line 10). sha256
+`{UNITREE_RL_GYM['policy_sha256']}`, 145,745 bytes, as fetched. It is a TorchScript
+module: an LSTM (47 inputs, 64 hidden) and an ELU MLP 64 -> 32 -> 12, loaded with `torch.jit.load` and played as
+published. Unitree trained it with `legged_gym` on [Isaac Gym](https://developer.nvidia.com/isaac-gym)
+(`legged_gym/envs/g1/g1_config.py`, `G1RoughCfg` / `G1RoughCfgPPO`: `ActorCriticRecurrent`, plane terrain, friction and
+added-mass randomization, pushes every 5 s; physics 5 ms x decimation 4, so 50 Hz). Its gait is set by the training
+task, not left to the policy: `g1_env.py` feeds a fixed gait clock (period 0.8 s, so 1.25 gait cycles per second; the
+right leg half a cycle behind the left) to the policy as sin / cos of the phase, and rewards foot contact in the stance
+part of each leg's cycle (phase < 0.55, `_reward_contact`) and an 8 cm swing height of the ankle-roll link
+(`_reward_feet_swing_height`). `scripts/fetch_unitree_rl_gym.sh` fetches the repository at that commit into
+`assets/unitree_rl_gym/` (git-ignored, not committed); the record stage checks the policy's sha256 and writes the
+repository, commit, file, licence and hash into `rec.json` `checkpoint` and `adapter`.
 
 **Unitree's loop, on MuJoCo Warp.** Unitree plays the policy in MuJoCo with `deploy/deploy_mujoco/deploy_mujoco.py`
 and `configs/g1.yaml`: physics step 2 ms, a policy step every 10 physics steps (50 Hz), PD gains kp (100, 100, 100,
@@ -533,13 +547,8 @@ def _g1_unitree_notes(take) -> str:
                 "cm planks; `ground_tile_m`)")
     else:
         size = f", at {t:.2f} m per image (`ground_tile_m`; `laminate_floor_02` is {LAMINATE_TILE_M:.2f} m across)"
-    mjw, warp, hero_warp = take.commit("mujoco_warp", n=7), take.commit("warp"), take.commit("warp", "hero")
-    mjw = (f"on the pinned MuJoCo Warp fork commit `{mjw}`" if take.at_pin("mujoco_warp") else
-           f"on the MuJoCo Warp fork commit `{mjw}`, not its pin `{take.pin('mujoco_warp', 7)}`")
-    warp = (f"Warp itself at its pin `{warp}`" if take.at_pin("warp") else
-            f"Warp itself at `{warp}`, not its pin `{take.pin('warp')}`")
-    hero_warp = (f"`{hero_warp}`, its pin" if take.at_pin("warp", "hero") else
-                 f"`{hero_warp}`, not its pin `{take.pin('warp')}`")
+    mjw, warp = f"on {take.fork_at('mujoco_warp')}", take.fork_at("warp", n=8)
+    hero_warp = take.fork_at("warp", "hero", link=False, n=8)
     hero = take.at("hero")
     # the frames this re-render replaced: the G1 films' floor before ground_tile_m
     old_floor = (f", after the film tool started laying the floor texture at its real size (`ground_tile_m`; the "
@@ -547,30 +556,31 @@ def _g1_unitree_notes(take) -> str:
                  f"{LAMINATE_OLD_G1_TILE_M / 8 * 100:.0f} cm planks)" if real else "")
     this_take = take.fill(f"""
 **This take, and where its timings come from.** Recorded, rendered and encoded on {take.day} on the {take.machine},
-at metalsim {take.metalsim_at("uncommitted changes")}, {mjw} ({warp}). It replaces a take recorded at 13:55 the same
-day on a stale fork checkout (`07a51a6`); the two recordings differ by at most 2 um in any body position. The frames on
+at metalsim {take.metalsim_at("uncommitted changes")}, {mjw} (with {warp}). It replaces a take recorded at 13:55 the same
+day on a stale checkout of my fork ([`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc)); the two recordings differ by at most 2 um in any body position. The frames on
 this page were rendered again on {hero[:10]} at {hero[11:16]} from that same recording (`rec.npz`, `rec.json` and
-`twin.xml` unchanged; that render ran on Warp {hero_warp}, as the render stage's pins above say){old_floor}. This was
-not a timing run: MetalSim's timing runs are made on the 16-inch through the GPU queue's timing kind, and its
-throughput figures are in `docs/PARITY.md` §1.4 and §1.8; quote nothing on this page as MetalSim's speed. Power, as
-the stages stamped it ("Hardware and pins" below): {take.power_prose("the two render stamps are the re-render's")}.
+`twin.xml` unchanged; that render ran on {hero_warp}, as the render stage's pins above say){old_floor}. This was
+not a timing run: MetalSim's timing runs are made on the 16-inch MacBook Pro through the GPU queue's timing kind
+(`scripts/gpu_run.sh`), and its throughput figures are in `docs/PARITY.md` §1.4 and §1.8; quote nothing on this page as
+MetalSim's speed. Power, as the stages stamped it ("Hardware and pins" below): {take.power_prose("the two render stamps are the re-render's")}.
 Record and render ran as GPU-queue jobs of kind render, one at a time, into `runs/film/g1_unitree`: `--stage record`,
 then `--stage render` (both shots); later a second `--stage render` job (both shots, the real-size floor); then
 `--stage encode --shots hero`, the README WebP command above and `--stage doc` (CPU).""")
     return G1_UNITREE_STORY + f"""
-**Rendering.** Tier 2 (the path tracer), 64 samples per pixel (16 passes x 4), 3 bounces, Open Image Denoise, ACES
-tone map, sRGB; lit by the Poly Haven studio HDRI as an importance-sampled dome, with the laminate floor texture on
-the scene's `floor` plane in place of Unitree's checker{size}, the same look as the G1 flat film. The render twin is
-Unitree's own `scene.xml` with its STL meshes, posed per frame from the recorded joint state. Unitree's model gives
-each link a visual mesh and a colliding copy; the colliding copies and the foot spheres are hidden (`rec.json`
-`twin.visibility`), and the meshes keep Unitree's two greys. The scene's own lights, sky and checker floor are
-replaced by the film's look.
+**Rendering.** Tier 2 (the path tracer), 64 samples per pixel (16 passes x 4), 3 bounces,
+[Open Image Denoise](https://www.openimagedenoise.org), ACES tone map, sRGB; lit by the Poly Haven studio HDRI as an
+importance-sampled dome, with the laminate floor texture on the scene's `floor` plane in place of Unitree's
+checker{size}, the same look as the G1 flat film.
+The render twin is Unitree's own `scene.xml` with its STL meshes, posed per frame from the recorded joint state.
+Unitree's model gives each link a visual mesh and a colliding copy; the colliding copies and the foot spheres are hidden
+(`rec.json` `twin.visibility`), and the meshes keep Unitree's two greys. The scene's own lights, sky and checker floor
+are replaced by the film's look.
 
 **README clip.** [g1_unitree.webp](g1_unitree.webp) is the `readme` shot from 0.5 s to 5.5 s (frames 25 to 274),
 resampled from 50 to 30 fps and written as MuJoCo Warp writes its README clips: 320x240 (Lanczos), lossy animated
-WebP from Pillow at quality 70, 33 ms per frame, looping; 150 frames. Command, run from the repository root after the
-render stage: `python -m metalsim.render.film.encode webp runs/film/g1_unitree/readme/frames
-docs/renders/g1_unitree.webp --start 0.5 --seconds 5 --src-fps 50 --fps 30`.
+WebP from [Pillow](https://github.com/python-pillow/Pillow) at quality 70, 33 ms per frame, looping; 150 frames.
+Command, run from the repository root after the render stage: `python -m metalsim.render.film.encode webp
+runs/film/g1_unitree/readme/frames docs/renders/g1_unitree.webp --start 0.5 --seconds 5 --src-fps 50 --fps 30`.
 
 {this_take}
 """
@@ -584,10 +594,11 @@ G1_UNITREE = FilmTask(
     checkpoint=f"{UNITREE_RL_GYM['root']}/{UNITREE_RL_GYM['policy']}",
     adapter_kw={"cmd": (0.5, 0.0, 0.0)},          # configs/g1.yaml cmd_init
     title="G1 walk, Unitree's policy",
-    summary=("Unitree G1 walking on flat ground with Unitree's own pretrained walking policy (unitree_rl_gym, "
-             "`deploy/pre_train/g1/motion.pt`, BSD-3-Clause), played by Unitree's MuJoCo sim2sim loop "
-             "(`deploy_mujoco.py`, `configs/g1.yaml`) ported to metalsim's MuJoCo Warp on Metal, on Unitree's own G1 "
-             "model and meshes. Rendered on the 14-inch MacBook Pro (Mac16,6), not in a timing run, so its "
+    summary=("Unitree G1 walking on flat ground with Unitree's own pretrained walking policy "
+             "([unitree_rl_gym](https://github.com/unitreerobotics/unitree_rl_gym), `deploy/pre_train/g1/motion.pt`, "
+             "BSD-3-Clause), played by Unitree's [MuJoCo](https://github.com/google-deepmind/mujoco) sim2sim loop "
+             "(`deploy_mujoco.py`, `configs/g1.yaml`) ported to [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) on Metal, "
+             "on Unitree's own G1 model and meshes. Rendered on the 14-inch MacBook Pro (Mac16,6), not in a timing run, so its "
              "Performance table is not a timing figure."),
     notes=_g1_unitree_notes,
     viewer=G1_VIEWER,
@@ -634,14 +645,16 @@ G1_BUMPS_MJW = "787a5b3"      # the MuJoCo Warp fork commit the measurements bel
 G1_BUMPS_CHECKED_RECORD = "2026-10-31T23:37:22-0700"
 G1_BUMPS_STORY = f"""
 **What this film is.** The policy of the G1 flat film ([G1_UNITREE.md](G1_UNITREE.md)): Unitree's own pretrained G1
-walking policy, `deploy/pre_train/g1/motion.pt` from `unitree_rl_gym` (<{UNITREE_REPO}>, BSD-3-Clause, commit
-`{UNITREE_COMMIT}`, sha256 `{UNITREE_RL_GYM['policy_sha256']}`), played by Unitree's MuJoCo sim2sim loop
-(`deploy/deploy_mujoco/deploy_mujoco.py`, `configs/g1.yaml`, command (0.5, 0, 0)) ported to MetalSim's MuJoCo Warp, as
-in the G1 flat film, with one change: Unitree's floor plane is Isaac Lab's random rough ground. The policy is blind (47
-observations: body rates, gravity, command, joint state, last action, gait clock; no height scan) and Unitree trained
-it on flat ground only (`legged_gym`, `legged_robot_config.py` line 15 `mesh_type = 'plane'`, not overridden by
-`g1_config.py`), with pushes, friction and mass randomization. Nothing is tuned, and the robot falls: this page shows
-what happens.
+walking policy, `deploy/pre_train/g1/motion.pt` from `unitree_rl_gym`
+(<{UNITREE_REPO}>, BSD-3-Clause, commit
+[`{UNITREE_COMMIT[:7]}`]({UNITREE_REPO}/commit/{UNITREE_COMMIT}), sha256
+`{UNITREE_RL_GYM['policy_sha256']}`), played by Unitree's MuJoCo sim2sim loop
+(`deploy/deploy_mujoco/deploy_mujoco.py`, `configs/g1.yaml`, command (0.5, 0, 0)) ported to [my fork of MuJoCo
+Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim), as in the G1 flat film, with one change: Unitree's
+floor plane is Isaac Lab's random rough ground. The policy is blind (47 observations: body rates, gravity, command,
+joint state, last action, gait clock; no height scan) and Unitree trained it on flat ground only (`legged_gym`,
+`legged_robot_config.py` line 15 `mesh_type = 'plane'`, not overridden by `g1_config.py`), with pushes, friction and
+mass randomization. Nothing is tuned, and the robot falls: this page shows what happens.
 
 **Terrain.** Isaac Lab 2.3.2's `ROUGH_TERRAINS_CFG["random_rough"]` (`isaaclab/terrains/config/rough.py`):
 `HfRandomUniformTerrainCfg(proportion=0.2, noise_range=(0.02, 0.10), noise_step=0.02, border_width=0.25)`, on one 8 x 8
@@ -672,34 +685,38 @@ square's edge (|y| > 3.75 m) at 2.38 s and fell 0.3 s later in the MetalSim meas
 outermost robots did (at 2.34 and 4.64 s; down 0.7 and 0.2 s later), near the tile's 0.25 m flat rim. (The outer
 lanes were a poor choice; `measure.py` keeps them so the takes and the measurements stay comparable.)
 
-**Physics: MetalSim's MuJoCo Warp.** The film plays Unitree's loop on MetalSim's MuJoCo Warp
-(`metalsim.physics.batch.BatchSim`, 16 worlds of Unitree's model with the heightfield; `unitree.UnitreeG1`: the PD
-torque before every 2 ms physics step, the policy every tenth), the port the G1 flat film plays. On flat ground it
-matches Unitree's own CPU MuJoCo run: re-checked on this fork, the pelvis agrees to the printed 0.1 mm at every
-checkpoint from 0.02 to 8 s and every gait figure is equal (`runs/film/g1_bumps/measure/mjw_787a5b3/flat_sim2sim_compare.json`,
-G1_UNITREE.md). The MuJoCo Warp fork is MetalSim's `metalsim` branch at `{G1_BUMPS_MJW}`: heightfield contacts checked
-against the exact geometry (fork `93e5ce1`, docs/research/hfield_contacts_2026-10-31.md) and EPA's horizon built as
-MuJoCo C builds it (`{G1_BUMPS_MJW}`). Those fixes are why this film can run on MetalSim's physics. The G1's feet collide
-through four 5 mm spheres each, and on this tile a sphere in a crease between two bumps touches two faces at once.
-Before the fixes the fork lost such contacts and kept most robots walking (54 of 288 robots fell, 18.8 %, fork
-`8eb51fe` over tile seeds 0 to 4; research note section 8.3), so the first take of this film (2026-10-31, afternoon)
-ran Unitree's loop on CPU MuJoCo instead (`adapter_kw["engine"] = "mujoco_c"`). A static check on this tile
+**Physics: MetalSim's MuJoCo Warp.** The film plays Unitree's loop on [my fork of MuJoCo
+Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) (`metalsim.physics.batch.BatchSim`, 16 worlds of
+Unitree's model with the heightfield; `unitree.UnitreeG1`: the PD torque before every 2 ms physics step, the policy
+every tenth), the port the G1 flat film plays. On flat ground it matches Unitree's own CPU MuJoCo run: re-checked on my
+fork, the pelvis agrees to the printed 0.1 mm at every checkpoint from 0.02 to 8 s and every gait figure is equal
+(`runs/film/g1_bumps/measure/mjw_787a5b3/flat_sim2sim_compare.json`, G1_UNITREE.md). My fork's `metalsim` branch has
+heightfield contacts checked against the exact geometry
+([`93e5ce1`](https://github.com/pulipakaa24/mujoco_warp/commit/93e5ce18e76854c430ce669314af00ddceb92147),
+docs/research/hfield_contacts_2026-10-31.md) and EPA's horizon built as MuJoCo C builds it. Those fixes are why this
+film can run on MetalSim's physics. The G1's feet collide through four 5 mm spheres each, and on this tile a sphere in a
+crease between two bumps touches two faces at once. Before the fixes my fork lost such contacts and kept most robots
+walking (54 of 288 robots fell, 18.8 %, at
+[`8eb51fe`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624), over tile seeds
+0 to 4; research note section 8.3), so the first take of this film (2026-10-31, afternoon) ran Unitree's loop on CPU
+MuJoCo instead (`adapter_kw["engine"] = "mujoco_c"`). A static check on this tile
 (`runs/film/g1_bumps/measure/contact_check.py`; `mjw_787a5b3/contact_check.json`; the "before" row from the first take's
 `contact_check.json`): 3,000 spheres pressed 0.5 to 3 mm into the triangulated surface at random spots, each engine's
-contacts compared with the exact contact set (every distinct closest point of the surface's triangles within the
-sphere; 661 of the 3,000 touch two or more faces).
+contacts compared with the exact contact set (every distinct closest point of the surface's triangles within the sphere;
+661 of the 3,000 touch two or more faces).
 
 | | contacts per sphere equal to the exact set | spheres with fewer contacts | spheres with no contact | contacts more than 10 deg off the nearest true normal |
 |---|---|---|---|---|
 | CPU MuJoCo 3.14 | 99.6 % (11 spheres get a duplicate) | 0 | 0 | 0 of 3,736 |
-| MetalSim's MuJoCo Warp, fork `{G1_BUMPS_MJW}` (this film) | 99.5 % | 14 (13 of them touch 5 or 6 faces, more than the 4 contacts MuJoCo keeps per pair) | 0 | 1 of 3,707 |
-| MetalSim's MuJoCo Warp before the fixes (fork `8eb51fe`) | 88.8 % (211 spheres get extra contacts) | 126 | 0 | 6.1 % of 3,781 |
+| MetalSim's MuJoCo Warp, my fork (this film) | 99.5 % | 14 (13 of them touch 5 or 6 faces, more than the 4 contacts MuJoCo keeps per pair) | 0 | 1 of 3,707 |
+| MetalSim's MuJoCo Warp before the fixes (my fork at [`8eb51fe`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624)) | 88.8 % (211 spheres get extra contacts) | 126 | 0 | 6.1 % of 3,781 |
 
-(The first take's page listed 81.9 % for "MetalSim's MuJoCo Warp"; that run had imported a stale fork checkout,
-`07a51a6`: research note section 2.)
+(The first take's page listed 81.9 % for "MetalSim's MuJoCo Warp"; that run had imported a stale checkout of my fork,
+[`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc): research note
+section 2.)
 
 **Measured before filming** (`runs/film/g1_bumps/measure/measure.py`: `cpu_levels.json`, the first take's CPU MuJoCo
-run; `mjw_787a5b3/gpu_levels.json`, MetalSim on fork `{G1_BUMPS_MJW}`). Per level 16 robots for 8 s, the lanes above,
+run; `mjw_787a5b3/gpu_levels.json`, MetalSim on my fork). Per level 16 robots for 8 s, the lanes above,
 command (0.5, 0, 0), tile seed 0. A fall: the pelvis below 0.4 m (`unitree.FALLEN_Z`; the robot is on the ground;
 Unitree's training ends an episode on pelvis contact). Gait per robot from 1 s to its fall or to 8 s
 (`record.gait_metrics`), the foot's height taken above the highest terrain under its sole (a 1 cm grid over the
@@ -736,8 +753,8 @@ start joints by 1e-6 rad.
 |---|---|---|---|---|
 | CPU MuJoCo 3.14 | 1 | 11 / 10 / 14 / 12 / 8 | 55 | 55 / 80 = 68.8 % |
 | CPU MuJoCo, start joints + N(0, 1e-6 rad) | 3 | 12, 11, 10 / 13, 12, 11 / 13, 11, 11 / 11, 11, 10 / 10, 13, 5 | 59, 58, 47 | 164 / 240 = 68.3 % |
-| MetalSim's MuJoCo Warp, fork `{G1_BUMPS_MJW}` (this film) | 3 | 11, 11, 11 / 13, 15, 15 / 12, 12, 12 / 15, 11, 11 / 9, 11, 11 | 60, 60, 60 | 180 / 240 = 75.0 % |
-| MetalSim's MuJoCo Warp before the fixes (fork `8eb51fe`) | 3 to 6 | 2, 5, 4, 3, 1, 3 / 3, 3, 6 / 1, 6, 5 / 3, 1, 4 / 1, 1, 2 | 10, 12, 20 | 54 / 288 = 18.8 % |
+| MetalSim's MuJoCo Warp, my fork (this film) | 3 | 11, 11, 11 / 13, 15, 15 / 12, 12, 12 / 15, 11, 11 / 9, 11, 11 | 60, 60, 60 | 180 / 240 = 75.0 % |
+| MetalSim's MuJoCo Warp before the fixes (my fork at [`8eb51fe`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624)) | 3 to 6 | 2, 5, 4, 3, 1, 3 / 3, 3, 6 / 1, 6, 5 / 3, 1, 4 / 1, 1, 2 | 10, 12, 20 | 54 / 288 = 18.8 % |
 
 MetalSim's robots fall a little more often than CPU MuJoCo's over the five tiles (60 against 55 per 80 robots, less
 than one standard deviation of CPU MuJoCo's own nudged runs, 6.7) and as often on the film's tile (seed 0: 10 to 12 of
@@ -807,7 +824,7 @@ def _g1_bumps_notes(take) -> str:
         the_take = take.fill(f"""
 **The take.** The level is Isaac's own terrain because it is the only one Isaac Lab defines, not because of its outcome;
 its bumps (2 to 10 cm) are clearly visible. The record stage is one more run of the 16 lanes on MetalSim's MuJoCo Warp
-(fork `{take.commit("mujoco_warp", n=7)}`), so its outcome is one draw from the spread above: {f['falls']} of {f['n']}
+({take.fork_at("mujoco_warp")}), so its outcome is one draw from the spread above: {f['falls']} of {f['n']}
 robots fall in it (the four measurement runs of this tile: 10, 11, 11 and 11). The film shows the record's typical
 outcome (`adapter_kw["pick"] = "typical"`, `UnitreeG1._rank_typical`): as at least half of the 16 fell, the fallen robot
 whose fall time is nearest the median fall time of all {p.get('envs_down', f['falls'])} ({p.get('median', 0):.2f} s),
@@ -849,18 +866,15 @@ frames and in the first take's, which had the same terrain and renderer); their 
     clip = take.fill(f"""
 **README clip.** [g1_bumps.webp](g1_bumps.webp) is the `readme` shot from 1.0 s to 6.0 s (frames 50 to 299), so that
 the clip holds{clip_fall} (the first take's clip ran from 0.5 s, its fall being earlier), resampled from 50 to 30 fps and written as MuJoCo Warp writes
-its README clips: 320x240 (Lanczos), lossy animated WebP from Pillow at quality 70, 33 ms per frame, looping; 150
+its README clips: 320x240 (Lanczos), lossy animated WebP from [Pillow](https://github.com/python-pillow/Pillow) at quality 70, 33 ms per frame, looping; 150
 frames. Command, run from the repository root after the render stage: `python -m metalsim.render.film.encode webp
 runs/film/g1_bumps/readme/frames docs/renders/g1_bumps.webp --start 1.0 --seconds 5 --src-fps 50 --fps 30`.""")
-    mjw = take.commit("mujoco_warp", n=7)
-    mjw = (f"on the pinned MuJoCo Warp fork commit `{mjw}`" if take.at_pin("mujoco_warp") else
-           f"on the MuJoCo Warp fork commit `{mjw}`, not this tree's pin `{take.pin('mujoco_warp', 7)}`")
-    warp = (f"Warp at its pin `{take.commit('warp')}`" if take.at_pin("warp") else
-            f"Warp at `{take.commit('warp')}`, not its pin `{take.pin('warp')}`")
+    mjw, warp = f"on {take.fork_at('mujoco_warp')}", take.fork_at("warp", n=8)
     this_take = take.fill(f"""
 **This take, and where its timings come from.** Recorded, rendered and encoded on {take.day} on the {take.machine},
-at metalsim {take.metalsim_at("the uncommitted G1 bumps work")}, {mjw} ({warp}). This was not a timing run: MetalSim's
-timing runs are made on the 16-inch through the GPU queue's timing kind, and its throughput figures are in
+at metalsim {take.metalsim_at("the uncommitted G1 bumps work")}, {mjw} (with {warp}). This was not a timing run: MetalSim's
+timing runs are made on the 16-inch MacBook Pro through the GPU queue's timing kind (`scripts/gpu_run.sh`), and its
+throughput figures are in
 `docs/PARITY.md` §1.4 and §1.8; quote nothing on this page as MetalSim's speed. Power, as the stages stamped it
 ("Hardware and pins" below): {take.power_prose()}. The measurements, the record stage and the render stage (both shots)
 ran as GPU-queue jobs of kind render into `runs/film/g1_bumps`, one at a time, the record and the render in one job
@@ -889,13 +903,14 @@ view), as in the G1 films (G1_UNITREE.md), but lower. `hero` (1280x720; the vide
 the README grid): the same direction and elevation at 0.75 times the distance (2.60 m), looking at (0, 0, -0.15) m so
 the standing robot fits the 4:3 frame, plus MuJoCo Warp's README orbit of 10 deg/s about the vertical through the
 look-at point, symmetric about the middle of the 8 s film: -40 deg at 0 s, 0 at 4 s (the hero's direction), +40 deg at
-8 s, counter-clockwise seen from above (`mujoco_warp/record.py` at `d41a47c0`, lines 43 and 142: 0.05 deg per 5 ms
-physics step). When the robot falls the tracked pelvis drops with it, and so does the camera.
+8 s, counter-clockwise seen from above (`mujoco_warp/record.py` in upstream MuJoCo Warp at
+[`d41a47c0`](https://github.com/google-deepmind/mujoco_warp/commit/d41a47c0837fc71abb44d7d4799bf85ca19ff7ab), lines 43
+and 142: 0.05 deg per 5 ms physics step). When the robot falls the tracked pelvis drops with it, and so does the camera.
 
-**Rendering.** Tier 2 (the path tracer), 64 samples per pixel (16 passes x 4), 3 bounces, Open Image Denoise, ACES
-tone map, sRGB. The render twin is Unitree's `scene.xml` with the heightfield and the backdrop plane, its STL meshes
-posed per frame from the recorded joint state; the colliding copies and the foot spheres are hidden (`rec.json`
-`twin.visibility`), and the meshes keep Unitree's two greys.
+**Rendering.** Tier 2 (the path tracer), 64 samples per pixel (16 passes x 4), 3 bounces, [Open Image
+Denoise](https://www.openimagedenoise.org), ACES tone map, sRGB. The render twin is Unitree's `scene.xml` with the
+heightfield and the backdrop plane, its STL meshes posed per frame from the recorded joint state; the colliding copies
+and the foot spheres are hidden (`rec.json` `twin.visibility`), and the meshes keep Unitree's two greys.
 
 {clip}
 
@@ -915,11 +930,13 @@ G1_BUMPS = FilmTask(
     adapter_kw={"cmd": (0.5, 0.0, 0.0), "terrain": G1_BUMPS_TERRAIN, "starts": G1_BUMPS_STARTS, "pick": "typical",
                 "film_lanes": G1_BUMPS_FILM_LANES},
     title="G1 on rough ground, Unitree's policy",
-    summary=("Unitree G1 walking onto Isaac Lab's random rough ground (the `random_rough` sub-terrain of "
-             "`ROUGH_TERRAINS_CFG`: bumps of 2 to 10 cm every 0.1 m) with Unitree's own pretrained walking policy, which "
-             "is blind and was trained on flat ground (unitree_rl_gym, `deploy/pre_train/g1/motion.pt`, BSD-3-Clause), "
-             "played by Unitree's MuJoCo sim2sim loop ported to metalsim's MuJoCo Warp on Metal (fork `787a5b3`, whose "
-             "heightfield contacts match the exact geometry), on Unitree's own G1 model, and rendered by metalsim's path "
+    summary=("Unitree G1 walking onto [Isaac Lab](https://github.com/isaac-sim/IsaacLab)'s random rough ground (the "
+             "`random_rough` sub-terrain of `ROUGH_TERRAINS_CFG`: bumps of 2 to 10 cm every 0.1 m) with Unitree's own "
+             "pretrained walking policy, which is blind and was trained on flat ground "
+             "([unitree_rl_gym](https://github.com/unitreerobotics/unitree_rl_gym), `deploy/pre_train/g1/motion.pt`, "
+             "BSD-3-Clause), played by Unitree's [MuJoCo](https://github.com/google-deepmind/mujoco) sim2sim loop ported to "
+             "[my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) on Metal (whose heightfield contacts match the "
+             "exact geometry), on Unitree's own G1 model, and rendered by metalsim's path "
              "tracer. Rendered on the 14-inch MacBook Pro (Mac16,6), not in a timing run, so its Performance table is "
              "not a timing figure."),
     notes=_g1_bumps_notes,

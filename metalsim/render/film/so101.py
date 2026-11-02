@@ -718,27 +718,28 @@ SO101_README_VIEWER = ViewerCfg(eye=(0.55, -0.42, 0.32), lookat=(0.12, 0.03, 0.1
 
 PORT = "runs/film/so101_lift/port"
 SO101_NOTES = f"""
-**The policy.** so101Sim's state-based lift teacher (<{SO101SIM['repo']}>, the owner's project, commit
-`{SO101SIM['commit']}`): stable-baselines3 PPO, `MlpPolicy` with two 256-unit tanh layers for actor and critic, 12
-`SubprocVecEnv` workers with `VecNormalize`, on CPU MuJoCo (`rl/native/train_lift.py`). so101Sim trained it in two
-runs (`docs/AGENT_CONTEXT.md` section 6): run 1, 0 to 3 M steps, plateaued at 13 % success because success ended the
-episode, so hovering just under the lift height paid more than lifting; run 2, 3 to 8 M steps from run 1's checkpoint
-with a non-terminating success and a per-step bonus while the box is up (`rl/native/continue_lift.py`), reached 98 %
-within 300 k steps, and so101Sim reports a deterministic 100/100 (mean lift height 0.17 m, 0.95 s to lift). Run 2's
-output is not published: it is in neither so101Sim's git nor its LFS, and not on this machine. Run 1's checkpoint is
-tracked there (`rl/runs/lift_ppo_run1_backup`, 3,004,416 steps, training success 0.13 at its end). **Run 2 was reproduced here** with
-so101Sim's own code on the CPU and no tracked file changed: the run 1 checkpoint copied to the untracked
-`rl/runs/lift_ppo` its scripts read, then `continue_lift.py` with its default 5 M extra steps (8.2 min, 12 workers),
-then `eval_lift_native.py 100`: **100/100, mean lift height 0.170 m (lowest 0.148 m), 0.95 s to lift**, the documented
-figures (training success 0.94 at 3.10 M steps and 0.95 to 1.00 from then on; `{PORT}/repro/`: `run.json`, `progress.txt`,
-`eval_lift_native.log`). The film plays that checkpoint (8,005,632 steps; SB3 `model.zip` sha256 `1ddf1bc3...`,
-`vecnorm.pkl` `ce78ad44...`) through plain torch weights: `{PORT}/extract_policy.py` (run in so101Sim's environment)
-writes the actor's three layers and VecNormalize's observation mean and variance as tensors to
-`{POLICY}` (sha256 `9dfdea71...`, 296,754 bytes; `torch.load(weights_only=True)`, no stable-baselines3 needed); on 4,096
-observations its output differs from SB3's `predict(deterministic=True)` by at most 2.0e-6. The action is the actor's
-mean clipped to [-1, 1], after so101Sim's eval normalisation, clip((obs - mean) / sqrt(var + 1e-8), -10, 10). The
-repository's `.gitignore` ignores `*.pt` files unless they are listed; without the weights file, rebuild it from
-so101Sim (the reproduction above, then `extract_policy.py`; `{PORT}/repro/run.json` lists the commands).
+**The policy.** so101Sim's state-based lift teacher (<{SO101SIM['repo']}>, the owner's project):
+[stable-baselines3](https://github.com/DLR-RM/stable-baselines3) (SB3) PPO, `MlpPolicy` with two 256-unit tanh layers
+for actor and critic, 12 `SubprocVecEnv` workers with `VecNormalize`, on CPU MuJoCo (`rl/native/train_lift.py`).
+so101Sim trained it in two runs (`docs/AGENT_CONTEXT.md` section 6): run 1, 0 to 3 M steps, plateaued at 13 % success
+because success ended the episode, so hovering just under the lift height paid more than lifting; run 2, 3 to 8 M steps
+from run 1's checkpoint with a non-terminating success and a per-step bonus while the box is up
+(`rl/native/continue_lift.py`), reached 98 % within 300 k steps, and so101Sim reports a deterministic 100/100 (mean lift
+height 0.17 m, 0.95 s to lift). Run 2's output is not published: it is in neither so101Sim's git nor its LFS, and not on
+this machine. Run 1's checkpoint is tracked there (`rl/runs/lift_ppo_run1_backup`, 3,004,416 steps, training success
+0.13 at its end). **Run 2 was reproduced here** with so101Sim's own code on the CPU and no tracked file changed: the run
+1 checkpoint copied to the untracked `rl/runs/lift_ppo` its scripts read, then `continue_lift.py` with its default 5 M
+extra steps (8.2 min, 12 workers), then `eval_lift_native.py 100`: **100/100, mean lift height 0.170 m (lowest 0.148 m),
+0.95 s to lift**, the documented figures (training success 0.94 at 3.10 M steps and 0.95 to 1.00 from then on;
+`{PORT}/repro/`: `run.json`, `progress.txt`, `eval_lift_native.log`). The film plays that checkpoint (8,005,632 steps;
+SB3 `model.zip` sha256 `1ddf1bc3...`, `vecnorm.pkl` `ce78ad44...`) through plain torch weights:
+`{PORT}/extract_policy.py` (run in so101Sim's environment) writes the actor's three layers and VecNormalize's
+observation mean and variance as tensors to `{POLICY}` (sha256 `9dfdea71...`, 296,754 bytes;
+`torch.load(weights_only=True)`, no stable-baselines3 needed); on 4,096 observations its output differs from SB3's
+`predict(deterministic=True)` by at most 2.0e-6. The action is the actor's mean clipped to [-1, 1], after so101Sim's
+eval normalisation, clip((obs - mean) / sqrt(var + 1e-8), -10, 10). The repository's `.gitignore` ignores `*.pt` files
+unless they are listed; without the weights file, rebuild it from so101Sim (the reproduction above, then
+`extract_policy.py`; `{PORT}/repro/run.json` lists the commands).
 
 **so101Sim's task on MuJoCo Warp.** `metalsim/render/film/so101.py`, `SO101Lift`: so101Sim's `SO101LiftEnv`
 (`rl/native/so101_lift.py`) on `metalsim.physics.batch.BatchSim`, 16 worlds. Per 20 ms control step the action sets
@@ -752,16 +753,16 @@ from the base within +-0.7 rad, random yaw; +-0.08 rad on the five arm joints; b
 states equal so101Sim's to float32 rounding (3e-8). Success is so101Sim's: the box centre above 0.10 m for 10 control
 steps in a row (it does not end the episode); an episode ends at 300 steps (6 s) or when the box leaves a 0.45 m
 radius. The scene is `assets/so101/scene_box_rl.xml` (MuJoCo Menagerie's SO-101 with the box and floor). so101Sim's
-own `scene_box_rl.xml` is not published (the README's "known gaps"); compiled with so101Sim's MuJoCo 3.10.0, every
+own `scene_box_rl.xml` is not published (its README's "known gaps"); compiled with so101Sim's MuJoCo 3.10.0, every
 numeric model array of the two is equal except the floor plane's render size, the box's colour, the box's position
 before the reset overwrites it, a keyframe and a skybox (`{PORT}/scene_diff.py`, output in `repro/scene_diff.txt`).
 MetalSim compiles it with MuJoCo 3.14.0, which recentres the meshes differently from 3.10.0 (mesh geom frames differ
 by up to 1.3e-3 in quaternion, mesh vertices by up to 46 um; inertia frames by 3e-6).
 
-**Against so101Sim's own CPU run.** `{PORT}/reference.py` runs so101Sim's `SO101LiftEnv` unchanged on CPU MuJoCo
-3.10.0 with the extracted weights and `eval_lift_native.py`'s seeds and loop (`reference.json`; with the weights it
-gives so101Sim's own eval figures). `{PORT}/compare.py` runs the film's adapter on the same 100 seeds, one MuJoCo
-Warp world each (`compare.json`, a GPU-queue job).
+**Against so101Sim's own CPU run.** `{PORT}/reference.py` runs so101Sim's `SO101LiftEnv` unchanged on CPU MuJoCo 3.10.0
+with the extracted weights and `eval_lift_native.py`'s seeds and loop (`reference.json`; with the weights it gives
+so101Sim's own eval figures). `{PORT}/compare.py` runs the film's adapter on the same 100 seeds, one MuJoCo Warp world
+each (`compare.json`, a job of the GPU queue, `scripts/gpu_run.sh`).
 
 | 100 episodes, seeds 10000-10099 | so101Sim, CPU MuJoCo 3.10.0 | MetalSim, MuJoCo Warp | MetalSim, three re-runs |
 |---|---|---|---|
@@ -772,10 +773,15 @@ Warp world each (`compare.json`, a GPU-queue job).
 | same outcome, seed by seed | | 98 of 100 | 98, 97, 98 (10021 and 10027 each time, 10098 once) |
 
 The GPU rollout is not bitwise repeatable from run to run (float atomics accumulate in arrival order; `docs/GAPS.md`),
-so each MetalSim figure is one draw. The re-runs (2026-10-31, MuJoCo Warp fork `8eb51fe637` on Warp `4127c48183`;
-`{PORT}/compare.py` twice and `runs/film/so101_lift_74v/port/compare_servo.py 12v` once; `runs/readme_media/handoff/revalidate.md`) put
+so each MetalSim figure is one draw. The re-runs (2026-10-31, [my fork of MuJoCo
+Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) at
+[`8eb51fe637`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624) on [my fork
+of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) at
+[`4127c48183`](https://github.com/pulipakaa24/warp/commit/4127c4818334080de6f3d23aef522e582ff6a2a7); `{PORT}/compare.py`
+twice and `runs/film/so101_lift_74v/port/compare_servo.py 12v` once; `runs/readme_media/handoff/revalidate.md`) put
 MetalSim at **97 to 98 successes in 100 over three runs** (92 to 94 boxes still up at 6 s); the first column's run was
-on the earlier fork checkout `07a51a63`.
+on an earlier commit of my fork,
+[`07a51a63`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc).
 
 The trajectories agree until the jaws touch the box: on seeds 10000 to 10004 the box positions differ by less than
 1 mm up to 0.26 to 0.36 s (first jaw contact: 0.24 s, median), then by centimetres (median over the 100 seeds: 1.3 cm
@@ -792,15 +798,15 @@ no contact or row was dropped). CPU MuJoCo reached its 10-iteration cap on 0.03 
 step of each, 20 episodes; an experiment in the scratch area, not kept).
 
 **Realism check: beyond the standard SO-101 follower.** Measured on so101Sim's CPU run (`{PORT}/realism.py`,
-`realism.json`; 100 episodes, every 5 ms physics step). The SO-101 follower uses six Feetech STS3215 servos, the 7.4 V
-1/345 C001 in The Robot Studio's bill of materials (<https://github.com/TheRobotStudio/SO-ARM100>); a 12 V version
-is the alternative. C001 at 7.4 V: 19.5 kg.cm = 1.91 N.m stall torque, 52 rpm = 5.45 rad/s no-load speed (Feetech
-datasheet "STS3215 200620a"); 12 V (C018): 30 kg.cm = 2.94 N.m, 0.222 s/60 deg = 4.72 rad/s (vendor listings). The
-scene's actuators are Menagerie's: position servos with kp 998.22, kv 2.731 and a 2.94 N.m force limit, and joint
-damping 0.6 N.m.s/rad. Servo force minus damping is a motor line from 2.94 N.m at rest to zero at 4.9 rad/s, so the
-model is the 12 V servo. A DC servo at full voltage is bounded by |tau / tau_stall + omega / omega_0| <= 1 (all four
-quadrants); the table counts physics steps outside that bound by more than 2 %, with tau the servo force minus
-damping.
+`realism.json`; 100 episodes, every 5 ms physics step). The SO-101 follower uses six
+[Feetech](https://www.feetechrc.com/) STS3215 servos, the 7.4 V 1/345 C001 in The Robot Studio's bill of materials
+(<https://github.com/TheRobotStudio/SO-ARM100>); a 12 V version is the alternative. C001 at 7.4 V: 19.5 kg.cm = 1.91 N.m
+stall torque, 52 rpm = 5.45 rad/s no-load speed (Feetech datasheet "STS3215 200620a"); 12 V (C018): 30 kg.cm = 2.94 N.m,
+0.222 s/60 deg = 4.72 rad/s (vendor listings). The scene's actuators are Menagerie's: position servos with kp 998.22, kv
+2.731 and a 2.94 N.m force limit, and joint damping 0.6 N.m.s/rad. Servo force minus damping is a motor line from 2.94
+N.m at rest to zero at 4.9 rad/s, so the model is the 12 V servo. A DC servo at full voltage is bounded by |tau /
+tau_stall + omega / omega_0| <= 1 (all four quadrants); the table counts physics steps outside that bound by more than 2
+%, with tau the servo force minus damping.
 
 | joint | peak speed | episode peak (median) | steps at the 2.94 N.m limit | outside the 12 V C018 bound | outside the 7.4 V C001 bound (p99 ratio) |
 |---|---|---|---|---|---|
@@ -825,21 +831,21 @@ damping.
   and its overload protection is likely to cut in.
 - **Gripper and contact.** The gripper's command is at one end of its range on 97 % of steps (open on the approach,
   fully closed from the grasp on); it holds the 4 cm box at 0.33 rad, so it squeezes at the full 2.94 N.m for the whole
-  hold (106 N summed normal force on the box, median). LeRobot's
-  SO-101 driver caps the real gripper at 50 % torque, 25 % when overloaded
-  (`lerobot/robots/so_follower/so_follower.py`, `configure`: `Max_Torque_Limit` 500, `Overload_Torque` 25). The box is
-  held only by the jaws (12 contacts, median; no contact with the floor or other links during the hold) and ends up
-  lying on its side in them (largest tilt during the hold: 84 deg, median). The deepest box penetration per episode
-  is 3.2 mm (median), 10.6 mm at most; in three episodes inspected at 3 s the moving jaw's collision mesh carried
-  25 to 55 N per contact, at 1.7 to 3.4 mm penetration.
+  hold (106 N summed normal force on the box, median). [LeRobot](https://github.com/huggingface/lerobot)'s SO-101 driver
+  caps the real gripper at 50 % torque, 25 % when overloaded (`lerobot/robots/so_follower/so_follower.py`, `configure`:
+  `Max_Torque_Limit` 500, `Overload_Torque` 25). The box is held only by the jaws (12 contacts, median; no contact with
+  the floor or other links during the hold) and ends up lying on its side in them (largest tilt during the hold: 84 deg,
+  median). The deepest box penetration per episode is 3.2 mm (median), 10.6 mm at most; in three episodes inspected at 3
+  s the moving jaw's collision mesh carried 25 to 55 N per contact, at 1.7 to 3.4 mm penetration.
 - **Lift.** The box rises at up to 0.86 m/s (median of episode peaks; 1.26 m/s at most) with about 2 g of vertical
   acceleration, and 99 of 100 boxes are still up at 6 s (seed 10014 is dropped after it counted as a success).
 
 Verdict: plausible kinematics, but not the standard SO-101. The motion is what a 12 V SO-101 could do only by running
-every servo at its limit with a full-range command switching up to 25 times a second, and with a gripper squeezing
-twice as hard as LeRobot lets the real one. The 7.4 V follower in the bill of materials could not follow it. so101Sim
-reports 5/5 zero-shot in Unreal (the same MuJoCo physics in URLab), and nothing has run on the physical arm. The film
-shows what the simulation does; it is not evidence that the policy works on hardware.
+every servo at its limit with a full-range command switching up to 25 times a second, and with a gripper squeezing twice
+as hard as LeRobot lets the real one. The 7.4 V follower in the bill of materials could not follow it. so101Sim reports
+5/5 zero-shot in Unreal (the same MuJoCo physics in [URLab](https://github.com/URLab-Sim/UnrealRoboticsLab)), and
+nothing has run on the physical arm. The film shows what the simulation does; it is not evidence that the policy works
+on hardware.
 
 **How the env was chosen.** 16 worlds, seeds 10000 to 10015 (`film.seed` 10000, the first of `eval_lift_native.py`'s
 seeds); `envs="auto"` ranks them (`SO101Lift.rank`): episodes that succeeded and still hold the box above 0.10 m at
@@ -849,41 +855,44 @@ accelerations span only 67.3 to 70.3 rad/s^2 (every episode chatters), and seed 
 lifted at 0.76 s, box up to 0.162 m (`rec.json` `adapter.first_episode`). That list is the top four of the ranking;
 both shots film the first.
 
-**Camera and look.** Two fixed cameras in the env frame with Kit's lens (36 deg vertical), on the -y side of the arm,
-so the box stays in view through the hold (the arm folds back and holds it out to its +y side; from +y the arm hides
-it): `hero`, 1280x720, eye (0.62, -0.48, 0.36) m, looking at (0.12, 0.03, 0.10) m; `readme`, 640x480 (4:3, for the
-README grid), eye (0.55, -0.42, 0.32), looking at (0.12, 0.03, 0.11). The render twin is the simulated scene with the
-floor plane (z = 0, what the arm and box stand on) replaced by a 0.9 x 0.7 m wooden table top, 4 cm thick, on four
-legs, with a grey studio floor 0.75 m below (render-only geoms; `SO101Lift.twin_spec`); Poly Haven's `wood_table_001`
-on the top at its real size (1.5 m per image, `ground_tile_m`) and in its own colours, the box in so101Sim's green
-(0.1, 0.9, 0.15), the legs dark metal (0.12, metallic 0.6). The film tool writes these look colours into the geoms' own
-`rgba` (`render.build_scene`): the twin gives the box (0, 1, 0), the legs 0.2 and the top (0.6, 0.45, 0.3), and MuJoCo
-draws a geom's own `rgba` over its material's (times the texture on the top).
+**Camera and look.** Two fixed cameras in the env frame with Isaac Lab's default camera lens (Omniverse Kit's
+perspective camera, 36 deg vertical), on the -y side of the arm, so the box stays in view through the hold (the arm
+folds back and holds it out to its +y side; from +y the arm hides it): `hero`, 1280x720, eye (0.62, -0.48, 0.36) m,
+looking at (0.12, 0.03, 0.10) m; `readme`, 640x480 (4:3, for the README grid), eye (0.55, -0.42, 0.32), looking at
+(0.12, 0.03, 0.11). The render twin is the simulated scene with the floor plane (z = 0, what the arm and box stand on)
+replaced by a 0.9 x 0.7 m wooden table top, 4 cm thick, on four legs, with a grey studio floor 0.75 m below (render-only
+geoms; `SO101Lift.twin_spec`); Poly Haven's `wood_table_001` on the top at its real size (1.5 m per image,
+`ground_tile_m`) and in its own colours, the box in so101Sim's green (0.1, 0.9, 0.15), the legs dark metal (0.12,
+metallic 0.6). The film tool writes these look colours into the geoms' own `rgba` (`render.build_scene`): the twin gives
+the box (0, 1, 0), the legs 0.2 and the top (0.6, 0.45, 0.3), and MuJoCo draws a geom's own `rgba` over its material's
+(times the texture on the top).
 
-**Rendering.** Tier 2 (the path tracer), 64 samples per pixel (16 passes x 4), 4 bounces, Open Image Denoise, ACES
-tone map, sRGB, lit by the Poly Haven studio HDRI as an importance-sampled dome. One frame per 20 ms control step
-(50 fps), 300 frames.
+**Rendering.** Tier 2 (the path tracer), 64 samples per pixel (16 passes x 4), 4 bounces, [Open Image
+Denoise](https://www.openimagedenoise.org), ACES tone map, sRGB, lit by the Poly Haven studio HDRI as an
+importance-sampled dome. One frame per 20 ms control step (50 fps), 300 frames.
 
-**README clip.** [so101_lift.webp](so101_lift.webp) is the `readme` shot from 0 to 5 s (frames 0 to 249), resampled
-from 50 to 30 fps and written as MuJoCo Warp writes its README clips: 320x240 (Lanczos), lossy animated WebP from
-Pillow at quality 70, 33 ms per frame, looping; 150 frames. Command, from the repository root after the render stage:
+**README clip.** [so101_lift.webp](so101_lift.webp) is the `readme` shot from 0 to 5 s (frames 0 to 249), resampled from
+50 to 30 fps and written as MuJoCo Warp writes its README clips: 320x240 (Lanczos), lossy animated WebP from
+[Pillow](https://python-pillow.org) at quality 70, 33 ms per frame, looping; 150 frames. Command, from the repository
+root after the render stage:
 `python -m metalsim.render.film.encode webp runs/film/so101_lift/readme/frames docs/renders/so101_lift.webp --start 0
 --seconds 5 --src-fps 50 --fps 30`.
 
-**This take, and where its timings come from.** Recorded on 2026-10-31 on the 14-inch MacBook Pro (Mac16,6), at
-metalsim `ed66d8ef` plus this film's uncommitted files (hence `+dirty` in the pins); rendered and encoded again on
-2026-11-01 on the same machine, at metalsim `68f695b2` plus uncommitted files, from the same recording,
-after the film tool started laying the wood at its real size and drawing the look's colours on geoms with their own
-`rgba` (the frames rendered on 2026-10-31 had the wood 1.33 times too large and tinted (0.6, 0.45, 0.3), the box in
-(0, 1, 0) and the legs at 0.2). This was not a timing run; quote nothing on this page as MetalSim's speed (MetalSim's
-timing runs are made on the 16-inch through the GPU queue's timing kind; throughput figures are in `docs/PARITY.md`).
-Power, as the stages stamped it: on AC power at every stamp (charging at 88 % when the record stage wrote `rec.json` at
-14:53 on 2026-10-31; 100 % and finishing its charge at the shots' first frames, 00:34 and 00:36 on 2026-11-01, local
-time), with pmset's power-mode setting at High Power (`powermode 2`: the configured setting, which does not show that
-the machine ran in High Power Mode). Record and render ran as GPU-queue jobs of kind render, one at a time, into
-`runs/film/so101_lift`. The entry is registered in `tasks.py` (`python -m metalsim.render.film so101_lift`, as below);
-`python -m metalsim.render.film.so101 <film-tool args>` also runs the film tool with it. A new recording is another
-take: the GPU rollout is not bitwise repeatable.
+**This take, and where its timings come from.** Recorded on 2026-10-31 on the 14-inch MacBook Pro (Mac16,6), at metalsim
+[`ed66d8ef`](https://github.com/pulipakaa24/MetalSim/commit/ed66d8ef3ecd7f17aa16207231000b1d22ff7812) plus this film's
+uncommitted files (hence `+dirty` in the pins); rendered and encoded again on 2026-11-01 on the same machine, at
+metalsim [`68f695b2`](https://github.com/pulipakaa24/MetalSim/commit/68f695b29fc0ef9f049b6d025f3e8937e72d8414) plus
+uncommitted files, from the same recording, after the film tool started laying the wood at its real size and drawing the
+look's colours on geoms with their own `rgba` (the frames rendered on 2026-10-31 had the wood 1.33 times too large and
+tinted (0.6, 0.45, 0.3), the box in (0, 1, 0) and the legs at 0.2). This was not a timing run; quote nothing on this
+page as MetalSim's speed (MetalSim's timing runs are made on the 16-inch MacBook Pro through the GPU queue's timing
+kind; throughput figures are in `docs/PARITY.md`). Power, as the stages stamped it: on AC power at every stamp (charging
+at 88 % when the record stage wrote `rec.json` at 14:53 on 2026-10-31; 100 % and finishing its charge at the shots'
+first frames, 00:34 and 00:36 on 2026-11-01, local time), with pmset's power-mode setting at High Power (`powermode 2`:
+the configured setting, which does not show that the machine ran in High Power Mode). Record and render ran as GPU-queue
+jobs of kind render, one at a time, into `runs/film/so101_lift`. The entry is registered in `tasks.py` (`python -m
+metalsim.render.film so101_lift`, as below); `python -m metalsim.render.film.so101 <film-tool args>` also runs the film
+tool with it. A new recording is another take: the GPU rollout is not bitwise repeatable.
 """
 
 PORT74 = "runs/film/so101_lift_74v/port"
@@ -895,13 +904,15 @@ and not retrained, runs on a model of those servos, and the `so101_lift_74v` tak
 (`python -m metalsim.render.film.so101 so101_lift_74v`; adapter option `servo="7v4"`; the default, `"12v"`, is the
 scene as it is and everything above).
 
-**The scene's servos and where their numbers come from.** `assets/so101/so101.xml`, class `sts3215` (Menagerie's copy
-of SO-ARM100's `so101_new_calib.xml` at `aec17bbc`):
+**The scene's servos and where their numbers come from.** `assets/so101/so101.xml`, class `sts3215` (Menagerie's copy of
+SO-ARM100's `so101_new_calib.xml` at
+[`aec17bbc`](https://github.com/TheRobotStudio/SO-ARM100/commit/aec17bbc256d1a7342d53aaa4950595d4c30b40d)):
 
 - position actuators, kp 998.22, kv 2.731, force limit +-2.94 N.m: Gregory119's DC-motor derivation for the 12 V
   ST-3215-C047 (30 kg.cm stall and 45 rpm at 12 V, servo P gain 16;
-  <https://github.com/Gregory119/RBE501-RL-arm-project>, `gymnasium_env/calc_actuator_model.py` and its README),
-  merged by SO-ARM100 PR #141 (2025-11-27), which replaced kp 17.8 and a 3.35 N.m limit;
+  <https://github.com/Gregory119/RBE501-RL-arm-project>, `gymnasium_env/calc_actuator_model.py` and its README), merged
+  by SO-ARM100 [PR #141](https://github.com/TheRobotStudio/SO-ARM100/pull/141) (2025-11-27), which replaced kp 17.8 and
+  a 3.35 N.m limit;
 - joint damping 0.60 N.m.s/rad, frictionloss 0.052 N.m, armature 0.028 kg.m^2: in SO-ARM100's SO-101 MJCF since its
   first version (2025-05-19). They match Rhoban BAM's MuJoCo export of its identified 7.4 V STS3215
   (<https://github.com/Rhoban/bam>, `bam/to_mujoco.py`: damping = viscous friction + kt^2 / R, frictionloss = Coulomb
@@ -946,12 +957,14 @@ the line at 3.2 rad/s, below both the datasheet's 5.45 rad/s and BAM's 5.3 rad/s
 | box never above 6 cm | 0 | 21 | 1 | 22 |
 | same outcome as CPU, seed by seed | | | 98 | 81 (86, 81) |
 
-The 12 V MetalSim column is a re-run with the servo forces recorded (another GPU take); the first run, in the
-comparison above, gave 98, 94, 0.166 m and 0.91 s. Each MetalSim figure is one GPU draw (not bitwise repeatable). The
-7.4 V re-runs in brackets are two more runs of `{PORT74}/compare_servo.py 7v4` on MuJoCo Warp `8eb51fe637` (the
-column's run was on `07a51a63`; `runs/readme_media/handoff/revalidate.md`): **73 to 78 successes in 100 over two
-re-runs** (78 in the first run; 75 in the next section's table, a fourth run). At 12 V the re-runs give 97 to 98 over
-three runs (the comparison above).
+The 12 V MetalSim column is a re-run with the servo forces recorded (another GPU take); the first run, in the comparison
+above, gave 98, 94, 0.166 m and 0.91 s. Each MetalSim figure is one GPU draw (not bitwise repeatable). The 7.4 V re-runs
+in brackets are two more runs of `{PORT74}/compare_servo.py 7v4` on [my fork of MuJoCo
+Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) at
+[`8eb51fe637`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624) (the column's
+run was on [`07a51a63`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc);
+`runs/readme_media/handoff/revalidate.md`): **73 to 78 successes in 100 over two re-runs** (78 in the first run; 75 in
+the next section's table, a fourth run). At 12 V the re-runs give 97 to 98 over three runs (the comparison above).
 
 Fraction of the episode each servo spends at its force limit:
 
@@ -1002,11 +1015,12 @@ films world 13 (seed 10013), the 12 V take's env, whatever happens in it.
   0 --seconds 5 --src-fps 50 --fps 30`).
 - Hero: [so101_lift_74v.mp4](so101_lift_74v.mp4) (0.8 MB) and `so101_lift_74v_still{{1,2,3}}.jpg` (frames 15, 30
   and 150).
-- Recorded and first rendered on the 14-inch MacBook Pro (Mac16,6), 2026-10-31, on AC power and charging at every
-  stamp (97 to 98 %, 15:17 to 15:19), powermode 2. The frames here were rendered again from that recording on
-  2026-11-01 (00:37 to 00:39, AC power, 100 % and finishing its charge, powermode 2), at metalsim `68f695b2` plus
-  uncommitted files, with the wood at its real size and the look's colours, as so101_lift's ("This
-  take" above). This was not a timing run.
+- Recorded and first rendered on the 14-inch MacBook Pro (Mac16,6), 2026-10-31, on AC power and charging at every stamp
+  (97 to 98 %, 15:17 to 15:19), powermode 2. The frames here were rendered again from that recording on 2026-11-01
+  (00:37 to 00:39, AC power, 100 % and finishing its charge, powermode 2), at metalsim
+  [`68f695b2`](https://github.com/pulipakaa24/MetalSim/commit/68f695b29fc0ef9f049b6d025f3e8937e72d8414) plus uncommitted
+  files, with the wood at its real size and the look's colours, as so101_lift's ("This take" above). This was not a
+  timing run.
 
 **Verdict.** On a model of the standard follower's servos, the unchanged policy succeeds 77 times in 100 on CPU (73 to
 78 on MetalSim over four runs) instead of 100. It takes 1.6 s instead of 0.95 s to lift, and the box is still up at 6 s
@@ -1037,26 +1051,29 @@ The expert at 7.4 V gives 0.0139 and 0.9 %; the original policy gives 0.68 and 6
 
 **Training, both variants.** The run-2 teacher continued for 10 M steps on the 7.4 V model, with everything else
 so101Sim's: `SO101LiftEnv`'s reward, reset and loop, 12 workers, VecNormalize continued from run 2, and run 2's PPO
-settings (`runs/film/so101_lift_smooth/train/train_smooth.py`, `smooth_env.py`; run in so101Sim's environment, about
-16 minutes each on CPU; logs in `train/runs/<variant>/`). The penalties are Isaac Lab's lift task's
-(IsaacLab `source/isaaclab_tasks/isaaclab_tasks/contrib/lift/lift_env_cfg.py`, `RewardsCfg` `action_rate` and
-`joint_vel`, `CurriculumCfg`):
+settings (`runs/film/so101_lift_smooth/train/train_smooth.py`, `smooth_env.py`; run in so101Sim's environment, about 16
+minutes each on CPU; logs in `train/runs/<variant>/`). The penalties are [Isaac
+Lab](https://github.com/isaac-sim/IsaacLab)'s lift task's (IsaacLab
+`source/isaaclab_tasks/isaaclab_tasks/contrib/lift/lift_env_cfg.py`, `RewardsCfg` `action_rate` and `joint_vel`,
+`CurriculumCfg`):
 
 - `action_rate_l2`, the sum over the action of (a(t) - a(t-1))^2;
 - `joint_vel_l2`, the sum over the joints of qdot^2;
-- weights 1e-4 each, raised to 1e-1 after 10,000 of the 36,000 environment steps of its rsl_rl run
-  (`config/franka/agents/rsl_rl_ppo_cfg.py`: 1500 iterations x 24 steps); here after 27.8 % of the 10 M steps.
+- weights 1e-4 each, raised to 1e-1 after 10,000 of the 36,000 environment steps of its
+  [rsl_rl](https://github.com/leggedrobotics/rsl_rl) run (`config/franka/agents/rsl_rl_ppo_cfg.py`: 1500 iterations x 24
+  steps); here after 27.8 % of the 10 M steps.
 
 **Variant 1, `isaac_scaled`: no effect.** Isaac Lab's weights times 9/37 (so101Sim's largest task reward per step over
 Isaac Lab's), penalising the action after the [-1, 1] clip. The action change per step rose from 0.68 to 0.76 and the
-actions at the limit from 66 to 78 %. SB3's exploration noise for wrist flex and wrist roll grew from 0.92 and 2.4 to 16 and 103.
-The cause (`runs/film/so101_lift_smooth/eval/raw_actions.py`): the deterministic action is the policy's Gaussian mean
-clipped to [-1, 1], and that mean lies outside [-1, 1] on 45 to 86 % of steps per joint for the original policy (median
-|mean| 20 for variant 1's wrist flex). A penalty on the clipped action cannot see a mean beyond the clip, nor noise
-beyond it. Isaac Lab penalises the raw action: its `ActionManager.process_action` stores the action as the policy
-emits it (`source/isaaclab/isaaclab/managers/action_manager.py`), and its rsl_rl wrapper clips nothing unless
-`clip_actions` is set (`source/isaaclab_rl/isaaclab_rl/rsl_rl/rl_cfg.py`, default `None`; the lift task does not
-set it). Isaac Lab files read at `main` = `6bb65480`.
+actions at the limit from 66 to 78 %. SB3's exploration noise for wrist flex and wrist roll grew from 0.92 and 2.4 to 16
+and 103. The cause (`runs/film/so101_lift_smooth/eval/raw_actions.py`): the deterministic action is the policy's
+Gaussian mean clipped to [-1, 1], and that mean lies outside [-1, 1] on 45 to 86 % of steps per joint for the original
+policy (median |mean| 20 for variant 1's wrist flex). A penalty on the clipped action cannot see a mean beyond the clip,
+nor noise beyond it. Isaac Lab penalises the raw action: its `ActionManager.process_action` stores the action as the
+policy emits it (`source/isaaclab/isaaclab/managers/action_manager.py`), and its rsl_rl wrapper clips nothing unless
+`clip_actions` is set (`source/isaaclab_rl/isaaclab_rl/rsl_rl/rl_cfg.py`, default `None`; the lift task does not set
+it). Isaac Lab files read at `main` =
+[`6bb65480`](https://github.com/isaac-sim/IsaacLab/commit/6bb654809eece03bb2677a1e9eb8a8d3f135377e).
 
 **Variant 2, `isaac_unscaled_raw`, the filmed one.** Isaac Lab's weights unscaled, on the raw policy output as Isaac
 Lab computes them. SB3 passes the Gaussian sample through unclipped (action space widened to +-1000); so101Sim's
@@ -1066,7 +1083,8 @@ LeRobot's `max_relative_target`, was not used, for three reasons:
 - it is off by default on the SO-101 follower (`None`, `lerobot/robots/so_follower/config_so_follower.py`, lerobot
   0.6.1);
 - typical values are 5 degrees (the old Aloha default, `lerobot/common/robot_devices/robots/configs.py` at
-  `3c0a209f`) or 10 to 15 degrees (Koch, in LeRobot PR #373's first revision);
+  [`3c0a209f`](https://github.com/huggingface/lerobot/commit/3c0a209f9fac4d2a57617e686a7f2a2309144ba2)) or 10 to 15
+  degrees (Koch, in LeRobot [PR #373](https://github.com/huggingface/lerobot/pull/373)'s first revision);
 - it clamps each goal to the present position +- the limit (`lerobot/robots/utils.py`, `ensure_safe_goal_position`).
   5 degrees is 87 mrad, 45 times the servo's 1.9 mrad proportional band, so the policy's output would be unchanged
   and the servo torque would still switch between its limits.
@@ -1086,14 +1104,19 @@ How each column is measured:
 
 - **CPU:** so101Sim's env on MuJoCo 3.10.0 with the servo model applied (`eval/eval_cpu.py`). Force and speed are
   read at every 5 ms physics step.
-- **MetalSim:** the film's adapter on MuJoCo Warp, one world per seed (`eval/eval_metalsim.py`, GPU queue, MuJoCo
-  Warp fork `8eb51fe637`, 2026-10-31 16:13 to 16:14). Force and speed are read at the end of each 20 ms control step.
-  The expert runs here on CPU kinematics of each world's state.
+- **MetalSim:** the film's adapter on MuJoCo Warp, one world per seed (`eval/eval_metalsim.py`, GPU queue, [my fork of
+  MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) at
+  [`8eb51fe637`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624), 2026-10-31
+  16:13 to 16:14). Force and speed are read at the end of each 20 ms control step. The expert runs here on CPU
+  kinematics of each world's state.
 - **Tables:** `eval/table.py`, giving `eval/table.md` and `eval/results.json`. The same jobs run at 15:58 gave
   successes within 3 of these: MetalSim is not bitwise repeatable from run to run.
-- The section above's MetalSim column for the unchanged policy (78 and 65 at 7.4 V) was measured at 15:17, on
-  the earlier fork checkout `07a51a63` (moved to `8eb51fe6` at 15:47, `upstream/mujoco_warp` reflog), with
-  `compare_servo.py`; this table's 75 and 68 are from `8eb51fe637`.
+- The section above's MetalSim column for the unchanged policy (78 and 65 at 7.4 V) was measured at 15:17, on an earlier
+  commit of my fork,
+  [`07a51a63`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc) (its clone
+  moved to [`8eb51fe6`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624) at
+  15:47, `upstream/mujoco_warp` reflog), with `compare_servo.py`; this table's 75 and 68 are from
+  [`8eb51fe637`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624).
 
 **Verdict.**
 
@@ -1125,11 +1148,14 @@ checked against SB3's predict clipped to [-1, 1]: 1.7e-6).
 - Clip: [so101_lift_smooth.webp](so101_lift_smooth.webp), the same command and window as so101_lift.webp.
 - Hero: [so101_lift_smooth.mp4](so101_lift_smooth.mp4) (0.7 MB) and `so101_lift_smooth_still{1,2,3}.jpg` (frames
   15, 30 and 150).
-- Recorded and first rendered on the 14-inch MacBook Pro (Mac16,6), 2026-10-31, 16:14 to 16:17, with MuJoCo Warp at
-  `8eb51fe637`, **on battery** (58 to 55 %, discharging), powermode 2. The frames here were rendered again from that
-  recording on 2026-11-01 (00:39 to 00:42, AC power, 100 % and finishing its charge, powermode 2), at metalsim
-  `68f695b2` plus uncommitted files, with the wood at its real size and the look's colours, as
-  so101_lift's ("This take" above). This was not a timing run.
+- Recorded and first rendered on the 14-inch MacBook Pro (Mac16,6), 2026-10-31, 16:14 to 16:17, with [my fork of MuJoCo
+  Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) at
+  [`8eb51fe637`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624), **on
+  battery** (58 to 55 %, discharging), powermode 2. The frames here were rendered again from that recording on
+  2026-11-01 (00:39 to 00:42, AC power, 100 % and finishing its charge, powermode 2), at metalsim
+  [`68f695b2`](https://github.com/pulipakaa24/MetalSim/commit/68f695b29fc0ef9f049b6d025f3e8937e72d8414) plus uncommitted
+  files, with the wood at its real size and the look's colours, as so101_lift's ("This take" above). This was not a
+  timing run.
 
 Still a simulation: the servo's P loop, current limit, overload protection and backlash are not modelled, and nothing
 has run on the arm.
@@ -1155,19 +1181,20 @@ followers than 7v4_real does (the shoulder still sags 1.6-2.4 times as much as t
   `bam/feetech/record.py`). A third-party STS memory table gives the same gain, "Kp scaled by 1/4": 0.25 per mille of
   duty per encoder step, 0.163 per rad. LeRobot writes P 16, I 0 and D 32 (`so_follower/config_so_follower.py`
   `position_*_coefficient`, `so_follower.py` `configure`).
-- **What that means as torque.** At P 16 a 0.06 rad error gives 16 % duty, 0.32 N.m on the 7.4 V servo. The scene's
-  kp of 998 N.m/rad comes from Gregory119's derivation, which reads P 16 as 16 V per degree of error, with an assumed
-  1 ohm winding. That is about 190 times too stiff, and with only 3.3 N.m.s/rad of damping it rings. SO-ARM100's
-  SO-101 model before PR #141 had kp 17.8, which matches BAM's own MuJoCo export at the factory P of 32 (18). That
-  match is inferred from the numbers only.
+- **What that means as torque.** At P 16 a 0.06 rad error gives 16 % duty, 0.32 N.m on the 7.4 V servo. The scene's kp
+  of 998 N.m/rad comes from Gregory119's derivation, which reads P 16 as 16 V per degree of error, with an assumed 1 ohm
+  winding. That is about 190 times too stiff, and with only 3.3 N.m.s/rad of damping it rings. SO-ARM100's SO-101 model
+  before [PR #141](https://github.com/TheRobotStudio/SO-ARM100/pull/141) had kp 17.8, which matches BAM's own MuJoCo
+  export at the factory P of 32 (18). That match is inferred from the numbers only.
 - **The firmware moves its own target.** The loop tracks an internal target that moves toward the goal at no more than
   5.29 rad/s (BAM `max_velocity`, m1). LeRobot also writes Acceleration 254 (`motors/feetech/feetech.py`
   `configure_motors`). At 100 step/s^2 per unit (third-party memory tables) that is 39 rad/s^2.
 
   Two things support that this register acts in position mode when Goal_Velocity is 0. The datasheet says "Mode 0 ...
-  support acceleration movement". LeRobot's first SO-100 calibration (commit 07e87163) wrote Acceleration 10 "to lower
-  the acceleration of the motors" before position moves. That it acts here, and the shape of the profile, are
-  inference: no source states either.
+  support acceleration movement". LeRobot's first SO-100 calibration (commit
+  [`07e87163`](https://github.com/huggingface/lerobot/commit/07e8716315244c2dea8e38c0e7a48bb73a9cabf6)) wrote
+  Acceleration 10 "to lower the acceleration of the motors" before position moves. That it acts here, and the shape of
+  the profile, are inference: no source states either.
 - **The motor.** The torque-speed line runs through the datasheet's stall torque and no-load speed, friction
   included:
 
@@ -1209,10 +1236,10 @@ on the host and feeds them to the GPU with a substep hook (`CtrlPlanFeeder`). Ag
 and a fixed command schedule, the GPU joint trajectories agree to 8e-7 rad. Holding the first target for all four steps
 instead differs by up to 0.09 rad.
 
-**Step response.** The orchestrator's protocol, reproduced for the old model within 4 points of overshoot: so101Sim's
-scene, every joint at qpos0, targets equal to positions, 1 s settling, then one joint's target +0.06 rad (the expert's
-largest step per tick). Overshoot and crossings are against the final value, with a 0.5 % hysteresis. "Sag" is the
-gravity offset before the step.
+**Step response.** The protocol of an earlier step-response table of the old model, whose overshoots this run reproduces
+within 4 points: so101Sim's scene, every joint at qpos0, targets equal to positions, 1 s settling, then one joint's
+target +0.06 rad (the expert's largest step per tick). Overshoot and crossings are against the final value, with a 0.5 %
+hysteresis. "Sag" is the gravity offset before the step.
 
 | servo | joint | overshoot | crossings | settle to 2 % | 90 % at | sag | peak speed / acc, 0.06 rad | peak, 0.5 rad step |
 |---|---|---|---|---|---|---|---|---|
@@ -1231,8 +1258,9 @@ gravity offset before the step.
 
 Two published hardware figures check the soft loop:
 
-- lerobot issue #3400 measures a mean settle error of 63 encoder steps (97 mrad) at P 16, against 26.7 at P 32. The
-  model's sag is 21-121 mrad, inversely proportional to P. The old model's is 1 mrad.
+- [lerobot issue #3400](https://github.com/huggingface/lerobot/issues/3400) measures a mean settle error of 63 encoder
+  steps (97 mrad) at P 16, against 26.7 at P 32. The model's sag is 21-121 mrad, inversely proportional to P. The old
+  model's is 1 mrad.
 - The firmware profile caps the target's acceleration at 39 rad/s^2. The model's peak joint accelerations on a
   0.5 rad step are 22-30 rad/s^2; the old model's are 77-180.
 
@@ -1335,9 +1363,11 @@ Scripts and outputs: `runs/readme_media/scratch/so101-servo/` (`stepresp.py`, `e
 ### 7v4_bam: BAM's identified servo, with load-dependent gearbox friction
 
 **Why.** Real followers hold a gravity load differently from 7v4_real. Two LeRobot teleoperation datasets of SO-101
-followers were measured (`hungho77/so101_left_arm_pick_red_cube_into_pot` and `IlyaGusev/so101_pick_gum`). The steady
-error there is action minus state, the follower's own Goal_Position minus Present_Position, so the leader's calibration
-does not enter it. A joint stops much nearer its goal after moving with gravity than after moving against it:
+followers were measured
+([`hungho77/so101_left_arm_pick_red_cube_into_pot`](https://huggingface.co/datasets/hungho77/so101_left_arm_pick_red_cube_into_pot)
+and [`IlyaGusev/so101_pick_gum`](https://huggingface.co/datasets/IlyaGusev/so101_pick_gum)). The steady error there is
+action minus state, the follower's own Goal_Position minus Present_Position, so the leader's calibration does not enter
+it. A joint stops much nearer its goal after moving with gravity than after moving against it:
 
 | joint | after moving with gravity | after moving against gravity |
 |---|---|---|
@@ -1348,9 +1378,11 @@ That is a static friction band that widens with the load. 7v4_real's band is a c
 5.26. Its shoulder, which in the datasets mostly stops after lowering, sagged 5-6 times more than the real ones; its
 elbow, which mostly stops after rising, agreed only by that coincidence.
 
-**What.** `apply_servo(m, "7v4_bam")` takes every motor and friction number from BAM's m6 identification of the
-7.4 V STS3215 (<https://github.com/Rhoban/bam> at `b9e1111`, `bam/params/feetech_sts3215_7_4V/m6.json`; BAM's
-best-ranked friction model; paper arXiv 2410.08650). Nothing was fitted to the sag data.
+**What.** `apply_servo(m, "7v4_bam")` takes every motor and friction number from BAM's m6 identification of the 7.4 V
+STS3215 (<https://github.com/Rhoban/bam> at
+[`b9e1111`](https://github.com/Rhoban/bam/commit/b9e11118e17fe8ec803d430202f6fcf31d57901e),
+`bam/params/feetech_sts3215_7_4V/m6.json`; BAM's best-ranked friction model; paper [arXiv
+2410.08650](https://arxiv.org/abs/2410.08650)). Nothing was fitted to the sag data.
 
 | | 7v4_real | 7v4_bam |
 |---|---|---|
@@ -1424,7 +1456,8 @@ options `servo="7v4_bam"`, `controller="deploy_expert"`). The same expert also r
 (`servo="7v4_real"`); its numbers stay below for comparison, and its earlier take was replaced by this one. **It is
 scripted, not learned**, and it reads the cube's pose from the simulator, not from a camera.
 
-**How LeRobot commands a real SO-101** (LeRobot at `bf31dd79`):
+**How LeRobot commands a real SO-101** (LeRobot at
+[`bf31dd79`](https://github.com/huggingface/lerobot/commit/bf31dd794ffb4f87380aba3912f64421e8352d3c)):
 
 - every control tick the host writes *absolute* goal positions: `SOFollower.send_action`
   (`src/lerobot/robots/so_follower/so_follower.py`) calls `bus.sync_write("Goal_Position", ...)`, and
@@ -1439,7 +1472,7 @@ scripted, not learned**, and it reads the cube's pose from the simulator, not fr
 - LeRobot's own scripted move, `return_to_initial_position` (`rollout/strategies/core.py`), streams absolute targets
   interpolated from the present position, open loop: the precedent for streaming a planned trajectory.
 
-**What the expert keeps and what changes.** It keeps so101Sim's plan (`rl/native/scripted_expert.py` at `d4c2990`):
+**What the expert keeps and what changes.** It keeps so101Sim's plan (`rl/native/scripted_expert.py`):
 the waypoints (10 cm above the cube; 8 mm above its centre to grasp; 0.20 m over the grasp point to lift), the
 damped-least-squares IK on the point between the jaws (lambda 1e-4, five arm joints, wrist roll aligned with the cube's
 yaw), the phases (approach, descend, grasp, lift, and a retry when the cube is still below 7 cm) and their tolerances.
@@ -1479,12 +1512,14 @@ derived for 7v4_real's weaker 1.91 N.m clip, so on 7v4_bam's 3.32 N.m (open: the
   servos holding the start pose.
 - Frames, success and the episode's end are the policy films'.
 
-This is so101-expert's evaluation loop (`runs/readme_media/scratch/so101-expert/eval_metalsim.py`; with the friction,
-so101-bam-gpu's `eval_metalsim_bam.py`). On 7v4_real, with a CPU MuJoCo stand-in for BatchSim, the film adapter
-reproduces that script's CPU run exactly: the same outcome, retries and phase-change times on all 100 seeds, and the same
-arm joint positions at every frame. The option leaves the policy films unchanged: their adapter output is bit for bit
-the same as before (60 frames x 4 worlds for each of `so101_lift`, `so101_lift_74v` and `so101_lift_smooth`). Script and
-output: `runs/readme_media/scratch/so101-film/cpu_check.py`, `cpu_check.json`.
+This is the evaluation loop of `runs/readme_media/scratch/so101-expert/eval_metalsim.py` (with the friction,
+`runs/readme_media/scratch/so101-bam-gpu/eval_metalsim_bam.py`). Below, so101-expert, so101-sag and so101-bam-gpu name
+the evaluations whose scripts and outputs are in the directories of those names under `runs/readme_media/scratch/` (not
+tracked). On 7v4_real, with a CPU MuJoCo stand-in for BatchSim, the film adapter reproduces that script's CPU run
+exactly: the same outcome, retries and phase-change times on all 100 seeds, and the same arm joint positions at every
+frame. The option leaves the policy films unchanged: their adapter output is bit for bit the same as before (60 frames x
+4 worlds for each of `so101_lift`, `so101_lift_74v` and `so101_lift_smooth`). Script and output:
+`runs/readme_media/scratch/so101-film/cpu_check.py`, `cpu_check.json`.
 
 **Results**, seeds 10000-10099, one world per seed. One run each; CPU MuJoCo is deterministic, each MetalSim run is one
 GPU draw:
@@ -1503,9 +1538,12 @@ GPU draw:
 - **On 7v4_bam every run agrees on every seed.** The take's own 100 worlds equal so101-bam-gpu's MetalSim evaluation
   seed for seed: the same outcome, time to lift, retries and phase-change times on all 100. Against CPU 3.10 and CPU
   3.14 the outcome and retries are the same on all 100 seeds, and the time to lift is within 0.04 s on every seed
-  (identical on 71 and on 86). The one retry is seed 10024 in every run. The take ran on MuJoCo Warp `787a5b3a37` (the
-  fork took EPA collision fixes between the two runs), the evaluation on `93e5ce18e7`, both on Warp `52c09cdd82`; the
-  rollout is still not bitwise repeatable.
+  (identical on 71 and on 86). The one retry is seed 10024 in every run. The take ran on [my fork of MuJoCo
+  Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) at
+  [`787a5b3a37`](https://github.com/pulipakaa24/mujoco_warp/commit/787a5b3a37acc2551ffc8a2c1af1e9781d76723f) (my fork
+  took EPA collision fixes between the two runs), the evaluation on
+  [`93e5ce18e7`](https://github.com/pulipakaa24/mujoco_warp/commit/93e5ce18e76854c430ce669314af00ddceb92147), both on
+  [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim); the rollout is still not bitwise repeatable.
 - **On 7v4_real the backends differed on a few seeds**: against CPU 3.10, MetalSim gave the same outcome on 98 seeds
   and time to lift within 0.1 s on 84 of the 98. Its failures, 10032 and 10064, lose the box in a grasp that slips,
   retry, and run out of time; on CPU they lift. On CPU MuJoCo 3.14.0, seed 10095 hits "NaN, Inf or huge value in QVEL"
@@ -1561,14 +1599,19 @@ wrist roll / gripper; the measures of the section above):
 - Hero: [so101_lift_deploy.mp4](so101_lift_deploy.mp4) (0.7 MB) and `so101_lift_deploy_still{1,2,3}.jpg` (frames 60,
   110 and 199: the open jaws coming down over the box, the box rising, the hold).
 - Recorded on 2026-10-31 in one GPU-queue job of kind render (21:51 to 21:54), on the 14-inch MacBook Pro (Mac16,6),
-  with a first render. At every stage stamp (21:51:30 to 21:53:14) and at the job's start and end it was on AC power
-  and charging (79 %), powermode 2. Software: MuJoCo Warp `787a5b3a37`, Warp `52c09cdd82`, MuJoCo 3.14.0, metalsim
-  `ed66d8ef` plus uncommitted changes. This was not a timing run.
-- The frames here were rendered again from that recording on 2026-11-01 (00:31 to 00:34, a GPU-queue job of kind
-  render; AC power, 100 % and finishing its charge at both shots' stamps, powermode 2), at metalsim `68f695b2` plus
-  uncommitted files, after the film tool started drawing the look's colours on geoms with their own
-  `rgba` (`render.build_scene`): the first render drew the box in the twin's (0, 1, 0), the table legs at 0.2 and the
-  wood times (0.6, 0.45, 0.3).
+  with a first render. At every stage stamp (21:51:30 to 21:53:14) and at the job's start and end it was on AC power and
+  charging (79 %), powermode 2. Software: [my fork of MuJoCo
+  Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) at
+  [`787a5b3a37`](https://github.com/pulipakaa24/mujoco_warp/commit/787a5b3a37acc2551ffc8a2c1af1e9781d76723f), [my fork
+  of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) at
+  [`52c09cdd82`](https://github.com/pulipakaa24/warp/commit/52c09cdd82f79e8564b5ae17cdcee7b52d10d075), MuJoCo 3.14.0,
+  metalsim [`ed66d8ef`](https://github.com/pulipakaa24/MetalSim/commit/ed66d8ef3ecd7f17aa16207231000b1d22ff7812) plus
+  uncommitted changes. This was not a timing run.
+- The frames here were rendered again from that recording on 2026-11-01 (00:31 to 00:34, a GPU-queue job of kind render;
+  AC power, 100 % and finishing its charge at both shots' stamps, powermode 2), at metalsim
+  [`68f695b2`](https://github.com/pulipakaa24/MetalSim/commit/68f695b29fc0ef9f049b6d025f3e8937e72d8414) plus uncommitted
+  files, after the film tool started drawing the look's colours on geoms with their own `rgba` (`render.build_scene`):
+  the first render drew the box in the twin's (0, 1, 0), the table legs at 0.2 and the wood times (0.6, 0.45, 0.3).
 - Rendering: tier 2, 64 samples per pixel, 4 bounces, Open Image Denoise, the studio HDRI. The table's wood texture is
   at its real size (Poly Haven's 1.5 m tile, `ground_tile_m`) and in its own colours.
 
@@ -1674,8 +1717,10 @@ SO101_LIFT = FilmTask(
     checkpoint=POLICY,
     adapter_kw={},
     title="SO-101 cube lift",
-    summary=("The Robot Studio's SO-101 arm grasps a 4 x 4 x 6 cm box and lifts it: so101Sim's state-based cube-lift "
-             "task and its PPO teacher (trained on CPU MuJoCo in so101Sim), played on metalsim (MuJoCo Warp on Metal) "
+    summary=("[The Robot Studio's SO-101 arm](https://github.com/TheRobotStudio/SO-ARM100) grasps a 4 x 4 x 6 cm box and "
+             "lifts it: so101Sim's state-based cube-lift task and its PPO teacher (trained on CPU "
+             "[MuJoCo](https://github.com/google-deepmind/mujoco) in so101Sim), played on metalsim "
+             "([MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp) on Metal) "
              "through so101Sim's own observation, action and control loop. The realism check below finds the motion "
              "beyond what the standard SO-101 follower's servos can do. Rendered on the 14-inch MacBook Pro (Mac16,6), "
              "not in a timing run, so its Performance table is not a timing figure."),

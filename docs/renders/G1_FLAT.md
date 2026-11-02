@@ -1,6 +1,6 @@
 # G1 flat-terrain walk: a metalsim render
 
-Unitree G1 walking on flat ground: Isaac Lab's G1 flat velocity task on metalsim (MuJoCo Warp on Metal), driven by NVIDIA's published Isaac Lab 2.3 policy for the task (rsl_rl, iteration 1499, trained in PhysX), played without retraining. Rendered on the 14-inch MacBook Pro (Mac16,6), not in a timing run, so its Performance table is not a timing figure.
+Unitree G1 walking on flat ground: [Isaac Lab](https://github.com/isaac-sim/IsaacLab)'s G1 flat velocity task on metalsim ([MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp) on Metal), driven by NVIDIA's published Isaac Lab 2.3 policy for the task ([rsl_rl](https://github.com/leggedrobotics/rsl_rl), iteration 1499, trained in [PhysX](https://github.com/NVIDIA-Omniverse/PhysX)), played without retraining. Rendered on the 14-inch MacBook Pro (Mac16,6), not in a timing run, so its Performance table is not a timing figure.
 
 **hero** (301 frames, 6.0 s at 50 fps): [video](g1_flat.mp4) (1.8 MB, H.264)
 
@@ -19,7 +19,7 @@ Unitree G1 walking on flat ground: Isaac Lab's G1 flat velocity task on metalsim
 
 ## Performance
 
-Measured on the machine below; one frame = one policy step (Isaac Lab's `render_fps` = 1 / step_dt).
+Measured on the machine below; one frame = one policy step ([Isaac Lab](https://github.com/isaac-sim/IsaacLab)'s `render_fps` = 1 / step_dt).
 
 | stage | measurement |
 |---|---|
@@ -34,8 +34,8 @@ Measured on the machine below; one frame = one policy step (Isaac Lab's `render_
 
 - Mac16,6 (Apple M4 Max, 40 GPU cores, 64 GB), macOS 27.0.1 (26A434).
 - Power as each stage stamped it (`pmset -g batt` and `pmset -g`; `hardware.power`: the record stage's when it wrote rec.json, a render shot's at its first frame): record: on battery (66 %, discharging), power-mode setting High Power (pmset `powermode 2`), 2026-10-31 04:51 (-0700); render hero: on battery (66 %, discharging), power-mode setting High Power (pmset `powermode 2`), 2026-10-31 04:51 (-0700); render readme: on battery (62 %, discharging), power-mode setting High Power (pmset `powermode 2`), 2026-10-31 04:53 (-0700).
-- metalsim `ef346e7efc+dirty`; record stage (main venv): warp 1.18.0.dev20260917 (`4127c48183`), mujoco 3.14.0, mujoco_warp 3.14.0 (`07a51a63bc`), torch 2.14.0, numpy 2.5.3.
-- render stage (main venv): warp 1.18.0.dev20260917 (`4127c48183`), mujoco 3.14.0, numpy 2.5.3.
+- metalsim [`ef346e7efc+dirty`](https://github.com/pulipakaa24/MetalSim/commit/ef346e7efcad59dcd951dabd305ca18a5c0513c0); record stage (main venv): warp 1.18.0.dev20260917 ([`4127c48183`](https://github.com/pulipakaa24/warp/commit/4127c4818334080de6f3d23aef522e582ff6a2a7)), mujoco 3.14.0, mujoco_warp 3.14.0 ([`07a51a63bc`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc)), torch 2.14.0, numpy 2.5.3.
+- render stage (main venv): warp 1.18.0.dev20260917 ([`4127c48183`](https://github.com/pulipakaa24/warp/commit/4127c4818334080de6f3d23aef522e582ff6a2a7)), mujoco 3.14.0, numpy 2.5.3.
 
 ## Assets
 
@@ -50,7 +50,8 @@ Measured on the machine below; one frame = one policy step (Isaac Lab's `render_
 
 **The policy.** NVIDIA's published Isaac Lab 2.3 checkpoint for `Isaac-Velocity-Flat-G1-v0`: rsl_rl, iteration
 1499, the last of the task's 1,500 (`assets/isaac/g1_rsl_rl_ppo_cfg.py`, `G1FlatPPORunnerCfg`), trained by NVIDIA in
-Isaac Sim with PhysX. MetalSim plays it as published, without retraining or fine-tuning. Source:
+[Isaac Sim](https://github.com/isaac-sim/IsaacSim) with PhysX. MetalSim plays it as published, without retraining or
+fine-tuning. Source:
 <https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.1/Isaac/IsaacLab/PretrainedCheckpoints/rsl_rl/Isaac-Velocity-Flat-G1-v0/checkpoint.pt>
 (the path Isaac Lab's `--use_pretrained_checkpoint` resolves, `isaaclab_rl/utils/pretrained_checkpoint.py`, under
 the Isaac 5.1 asset root), sha256 `fdf0f242bb8f3bcfc1aa9b7ff2761af4c014cf1cdc7e49242c9b92f3581720e7`, 2,027,170
@@ -63,7 +64,8 @@ weights with `torch.load(weights_only=True)` (`adapters.load_g1_checkpoint`); th
 
 Our own checkpoint stays selectable and tracked: `--checkpoint runs/g1regress/ckpt14/flat_main_s0.pt` (500 iterations trained
 in MetalSim, its training log beside it) films it with the task settings that checkpoint saved, and this page's text
-then does not describe the policy that ran. The previous take of this page, in git history at `ef346e7e`, filmed it.
+then does not describe the policy that ran. The previous take of this page, in git history at
+[`ef346e7e`](https://github.com/pulipakaa24/MetalSim/commit/ef346e7efcad59dcd951dabd305ca18a5c0513c0), filmed it.
 
 **Task settings.** `metalsim.learn.g1_velocity.G1VelocityTask(16, terrain="flat", seed=3)` with the settings Isaac's
 checkpoint implies (`adapters.ISAAC_TASK_SETTINGS["flat"]`: `reward_cfg="flat"`, which carries `G1FlatEnvCfg`'s
@@ -101,8 +103,8 @@ height; stance slip 0.019 / 0.015 m/s; airborne 56 / 47 % of the time; 0.225 m c
 the 16 envs: 0.53 m/s (commanded 0.62), 3.91 Hz, apex 7.3 / 5.7 cm, slip 0.019 / 0.013 m/s, 0.134 m per cycle.
 
 **The quick, short-stepping gait is Isaac's own.** Isaac Lab's G1 policies walk this way in PhysX too. Checkpoints of
-the flat task trained with Isaac Lab in Isaac Sim (this project's L4 training run, iterations 500 / 1000 / 1499,
-played in Isaac Sim at 0.5 m/s) step at 3.85 / 3.60 / 3.23 Hz with 0.108 / 0.110 / 0.123 m per gait cycle
+the flat task trained with Isaac Lab in Isaac Sim (this project's training run on an NVIDIA L4 GPU, iterations 500 /
+1000 / 1499, played in Isaac Sim at 0.5 m/s) step at 3.85 / 3.60 / 3.23 Hz with 0.108 / 0.110 / 0.123 m per gait cycle
 (`docs/research/speculative_contacts_2026-09-27.md`, Verdict 1 and the cadence table of §2). MuJoCo Warp adds 3.4 to
 5.9 % to the cadence of the same checkpoints under every contact setting measured (same note). NVIDIA's published
 checkpoint itself was not played in PhysX for this page: Isaac Sim does not run on this machine.
@@ -114,43 +116,46 @@ looking at (0, 0, -0.05) m, 3.55 m away. `readme` (640x480, 4:3, for the README 
 look-at at 0.75 times the distance (eye (1.95, -1.5, 0.98) m, 2.66 m), so the robot fills about three quarters of the
 frame height, plus a slow orbit of 10 deg/s about the vertical through the look-at point, symmetric about the middle
 of the film: -30 deg at 0 s, 0 at 3 s (the hero's direction), +30 deg at 6 s, counter-clockwise seen from above, as
-MuJoCo's azimuth grows. The orbit copies MuJoCo Warp's README clips: `mujoco_warp/record.py` (google-deepmind/
-mujoco_warp at `d41a47c0`, lines 43 and 142) sets `cam.azimuth = 90 + (step - nstep / 2) * cam_azimuth_speed` with
-0.05 deg per physics step, and its G1 scenes step at 5 ms (`benchmarks/unitree_g1/unitree_g1_mjlab.xml`, line 14),
-so 10 deg/s.
+MuJoCo's azimuth grows. The orbit copies MuJoCo Warp's README clips: `mujoco_warp/record.py` (upstream MuJoCo Warp at
+[`d41a47c0`](https://github.com/google-deepmind/mujoco_warp/commit/d41a47c0837fc71abb44d7d4799bf85ca19ff7ab), lines 43
+and 142) sets `cam.azimuth = 90 + (step - nstep / 2) * cam_azimuth_speed` with 0.05 deg per physics step, and its G1
+scenes step at 5 ms (`benchmarks/unitree_g1/unitree_g1_mjlab.xml`, line 14), so 10 deg/s.
 
-**Rendering.** Tier 2 (the path tracer), 64 samples per pixel (16 passes x 4), 3 bounces, Open Image Denoise, ACES
-tone map, sRGB; lit by a Poly Haven studio HDRI as an importance-sampled dome, with a laminate floor texture on the
-task's ground instead of Isaac's grey ground. The render twin is the task's own G1 model with Isaac's visual meshes
-(`build_g1_model(visuals=True)`), posed per frame from the recorded joint state. On bodies that have visual meshes the
-colliders are hidden (the three `*Cube` boxes, `rec.json` `twin.visibility`), and the touch-sensor sites are hidden:
-one of them, `torso_link_touch`, was the grey box of the earlier G1 film. The ray tracer's env cell is sized up front
-from the recorded geometry and the whole camera path, so the floor is drawn complete to the horizon (`render.json`
-`env_grid.growths` 0). Each `render.json` carries a `cache_key`, a hash of the recording and of every setting that
-changes a pixel, so a re-recording into the same directory re-renders rather than reusing old frames
-(`docs/research/readme_media_plan_2026-10-31.md` section 2, defects 2, 3 and 5).
+**Rendering.** Tier 2 (the path tracer), 64 samples per pixel (16 passes x 4), 3 bounces,
+[Open Image Denoise](https://www.openimagedenoise.org), ACES tone map, sRGB; lit by a Poly Haven studio HDRI as an
+importance-sampled dome, with a laminate floor texture on the task's ground instead of Isaac's grey ground.
+The render twin is the task's own G1 model with Isaac's visual meshes (`build_g1_model(visuals=True)`), posed per frame
+from the recorded joint state. On bodies that have visual meshes the colliders are hidden (the three `*Cube` boxes,
+`rec.json` `twin.visibility`), and the touch-sensor sites are hidden: one of them, `torso_link_touch`, was the grey box
+of the earlier G1 film. The ray tracer's env cell is sized up front from the recorded geometry and the whole camera
+path, so the floor is drawn complete to the horizon (`render.json` `env_grid.growths` 0). Each `render.json` carries a
+`cache_key`, a hash of the recording and of every setting that changes a pixel, so a re-recording into the same
+directory re-renders rather than reusing old frames (`docs/research/readme_media_plan_2026-10-31.md` section 2, defects
+2, 3 and 5).
 
 **README clip.** [g1_flat.webp](g1_flat.webp) is the `readme` shot from 0.5 s to 5.5 s (frames 25 to 274), resampled
 from 50 to 30 fps and written as MuJoCo Warp writes its README clips: 320x240 (Lanczos), lossy animated WebP from
-Pillow at quality 70, 33 ms per frame, looping; 150 frames. Command, run from the repository root after the render
-stage: `python -m metalsim.render.film.encode webp runs/film/g1_flat/readme/frames docs/renders/g1_flat.webp --start 0.5
---seconds 5 --src-fps 50 --fps 30`. The film tool's route, `python -m metalsim.render.film g1_flat --stage encode
---shots readme --webp --webp-window 0.5:5`, uses the same encoder but names its output `g1_flat_readme.webp` and also
-writes a `g1_flat_readme.mp4` and a still.
+[Pillow](https://github.com/python-pillow/Pillow) at quality 70, 33 ms per frame, looping; 150 frames. Command, run
+from the repository root after the render stage: `python -m metalsim.render.film.encode webp
+runs/film/g1_flat/readme/frames docs/renders/g1_flat.webp --start 0.5 --seconds 5 --src-fps 50 --fps 30`. The film
+tool's route, `python -m metalsim.render.film g1_flat --stage encode --shots readme --webp --webp-window 0.5:5`, uses the
+same encoder but names its output `g1_flat_readme.webp` and also writes a `g1_flat_readme.mp4` and a still.
 
 **This take, and where its timings come from.** Recorded, rendered and encoded on 2026-10-31 on the 14-inch MacBook Pro
-(Mac16,6), at metalsim `ef346e7e` plus the uncommitted switch to Isaac's checkpoints (hence `+dirty` in the pins). This
-was not a timing run: MetalSim's timing runs are made on the 16-inch through the GPU queue's timing kind
-(`scripts/gpu_run.sh <name> timing <minutes> -- <command>`, which waits for an idle device), and its throughput figures
-are in `docs/PARITY.md` §1.4 and §1.8. The Performance table above records how long each stage took here; quote nothing
-on this page as MetalSim's speed. Power, as the stages stamped it (`pmset -g batt` and `pmset -g`; "Hardware and pins"
-below): on battery and discharging at every stamp (66 % when the record stage wrote `rec.json` at 04:51, 66 % at the
-hero shot's first frame at 04:51 and 62 % at the readme shot's at 04:53, local time), with pmset's power-mode setting at
-High Power (`powermode 2`: the configured setting, which does not show that the machine ran in High Power Mode); the
-encode and doc stages stamp nothing. Record and render ran as GPU-queue jobs of kind render, one at a time, into
-`runs/film/g1_flat` (the tool's default `--out`): `--stage record`, then `--stage render` (both shots); then `--stage
-encode --shots hero`, the README WebP command above and `--stage doc` (CPU). A new recording is another take of the same
-policy, not this one: the GPU rollout is not bitwise repeatable, so which env is filmed, and its path, can change.
+(Mac16,6), at metalsim
+[`ef346e7e`](https://github.com/pulipakaa24/MetalSim/commit/ef346e7efcad59dcd951dabd305ca18a5c0513c0) plus the
+uncommitted switch to Isaac's checkpoints (hence `+dirty` in the pins). This was not a timing run: MetalSim's timing
+runs are made on the 16-inch MacBook Pro through the GPU queue's timing kind (`scripts/gpu_run.sh <name> timing
+<minutes> -- <command>`, which waits for an idle device), and its throughput figures are in `docs/PARITY.md` §1.4 and
+§1.8. The Performance table above records how long each stage took here; quote nothing on this page as MetalSim's speed.
+Power, as the stages stamped it (`pmset -g batt` and `pmset -g`; "Hardware and pins" below): on battery and discharging
+at every stamp (66 % when the record stage wrote `rec.json` at 04:51, 66 % at the hero shot's first frame at 04:51 and
+62 % at the readme shot's at 04:53, local time), with pmset's power-mode setting at High Power (`powermode 2`: the
+configured setting, which does not show that the machine ran in High Power Mode); the encode and doc stages stamp
+nothing. Record and render ran as GPU-queue jobs of kind render, one at a time, into `runs/film/g1_flat` (the tool's
+default `--out`): `--stage record`, then `--stage render` (both shots); then `--stage encode --shots hero`, the README
+WebP command above and `--stage doc` (CPU). A new recording is another take of the same policy, not this one: the GPU
+rollout is not bitwise repeatable, so which env is filmed, and its path, can change.
 
 ## Reproduce
 
