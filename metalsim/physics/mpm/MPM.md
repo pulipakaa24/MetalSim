@@ -1039,13 +1039,13 @@ Everything above runs from a clone of MetalSim plus the three forks ([my fork of
 
 ```
 # after the install of README / docs/GUIDE.md (.venv, scripts/setup_warp.sh, the MuJoCo Warp fork):
-scripts/setup_newton152.sh          # .venv-newton152: Newton fork metalsim-1.5.2 @addd10cb, shared Warp fork @52c09cdd
+scripts/setup_newton152.sh          # .venv-newton152: Newton fork metalsim-1.5.2 @addd10cb, shared Warp fork @23e0fa98
 scripts/gpu_run.sh test_mpm check 15 -- .venv-newton152/bin/python -m pytest tests/test_mpm.py   # 15 passed, 1 xfailed
 ```
 
 | what | where it lives | how a fresh setup gets it |
 |---|---|---|
-| Warp changes | [my fork of Warp][warp-fork] (`metalsim`), pinned [`52c09cdd`][] | `scripts/setup_warp.sh` (fallback: [innate-inc/warp][innate-warp] [`ce15f6bb`][] + `patches/warp/metalsim-52c09cdd.diff`) |
+| Warp changes | [my fork of Warp][warp-fork] (`metalsim`), pinned [`23e0fa98`][] | `scripts/setup_warp.sh` (fallback: [innate-inc/warp][innate-warp] [`ce15f6bb`][] + `patches/warp/metalsim-23e0fa98.diff`) |
 | Newton changes (MPM, Franka-Pour rigid) | [my fork of Newton][newton-fork-152] (`metalsim-1.5.2`), pinned [`addd10cb`][] | `scripts/setup_newton152.sh` (fallback: v1.5.2 + `patches/newton/metalsim-1.5.2-addd10cb.diff`) |
 | Newton 1.7 Metal fixes for the rigid stack | [my fork of Newton][newton-fork]: [`metalsim-hashtable-metal`][newton-hashtable] [`9d6616c6`][] (`.venv`'s `newton` extra) and `metalsim` [`1301e8da`][] (`.venv-newtonfork`) | `pip install -e ".[newton]"`, `scripts/setup_newton.sh` |
 | compat layer, scenes, probes, tests, Isaac-side recorders | this repository | the clone |
@@ -1279,7 +1279,7 @@ The copy must always be the commit `scripts/setup_newton152.sh` pins. After a ch
 [`732b6e83`]: https://github.com/pulipakaa24/warp/commit/732b6e836656b2109dfbaca11fe83bc22d74b533
 [`95f6f121`]: https://github.com/pulipakaa24/warp/commit/95f6f121b7e67025958335c7c15e338ac04a798a
 [`31cf79d7`]: https://github.com/pulipakaa24/warp/commit/31cf79d781e4b10d8ff85c8cbd98fc0e40f75953
-[`52c09cdd`]: https://github.com/pulipakaa24/warp/commit/52c09cdd82f79e8564b5ae17cdcee7b52d10d075
+[`23e0fa98`]: https://github.com/pulipakaa24/warp/commit/23e0fa9824684684cde02d68efcce01e6bae072b
 [`ce15f6bb`]: https://github.com/innate-inc/warp/commit/ce15f6bb2545e2d6c4a4c1fac8e40bb800db7265
 [`e25f15cb`]: https://github.com/pulipakaa24/MetalSim/commit/e25f15cb347d9810d01da9701b2519dd7c749d9c
 [`36c4738f`]: https://github.com/pulipakaa24/MetalSim/commit/36c4738fda80bd8959d134182d2baad4d3f899be
