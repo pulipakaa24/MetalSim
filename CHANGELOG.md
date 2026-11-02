@@ -74,42 +74,42 @@ for the full messages). Dates are the commit dates (month-day).
 
 ## Physics: capacity overflow guard (2026-10-13, `research_notes/capacity_overflow_guard/g1_bound_and_lost_flags.md`)
 
-- 10-13 BatchSim latches MuJoCo Warp's capacity flags after every substep (`reset_data` had erased the flags of the worlds it reset, so 13 of 31 overflowed worlds went unseen in a 100-step probe); NVMAX and TACTILE count as capacity flags; the four long-standing rigid-suite failures root-caused (three stale tests: the G1 capacity bound written under the pyramidal preset, an `njmax` that never overflows under elliptic cones, the dome azimuth test before the measured Kit offset)
-- 10-13 Real-scale training checks of the latched guard (G1 flat / rough boxes / rough heightfield 4096, Tron1 8192, SO-101 lift 64, a trained rough policy over all terrain levels): no capacity flag; latch cost within run-to-run spread; suite logs on the merged tree (rigid 396 passed / 5 skipped, render 208 passed / 1 skipped, `runs/fixfail/`)
+- 10-13 [`870d0d7f`](https://github.com/pulipakaa24/MetalSim/commit/870d0d7f97234678061a76d5acf91dc477d3c545) BatchSim latches MuJoCo Warp's capacity flags after every substep (`reset_data` had erased the flags of the worlds it reset, so 13 of 31 overflowed worlds went unseen in a 100-step probe); NVMAX and TACTILE count as capacity flags; the four long-standing rigid-suite failures root-caused (three stale tests: the G1 capacity bound written under the pyramidal preset, an `njmax` that never overflows under elliptic cones, the dome azimuth test before the measured Kit offset)
+- 10-13 [`aeb7cf75`](https://github.com/pulipakaa24/MetalSim/commit/aeb7cf75ed3eff7bd26b6f77c9fb03d23c18dd74) Real-scale training checks of the latched guard (G1 flat / rough boxes / rough heightfield 4096, Tron1 8192, SO-101 lift 64, a trained rough policy over all terrain levels): no capacity flag; latch cost within run-to-run spread; suite logs on the merged tree (rigid 396 passed / 5 skipped, render 208 passed / 1 skipped, `runs/fixfail/`)
 
 ## Franka-Pour: Isaac Lab 3.0-EA's MPM manipulation task (2026-10-12 .. 13, `docs/PARITY.md` §1b)
 
-- 10-12 IsaacContrib-Franka-Pour on Metal: scene from Isaac's own assets, Isaac's coupled solver settings, MDP, [rsl_rl](https://github.com/leggedrobotics/rsl_rl) 5.4.1 PPO transcription; term tests against Isaac's own code (`tests/test_franka_pour_terms.py`, `tests/franka_pour_isaac_ref.py`); Isaac-side stage scripts for the L4
-- 10-12 Complete resume state, STOP-file pause, cooperative training driver that yields to waiting GPU jobs
-- 10-12 Throughput on the M4 Max at 2,048 envs (idle device: step 986, rollout 999, PPO loop 979 env-steps/s); 1,024 envs step 1,054 / loop 992 (L4: 317)
-- 10-12 Matched learning curve against Isaac on the L4 (1,024 envs, 60 iterations); 300-iteration run at 2,048 envs (14-inch MacBook Pro)
-- 10-12 Opt-in MPM memory budgets (`mpm_grid_budget="measured"`, `mpm_cells_per_world`); overflow check once per PPO iteration
-- 10-13 Deterministic evaluation of the iteration-299 policy (2,048 episodes: 0.477; the memory opt-ins give 0.470); why evaluation reads 0.48 and training 0.62 (reset distribution and episode counting)
-- 10-13 Seed study: 5 seeds ours at the matched configuration; Isaac's single run inside the prediction interval through iteration 49, about 0.06 ahead at 50-59 (verdict partial); `stage_pour_seeds.sh` for Isaac seeds 1-4 on the L4
+- 10-12 [`8f96632d`](https://github.com/pulipakaa24/MetalSim/commit/8f96632d7d85b1aea269b583dd7b2d8d506a539c) IsaacContrib-Franka-Pour on Metal: scene from Isaac's own assets, Isaac's coupled solver settings, MDP, [rsl_rl](https://github.com/leggedrobotics/rsl_rl) 5.4.1 PPO transcription; term tests against Isaac's own code (`tests/test_franka_pour_terms.py`, `tests/franka_pour_isaac_ref.py`); Isaac-side stage scripts for the L4
+- 10-12 [`1390abc2`](https://github.com/pulipakaa24/MetalSim/commit/1390abc2440c75a38dd5bd7fa63f19974cb559df) / [`ab2fc58b`](https://github.com/pulipakaa24/MetalSim/commit/ab2fc58b66c09dfbc0f902f52ec75f7d52cbf178) / [`32c0e62a`](https://github.com/pulipakaa24/MetalSim/commit/32c0e62a28c0e3dadd6c47de20b27ba8ed0f16f7) Complete resume state, STOP-file pause, cooperative training driver that yields to waiting GPU jobs
+- 10-12 [`148744f2`](https://github.com/pulipakaa24/MetalSim/commit/148744f23dc86b6f428272a1aeb3ade389401dc0) / [`ad6fe1b6`](https://github.com/pulipakaa24/MetalSim/commit/ad6fe1b654845e382bcca7a53faec58bae4126a0) / [`635eb0c6`](https://github.com/pulipakaa24/MetalSim/commit/635eb0c60bbb0f62390996644104951860337128) Throughput on the M4 Max at 2,048 envs (idle device: step 986, rollout 999, PPO loop 979 env-steps/s); 1,024 envs step 1,054 / loop 992 (L4: 317)
+- 10-12 [`f5970510`](https://github.com/pulipakaa24/MetalSim/commit/f5970510630767781c65e8e08fbbb3f744275de8) Matched learning curve against Isaac on the L4 (1,024 envs, 60 iterations); 300-iteration run at 2,048 envs (14-inch MacBook Pro)
+- 10-12 [`36c4738f`](https://github.com/pulipakaa24/MetalSim/commit/36c4738fda80bd8959d134182d2baad4d3f899be) Opt-in MPM memory budgets (`mpm_grid_budget="measured"`, `mpm_cells_per_world`); overflow check once per PPO iteration
+- 10-13 [`f495a18c`](https://github.com/pulipakaa24/MetalSim/commit/f495a18cf7dfd956ed338af6ca57b2b39f90d47d) / [`4d66ce48`](https://github.com/pulipakaa24/MetalSim/commit/4d66ce480d318b0661ea51ef05aa87fe82df4516) / [`8800df17`](https://github.com/pulipakaa24/MetalSim/commit/8800df171c9ee63f07cbe6b199068cc141350c0d) Deterministic evaluation of the iteration-299 policy (2,048 episodes: 0.477; the memory opt-ins give 0.470); why evaluation reads 0.48 and training 0.62 (reset distribution and episode counting)
+- 10-13 [`04145965`](https://github.com/pulipakaa24/MetalSim/commit/04145965e8a7c00680e3d8432c701d49dedd75d0) Seed study: 5 seeds ours at the matched configuration; Isaac's single run inside the prediction interval through iteration 49, about 0.06 ahead at 50-59 (verdict partial); `stage_pour_seeds.sh` for Isaac seeds 1-4 on the L4
 - 10-13 Isaac seeds 1 and 2 on two L4 machines (`fingerprint.sh` gate against the seed-0 setup): 5 seeds ours vs 3 Isaac's, no window differs through iteration 49, 50-59 success 0.376 vs 0.411 (Welch p = 0.09); verdict still partial, the gap is at most ~0.04
 
 ## Rendering: integration, coverage audit, render gaps (2026-10-12 .. 13; the tilted DomeLight has its own section above)
 
-- 10-12 Render coverage audit: every simulated feature against what each renderer draws (`docs/RENDER_COVERAGE.md`)
-- 10-12 Appearance against MuJoCo's renderer: mesh normals (hard edges without duplicated vertices), SDF geoms, texture mapping, skybox, transparency, every light, spot / point shadows (RENDER_COVERAGE §3b)
-- 10-12 Deformables, cables, tendons, skins and sites in every renderer and sensor; dynamic geometry in the ray tracers (`dyn_layout`: sbvh for sensors and tier 2, per_env for tier 1; merged tiles dropped) (§5)
-- 10-12 World extent (infinite planes, far plane, heightfield sides), per-env fields (size, colour, lights), camera models (fisheye), compact env grid (§3c)
-- 10-12 Newton → renderer bridge: Newton models, cloth / soft surfaces and free particles in every renderer (`docs/NEWTON_RENDER.md`)
-- 10-12 MPM particles as render grains in tiers 2 and 0, two-level grain acceleration structures within Metal's limits (`metalsim/render/PARTICLES.md`); grain chunks of 2^24 - 1, 25 M-grain validation (14-inch); demo ground tint; 25 M-grain benchmark on the 16-inch with logs (`runs/sand25m_16in/`)
-- 10-13 Render gaps 2: rolling shutter, per-env texture pool, MuJoCo haze / fog, tendon catenary and limit colour, heightfield-side shadows; ray kernels specialized per scene (§3d)
-- 10-13 Transparent geoms in the ray-traced depth camera and lidar; true USD area lights in tier 2 and tier 1 (§3e; `research_notes/Render sensor fidelity/`)
+- 10-12 [`dff82d54`](https://github.com/pulipakaa24/MetalSim/commit/dff82d54c1b603425a1769ea902053d8877c5a71) Render coverage audit: every simulated feature against what each renderer draws (`docs/RENDER_COVERAGE.md`)
+- 10-12 [`251118d8`](https://github.com/pulipakaa24/MetalSim/commit/251118d85922427a0adcd6186823bc846158c377) / [`af435901`](https://github.com/pulipakaa24/MetalSim/commit/af435901293436919d33e84bb3dc7b1c326442d5) Appearance against MuJoCo's renderer: mesh normals (hard edges without duplicated vertices), SDF geoms, texture mapping, skybox, transparency, every light, spot / point shadows (RENDER_COVERAGE §3b)
+- 10-12 [`289b1a0e`](https://github.com/pulipakaa24/MetalSim/commit/289b1a0ea446076d3ddce72dc5f6dce5967b026a) Deformables, cables, tendons, skins and sites in every renderer and sensor; dynamic geometry in the ray tracers (`dyn_layout`: sbvh for sensors and tier 2, per_env for tier 1; merged tiles dropped) (§5)
+- 10-12 [`2590c3e3`](https://github.com/pulipakaa24/MetalSim/commit/2590c3e32aeb423456a27df784f7260901a9ceaa) World extent (infinite planes, far plane, heightfield sides), per-env fields (size, colour, lights), camera models (fisheye), compact env grid (§3c)
+- 10-12 [`d8eef2a3`](https://github.com/pulipakaa24/MetalSim/commit/d8eef2a3129c2d24321c32e5aee619d11d3bbd36) Newton → renderer bridge: Newton models, cloth / soft surfaces and free particles in every renderer (`docs/NEWTON_RENDER.md`)
+- 10-12 [`23fcd352`](https://github.com/pulipakaa24/MetalSim/commit/23fcd352ca5fd2d35422a6ac58e398b83bb944d1) MPM particles as render grains in tiers 2 and 0, two-level grain acceleration structures within Metal's limits (`metalsim/render/PARTICLES.md`); grain chunks of 2^24 - 1, 25 M-grain validation (14-inch); demo ground tint; 25 M-grain benchmark on the 16-inch with logs (`runs/sand25m_16in/`)
+- 10-13 [`4236db9c`](https://github.com/pulipakaa24/MetalSim/commit/4236db9c6795554bde783ee57d22db9789fc43ca) / [`d0198c0d`](https://github.com/pulipakaa24/MetalSim/commit/d0198c0d3ad70721b9959e00a0e68082fa449202) Render gaps 2: rolling shutter, per-env texture pool, MuJoCo haze / fog, tendon catenary and limit colour, heightfield-side shadows; ray kernels specialized per scene (§3d)
+- 10-13 [`bb5318bd`](https://github.com/pulipakaa24/MetalSim/commit/bb5318bd454781e7dc958e849aa54ff1db87ab0a) / [`130a9a05`](https://github.com/pulipakaa24/MetalSim/commit/130a9a0523174c01427a346982f50c821f6fc2af) / [`e18cdca6`](https://github.com/pulipakaa24/MetalSim/commit/e18cdca62383cc253bc38936a33e255f18f54c99) Transparent geoms in the ray-traced depth camera and lidar; true USD area lights in tier 2 and tier 1 (§3e; `research_notes/Render sensor fidelity/`)
 
 ## MPM: parity close-out, step at scale, pins (2026-10-12, `metalsim/physics/mpm/MPM.md` 8d-8h)
 
-- 10-12 Parity close-out: multi_material and ANYmal inside the L4's floor ensemble; Warp pin [`43ffc6dd`](https://github.com/pulipakaa24/warp/commit/43ffc6dd544ccaa8ae18772ba67b0d292bf01371) ([my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim); CUDA's warp.fem tiling, `metal_cuda_libm`) (8e)
-- 10-12 MPM step at 2,048 worlds: profile and four bitwise speedups, [my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim-1.5.2)'s `metalsim-1.5.2` pin [`3fd1f052`](https://github.com/pulipakaa24/newton/commit/3fd1f052a5ad031578960d9642aaaedc03834e4d) (8f)
-- 10-12 Warp pins [`85b92466`](https://github.com/pulipakaa24/warp/commit/85b924669629838c2d2637f3e1e51ef650b3a8d6) (capture memory reuse, page fault fixed), [`f0df4cf8`](https://github.com/pulipakaa24/warp/commit/f0df4cf8b291c0fcc5590d5286f0e7341a692ab1), [`95f6f121`](https://github.com/pulipakaa24/warp/commit/95f6f121b7e67025958335c7c15e338ac04a798a) (tight warp.fem temporary pools; Franka-Pour 37.6 -> 34.5 GB at 2,048 worlds) (8g, 8h); deterministic coupled-solver contacts on Metal
-- 10-12 Setup pins a commit of [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) ([`cf0f8ad`](https://github.com/pulipakaa24/mujoco_warp/commit/cf0f8adc8f99f0c559cf8580cb667952e473bd07), replaced by [`f1b35e2`](https://github.com/pulipakaa24/mujoco_warp/commit/f1b35e2b3ddc80b197b0c665bf6d71523d175daf) on 10-13) and keeps MuJoCo below 3.15
-- 10-12 My Newton fork's branches pinned with the 64-bit atomics protocols and rigid-scale ports; 2,048-world and deterministic timings of the 1.7-line ports (8d)
+- 10-12 [`6927bd65`](https://github.com/pulipakaa24/MetalSim/commit/6927bd655da6b51da605266c62225fc194a434bc) / [`47875d50`](https://github.com/pulipakaa24/MetalSim/commit/47875d50cddff30a68370fea2a377c9f53e95f2b) Parity close-out: multi_material and ANYmal inside the L4's floor ensemble; Warp pin [`43ffc6dd`](https://github.com/pulipakaa24/warp/commit/43ffc6dd544ccaa8ae18772ba67b0d292bf01371) ([my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim); CUDA's warp.fem tiling, `metal_cuda_libm`) (8e)
+- 10-12 [`3aa94a50`](https://github.com/pulipakaa24/MetalSim/commit/3aa94a50d804c09e6eb08de875975537b4a5a741) MPM step at 2,048 worlds: profile and four bitwise speedups, [my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim-1.5.2)'s `metalsim-1.5.2` pin [`3fd1f052`](https://github.com/pulipakaa24/newton/commit/3fd1f052a5ad031578960d9642aaaedc03834e4d) (8f)
+- 10-12 [`81b35d1a`](https://github.com/pulipakaa24/MetalSim/commit/81b35d1a3c6ca62055ddec20991c3cc45dd43aa0) / [`c684b6c5`](https://github.com/pulipakaa24/MetalSim/commit/c684b6c5a24567b020a91d0f4aefb9fd0f0ec1c2) / [`060cc7ac`](https://github.com/pulipakaa24/MetalSim/commit/060cc7ac7e761e0c526f2ad707e53e97126ac0ea) Warp pins [`85b92466`](https://github.com/pulipakaa24/warp/commit/85b924669629838c2d2637f3e1e51ef650b3a8d6) (capture memory reuse, page fault fixed), [`f0df4cf8`](https://github.com/pulipakaa24/warp/commit/f0df4cf8b291c0fcc5590d5286f0e7341a692ab1), [`95f6f121`](https://github.com/pulipakaa24/warp/commit/95f6f121b7e67025958335c7c15e338ac04a798a) (tight warp.fem temporary pools; Franka-Pour 37.6 -> 34.5 GB at 2,048 worlds) (8g, 8h); deterministic coupled-solver contacts on Metal
+- 10-12 [`6b011c3f`](https://github.com/pulipakaa24/MetalSim/commit/6b011c3feb5177a03f1b2a40d9571c8a72a9cc92) / [`90af3392`](https://github.com/pulipakaa24/MetalSim/commit/90af339227b543925d99ad67495b7dcbfc718444) Setup pins a commit of [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) ([`cf0f8ad`](https://github.com/pulipakaa24/mujoco_warp/commit/cf0f8adc8f99f0c559cf8580cb667952e473bd07), replaced by [`f1b35e2`](https://github.com/pulipakaa24/mujoco_warp/commit/f1b35e2b3ddc80b197b0c665bf6d71523d175daf) on 10-13) and keeps MuJoCo below 3.15
+- 10-12 [`7f04ad03`](https://github.com/pulipakaa24/MetalSim/commit/7f04ad03cafd8b8329d83646de1b541d2041654a) / [`676536f5`](https://github.com/pulipakaa24/MetalSim/commit/676536f5f13249ba4985403c4f2dcb42b4fa1062) My Newton fork's branches pinned with the 64-bit atomics protocols and rigid-scale ports; 2,048-world and deterministic timings of the 1.7-line ports (8d)
 
 ## Tooling: GPU queue (2026-10-12)
 
-- 10-12 Check jobs waiting over 10 minutes go ahead of timing jobs; no starvation; jobs refused on a runaway GPU (work with no owning process), queue paused and `runs/GPU_RUNAWAY_ALERT` written
+- 10-12 [`3b880768`](https://github.com/pulipakaa24/MetalSim/commit/3b8807686992b7a81d5cc187a4e114239047c8be) / [`efaae252`](https://github.com/pulipakaa24/MetalSim/commit/efaae25286eea886ad9357f6749c927c42a744dd) Check jobs waiting over 10 minutes go ahead of timing jobs; no starvation; jobs refused on a runaway GPU (work with no owning process), queue paused and `runs/GPU_RUNAWAY_ALERT` written
 
 ## MPM, scalable determinism, rigid scale (2026-10-09 .. 11, `metalsim/physics/mpm/MPM.md`)
 
@@ -128,11 +128,11 @@ for the full messages). Dates are the commit dates (month-day).
 ## Install and packaging
 
 - 09-25 GPU queue dashboard: `scripts/gpu_dashboard.py` (`--serve`, `--watch`, `--html`, `/json`), `scripts/gpu_dashboard.sh` launcher; queue records command lines, grants and releases with exit codes (`runs/gpu_history.jsonl`)
-- 09-25 MIT licence (LICENSE, pyproject metadata), THIRD_PARTY_NOTICES.md with the IP audit and `licenses/`, source headers on the three ported files, README rewritten as the front page (what was built in each fork + branch, heads and commits); `METALSIM_CHANGES.md` pushed to every fork branch
-- 09-23 Rename to MetalSim (package metalsim); setup script and patches for [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim); heightfield defect localized
-- 09-23 Point the Warp setup at my fork of Warp (branch `metalsim`)
-- 09-23 Fetch NVIDIA Isaac assets instead of committing them; tron1 rename leftovers
-- 09-24 Setup for [my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim): scripts/setup_newton.sh installs pulipakaa24/newton@metalsim into .venv-newtonfork
+- 09-25 [`dcbe6aa`](https://github.com/pulipakaa24/MetalSim/commit/dcbe6aad8087b2223e64b17fa947b92574c348ce) MIT licence (LICENSE, pyproject metadata), THIRD_PARTY_NOTICES.md with the IP audit and `licenses/`, source headers on the three ported files, README rewritten as the front page (what was built in each fork + branch, heads and commits); `METALSIM_CHANGES.md` pushed to every fork branch
+- 09-23 [`08bb9f9`](https://github.com/pulipakaa24/MetalSim/commit/08bb9f9344422f3911edb8d96edcf796bb098e4f) Rename to MetalSim (package metalsim); setup script and patches for [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim); heightfield defect localized
+- 09-23 [`1521ced`](https://github.com/pulipakaa24/MetalSim/commit/1521cedafb4126639b3d22a4811696c595acd082) Point the Warp setup at my fork of Warp (branch `metalsim`)
+- 09-23 [`f4e039b`](https://github.com/pulipakaa24/MetalSim/commit/f4e039b9894198d64a7d565a8ba69523f68eeab2) Fetch NVIDIA Isaac assets instead of committing them; tron1 rename leftovers
+- 09-24 [`6f310ca`](https://github.com/pulipakaa24/MetalSim/commit/6f310ca9391c0b5b3e11acacdd3daf3a61c9d1a7) Setup for [my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim): scripts/setup_newton.sh installs pulipakaa24/newton@metalsim into .venv-newtonfork
 
 ## Physics (MuJoCo Warp on Metal) and interop
 
@@ -149,180 +149,180 @@ for the full messages). Dates are the commit dates (month-day).
 - 09-22 [`3f6c5e7`](https://github.com/pulipakaa24/MetalSim/commit/3f6c5e736bd8491b94000823e2a3626f062b9f53) physics: size constraint buffers (njmax=512) and expose overflow flags; tools: race finder; scene: MJCF->USD importer
 - 09-22 [`1a2741a`](https://github.com/pulipakaa24/MetalSim/commit/1a2741a86d3dc6f5aec6543a9bbbcfec3cd1c224) physics: per-world model fields (physics DR) with recompute_constants; lift env randomizes box mass/friction per world; URDF->USD test; IMU/contact sensor tensors test
 - 09-22 [`1359a52`](https://github.com/pulipakaa24/MetalSim/commit/1359a5284dda87d516c858b69e711bee56ab6cfe) G1 velocity task on Isaac's g1_minimal.usd with test-cited parity matrix; tier 2 path tracer; Metal backend memory fix
-- 09-23 MuJoCo Warp heightfield plane-contact patch; heightfield contact test now passes (was xfail)
-- 09-24 Uncontended benchmark pass 2026-09-24; rough terrain at 4096 envs (nconmax 32); docs updated from the clean pass
-- 09-24 My MuJoCo Warp fork: plane_convex now reproduces MuJoCo C's contact set (`metalsim` [`284dcd1`](https://github.com/pulipakaa24/mujoco_warp/commit/284dcd12ff37d56ea0201ade4e7f941d772a0f28))
-- 09-24 Contact/limit tuning module and tuned parity replays against Isaac's PhysX recordings
-- 09-24 plane_convex patch: add the MJW_PLANE_CONVEX=legacy switch (my fork's `metalsim` [`a8e6485`](https://github.com/pulipakaa24/mujoco_warp/commit/a8e64857ea81c5277f55ec7a995adc1e99191e09)); regression test skips under it
+- 09-23 [`8f87de2`](https://github.com/pulipakaa24/MetalSim/commit/8f87de2922b3bd499d1ac31ef7bbde9885e3e331) MuJoCo Warp heightfield plane-contact patch; heightfield contact test now passes (was xfail)
+- 09-24 [`3cd0f7e`](https://github.com/pulipakaa24/MetalSim/commit/3cd0f7ed8e330d6204f250a321369fb20c530a7e) Uncontended benchmark pass 2026-09-24; rough terrain at 4096 envs (nconmax 32); docs updated from the clean pass
+- 09-24 [`02ca0bf`](https://github.com/pulipakaa24/MetalSim/commit/02ca0bf0629266ca33752af7aa3eaf8af2eeff3d) My MuJoCo Warp fork: plane_convex now reproduces MuJoCo C's contact set (`metalsim` [`284dcd1`](https://github.com/pulipakaa24/mujoco_warp/commit/284dcd12ff37d56ea0201ade4e7f941d772a0f28))
+- 09-24 [`d003c16`](https://github.com/pulipakaa24/MetalSim/commit/d003c167a57377a134ad081f8f2dceb77eb6cef5) Contact/limit tuning module and tuned parity replays against Isaac's PhysX recordings
+- 09-24 [`bee56a2`](https://github.com/pulipakaa24/MetalSim/commit/bee56a26d5551e1923e87ce298b9015f640e2483) plane_convex patch: add the MJW_PLANE_CONVEX=legacy switch (my fork's `metalsim` [`a8e6485`](https://github.com/pulipakaa24/mujoco_warp/commit/a8e64857ea81c5277f55ec7a995adc1e99191e09)); regression test skips under it
 - 09-25 Throughput "regression" settled (`docs/research/throughput_regression_2026-09-25.md`): the flex merge in my MuJoCo Warp fork costs the G1 nothing (interleaved A/B ±0.4 %); the 67.6 K → 54.2 K env step is the task's PhysX-parity contact preset (solver only); README / PARITY §1.4 carry both settings; `g1_tp_variants.py` / `g1_step_profile.py` take `contact_cfg` / `solver_cfg`; `g1_tp_generality.py` prints which fast paths a scene takes (Go2, SO-101, Panda at 4096: elliptic cones fall off the fused Hessian)
 
 ## Rendering
 
 - 09-22 [`0656f1f`](https://github.com/pulipakaa24/MetalSim/commit/0656f1fa97e53ab3aaff005f920625455ef12417) render: model light list, headlight/ambient model, tiled shadow maps, radiance calibration; fidelity benchmark (PSNR/[FLIP](https://github.com/NVlabs/flip))
 - 09-22 [`62857e0`](https://github.com/pulipakaa24/MetalSim/commit/62857e0678bdf755ec344fa25de8a65982abc323) render: tier 1 hybrid ray tracing (RT soft shadows, AO, mirror reflections from the fragment stage), skybox colour, Isaac-style lidar spec; bench suite
-- 09-24 Parity scene: hide collision geometry in renders (Isaac draws visuals only; the foot collider plates were visible); post-queue video re-render
-- 09-26 Tier 2: HDR equirectangular environment map (textured USD DomeLight) importance-sampled with MIS (`set_environment`, `env_sampling_table`, `metalsim/render/hdr.py` RGBE reader), oriented as Kit/RTX renders a dome on a z-up stage; USD import records DomeLights (`usd_dome` custom text, `set_environment_from_model`); `Randomizer.environment` per-episode map by key; `set_fovy`, `set_materials`, opt-in `firefly_clamp` (biased); parity presets bit-for-bit unchanged without a map; [Poly Haven](https://polyhaven.com) CC0 maps fetched (not committed); gallery `g1_hdri_tier2.png`; handoff `docs/HANDOFF_tier2_hdri_envmap.md` ported
+- 09-24 [`40b2107`](https://github.com/pulipakaa24/MetalSim/commit/40b2107d0d3f8bb61f06b02904eeb8301b753e66) Parity scene: hide collision geometry in renders (Isaac draws visuals only; the foot collider plates were visible); post-queue video re-render
+- 09-26 [`c2f469e`](https://github.com/pulipakaa24/MetalSim/commit/c2f469e5c6bb17d4f41d7ecb50036991690057ff) Tier 2: HDR equirectangular environment map (textured USD DomeLight) importance-sampled with MIS (`set_environment`, `env_sampling_table`, `metalsim/render/hdr.py` RGBE reader), oriented as Kit/RTX renders a dome on a z-up stage; USD import records DomeLights (`usd_dome` custom text, `set_environment_from_model`); `Randomizer.environment` per-episode map by key; `set_fovy`, `set_materials`, opt-in `firefly_clamp` (biased); parity presets bit-for-bit unchanged without a map; [Poly Haven](https://polyhaven.com) CC0 maps fetched (not committed); gallery `g1_hdri_tier2.png`; handoff `docs/HANDOFF_tier2_hdri_envmap.md` ported
 
 ## Sensors
 
 - 09-22 [`fbc6c58`](https://github.com/pulipakaa24/MetalSim/commit/fbc6c58e9495abc548b8f27aec2955e8aa69a45d) sensors: Metal hardware ray tracing (per-mesh primitive AS, per-frame instance AS refit from physics), lidar and ray-cast depth kernels, tests vs mj_ray and raster depth
-- 09-24 Contact sensor (Isaac Lab ContactSensor equivalent) on MuJoCo Warp as in-graph Warp kernels
-- 09-24 Lidar extras (beam divergence, multi-return, reflectance table) and radar-lite on Metal RT
-- 09-24 Sensor benches: record GPU queue status at start; 7 interleaved A/B repeats for the contact sensor; measured logs
+- 09-24 [`acec0a7`](https://github.com/pulipakaa24/MetalSim/commit/acec0a70dbfb7d7b39f1d0b53def94169f4668c9) Contact sensor (Isaac Lab ContactSensor equivalent) on MuJoCo Warp as in-graph Warp kernels
+- 09-24 [`c731e92`](https://github.com/pulipakaa24/MetalSim/commit/c731e92f12b3c2163e33d172062bb92ea94c5aff) Lidar extras (beam divergence, multi-return, reflectance table) and radar-lite on Metal RT
+- 09-24 [`5c43900`](https://github.com/pulipakaa24/MetalSim/commit/5c43900eb7262d2fceb77e2c65c5c1f735cd88fd) Sensor benches: record GPU queue status at start; 7 interleaved A/B repeats for the contact sensor; measured logs
 
 ## Scene layer (USD / MJCF), terrain, replicator
 
 - 09-22 [`3c921be`](https://github.com/pulipakaa24/MetalSim/commit/3c921bebe37afe853e3cbda94e51516de328a543) scene: USD -> MuJoCo loader (lossless and generic UsdPhysics paths) with round-trip tests; learn: contiguous NCHW rollout buffer (2.3x faster updates), train_lift script
 - 09-22 [`46768d0`](https://github.com/pulipakaa24/MetalSim/commit/46768d0be8fda6f1a2a413489d7560c9127f61af) replicator: randomizers, annotators (2D/3D boxes, semantic seg, camera params), [COCO](https://cocodataset.org)/[KITTI](https://www.cvlibs.net/datasets/kitti/)/basic writers with test; learn: Warp-rollout PPO with rsl_rl KL schedule (learning issue under investigation)
-- 09-24 USD loader: instance proxies and MDL OmniPBR materials (G1 visual meshes render); kinematics-only reset (+20% step rate); clipped value loss; terrain curriculum; cartpole tier-2 video; G1 still
-- 09-24 Rough terrain: port Isaac Lab v2.3.2's TerrainGenerator exactly (ROUGH_TERRAINS_CFG)
+- 09-24 [`840ac1d`](https://github.com/pulipakaa24/MetalSim/commit/840ac1dfd0b80cb3c83210b77181e0f5eb3e257d) USD loader: instance proxies and MDL OmniPBR materials (G1 visual meshes render); kinematics-only reset (+20% step rate); clipped value loss; terrain curriculum; cartpole tier-2 video; G1 still
+- 09-24 [`2a544b0`](https://github.com/pulipakaa24/MetalSim/commit/2a544b03cf1d9339a7901baac094212d83b5a8ba) Rough terrain: port Isaac Lab v2.3.2's TerrainGenerator exactly (ROUGH_TERRAINS_CFG)
 
 ## G1 velocity task and PPO learning
 
 - 09-26 G1 default contacts: elliptic friction cones, impratio 10, Newton cap 20 (`recommended` = `tau10_impact_hardlimits_ellip10`; `recommended_pyramidal` archives the previous default); contact presets carry their Newton cap; the isaaclab3 solver presets own the cone (pyramidal, impratio 1); headline re-runs queued
-- 09-24 Blow-up guard by magnitude, non-finite rows dropped from the PPO update, per-iteration callback with periodic checkpoints; hero cartpole video
-- 09-24 G1 1,500-iteration run recorded (learns to stand for 12 s by it 750, then degrades); G1 tier-2 policy video; camera-cartpole PPO brought to Isaac's [skrl](https://github.com/Toni-SM/skrl) config
-- 09-24 G1 blow-up root cause: explicit actuator stiffness at 5 ms with Isaac's kp 200 (0/8 blow-ups at 2.5 ms); physics_dt option; camera PPO gets Isaac's image centering and skrl value scaler
-- 09-24 G1 reward: termination penalty scaled by dt as Isaac's RewardManager does (was -200 unscaled, which made falling optimal)
-- 09-24 Task-agnostic anomaly monitor (learning signals + physics invariants) hooked into training; G1 preflight; monitor findings recorded
-- 09-24 Corrected G1 run recorded (stays up 11-15 s by it 1000, return still negative); monitor trend window 100 iterations
-- 09-24 G1 learning: per-term reward comparison against Isaac's rsl_rl run (PARITY 1.5); reward-term diagnostic
-- 09-24 G1 feet_slide: Isaac's quantity (foot body world linear velocity) on both engines
-- 09-24 Learner differential: rsl_rl 3.1.2 on MetalSim G1 flat; PPOWarp rollout fixes
-- 09-24 rsl_rl 3.1.2 on MetalSim G1 flat, 1500 iterations (Isaac's G1FlatPPORunnerCfg, seed 0, 4096 envs): log, per-term JSONL, curves script
-- 09-24 G1 task: flat terrain uses Isaac's G1FlatEnvCfg reward set; all 13 reward terms exposed and asserted against Isaac's formulas
-- 09-24 Fixed PPO demonstrated on G1 flat: +32.8 return / 995 length at iteration 1000, tracking rsl_rl on the same physics (PARITY 1.5, GAPS, STATUS)
-- 09-24 G1 task: Isaac ContactSensor for the flat set's contact terms; Isaac's rough-terrain seed and env-column assignment
-- 09-24 G1 flat: ContactSensor cost at 4096 envs, 5 interleaved A/B repeats: +0.62 ms per control step (+0.4 %), 29,479 vs 29,611 env-steps/s
-- 09-24 rsl_rl 3.1.2 on the ported G1FlatEnvCfg task (ContactSensor contact terms), 400 iterations, 4096 envs, seed 0
-- 09-25 Like-for-like training result: MuJoCo Warp + fixed PPO on Isaac's flat config reaches +28.4 at iteration 1000 vs Isaac's +27.3 (PARITY 1.5, STATUS, GAPS)
-- 09-25 G1 training CLI: --seed
-- 09-25 Per-term reward breakdown at it 300/1000 of the MuJoCo Warp flat-cfg fixed-PPO checkpoints (like-for-like with the Newton rows)
+- 09-24 [`d886351`](https://github.com/pulipakaa24/MetalSim/commit/d88635174cd177a85660ffe0958aba502916c58d) Blow-up guard by magnitude, non-finite rows dropped from the PPO update, per-iteration callback with periodic checkpoints; hero cartpole video
+- 09-24 [`4236cc2`](https://github.com/pulipakaa24/MetalSim/commit/4236cc2c69f8f9686c73cc20f77f973b97578eb2) G1 1,500-iteration run recorded (learns to stand for 12 s by it 750, then degrades); G1 tier-2 policy video; camera-cartpole PPO brought to Isaac's [skrl](https://github.com/Toni-SM/skrl) config
+- 09-24 [`47a382c`](https://github.com/pulipakaa24/MetalSim/commit/47a382c3e5f0d371a8d9458559e6ae4b87e9bf1d) G1 blow-up root cause: explicit actuator stiffness at 5 ms with Isaac's kp 200 (0/8 blow-ups at 2.5 ms); physics_dt option; camera PPO gets Isaac's image centering and skrl value scaler
+- 09-24 [`007df7f`](https://github.com/pulipakaa24/MetalSim/commit/007df7f73e81bfa01483835630ebf61ac82626f9) G1 reward: termination penalty scaled by dt as Isaac's RewardManager does (was -200 unscaled, which made falling optimal)
+- 09-24 [`ca3d401`](https://github.com/pulipakaa24/MetalSim/commit/ca3d401d9b89d7d14c97bf91102de16244da2a73) Task-agnostic anomaly monitor (learning signals + physics invariants) hooked into training; G1 preflight; monitor findings recorded
+- 09-24 [`95acdfa`](https://github.com/pulipakaa24/MetalSim/commit/95acdfa46f3a95c8f5ecf3583a1f8d64a94e2deb) Corrected G1 run recorded (stays up 11-15 s by it 1000, return still negative); monitor trend window 100 iterations
+- 09-24 [`1b09d25`](https://github.com/pulipakaa24/MetalSim/commit/1b09d2520d8aa9941571caec9443bb1a0b822518) G1 learning: per-term reward comparison against Isaac's rsl_rl run (PARITY 1.5); reward-term diagnostic
+- 09-24 [`c3ec67a`](https://github.com/pulipakaa24/MetalSim/commit/c3ec67aebdcc1b3ead45826e5b06ba799f245e58) G1 feet_slide: Isaac's quantity (foot body world linear velocity) on both engines
+- 09-24 [`c6ec1a7`](https://github.com/pulipakaa24/MetalSim/commit/c6ec1a7fc51445f5857f937401714b1394f32f4e) Learner differential: rsl_rl 3.1.2 on MetalSim G1 flat; PPOWarp rollout fixes
+- 09-24 [`e67e563`](https://github.com/pulipakaa24/MetalSim/commit/e67e56377bc5ba2cc70d26626dbc6066707a9c20) rsl_rl 3.1.2 on MetalSim G1 flat, 1500 iterations (Isaac's G1FlatPPORunnerCfg, seed 0, 4096 envs): log, per-term JSONL, curves script
+- 09-24 [`9be6800`](https://github.com/pulipakaa24/MetalSim/commit/9be680043efe98756c2ee708025480e216c961c8) G1 task: flat terrain uses Isaac's G1FlatEnvCfg reward set; all 13 reward terms exposed and asserted against Isaac's formulas
+- 09-24 [`7b619aa`](https://github.com/pulipakaa24/MetalSim/commit/7b619aa9304f097faf2b9d5add5d45222f5d30e6) Fixed PPO demonstrated on G1 flat: +32.8 return / 995 length at iteration 1000, tracking rsl_rl on the same physics (PARITY 1.5, GAPS, STATUS)
+- 09-24 [`c004743`](https://github.com/pulipakaa24/MetalSim/commit/c0047437a820be62fefb940c5ab728057750b383) G1 task: Isaac ContactSensor for the flat set's contact terms; Isaac's rough-terrain seed and env-column assignment
+- 09-24 [`b3d4747`](https://github.com/pulipakaa24/MetalSim/commit/b3d47470d6a5add09a131b9cdf9c89788752887c) G1 flat: ContactSensor cost at 4096 envs, 5 interleaved A/B repeats: +0.62 ms per control step (+0.4 %), 29,479 vs 29,611 env-steps/s
+- 09-24 [`85747a4`](https://github.com/pulipakaa24/MetalSim/commit/85747a45c4d47da051ff642a8a8015b6d8ae0816) rsl_rl 3.1.2 on the ported G1FlatEnvCfg task (ContactSensor contact terms), 400 iterations, 4096 envs, seed 0
+- 09-25 [`46f7864`](https://github.com/pulipakaa24/MetalSim/commit/46f7864cd7c01709d058393328ae094da447f767) Like-for-like training result: MuJoCo Warp + fixed PPO on Isaac's flat config reaches +28.4 at iteration 1000 vs Isaac's +27.3 (PARITY 1.5, STATUS, GAPS)
+- 09-25 [`c4929bf`](https://github.com/pulipakaa24/MetalSim/commit/c4929bfce4fbed23c522001457a7a7ce81dbcada) G1 training CLI: --seed
+- 09-25 [`1868aa7`](https://github.com/pulipakaa24/MetalSim/commit/1868aa758fe62183863124fa31f08d8720545ecc) Per-term reward breakdown at it 300/1000 of the MuJoCo Warp flat-cfg fixed-PPO checkpoints (like-for-like with the Newton rows)
 
 ## Other learning tasks (lift, cartpole, camera cartpole, lidar navigation)
 
 - 09-22 [`836c518`](https://github.com/pulipakaa24/MetalSim/commit/836c5182614e095f98e6e13d048fbd2d37b689f1) learn: GPU SO-101 lift task and MPS PPO; render: levels of detail, GPU-writable DR params; docs and gallery
 - 09-22 [`7d2ee8b`](https://github.com/pulipakaa24/MetalSim/commit/7d2ee8bdaddcb8503685d568f7a1de98119cef1b) learn: Warp rollout policy with graph-replayed rollouts (zero torch launches per step); Isaac Cartpole-RGB task; physics launch_step for outer captures
 - 09-22 [`72bad94`](https://github.com/pulipakaa24/MetalSim/commit/72bad94e7824f8476c28f3ff191831b08ee9400b) learn: cartpole learns with Isaac Lab's rsl_rl config on the Warp rollout path (collision-free cartpole MJCF)
-- 09-24 Camera-based RL row: Isaac's camera cartpole agent config learns from tier-0 pixels
-- 09-24 Lidar-based RL task (planar 64-beam Metal lidar, goal navigation among random obstacles) with scan-vs-mj_ray test
-- 09-24 Camera-RL update: research on MPS conv backward and alternatives, update profiler and measurements (torch eager/fp16/bf16/compile, [MLX](https://github.com/ml-explore/mlx))
-- 09-24 Camera-RL update on MPS: fast_update path (compiled loss and grad clip, fused Adam, per-rollout image means) and Metal kernels for conv1 weight grad and conv2 input grad; update 7.2 s -> 3.9 s
-- 09-25 Camera-cartpole training with the fast update path: 11.4K env-steps/s incl. training (was 7.5K), learning curve matches the reference run
-- 09-25 Camera-RL update: conv1 forward Metal kernel, minibatch gather fused into the compiled preprocessing, conv2/conv3 weight-grad kernels (measured, off by default); update 3.68 -> 3.20 s
-- 09-25 Camera-RL round two: gather fused in graph, conv1 forward kernel, conv2/conv3 wgrad measured (off), MLX whole-update experiment (no gain in fp32); training 12.7K env-steps/s incl. training, curve unchanged
-- 09-25 Camera-RL: 12.7K env-steps/s incl. training after the gather fusion and conv1 forward kernel; MLX not faster in fp32. GPU queue: release checks the job pid
+- 09-24 [`5f55d31`](https://github.com/pulipakaa24/MetalSim/commit/5f55d315c6e756a6996a48ebd4614a0277fa8df0) Camera-based RL row: Isaac's camera cartpole agent config learns from tier-0 pixels
+- 09-24 [`d27bcbb`](https://github.com/pulipakaa24/MetalSim/commit/d27bcbbc85635af7f17bdfc9052bef2ed902e96f) Lidar-based RL task (planar 64-beam Metal lidar, goal navigation among random obstacles) with scan-vs-mj_ray test
+- 09-24 [`b02d2e6`](https://github.com/pulipakaa24/MetalSim/commit/b02d2e6e40ddbe8baca1159b35c6d501ea932695) Camera-RL update: research on MPS conv backward and alternatives, update profiler and measurements (torch eager/fp16/bf16/compile, [MLX](https://github.com/ml-explore/mlx))
+- 09-24 [`4bb50ec`](https://github.com/pulipakaa24/MetalSim/commit/4bb50ecb360b4df332797ea67a793c1ec38b3381) Camera-RL update on MPS: fast_update path (compiled loss and grad clip, fused Adam, per-rollout image means) and Metal kernels for conv1 weight grad and conv2 input grad; update 7.2 s -> 3.9 s
+- 09-25 [`6b7b1b4`](https://github.com/pulipakaa24/MetalSim/commit/6b7b1b4b7910008082f798b362f0c0e7b3d58176) Camera-cartpole training with the fast update path: 11.4K env-steps/s incl. training (was 7.5K), learning curve matches the reference run
+- 09-25 [`3402e51`](https://github.com/pulipakaa24/MetalSim/commit/3402e51f2d2291fc9d04d8f1564ff34265f529e9) Camera-RL update: conv1 forward Metal kernel, minibatch gather fused into the compiled preprocessing, conv2/conv3 weight-grad kernels (measured, off by default); update 3.68 -> 3.20 s
+- 09-25 [`65b9849`](https://github.com/pulipakaa24/MetalSim/commit/65b9849ba26db8d1b0967e3dd905b9eec59b47b5) Camera-RL round two: gather fused in graph, conv1 forward kernel, conv2/conv3 wgrad measured (off), MLX whole-update experiment (no gain in fp32); training 12.7K env-steps/s incl. training, curve unchanged
+- 09-25 [`83201c4`](https://github.com/pulipakaa24/MetalSim/commit/83201c4e8d64a7d5d4762ff1593a8555770a8d0e) Camera-RL: 12.7K env-steps/s incl. training after the gather fusion and conv1 forward kernel; MLX not faster in fp32. GPU queue: release checks the job pid
 
 ## Parity against Isaac Sim / Isaac Lab (benchmarks, fidelity protocol, side-by-side, transfer)
 
 - 09-22 [`50efb27`](https://github.com/pulipakaa24/MetalSim/commit/50efb277273964e6f56de100db69e1d8725f3c3b) bench: uncontended suite and Isaac comparisons recorded
-- 09-24 Fidelity protocol: Isaac-side recorder and policy player, MetalSim replay, metrics (PSNR/SSIM/[LPIPS](https://github.com/richzhang/PerceptualSimilarity)/FLIP, depth, joint RMSE, divergence time, contact stats)
-- 09-24 Isaac Lab measured on an L4: Cartpole-Direct 400.7K, G1 rough 39.1K env-steps/s (reference rows)
-- 09-24 Side-by-side video composer (Isaac RTX vs MetalSim tier 2, same policy checkpoint and state)
-- 09-24 Policy export for Isaac playback; Isaac-side stage 5 (play checkpoints from both trainings in Isaac)
-- 09-24 Isaac-side recorder/player: no debug markers, plain grey ground, 20 m env spacing (fair frames)
-- 09-24 Fidelity protocol results vs [Isaac Sim](https://github.com/isaac-sim/IsaacSim) 5.1 (PARITY 1.7): physics rows, whole-frame and robot-only render metrics, gallery composites; lidar RL run; Isaac-side grey ground + stage 6 re-record
-- 09-24 Docs: Isaac's full rsl_rl run and cross-simulator playback results; L4 flat G1 benchmark; stage-video runner
-- 09-24 Fidelity: grey-ground re-recording replaces the whole-frame rendering rows (tier 2 vs RTX 18.0 dB / 0.876 SSIM); gallery composites refreshed
-- 09-24 Fidelity replay: full-extent ground plane; re-render runner
-- 09-24 Gallery: side-by-side training-stage videos (Isaac Sim | MetalSim) for Isaac's and MetalSim's checkpoints; cross-simulator transfer table
-- 09-24 MuJoCo Warp transfer of Isaac's checkpoints before / after the plane_convex contact-set fix ([my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) [`f2716b4`](https://github.com/pulipakaa24/mujoco_warp/commit/f2716b4e7873ed40b8405c0840238610349c7e7e) vs [`284dcd1`](https://github.com/pulipakaa24/mujoco_warp/commit/284dcd12ff37d56ea0201ade4e7f941d772a0f28))
-- 09-24 Transfer of Isaac checkpoints (500/1000/1499, 8 s) on MuJoCo Warp: old vs fixed plane_convex collider and each contact tuning; tuning throughput logs; --contact_tuning in g1_reward_terms and mjwarp:<tuning> in newton_transfer
-- 09-25 Gallery: round-two side-by-side videos (fixed-PPO policies in Isaac Sim and MetalSim); transfer table both directions
+- 09-24 [`e1fb8d1`](https://github.com/pulipakaa24/MetalSim/commit/e1fb8d129f98beca21a37eb2df3cced99ea4375a) Fidelity protocol: Isaac-side recorder and policy player, MetalSim replay, metrics (PSNR/SSIM/[LPIPS](https://github.com/richzhang/PerceptualSimilarity)/FLIP, depth, joint RMSE, divergence time, contact stats)
+- 09-24 [`1591eb9`](https://github.com/pulipakaa24/MetalSim/commit/1591eb926b0ccf48d384e1d8d4cbf75edeb5f08e) Isaac Lab measured on an L4: Cartpole-Direct 400.7K, G1 rough 39.1K env-steps/s (reference rows)
+- 09-24 [`083a2d6`](https://github.com/pulipakaa24/MetalSim/commit/083a2d6ca278ca7e530a10d458db0d9f1a5a6474) Side-by-side video composer (Isaac RTX vs MetalSim tier 2, same policy checkpoint and state)
+- 09-24 [`7f8c98f`](https://github.com/pulipakaa24/MetalSim/commit/7f8c98f38751a83f87e79a42091e436ba5afcd90) Policy export for Isaac playback; Isaac-side stage 5 (play checkpoints from both trainings in Isaac)
+- 09-24 [`c4a7a0d`](https://github.com/pulipakaa24/MetalSim/commit/c4a7a0deb5ae0d0981487303e98f2a1f4c647267) Isaac-side recorder/player: no debug markers, plain grey ground, 20 m env spacing (fair frames)
+- 09-24 [`2987539`](https://github.com/pulipakaa24/MetalSim/commit/2987539c2d834e2375e6efe9ec6a994af37384b9) Fidelity protocol results vs [Isaac Sim](https://github.com/isaac-sim/IsaacSim) 5.1 (PARITY 1.7): physics rows, whole-frame and robot-only render metrics, gallery composites; lidar RL run; Isaac-side grey ground + stage 6 re-record
+- 09-24 [`9a9971e`](https://github.com/pulipakaa24/MetalSim/commit/9a9971ec16849867c92e35bccda958efba2bb08e) Docs: Isaac's full rsl_rl run and cross-simulator playback results; L4 flat G1 benchmark; stage-video runner
+- 09-24 [`375e27a`](https://github.com/pulipakaa24/MetalSim/commit/375e27a592cc64beccce3c2fb18eb29391495a25) Fidelity: grey-ground re-recording replaces the whole-frame rendering rows (tier 2 vs RTX 18.0 dB / 0.876 SSIM); gallery composites refreshed
+- 09-24 [`11721a7`](https://github.com/pulipakaa24/MetalSim/commit/11721a7ca39fa7120c36cfba213bd105e8b6f2f2) Fidelity replay: full-extent ground plane; re-render runner
+- 09-24 [`38619a8`](https://github.com/pulipakaa24/MetalSim/commit/38619a87046131269ca022eee1829f13712b1e6a) Gallery: side-by-side training-stage videos (Isaac Sim | MetalSim) for Isaac's and MetalSim's checkpoints; cross-simulator transfer table
+- 09-24 [`efa6e5f`](https://github.com/pulipakaa24/MetalSim/commit/efa6e5f2d2754bd1196c663ff1d8b54a7423275b) MuJoCo Warp transfer of Isaac's checkpoints before / after the plane_convex contact-set fix ([my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) [`f2716b4`](https://github.com/pulipakaa24/mujoco_warp/commit/f2716b4e7873ed40b8405c0840238610349c7e7e) vs [`284dcd1`](https://github.com/pulipakaa24/mujoco_warp/commit/284dcd12ff37d56ea0201ade4e7f941d772a0f28))
+- 09-24 [`1cf3a0f`](https://github.com/pulipakaa24/MetalSim/commit/1cf3a0f3f8085050a3747bcc607ba9c3ceae2644) Transfer of Isaac checkpoints (500/1000/1499, 8 s) on MuJoCo Warp: old vs fixed plane_convex collider and each contact tuning; tuning throughput logs; --contact_tuning in g1_reward_terms and mjwarp:<tuning> in newton_transfer
+- 09-25 [`97b9e65`](https://github.com/pulipakaa24/MetalSim/commit/97b9e650642554b7ae4ed511d293417b59d031a5) Gallery: round-two side-by-side videos (fixed-PPO policies in Isaac Sim and MetalSim); transfer table both directions
 
 ## Newton XPBD engine (experimental; archived 2026-09-25)
 
-- 09-24 Diagnostics: MuJoCo contact stiffness sweep on the G1 drop test; Newton XPBD on Metal with Isaac's G1 USD (feasibility)
-- 09-24 Newton XPBD status: drives not engaging yet; throughput figure qualified
-- 09-24 Newton XPBD drives: root causes and a faithful PD actuator for the G1
-- 09-24 Diagnostics: Isaac actuator model under Newton XPBD (effort limits, armature) on the G1 hold and a 1 m drop
-- 09-24 Diagnostics: G1 drop-test penetration under Newton XPBD on Metal (MuJoCo C protocol)
-- 09-24 Diagnostics: G1 physics throughput, Newton XPBD with working drives vs MuJoCo Warp (graph replay)
-- 09-24 Diagnostics: Newton mesh/convex narrow phase (GJK/MPR) on Metal vs CPU
-- 09-24 Newton backend: optional native convex-mesh colliders (GJK/MPR on Metal); docstring with the measured recipe
-- 09-24 Newton backend: module docstring with the measured drive recipe
-- 09-24 Newton XPBD results in the parity and gap docs; Warp fixed-size-array patch; fidelity depth metric masks sky and separates the robot silhouette; Isaac-side player accepts MetalSim exports
-- 09-24 G1 task: engine switch (mjwarp default | newton) with a BatchSim-compatible NewtonSim
-- 09-24 Tests: G1 task invariants on both engines; Newton engine invariants
-- 09-24 Newton engine: gravity-implicit actuator on collider-free subtrees, MuJoCo cvel semantics, 2.5 ms qacc; preflight/bench engine flags
-- 09-24 G1 flat PPO on Newton XPBD: 1500 iterations, same config and seed as the MuJoCo Warp reference
-- 09-24 Newton upstream issue drafts: XPBD joint relaxation defaults, iteration-dependent drive stiffness
-- 09-24 Diagnostics: Newton XPBD joint-constraint drift on the G1 vs solver setting
-- 09-24 Newton engine: torso contact history over the last 15 ms of substeps (Isaac's illegal_contact window)
-- 09-24 Newton engine: rough terrain (heightfield collider, height-scan body pose)
-- 09-24 g1_engine_bench: --rough (either engine)
-- 09-24 Newton engine: solver/actuator knobs for the 3-sigma stability sweep
-- 09-24 Diagnostics: transfer of Isaac's checkpoints to the Newton engine (side_by_side protocol); Newton column in g1_learning_curves
-- 09-24 Newton engine: keep revolute limits inside +-(pi - 0.15) (XPBD angle wrap at pi); drift-remedy evaluation; Featherstone option
-- 09-24 Newton engine: optional recentred revolute zeros (moves XPBD's +-pi angle wrap away from the limits)
-- 09-24 Newton upstream issue draft: XPBD revolute angle wraps at +-pi (limit ranges or overshoot past pi explode)
-- 09-24 Newton drift remedies evaluated on CPU (projection, Featherstone, recentring, 0.625 ms); throughput script
-- 09-24 newton_remedy_throughput: drop Featherstone from the 4096-env timing (1 env-step/s at 16 envs, measured)
-- 09-24 G1 engine benchmark, final Newton recipe: cost split at 4096 envs (power source at start and end in the log)
-- 09-24 Mark the 21:19 final-engine benchmark as contended (not a result)
-- 09-24 G1 engine benchmark, final Newton recipe (clean: MuJoCo Warp control at start and end within 5 % of 27,749)
-- 09-24 Isaac fidelity protocol on the Newton engine (A_hold, B_random, C_drop vs Isaac's parity_out2/rt recording)
-- 09-24 [My fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim), item 1 (hinge angle wrap, [`f844a4e6`](https://github.com/pulipakaa24/newton/commit/f844a4e67f738592c1eb3e5722d3327071fa1965)): G1 check harness and measurements
-- 09-24 Newton engine: limit_margin pass-through (--newton_limit_margin none, sweep ':nolim'); install stamp in sweep logs
-- 09-24 G1 flat PPO (fixed learner) on Newton XPBD, 1000 iterations, 4 it 1.25 ms, seed 0
-- 09-24 g1_reward_terms: --engine newton (--newton_it, --newton_dt, --newton_limit_margin)
-- 09-24 Transfer of Isaac's PhysX checkpoints to the Newton engine (side_by_side protocol, 4 envs, 400 steps)
-- 09-24 My Newton fork, items 2, 3, 5, 6 ([`fda6658a`](https://github.com/pulipakaa24/newton/commit/fda6658a5654bc739e301ac9d8d13d4906623b4c), [`9f626ce2`](https://github.com/pulipakaa24/newton/commit/9f626ce23ad4ffe902f64c23fc7016f9eb727b15)): diagnostics and measurements
-- 09-24 NewtonSim: switches for my Newton fork's solver-level drive (drive='solver', joint_coloring, relaxation_angular)
-- 09-24 Newton transfer over-travel diagnostics: stance gap, fork drive, subtree joint inertia (opt-in)
-- 09-24 Push-off diagnostic (Isaac ckpt 1000): forward ground-reaction impulses per touch-down, MuJoCo Warp vs Newton
-- 09-24 newton_transfer: rlin=/rang= relaxation tokens
-- 09-24 G1 flat fixed-PPO on Newton XPBD 4 it 0.625 ms, 1000 iterations, seed 0 (pinned install)
-- 09-24 Per-term reward breakdown at it 300/1000: MuJoCo Warp vs Newton fixed-PPO policies, each on its own engine
-- 09-24 Newton 3-sigma stability sweep: blow-ups of 1024 vs physics throughput
-- 09-24 My Newton fork: pd drive damping fix ([`9b0901d3`](https://github.com/pulipakaa24/newton/commit/9b0901d36f01f8761cf52a5113f890e31c8d6d1b)) and throughput refactor ([`242eeda7`](https://github.com/pulipakaa24/newton/commit/242eeda7ba4b87cf94420ca9b0b4cd2c91b48811)): diagnostics and measurements
-- 09-24 NewtonSim drive='solver': probe joint_drive_mode, read my fork's public solver.joint_drive_force (total drive torque)
-- 09-24 3-sigma winner fails transfer: implicit leg stiffness makes Isaac's policies fall (functional check)
-- 09-25 Transfer of Isaac's checkpoints on my Newton fork (fixed solver drive vs ActuatorPD, 1.25 / 0.625 ms, relaxation 0.5/0.4, no clamp)
-- 09-25 My Newton fork final ([`90e23324`](https://github.com/pulipakaa24/newton/commit/90e23324521fa86710e483e01d02e80d1dac0060)): GPU throughput and 3-sigma
-- 09-25 G1 flat fixed-PPO on my Newton fork with the fixed solver PD drive, 4 it 0.625 ms, 1000 it, seed 0 (throughput provisional: fork build ~30 % slower on GPU)
-- 09-25 Per-term reward breakdown at it 300/1000, my Newton fork's solver-drive (0.625 ms) fixed-PPO policy
-- 09-25 My Newton fork: 3-sigma check and throughput with the fixed solver PD drive (vs ActuatorPD), GPU, 1024 / 4096 envs
-- 09-25 Swing-leg diagnostic (Isaac ckpt 1000): swing duration, clearance, touch-down velocity, step length, hip/knee trajectories, MuJoCo Warp vs Newton 0.625 ms
-- 09-25 Newton track archived: remaining logs (job-chain status, install watch, partial held benchmark, PhysX compare outputs)
-- 09-25 Newton upstream: issues [#4313](https://github.com/newton-physics/newton/issues/4313), [#4314](https://github.com/newton-physics/newton/issues/4314), [#4315](https://github.com/newton-physics/newton/issues/4315) and PRs [#4316](https://github.com/newton-physics/newton/pull/4316), [#4317](https://github.com/newton-physics/newton/pull/4317), [#4318](https://github.com/newton-physics/newton/pull/4318) filed (bodies, reproducers, regression logs)
-- 09-25 Newton upstream: three issues and three pull requests filed (`scripts/diagnostics/newton_upstream/FILED.md`); gap table
+- 09-24 [`b0018b7`](https://github.com/pulipakaa24/MetalSim/commit/b0018b7ea5f27212e9e58a9cc45002be7be0278e) Diagnostics: MuJoCo contact stiffness sweep on the G1 drop test; Newton XPBD on Metal with Isaac's G1 USD (feasibility)
+- 09-24 [`3af6d4f`](https://github.com/pulipakaa24/MetalSim/commit/3af6d4fdd11387ab20c3476ff4f61dee5e86db56) Newton XPBD status: drives not engaging yet; throughput figure qualified
+- 09-24 [`53eff5c`](https://github.com/pulipakaa24/MetalSim/commit/53eff5c7d8f83040d5b74b0a7398684f0cd7bd2f) Newton XPBD drives: root causes and a faithful PD actuator for the G1
+- 09-24 [`0cfa0b4`](https://github.com/pulipakaa24/MetalSim/commit/0cfa0b4630b507c8e405765f086ffc3190f1d84a) Diagnostics: Isaac actuator model under Newton XPBD (effort limits, armature) on the G1 hold and a 1 m drop
+- 09-24 [`ff875f2`](https://github.com/pulipakaa24/MetalSim/commit/ff875f2f13dd45b81c0f52c97090b0e918a18571) Diagnostics: G1 drop-test penetration under Newton XPBD on Metal (MuJoCo C protocol)
+- 09-24 [`6ec88b4`](https://github.com/pulipakaa24/MetalSim/commit/6ec88b4065491287cccce8e4d5490fe2872942d9) Diagnostics: G1 physics throughput, Newton XPBD with working drives vs MuJoCo Warp (graph replay)
+- 09-24 [`d23897b`](https://github.com/pulipakaa24/MetalSim/commit/d23897b99cf53e3096f1481e736b70752273dc3d) Diagnostics: Newton mesh/convex narrow phase (GJK/MPR) on Metal vs CPU
+- 09-24 [`ac3622f`](https://github.com/pulipakaa24/MetalSim/commit/ac3622f4de540dde856dbac8a6adc6b6871ae4d6) Newton backend: optional native convex-mesh colliders (GJK/MPR on Metal); docstring with the measured recipe
+- 09-24 [`97c2508`](https://github.com/pulipakaa24/MetalSim/commit/97c2508c2e061d13d6ad765a294076cec6a7efc9) Newton backend: module docstring with the measured drive recipe
+- 09-24 [`1070ca5`](https://github.com/pulipakaa24/MetalSim/commit/1070ca5d16a4609f98fb082049ee83e85aa1ce20) Newton XPBD results in the parity and gap docs; Warp fixed-size-array patch; fidelity depth metric masks sky and separates the robot silhouette; Isaac-side player accepts MetalSim exports
+- 09-24 [`a7bf690`](https://github.com/pulipakaa24/MetalSim/commit/a7bf69051dfc5edc2a1000fc8cf64ce9a0b7dd32) G1 task: engine switch (mjwarp default | newton) with a BatchSim-compatible NewtonSim
+- 09-24 [`540851f`](https://github.com/pulipakaa24/MetalSim/commit/540851f3d4fec5dbe6c3e9af6983765fb737352e) Tests: G1 task invariants on both engines; Newton engine invariants
+- 09-24 [`22d034b`](https://github.com/pulipakaa24/MetalSim/commit/22d034b20457d0349b1e080228c1fde257d7d794) Newton engine: gravity-implicit actuator on collider-free subtrees, MuJoCo cvel semantics, 2.5 ms qacc; preflight/bench engine flags
+- 09-24 [`74e141d`](https://github.com/pulipakaa24/MetalSim/commit/74e141d40fbdb414395781887a8b9401749cbfb2) G1 flat PPO on Newton XPBD: 1500 iterations, same config and seed as the MuJoCo Warp reference
+- 09-24 [`8593378`](https://github.com/pulipakaa24/MetalSim/commit/85933789bd826589fa1170d7ecbba119c9739c9c) Newton upstream issue drafts: XPBD joint relaxation defaults, iteration-dependent drive stiffness
+- 09-24 [`ceaa6b9`](https://github.com/pulipakaa24/MetalSim/commit/ceaa6b9c768305316e3e0887c890a6fe96350ae1) Diagnostics: Newton XPBD joint-constraint drift on the G1 vs solver setting
+- 09-24 [`6a69f8d`](https://github.com/pulipakaa24/MetalSim/commit/6a69f8df4b15ab8987176f01481869f9b5d64aa9) Newton engine: torso contact history over the last 15 ms of substeps (Isaac's illegal_contact window)
+- 09-24 [`a5e7855`](https://github.com/pulipakaa24/MetalSim/commit/a5e78555817e0cc9337a17361c4c0433cca51cfb) Newton engine: rough terrain (heightfield collider, height-scan body pose)
+- 09-24 [`9b8d02a`](https://github.com/pulipakaa24/MetalSim/commit/9b8d02a5b7093b6de615898fba301c5ba766dd12) g1_engine_bench: --rough (either engine)
+- 09-24 [`3b647a6`](https://github.com/pulipakaa24/MetalSim/commit/3b647a685c7f584703e95f36633e0b99e92e55c0) Newton engine: solver/actuator knobs for the 3-sigma stability sweep
+- 09-24 [`a00cd79`](https://github.com/pulipakaa24/MetalSim/commit/a00cd79fdb0c8eb42461c858f75563e395428dcd) Diagnostics: transfer of Isaac's checkpoints to the Newton engine (side_by_side protocol); Newton column in g1_learning_curves
+- 09-24 [`80bddf9`](https://github.com/pulipakaa24/MetalSim/commit/80bddf9760397793acccf0e895ed6819cb94cc31) Newton engine: keep revolute limits inside +-(pi - 0.15) (XPBD angle wrap at pi); drift-remedy evaluation; Featherstone option
+- 09-24 [`65847cd`](https://github.com/pulipakaa24/MetalSim/commit/65847cd7b52c7ac99b3a39bea176e67732844b99) Newton engine: optional recentred revolute zeros (moves XPBD's +-pi angle wrap away from the limits)
+- 09-24 [`8ae94c6`](https://github.com/pulipakaa24/MetalSim/commit/8ae94c64d57203046502fdb3133fcac333721388) Newton upstream issue draft: XPBD revolute angle wraps at +-pi (limit ranges or overshoot past pi explode)
+- 09-24 [`5fff734`](https://github.com/pulipakaa24/MetalSim/commit/5fff734a1a56f73b6a423920e6946123b5c3c4da) Newton drift remedies evaluated on CPU (projection, Featherstone, recentring, 0.625 ms); throughput script
+- 09-24 [`750ebf1`](https://github.com/pulipakaa24/MetalSim/commit/750ebf18e879eac538628944e4c34c28b15ca692) newton_remedy_throughput: drop Featherstone from the 4096-env timing (1 env-step/s at 16 envs, measured)
+- 09-24 [`9219a89`](https://github.com/pulipakaa24/MetalSim/commit/9219a89d5a6d8208521f7922598cd73b8f3b408e) G1 engine benchmark, final Newton recipe: cost split at 4096 envs (power source at start and end in the log)
+- 09-24 [`b2efea2`](https://github.com/pulipakaa24/MetalSim/commit/b2efea2fdb48e6647bfed8485509eb038e551d14) Mark the 21:19 final-engine benchmark as contended (not a result)
+- 09-24 [`b2af806`](https://github.com/pulipakaa24/MetalSim/commit/b2af806230175155d3e504c1cc20687ad0ed1ccb) G1 engine benchmark, final Newton recipe (clean: MuJoCo Warp control at start and end within 5 % of 27,749)
+- 09-24 [`9c9c11a`](https://github.com/pulipakaa24/MetalSim/commit/9c9c11ac784e9326fb9236fe6c2be6ce3e9ad303) Isaac fidelity protocol on the Newton engine (A_hold, B_random, C_drop vs Isaac's parity_out2/rt recording)
+- 09-24 [`f09ee76`](https://github.com/pulipakaa24/MetalSim/commit/f09ee76f0a2198dc809f45863814409412b97f3c) [My fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim), item 1 (hinge angle wrap, [`f844a4e6`](https://github.com/pulipakaa24/newton/commit/f844a4e67f738592c1eb3e5722d3327071fa1965)): G1 check harness and measurements
+- 09-24 [`b0c8b0c`](https://github.com/pulipakaa24/MetalSim/commit/b0c8b0ce7cb33798c2d7f2ffe65aaf8808bc2722) Newton engine: limit_margin pass-through (--newton_limit_margin none, sweep ':nolim'); install stamp in sweep logs
+- 09-24 [`5d57d34`](https://github.com/pulipakaa24/MetalSim/commit/5d57d34787a5c4a9efac84f583e09367c23a8e05) G1 flat PPO (fixed learner) on Newton XPBD, 1000 iterations, 4 it 1.25 ms, seed 0
+- 09-24 [`0f7e716`](https://github.com/pulipakaa24/MetalSim/commit/0f7e7160328c1590b00cafb0d2d375f8339be9c4) g1_reward_terms: --engine newton (--newton_it, --newton_dt, --newton_limit_margin)
+- 09-24 [`ae6e184`](https://github.com/pulipakaa24/MetalSim/commit/ae6e184ff2be3438a74096df46799fac307ccb5f) Transfer of Isaac's PhysX checkpoints to the Newton engine (side_by_side protocol, 4 envs, 400 steps)
+- 09-24 [`491faef`](https://github.com/pulipakaa24/MetalSim/commit/491faefecb87ed751b1e00693ab50c6865e7611f) My Newton fork, items 2, 3, 5, 6 ([`fda6658a`](https://github.com/pulipakaa24/newton/commit/fda6658a5654bc739e301ac9d8d13d4906623b4c), [`9f626ce2`](https://github.com/pulipakaa24/newton/commit/9f626ce23ad4ffe902f64c23fc7016f9eb727b15)): diagnostics and measurements
+- 09-24 [`961c61b`](https://github.com/pulipakaa24/MetalSim/commit/961c61b02d2f7eaa66f973581a62b0888d124a26) NewtonSim: switches for my Newton fork's solver-level drive (drive='solver', joint_coloring, relaxation_angular)
+- 09-24 [`bc520b2`](https://github.com/pulipakaa24/MetalSim/commit/bc520b246741587b65a6a694a29b02154869c187) Newton transfer over-travel diagnostics: stance gap, fork drive, subtree joint inertia (opt-in)
+- 09-24 [`ef8977c`](https://github.com/pulipakaa24/MetalSim/commit/ef8977cb0c08f5af24a5556f402bf02a7e15eaaf) Push-off diagnostic (Isaac ckpt 1000): forward ground-reaction impulses per touch-down, MuJoCo Warp vs Newton
+- 09-24 [`1a097ed`](https://github.com/pulipakaa24/MetalSim/commit/1a097ed81e8135be0d0ebf37800cc16ea38a58d9) newton_transfer: rlin=/rang= relaxation tokens
+- 09-24 [`2550552`](https://github.com/pulipakaa24/MetalSim/commit/2550552a3e46f8a22775f422f44799545691c3ab) G1 flat fixed-PPO on Newton XPBD 4 it 0.625 ms, 1000 iterations, seed 0 (pinned install)
+- 09-24 [`fb92115`](https://github.com/pulipakaa24/MetalSim/commit/fb92115e6dec058a7bee1b8cbd13d91601f73cc1) Per-term reward breakdown at it 300/1000: MuJoCo Warp vs Newton fixed-PPO policies, each on its own engine
+- 09-24 [`184dfdc`](https://github.com/pulipakaa24/MetalSim/commit/184dfdc075b32340163adb1c7a3ac0729ff2dfc0) Newton 3-sigma stability sweep: blow-ups of 1024 vs physics throughput
+- 09-24 [`e380e0f`](https://github.com/pulipakaa24/MetalSim/commit/e380e0f2ab125e88ce2447a5ae70a5091e2f0695) My Newton fork: pd drive damping fix ([`9b0901d3`](https://github.com/pulipakaa24/newton/commit/9b0901d36f01f8761cf52a5113f890e31c8d6d1b)) and throughput refactor ([`242eeda7`](https://github.com/pulipakaa24/newton/commit/242eeda7ba4b87cf94420ca9b0b4cd2c91b48811)): diagnostics and measurements
+- 09-24 [`de2fbd9`](https://github.com/pulipakaa24/MetalSim/commit/de2fbd9ec8fa3e1ed3741c9f79e40592d92cbc86) NewtonSim drive='solver': probe joint_drive_mode, read my fork's public solver.joint_drive_force (total drive torque)
+- 09-24 [`b06acd3`](https://github.com/pulipakaa24/MetalSim/commit/b06acd3e67b3840f3c71015bfcf936b014fb413a) 3-sigma winner fails transfer: implicit leg stiffness makes Isaac's policies fall (functional check)
+- 09-25 [`eb99504`](https://github.com/pulipakaa24/MetalSim/commit/eb995040711f46dc1308777fd4280dd1dd9fd051) Transfer of Isaac's checkpoints on my Newton fork (fixed solver drive vs ActuatorPD, 1.25 / 0.625 ms, relaxation 0.5/0.4, no clamp)
+- 09-25 [`d1a79d8`](https://github.com/pulipakaa24/MetalSim/commit/d1a79d85f5871723de887b0ea507b7cda7a8d6f3) My Newton fork final ([`90e23324`](https://github.com/pulipakaa24/newton/commit/90e23324521fa86710e483e01d02e80d1dac0060)): GPU throughput and 3-sigma
+- 09-25 [`d359758`](https://github.com/pulipakaa24/MetalSim/commit/d3597584e8db394e9bdfff626c9e940d9e5fb48e) G1 flat fixed-PPO on my Newton fork with the fixed solver PD drive, 4 it 0.625 ms, 1000 it, seed 0 (throughput provisional: fork build ~30 % slower on GPU)
+- 09-25 [`6eb92b6`](https://github.com/pulipakaa24/MetalSim/commit/6eb92b6244f102e7135e804c9979fea61d474aea) Per-term reward breakdown at it 300/1000, my Newton fork's solver-drive (0.625 ms) fixed-PPO policy
+- 09-25 [`848197a`](https://github.com/pulipakaa24/MetalSim/commit/848197a8af9054e3d8ba44d92d35c96157e54908) My Newton fork: 3-sigma check and throughput with the fixed solver PD drive (vs ActuatorPD), GPU, 1024 / 4096 envs
+- 09-25 [`534605c`](https://github.com/pulipakaa24/MetalSim/commit/534605c91dff7dd1c3cf8ed2cbb2929e383e71e8) Swing-leg diagnostic (Isaac ckpt 1000): swing duration, clearance, touch-down velocity, step length, hip/knee trajectories, MuJoCo Warp vs Newton 0.625 ms
+- 09-25 [`3ba52fb`](https://github.com/pulipakaa24/MetalSim/commit/3ba52fbb94f8c428a38db62101e19253b72b9272) Newton track archived: remaining logs (job-chain status, install watch, partial held benchmark, PhysX compare outputs)
+- 09-25 [`7182a28`](https://github.com/pulipakaa24/MetalSim/commit/7182a28e8a5b347bc5b5c5006da2c9c7090fad6b) Newton upstream: issues [#4313](https://github.com/newton-physics/newton/issues/4313), [#4314](https://github.com/newton-physics/newton/issues/4314), [#4315](https://github.com/newton-physics/newton/issues/4315) and PRs [#4316](https://github.com/newton-physics/newton/pull/4316), [#4317](https://github.com/newton-physics/newton/pull/4317), [#4318](https://github.com/newton-physics/newton/pull/4318) filed (bodies, reproducers, regression logs)
+- 09-25 [`0c37e08`](https://github.com/pulipakaa24/MetalSim/commit/0c37e082774a72be73c4a2913b7b106ca1bc5479) Newton upstream: three issues and three pull requests filed (`scripts/diagnostics/newton_upstream/FILED.md`); gap table
 
 ## Tooling (GPU queue)
 
-- 09-24 GPU arbitration: priority queue lock (timing > render > train) with atomic acquisition, stale-holder cleanup and a run wrapper
-- 09-24 gpu_run.sh: record the job's own pid in the lock and kill the job if the wrapper dies (a cut-off wrapper caused a double grant)
-- 09-25 GPU queue: low-priority class
+- 09-24 [`5843855`](https://github.com/pulipakaa24/MetalSim/commit/58438559c797970db4712195b505b76504717925) GPU arbitration: priority queue lock (timing > render > train) with atomic acquisition, stale-holder cleanup and a run wrapper
+- 09-24 [`af06f4d`](https://github.com/pulipakaa24/MetalSim/commit/af06f4dbc2652f98b9351bb636d609d22282db4b) gpu_run.sh: record the job's own pid in the lock and kill the job if the wrapper dies (a cut-off wrapper caused a double grant)
+- 09-25 [`517e066`](https://github.com/pulipakaa24/MetalSim/commit/517e06643dc856e26ee194716b4d28ef57c926e5) GPU queue: low-priority class
 
 ## Documentation (status, parity matrix, gap ledger, gallery)
 
 - 09-22 [`0460afb`](https://github.com/pulipakaa24/MetalSim/commit/0460afbd630423f7ba783025c78d58c8de54f70c) docs: status against the plan, acceptance tests, judgement calls
 - 09-22 [`fa2df43`](https://github.com/pulipakaa24/MetalSim/commit/fa2df43b539df449eaba85cefdf95ad8fa2fbf7c) gallery: tier 1, lidar, learning curves, Isaac comparison
-- 09-24 Contact-model section: MuJoCo stiffness limits and Newton XPBD on Metal (throughput table)
-- 09-24 Gap ledger: closed, open, and Newton-track issues
-- 09-24 Gap ledger: Newton-subsumed vs engine-independent items; camera-RL MPS update profile
-- 09-24 Docs: status and gap table refreshed with the fidelity, Newton, lidar and learning-gap measurements; Isaac L4 camera rollout rate
-- 09-24 Docs: Newton engine switch results (throughput at the training setting, 1500-iteration curve on both engines, preflight), feet-slide term defect, gap table
-- 09-24 Docs: feet-slide term fix and Newton constraint-drift finding
-- 09-24 Docs: learner differential verdict (rsl_rl on MetalSim learns like Isaac; three PPO rollout bugs fixed), flat-vs-rough reward config mismatch
-- 09-24 Research: PyTorch-on-Metal interop survey (2026-09-22) saved under docs/research
-- 09-24 Gap table: Newton constraint drift quantified, rough terrain on Newton closed, upstream issue drafts
-- 09-24 Gap table: XPBD angle-wrap defect and workaround, drift remedies evaluated
-- 09-24 Gap table: Newton learning parity pending the fixed learner, 3σ cause, Newton fidelity vs PhysX unmeasured, Featherstone verdict
-- 09-24 Docs: clean Newton benchmark with control row; PhysX fidelity protocol on Newton (PARITY 1.4, 1.7); rough-terrain Newton cost as a new gap
-- 09-24 Docs: exact Isaac terrain port (grid-exact, wall ramps remain) in the parity matrix and gap table
-- 09-24 Docs: contact sensor, lidar extras and radar-lite rows; MuJoCo Warp plane_convex contact-set defect as a new gap
-- 09-24 Gap table: camera-RL update profile, chosen route, MLX as a compounding next step
-- 09-24 Gap table: [my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim) fixes the angle wrap at source; relaxation fix in progress
-- 09-24 Docs: fixed PPO on Newton learns tracking far slower (+7.8 vs +32.6 at it 1000); MuJoCo Warp stays the default
-- 09-24 Gap ledger: engine position after the measurements (MuJoCo Warp is the parity engine; XPBD is a throughput option)
-- 09-24 Gap table: my Newton fork fixes relaxation, drives, contact forces; rest-height explained; coloring as the drift remedy pending throughput
-- 09-24 Docs: Isaac checkpoint transfer on Newton over-travels 20-48 % (drift changes the gait); MuJoCo Warp within 5 %
-- 09-24 Docs: Isaac flat config ported; rsl_rl on the ported task within 3.2 return of Isaac at it 399; remaining term gaps are contact quantities
-- 09-24 Gap table: Newton over-travel is a stride-length effect independent of the drift (unexplained); fork drive light-joint fault
-- 09-24 Gap table: fork drive light-joint fix measured; halving the substep beats joint colouring; fork throughput regression under investigation
-- 09-25 Gap table: my Newton fork's final state (six solver defects fixed at source, costs and remaining items); transfer with the in-solver drive
-- 09-25 Docs: camera-RL update 1.86x faster with Metal gradient kernels; 11.4K env-steps/s incl. training
-- 09-25 Docs: Newton learning at all settings vs MuJoCo Warp and Isaac (flat weights), 3σ closed with the fork drive, push-off diagnostic, collider A/B on transfer
-- 09-25 Docs: Newton XPBD archived as an experimental option; MuJoCo Warp is the parity engine
-- 09-25 Docs: like-for-like per-term rows and the swing-leg localisation of Newton's long stride; Newton validation closed
+- 09-24 [`4282404`](https://github.com/pulipakaa24/MetalSim/commit/4282404c12294fee52547ad2c0c7d8508c82a643) Contact-model section: MuJoCo stiffness limits and Newton XPBD on Metal (throughput table)
+- 09-24 [`fe64338`](https://github.com/pulipakaa24/MetalSim/commit/fe6433844e6cd18dff50f95daeb5eaeeb0f821b7) Gap ledger: closed, open, and Newton-track issues
+- 09-24 [`491ddd9`](https://github.com/pulipakaa24/MetalSim/commit/491ddd9e861e2ec02a580715d8412821db1135bb) Gap ledger: Newton-subsumed vs engine-independent items; camera-RL MPS update profile
+- 09-24 [`794eda2`](https://github.com/pulipakaa24/MetalSim/commit/794eda2c933524b0aa51ba73f3cbed683ecdd5d9) Docs: status and gap table refreshed with the fidelity, Newton, lidar and learning-gap measurements; Isaac L4 camera rollout rate
+- 09-24 [`70db0e2`](https://github.com/pulipakaa24/MetalSim/commit/70db0e278985d120eb62f1ff6fe552746c0f4c02) Docs: Newton engine switch results (throughput at the training setting, 1500-iteration curve on both engines, preflight), feet-slide term defect, gap table
+- 09-24 [`429cb01`](https://github.com/pulipakaa24/MetalSim/commit/429cb01c2a6b07e5ce583c1f348d82197db4bbd6) Docs: feet-slide term fix and Newton constraint-drift finding
+- 09-24 [`df6319a`](https://github.com/pulipakaa24/MetalSim/commit/df6319ad8848298a501ac3f68cb54ed8a3788691) Docs: learner differential verdict (rsl_rl on MetalSim learns like Isaac; three PPO rollout bugs fixed), flat-vs-rough reward config mismatch
+- 09-24 [`f377a19`](https://github.com/pulipakaa24/MetalSim/commit/f377a1930ce4b7039e4978c00949454300cc41a4) Research: PyTorch-on-Metal interop survey (2026-09-22) saved under docs/research
+- 09-24 [`20caf9a`](https://github.com/pulipakaa24/MetalSim/commit/20caf9ad9549e4af35bf3f65353329c6a24357da) Gap table: Newton constraint drift quantified, rough terrain on Newton closed, upstream issue drafts
+- 09-24 [`776af3f`](https://github.com/pulipakaa24/MetalSim/commit/776af3fa89319ac894ffe4f88b89118694121f9b) Gap table: XPBD angle-wrap defect and workaround, drift remedies evaluated
+- 09-24 [`e6ce121`](https://github.com/pulipakaa24/MetalSim/commit/e6ce1210162750a0566c3d70b9fe8bd6c3776041) Gap table: Newton learning parity pending the fixed learner, 3σ cause, Newton fidelity vs PhysX unmeasured, Featherstone verdict
+- 09-24 [`370bfa8`](https://github.com/pulipakaa24/MetalSim/commit/370bfa8c79532b2057b2108be37e50a1185bd42a) Docs: clean Newton benchmark with control row; PhysX fidelity protocol on Newton (PARITY 1.4, 1.7); rough-terrain Newton cost as a new gap
+- 09-24 [`7a93d52`](https://github.com/pulipakaa24/MetalSim/commit/7a93d527d81bb9320f03759fd6cab0aaf7eac1a4) Docs: exact Isaac terrain port (grid-exact, wall ramps remain) in the parity matrix and gap table
+- 09-24 [`c6d788f`](https://github.com/pulipakaa24/MetalSim/commit/c6d788f413d0ec63df5351efb2092f3dd18435cd) Docs: contact sensor, lidar extras and radar-lite rows; MuJoCo Warp plane_convex contact-set defect as a new gap
+- 09-24 [`0017ea3`](https://github.com/pulipakaa24/MetalSim/commit/0017ea3552862ee16cc6999747347a450376f853) Gap table: camera-RL update profile, chosen route, MLX as a compounding next step
+- 09-24 [`bff5ad8`](https://github.com/pulipakaa24/MetalSim/commit/bff5ad858f7122274bfb77c1fb3610dd59d1697d) Gap table: [my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim) fixes the angle wrap at source; relaxation fix in progress
+- 09-24 [`9fab99a`](https://github.com/pulipakaa24/MetalSim/commit/9fab99ad9978cfdc556b32a3c8dbe0942e245985) Docs: fixed PPO on Newton learns tracking far slower (+7.8 vs +32.6 at it 1000); MuJoCo Warp stays the default
+- 09-24 [`cb6e5ba`](https://github.com/pulipakaa24/MetalSim/commit/cb6e5baf7736b95dbc09a8a83f4aee37298a24b6) Gap ledger: engine position after the measurements (MuJoCo Warp is the parity engine; XPBD is a throughput option)
+- 09-24 [`9f6f9a3`](https://github.com/pulipakaa24/MetalSim/commit/9f6f9a3c7be82c9c2bd97bf1aeefd5c62bd70380) Gap table: my Newton fork fixes relaxation, drives, contact forces; rest-height explained; coloring as the drift remedy pending throughput
+- 09-24 [`8d2044f`](https://github.com/pulipakaa24/MetalSim/commit/8d2044fc36bb9bf87b61506da1306180207fc7cc) Docs: Isaac checkpoint transfer on Newton over-travels 20-48 % (drift changes the gait); MuJoCo Warp within 5 %
+- 09-24 [`5aaf931`](https://github.com/pulipakaa24/MetalSim/commit/5aaf931a0097cbaa04751871a244c9c6b1e77ebf) Docs: Isaac flat config ported; rsl_rl on the ported task within 3.2 return of Isaac at it 399; remaining term gaps are contact quantities
+- 09-24 [`f3e17e5`](https://github.com/pulipakaa24/MetalSim/commit/f3e17e57b885d8c15fd0c3768de7f93780462ec4) Gap table: Newton over-travel is a stride-length effect independent of the drift (unexplained); fork drive light-joint fault
+- 09-24 [`ab0b904`](https://github.com/pulipakaa24/MetalSim/commit/ab0b90423a26a4f7bba32e000599c25784794bce) Gap table: fork drive light-joint fix measured; halving the substep beats joint colouring; fork throughput regression under investigation
+- 09-25 [`2d98ea2`](https://github.com/pulipakaa24/MetalSim/commit/2d98ea24919eb259f98b4b9a6d31e0cfe1ac6bbb) Gap table: my Newton fork's final state (six solver defects fixed at source, costs and remaining items); transfer with the in-solver drive
+- 09-25 [`5deeeb5`](https://github.com/pulipakaa24/MetalSim/commit/5deeeb59615317292a37c78aec8cad5d8fa87419) Docs: camera-RL update 1.86x faster with Metal gradient kernels; 11.4K env-steps/s incl. training
+- 09-25 [`4d02f37`](https://github.com/pulipakaa24/MetalSim/commit/4d02f37e96a1b6724e477f832033f0692b1f97f8) Docs: Newton learning at all settings vs MuJoCo Warp and Isaac (flat weights), 3σ closed with the fork drive, push-off diagnostic, collider A/B on transfer
+- 09-25 [`5603b2d`](https://github.com/pulipakaa24/MetalSim/commit/5603b2dd1edb212a864ae5a312f857725153ab0e) Docs: Newton XPBD archived as an experimental option; MuJoCo Warp is the parity engine
+- 09-25 [`11a7013`](https://github.com/pulipakaa24/MetalSim/commit/11a7013fbb097a23cc29970b2ff1bbe8e88650f1) Docs: like-for-like per-term rows and the swing-leg localisation of Newton's long stride; Newton validation closed
