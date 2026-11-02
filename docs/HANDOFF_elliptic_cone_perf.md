@@ -32,7 +32,7 @@ costs 2.9–3.9× throughput. Elliptic cones are common:
 - [MuJoCo Menagerie](https://github.com/google-deepmind/mujoco_menagerie)'s Go2 declares
   `<option cone="elliptic" impratio="100"/>`.
 - MuJoCo's documentation recommends elliptic cones with a high `impratio` for grasping. The
-  so101Sim/YAM grasp study found the same thing: 1–2 mm in-hand creep with elliptic cones against
+  [so101Sim](https://github.com/pulipakaa24/so101Sim)/YAM grasp study found the same thing: 1–2 mm in-hand creep with elliptic cones against
   1–2.8 cm with pyramidal.
 
 So manipulation tasks and many quadruped models will hit this.

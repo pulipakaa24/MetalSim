@@ -41,7 +41,7 @@ cube pose is read from it, as the original reads it (a real script would get it 
 
 import numpy as np
 
-# -- so101Sim's plan (rl/native/scripted_expert.py at d4c2990, module constants and Expert.act) ---------------------
+# -- so101Sim's plan (rl/native/scripted_expert.py at d0546025, module constants and Expert.act) ---------------------
 GRIP_OPEN = 1.4             # rad
 GRIP_CLOSE = -0.15          # rad
 DQ_MAX = 0.06               # rad: the IK's per-iteration clip (here: per solver iteration, not per tick)

@@ -104,7 +104,7 @@ On `main`, construct these with `headlight=False` in place of the old `flags` bi
 
 ## Dropped
 
-`metalsim/learn/yam_act/` (ACT imitation learning on so101Sim's YAM scene, path-traced) was
+`metalsim/learn/yam_act/` (ACT imitation learning on [so101Sim](https://github.com/pulipakaa24/so101Sim)'s YAM scene, path-traced) was
 abandoned: the best held-out result was 4/56 successes. Its code, demos, gallery video and stash were
 deleted on 2026-09-25 and are not recoverable from this branch.
 

@@ -255,7 +255,7 @@ is not usable at this budget; impratio 10 leaves 60–177 worlds at the cap (pyr
 
 MuJoCo's modelling guide recommends elliptic cones with a large impratio (and the Newton solver) when
 contact slip is a problem (published: [mujoco.readthedocs.io/en/stable/modeling.html](https://mujoco.readthedocs.io/en/stable/modeling.html#cslippage), "Contact slip"); the
-handoff cites a so101Sim / YAM grasp study with 1–2 mm elliptic vs 1–2.8 cm pyramidal creep. Our scene is the
+handoff cites a [so101Sim](https://github.com/pulipakaa24/so101Sim) / YAM grasp study with 1–2 mm elliptic vs 1–2.8 cm pyramidal creep. Our scene is the
 lift task's (`assets/so101/scene_box_rl.xml`: 4 × 4 × 6 cm box, friction 1, box solref 0.01 / 1, the arm's
 Menagerie servos, 5 ms step, Newton 10 / 20, **the scene's own setting is elliptic with impratio 10**).
 Protocol (ours): gripper opened at the home pose, the box placed between the jaw tips aligned with the

@@ -79,7 +79,7 @@ TRON1 simulation on CPU MuJoCo, at its nominal realism settings (command and sen
 friction, IMU noise, a 1.5 kg sensor pack), unchanged: none of 16 simulated robots fell over the 8 s drive, turn and
 stop (each stood up for 3 s first, with its commands ramped over 0.5 s, as an operator drives), with 0.27 m/s and
 0.14 rad/s RMS speed and yaw-rate tracking error ([TRON1.md](docs/renders/TRON1.md)). Then
-the SO-101 lifting a box with so101Sim's scripted IK plan, streamed as absolute joint goals at
+the SO-101 lifting a box with [so101Sim](https://github.com/pulipakaa24/so101Sim)'s scripted IK plan, streamed as absolute joint goals at
 [LeRobot](https://github.com/huggingface/lerobot)'s 30 Hz to
 Rhoban [BAM](https://github.com/Rhoban/bam)'s identified model of the standard follower's 7.4 V servos (load-dependent
 gearbox friction, LeRobot's registers): 100 of 100 seeds lift on MuJoCo Warp and on CPU MuJoCo. Scripted, not learned;

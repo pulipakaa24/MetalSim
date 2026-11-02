@@ -1,6 +1,6 @@
 # SO-101 cube lift: a metalsim render
 
-[The Robot Studio's SO-101 arm](https://github.com/TheRobotStudio/SO-ARM100) grasps a 4 x 4 x 6 cm box and lifts it: so101Sim's state-based cube-lift task and its PPO teacher (trained on CPU [MuJoCo](https://github.com/google-deepmind/mujoco) in so101Sim), played on metalsim ([MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp) on Metal) through so101Sim's own observation, action and control loop. The realism check below finds the motion beyond what the standard SO-101 follower's servos can do. Rendered on the 14-inch MacBook Pro (Mac16,6), not in a timing run, so its Performance table is not a timing figure.
+[The Robot Studio's SO-101 arm](https://github.com/TheRobotStudio/SO-ARM100) grasps a 4 x 4 x 6 cm box and lifts it: [so101Sim](https://github.com/pulipakaa24/so101Sim)'s state-based cube-lift task and its PPO teacher (trained on CPU [MuJoCo](https://github.com/google-deepmind/mujoco) in so101Sim), played on metalsim ([MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp) on Metal) through so101Sim's own observation, action and control loop. The realism check below finds the motion beyond what the standard SO-101 follower's servos can do. Rendered on the 14-inch MacBook Pro (Mac16,6), not in a timing run, so its Performance table is not a timing figure.
 
 **hero** (300 frames, 6.0 s at 50 fps): [video](so101_lift.mp4) (0.8 MB, H.264)
 
@@ -43,7 +43,7 @@ Measured on the machine below; one frame = one policy step ([Isaac Lab](https://
 |---|---|---|---|
 | SO-101 arm MJCF and STL meshes (MuJoCo Menagerie robotstudio_so101; assets/so101/so101.xml) | Google DeepMind MuJoCo Menagerie, from The Robot Studio's SO-ARM100 | Apache-2.0 | https://github.com/google-deepmind/mujoco_menagerie/tree/main/robotstudio_so101 (`committed`) |
 | Lift scene: the arm, a 4 x 4 x 6 cm box on a free joint, the floor (assets/so101/scene_box_rl.xml; physics equal to so101Sim's scene_box_rl.xml) | this repository / so101Sim | Apache-2.0 | `assets/so101/scene_box_rl.xml` (`committed`) |
-| Task, reset distribution and control loop (SO101LiftEnv), ported | so101Sim (pulipakaa24) | no licence file published; the owner's project, used with the owner's approval | https://github.com/pulipakaa24/so101Sim/blob/d4c2990/rl/native/so101_lift.py |
+| Task, reset distribution and control loop (SO101LiftEnv), ported | so101Sim (pulipakaa24) | no licence file published; the owner's project, used with the owner's approval | https://github.com/pulipakaa24/so101Sim/blob/d0546025/rl/native/so101_lift.py |
 | Policy: so101Sim's PPO lift teacher (run 1 + run 2, 8 M steps), extracted to plain torch weights | so101Sim (pulipakaa24), trained on CPU MuJoCo | no licence file published; the owner's project, used with the owner's approval | `runs/film/so101_lift/policy/so101_lift_ppo.pt` (`runs/film/so101_lift/port/extract_policy.py`) |
 | Studio HDRI (poly_haven_studio, 2k) | Poly Haven | CC0 1.0 (Poly Haven; fetched, not committed) | https://polyhaven.com/a/poly_haven_studio (`scripts/fetch_polyhaven_assets.sh train`) |
 | Table texture (wood_table_001, 1k diffuse) | Poly Haven | CC0 1.0 (Poly Haven; fetched, not committed) | https://polyhaven.com/a/wood_table_001 (`scripts/fetch_polyhaven_assets.sh train`) |

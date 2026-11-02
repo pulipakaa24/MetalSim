@@ -55,7 +55,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.a
 
 # so101Sim (the owner's project), at the commit whose env code the port follows; the teacher is so101Sim's run 1
 # checkpoint (tracked there, rl/runs/lift_ppo_run1_backup) continued by its rl/native/continue_lift.py (run 2)
-SO101SIM = dict(repo="https://github.com/pulipakaa24/so101Sim", commit="d4c2990",
+# (`d0546025` is the public commit; the files named here are byte-identical to `d4c2990`, which the records name)
+SO101SIM = dict(repo="https://github.com/pulipakaa24/so101Sim", commit="d0546025",
                 env="rl/native/so101_lift.py", train="rl/native/train_lift.py", continue_="rl/native/continue_lift.py",
                 eval="rl/native/eval_lift_native.py", run1="rl/runs/lift_ppo_run1_backup")
 SCENE = "assets/so101/scene_box_rl.xml"
@@ -1718,7 +1719,7 @@ SO101_LIFT = FilmTask(
     adapter_kw={},
     title="SO-101 cube lift",
     summary=("[The Robot Studio's SO-101 arm](https://github.com/TheRobotStudio/SO-ARM100) grasps a 4 x 4 x 6 cm box and "
-             "lifts it: so101Sim's state-based cube-lift task and its PPO teacher (trained on CPU "
+             "lifts it: [so101Sim](https://github.com/pulipakaa24/so101Sim)'s state-based cube-lift task and its PPO teacher (trained on CPU "
              "[MuJoCo](https://github.com/google-deepmind/mujoco) in so101Sim), played on metalsim "
              "([MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp) on Metal) "
              "through so101Sim's own observation, action and control loop. The realism check below finds the motion "
