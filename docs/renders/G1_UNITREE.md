@@ -156,25 +156,26 @@ runs/film/g1_unitree/readme/frames docs/renders/g1_unitree.webp --start 0.5 --se
 changes (hence `+dirty` in the pins), on [my fork of MuJoCo
 Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) at
 [`8eb51fe`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624), not the commit
-the top-level README.md's `pip install` line pins (with [my fork of
+MetalSim's install pins (README.md's `pip install` line) (with [my fork of
 Warp](https://github.com/pulipakaa24/warp/tree/metalsim) at
 [`4127c481`](https://github.com/pulipakaa24/warp/commit/4127c4818334080de6f3d23aef522e582ff6a2a7), not the commit
-`scripts/setup_warp.sh` pins). It replaces a take recorded at 13:55 the same day on a stale checkout of my fork
+MetalSim's install pins (`scripts/setup_warp.sh`)). It replaces a take recorded at 13:55 the same day on a stale
+checkout of my fork
 ([`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc)); the two
 recordings differ by at most 2 um in any body position. The frames on this page were rendered again on 2026-10-31 at
-21:48 from that same recording (`rec.npz`, `rec.json` and `twin.xml` unchanged; that render ran on my fork of Warp at
-the commit `scripts/setup_warp.sh` pins, as the render stage's pins above say), after the film tool started laying the
-floor texture at its real size (`ground_tile_m`; the earlier frames drew it 2.35 times too large, as 50 cm planks). This
-was not a timing run: MetalSim's timing runs are made on the 16-inch MacBook Pro through the GPU queue's timing kind
-(`scripts/gpu_run.sh`), and its throughput figures are in `docs/PARITY.md` §1.4 and §1.8; quote nothing on this page as
-MetalSim's speed. Power, as the stages stamped it ("Hardware and pins" below): on battery, 86 %, discharging, when the
-record stage wrote `rec.json` at 15:52; on AC power, 79 %, charging, at the hero shot's first frame at 21:48 and on AC
-power, 79 %, charging, at the readme shot's at 21:50 (local time; the two render stamps are the re-render's), with
-pmset's power-mode setting at High Power at every stamp (`powermode 2`: the configured setting, which does not show that
-the machine ran in High Power Mode); the encode and doc stages stamp nothing. Record and render ran as GPU-queue jobs of
-kind render, one at a time, into `runs/film/g1_unitree`: `--stage record`, then `--stage render` (both shots); later a
-second `--stage render` job (both shots, the real-size floor); then `--stage encode --shots hero`, the README WebP
-command above and `--stage doc` (CPU).
+21:48 from that same recording (`rec.npz`, `rec.json` and `twin.xml` unchanged; that render ran on my fork of Warp, as
+the render stage's pins above say), after the film tool started laying the floor texture at its real size
+(`ground_tile_m`; the earlier frames drew it 2.35 times too large, as 50 cm planks). This was not a timing run:
+MetalSim's timing runs are made on the 16-inch MacBook Pro through the GPU queue's timing kind (`scripts/gpu_run.sh`),
+and its throughput figures are in `docs/PARITY.md` §1.4 and §1.8; quote nothing on this page as MetalSim's speed. Power,
+as the stages stamped it ("Hardware and pins" below): on battery, 86 %, discharging, when the record stage wrote
+`rec.json` at 15:52; on AC power, 79 %, charging, at the hero shot's first frame at 21:48 and on AC power, 79 %,
+charging, at the readme shot's at 21:50 (local time; the two render stamps are the re-render's), with pmset's power-mode
+setting at High Power at every stamp (`powermode 2`: the configured setting, which does not show that the machine ran in
+High Power Mode); the encode and doc stages stamp nothing. Record and render ran as GPU-queue jobs of kind render, one
+at a time, into `runs/film/g1_unitree`: `--stage record`, then `--stage render` (both shots); later a second `--stage
+render` job (both shots, the real-size floor); then `--stage encode --shots hero`, the README WebP command above and
+`--stage doc` (CPU).
 
 ## Reproduce
 

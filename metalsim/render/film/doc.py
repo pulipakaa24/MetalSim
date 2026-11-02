@@ -85,21 +85,10 @@ FORK_NAMES = {"mujoco_warp": "my fork of MuJoCo Warp", "warp": "my fork of Warp"
 FORK_LINKS = {k: f"[{v}](https://github.com/{GITHUB[k]}/tree/metalsim)" for k, v in FORK_NAMES.items()}
 # The forks' clones, relative to a checkout (scripts/setup_warp.sh, scripts/fork_sync.sh; tests/test_fork_pins.py)
 FORK_CLONES = {"mujoco_warp": ("upstream/mujoco_warp",), "warp": ("upstream/warp-metalsim", "upstream/warp-innate")}
-# MetalSim commits a stage logged under another SHA than GitHub shows for them: logged abbreviated SHA -> GitHub's full
-# SHA. A doc names and links GitHub's.
-METALSIM_GITHUB_SHA = {"cb76304fe6": "68c478bba217a0edd89e7ffa521eed26ba3fbf09"}
 # Where each pin of ``fork_pins`` is set, as the notes name it
-PIN_SOURCES = {"mujoco_warp": "the commit the top-level README.md's `pip install` line pins",
-               "warp": "the commit `scripts/setup_warp.sh` pins"}
+PIN_SOURCES = {"mujoco_warp": "the commit MetalSim's install pins (README.md's `pip install` line)",
+               "warp": "the commit MetalSim's install pins (`scripts/setup_warp.sh`)"}
 
-
-def _github_sha(module: str, sha: str) -> str:
-    """``sha`` (no "+dirty") as GitHub shows the commit: ``METALSIM_GITHUB_SHA``'s SHA for a metalsim commit listed
-    there, abbreviated to the logged length; else ``sha`` itself."""
-    for k, v in (METALSIM_GITHUB_SHA.items() if module == "metalsim" and sha else ()):
-        if k.startswith(sha) or sha.startswith(k):
-            return v[:len(sha)]
-    return sha
 
 
 def _main_checkout() -> str:
@@ -115,7 +104,7 @@ def commit_url(module: str, sha: str) -> str | None:
     repository for metalsim; for a fork, its clone (``FORK_CLONES``) in this checkout or in the main checkout of a git
     worktree. A commit counts as on GitHub when a branch of the clone's ``origin`` remote contains it. A fork commit no
     local clone holds is linked by the logged abbreviated SHA, which GitHub resolves."""
-    sha = _github_sha(module, (sha or "").split("+")[0])
+    sha = (sha or "").split("+")[0]
     if module not in GITHUB or not re.fullmatch(r"[0-9a-f]{7,40}", sha):
         return None
     roots = dict.fromkeys((provenance.ROOT, _main_checkout()))
@@ -133,11 +122,11 @@ def commit_url(module: str, sha: str) -> str | None:
 
 def commit_md(module: str, sha: str) -> str:
     """Commit ``sha`` of ``module`` as a markdown link to its GitHub page (``commit_url``), the logged text ("+dirty"
-    included; the SHA as GitHub shows it, ``_github_sha``) as the link text; "" when a reader cannot reach the commit,
+    included) as the link text; "" when a reader cannot reach the commit,
     so the doc leaves the hash out."""
     url = commit_url(module, sha)
     base, plus, rest = (sha or "").partition("+")
-    return f"[`{_github_sha(module, base)}{plus}{rest}`]({url})" if url else ""
+    return f"[`{base}{plus}{rest}`]({url})" if url else ""
 
 
 def _software(sw: dict) -> str:
@@ -193,13 +182,13 @@ class Take:
         return (len(sha) >= 7 and pin.startswith(sha)) if sha and pin else None
 
     def fork_at(self, module, stage="record", link=True, n=7) -> str:
-        """Which commit of the fork of ``module`` (mujoco_warp or warp) the stage ran, as prose: "[my fork of MuJoCo
-        Warp](...) at the commit the top-level README.md's `pip install` line pins" when it is this tree's pin
-        (``fork_pins``), else "... at [`8eb51fe`](...), not the commit the top-level README.md's `pip install` line
-        pins". ``link`` False: the fork's name without its link (a later mention in the same section)."""
+        """Which commit of the fork of ``module`` (mujoco_warp or warp) the stage ran, as prose: just "[my fork of MuJoCo
+        Warp](...)" when it is this tree's pin (``fork_pins``; no hash, the link says it), else "... at
+        [`8eb51fe`](...), not the commit MetalSim's install pins (...)". ``link`` False: the fork's name without its
+        link (a later mention in the same section)."""
         name = FORK_LINKS[module] if link else FORK_NAMES[module]
         if self.at_pin(module, stage):
-            return f"{name} at {PIN_SOURCES[module]}"
+            return name
         c = self.commit_md(module, stage, n)
         return f"{name} at {c}, not {PIN_SOURCES[module]}" if c else f"{name}, not at {PIN_SOURCES[module]}"
 

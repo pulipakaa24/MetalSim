@@ -823,8 +823,7 @@ def _g1_bumps_notes(take) -> str:
             "applied to the record of 2026-10-31 23:37).")
         the_take = take.fill(f"""
 **The take.** The level is Isaac's own terrain because it is the only one Isaac Lab defines, not because of its outcome;
-its bumps (2 to 10 cm) are clearly visible. The record stage is one more run of the 16 lanes on MetalSim's MuJoCo Warp
-({take.fork_at("mujoco_warp")}), so its outcome is one draw from the spread above: {f['falls']} of {f['n']}
+its bumps (2 to 10 cm) are clearly visible. The record stage is one more run of the 16 lanes on {take.fork_at("mujoco_warp")}, so its outcome is one draw from the spread above: {f['falls']} of {f['n']}
 robots fall in it (the four measurement runs of this tile: 10, 11, 11 and 11). The film shows the record's typical
 outcome (`adapter_kw["pick"] = "typical"`, `UnitreeG1._rank_typical`): as at least half of the 16 fell, the fallen robot
 whose fall time is nearest the median fall time of all {p.get('envs_down', f['falls'])} ({p.get('median', 0):.2f} s),

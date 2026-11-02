@@ -194,24 +194,23 @@ outline (hero frames 88 and 175, readme frame 150). The colours, on these frames
 [`e67efcb9`](https://github.com/pulipakaa24/MetalSim/commit/e67efcb9f92455f1dc723b3f9c7d7ba2ad85856e) plus this film's
 uncommitted pre-roll and ramps and other films' uncommitted film-tool work, whose new settings (`after_end`,
 `rank_keeps_terminated`) stay at their defaults here (hence `+dirty` in the pins), with the main venv's checkout of [my
-fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) at the commit the top-level README.md's
-`pip install` line pins ([my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) at the commit
-`scripts/setup_warp.sh` pins; the physics here is CPU MuJoCo, which neither checkout touches). This was not a timing
-run: quote nothing on this page as MetalSim's speed (MetalSim's throughput figures are in `docs/PARITY.md` §1.4 and
-§1.8). The record stage simulates on the CPU (one CPU MuJoCo `Tron1Sim` per robot, run one after another) and runs
-LimX's ONNX files with [onnxruntime](https://github.com/microsoft/onnxruntime) 1.31.0 (CPU, one thread; the `tron1`
-extra of `pyproject.toml`, which the record stage needs: `pip install -e '.[tron1]'`; the pins below list a fixed set of
-modules and omit it). Power, as the stages stamped it ("Hardware and pins" below): on AC power, 90 %, charging, when the
-record stage wrote `rec.json` at 23:42; on AC power, 100 %, finishing charge, at the hero shot's first frame at 00:42
-and on AC power, 100 %, finishing charge, at the readme shot's at 00:44 (local time), with pmset's power-mode setting at
-High Power at every stamp (`powermode 2`: the configured setting, which does not show that the machine ran in High Power
-Mode); the encode and doc stages stamp nothing. The record ran with a first render as one GPU-queue job
-(`scripts/gpu_run.sh`) of kind render, into `runs/film/tron1`: `--stage record`, then a check that the recording was new
-and made with the pre-roll and ramps, then `--stage render`. That render drew the robot in the MJCF's colours, white. A
-second `--stage render` of the same recording drew it in the robot's real colours, once the film tool wrote a
-`look.materials` colour into the geom's own `rgba` as well (`render.build_scene`; MuJoCo draws a geom's own `rgba` over
-its material's), but it drew the concrete times LimX's floor `rgba` (0.5 / 0.6 / 0.7), at exposure 1.4. The frames on
-this page are a third (both shots, a GPU-queue job of kind render of its own), at metalsim
+fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) ([my fork of
+Warp](https://github.com/pulipakaa24/warp/tree/metalsim); the physics here is CPU MuJoCo, which neither checkout
+touches). This was not a timing run: quote nothing on this page as MetalSim's speed (MetalSim's throughput figures are
+in `docs/PARITY.md` §1.4 and §1.8). The record stage simulates on the CPU (one CPU MuJoCo `Tron1Sim` per robot, run one
+after another) and runs LimX's ONNX files with [onnxruntime](https://github.com/microsoft/onnxruntime) 1.31.0 (CPU, one
+thread; the `tron1` extra of `pyproject.toml`, which the record stage needs: `pip install -e '.[tron1]'`; the pins below
+list a fixed set of modules and omit it). Power, as the stages stamped it ("Hardware and pins" below): on AC power, 90
+%, charging, when the record stage wrote `rec.json` at 23:42; on AC power, 100 %, finishing charge, at the hero shot's
+first frame at 00:42 and on AC power, 100 %, finishing charge, at the readme shot's at 00:44 (local time), with pmset's
+power-mode setting at High Power at every stamp (`powermode 2`: the configured setting, which does not show that the
+machine ran in High Power Mode); the encode and doc stages stamp nothing. The record ran with a first render as one
+GPU-queue job (`scripts/gpu_run.sh`) of kind render, into `runs/film/tron1`: `--stage record`, then a check that the
+recording was new and made with the pre-roll and ramps, then `--stage render`. That render drew the robot in the MJCF's
+colours, white. A second `--stage render` of the same recording drew it in the robot's real colours, once the film tool
+wrote a `look.materials` colour into the geom's own `rgba` as well (`render.build_scene`; MuJoCo draws a geom's own
+`rgba` over its material's), but it drew the concrete times LimX's floor `rgba` (0.5 / 0.6 / 0.7), at exposure 1.4. The
+frames on this page are a third (both shots, a GPU-queue job of kind render of its own), at metalsim
 [`68f695b2`](https://github.com/pulipakaa24/MetalSim/commit/68f695b29fc0ef9f049b6d025f3e8937e72d8414) plus uncommitted
 files, this film's colours and exposure among them: the film tool now also writes the ground tint into the floor's
 `rgba`, so the concrete is in its own colours, and the exposure is the grey card's 0.9 ("Exposure" above); the render

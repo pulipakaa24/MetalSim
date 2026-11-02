@@ -39,7 +39,7 @@ Measured on the machine below; one frame = one policy step ([Isaac Lab](https://
 
 - Mac16,5 (Apple M4 Max, 40 GPU cores, 64 GB), macOS 26.7.1 (25G241).
 - Power as each stage stamped it (`pmset -g batt` and `pmset -g`; `hardware.power`: the record stage's when it wrote rec.json, a render shot's at its first frame): record: not recorded; render hero: not recorded; render grid: not recorded.
-- metalsim [`68c478bba2`](https://github.com/pulipakaa24/MetalSim/commit/68c478bba217a0edd89e7ffa521eed26ba3fbf09); record stage (newton152 venv): warp 1.18.0.dev20260917 ([`52c09cdd82`](https://github.com/pulipakaa24/warp/commit/52c09cdd82f79e8564b5ae17cdcee7b52d10d075)), newton 1.5.2 ([`addd10cbeb`](https://github.com/pulipakaa24/newton/commit/addd10cbeb)), mujoco 3.11.0, mujoco_warp 3.11.0, torch 2.14.0, numpy 2.5.3.
+- record stage (newton152 venv): warp 1.18.0.dev20260917 ([`52c09cdd82`](https://github.com/pulipakaa24/warp/commit/52c09cdd82f79e8564b5ae17cdcee7b52d10d075)), newton 1.5.2 ([`addd10cbeb`](https://github.com/pulipakaa24/newton/commit/addd10cbeb)), mujoco 3.11.0, mujoco_warp 3.11.0, torch 2.14.0, numpy 2.5.3.
 - render stage (main venv): warp 1.18.0.dev20260917 ([`52c09cdd82`](https://github.com/pulipakaa24/warp/commit/52c09cdd82f79e8564b5ae17cdcee7b52d10d075)), mujoco 3.14.0, numpy 2.5.3.
 
 ## Assets
