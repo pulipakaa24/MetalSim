@@ -4,7 +4,6 @@ Status 2026-09-26. Head: [my fork of MuJoCo Warp](https://github.com/pulipakaa24
 [`6d8e29a`](https://github.com/pulipakaa24/mujoco_warp/commit/6d8e29a210ed0d1812118c3cd22b5e3450b6d2d3) (one commit on upstream `main` [`cc97eea`](https://github.com/google-deepmind/mujoco_warp/commit/cc97eea203bb6d18f5795cd5922a65da1e1051ce), which is still upstream's head; no rebase needed). Author and committer
 `Aditya Pulipaka <adipu@utexas.edu>`, no co-author trailer (upstream [AGENTS.md](https://github.com/google-deepmind/mujoco_warp/blob/main/AGENTS.md): AI co-authors fail the CLA check).
 Commit message unwrapped per upstream AGENTS.md. Issue filed: https://github.com/google-deepmind/mujoco_warp/issues/1704.
-Worktree: `upstream/mujoco_warp-pr`.
 
 Checks run 2026-09-26 (CPU only; scratch venv from upstream's `uv.lock`: warp-lang 1.15.0, mujoco 3.13.1):
 - `pytest mujoco_warp/_src -q --cpu -n 8`: 1514 passed, 39 skipped, 1 failed

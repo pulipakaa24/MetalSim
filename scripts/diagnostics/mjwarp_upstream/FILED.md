@@ -20,8 +20,8 @@ Warp CPU device) unless marked as fork-measured. Reproducers: `flex_issue_harnes
 State on 2026-10-13 (`gh issue view`, `runs/docs_audit/upstream_state.log`): #1705-#1708 closed upstream (2026-10-01 /
 2026-10-07; the log records the state, not whether a fix landed), #1704, #1709 and mujoco #3628 still open. [#1700](https://github.com/google-deepmind/mujoco_warp/pull/1700) is
 merged upstream (2026-09-25) and still not in the commit of [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) that MetalSim pinned then,
-[`f1b35e2`](https://github.com/pulipakaa24/mujoco_warp/commit/f1b35e2b3ddc80b197b0c665bf6d71523d175daf) (`patches/mujoco_warp/metalsim-f1b35e2.diff`
-has no part of it).
+[`f1b35e2`](https://github.com/pulipakaa24/mujoco_warp/commit/f1b35e2b3ddc80b197b0c665bf6d71523d175daf)
+([`patches/mujoco_warp/metalsim-f1b35e2.diff`](https://github.com/pulipakaa24/MetalSim/blob/a577e0ff2054a036d05a2b4b1fa35eba97360e69/patches/mujoco_warp/metalsim-f1b35e2.diff) has no part of it).
 
 ## Not filed, and why
 

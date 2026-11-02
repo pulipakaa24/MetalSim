@@ -56,8 +56,9 @@ Metal supports 2^24 instances, 2^28 primitives and 2^24 geometries per accelerat
 needs `MTLAccelerationStructureUsageExtendedLimits` (up to 2^30) and the `extended_limits` tag on every intersector
 that traverses it (`metalsim/render/as_limits.py`). Before 2026-10-13 the grains were one flat top-level structure
 of 25.1 M instances built without the flag, outside the supported range. On macOS 26, with the demo's four ground
-planes, that build never finished: still at 100 % utilisation after 900 s (`runs/stall_bisect/`), the same build with
-one plane took 1 s. The GPU work outlived the killed process, and the Mac rebooted after each such run. The 14-inch
+planes, that build never finished: still at 100 % utilisation after 900 s (`scripts/particle_demo/stall_bisect.sh`,
+stage `slow`; logs not published), the same build with one plane took 1 s. The GPU work outlived the killed process,
+and the Mac rebooted after each such run. The 14-inch
 MacBook Pro (M4 Max, macOS 27) built and rendered it, so it rendered by luck.
 
 Now:

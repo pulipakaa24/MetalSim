@@ -10,9 +10,10 @@ patch series and the merged heads).
 Target: google-deepmind/mujoco_warp (base v3.14.0,
 [`88af9cc`](https://github.com/google-deepmind/mujoco_warp/commit/88af9cc682d42e2e925daa0bae25f53277999f7b)). Fixes live
 on branch [`metalsim-flex`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-flex) of my fork (commits listed
-per item); each is behind a module flag in `mujoco_warp/_src/collision_flex.py` so the upstream behaviour is one
-assignment away. Reference: [MuJoCo](https://github.com/google-deepmind/mujoco) C 3.14.0 (pip) and MuJoCo C `main`
-(2026-09-23, built locally) where they differ.
+per item); each is behind a module flag in
+[`mujoco_warp/_src/collision_flex.py`](https://github.com/pulipakaa24/mujoco_warp/blob/metalsim-flex/mujoco_warp/_src/collision_flex.py)
+so the upstream behaviour is one assignment away. Reference: [MuJoCo](https://github.com/google-deepmind/mujoco) C
+3.14.0 (pip) and MuJoCo C `main` (2026-09-23, built locally) where they differ.
 
 Reproducers: `upstream_repro.py` (plain MuJoCo Warp API, no MetalSim; run it with the unmodified and the fixed
 MuJoCo Warp) and `row_order_repro.py`. Each case steps MuJoCo C (float64) into contact, hands that exact state to
@@ -129,7 +130,7 @@ MuJoCo and MuJoCo Warp (make the flex cap a model option, e.g. per flex); commit
 On the branch's merge into `metalsim`
 ([my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim)), Go1, Panda and Isaac's G1 run
 bitwise identical to the unmerged `metalsim` over 200 steps × 8 worlds on the CPU device; the Metal run and the MetalSim
-rigid tests are in the final report (`runs/deformable/merge_rigid_ab.log`). Upstream test suite on the branch: 1450
+rigid tests are in the final report (`runs/deformable/merge_rigid_ab_run1.log`). Upstream test suite on the branch: 1450
 passed, 2 failed (both pre-existing and unrelated: `io_test::test_put_data_nefc_zero_dense`,
 `collision_driver_test::test_hfield_maxconpair` — the latter from MetalSim's heightfield patch, fails identically
 without the flex changes).

@@ -1,6 +1,6 @@
 # Scalable run-to-run deterministic float atomics and reductions on GPUs (batched robot sim, thousands of worlds)
 
-Researched 2026-10-10. Versions are cited inline. "Local measurement" means a probe I ran on this machine (Apple M4 Max, 40-core GPU, macOS Darwin 25.6, Metal runtime compile through Swift `MTLDevice.makeLibrary(source:)`). The probe sources are in the session scratchpad, not in the repo.
+Researched 2026-10-10. Versions are cited inline. "Local measurement" means a probe I ran on this machine (Apple M4 Max, 40-core GPU, macOS Darwin 25.6, Metal runtime compile through Swift `MTLDevice.makeLibrary(source:)`). The probe sources are not published; `metalsim/physics/mpm/probes/a64.swift` and `tgtest.swift` cover some of the same compile checks (64-bit and threadgroup atomics).
 
 ## Q1. NVIDIA Warp deterministic mode: mechanism, coverage, overhead, version
 
@@ -66,7 +66,7 @@ Warp added `wp.config.deterministic` / `wp.DeterministicMode` in **1.15.0 (2026-
 
 ### Gaps
 - I found no published Warp overhead numbers on other GPUs (H100/Blackwell) or for realistic multi-kernel physics steps.
-- `asv/benchmarks/deterministic.py` exists in the repo, but I did not find published results from it.
+- [`asv/benchmarks/deterministic.py`](https://github.com/NVIDIA/warp/blob/main/asv/benchmarks/deterministic.py) exists in the Warp repo, but I did not find published results from it.
 
 ## Q2. MuJoCo Warp, Newton, Isaac Lab / PhysX determinism guarantees and cost
 

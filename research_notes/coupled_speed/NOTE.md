@@ -14,17 +14,18 @@ and logs are in `runs/mpm/coupled_speed/`.
   - J has one block row per grid node, with at most 3 blocks (`max_blocks_per_node = 3`).
   - IJtm has one block row per rigid-body block column (2 per body: linear and angular). Each of its rows holds one
     block per collider node of that body.
-- Warp's `bsr_mv` chooses between two kernels (`warp/_src/sparse.py`, `bsr_mv`). The tiled kernel is used when
-  `nnz * block_size > 2 * tile_size * rows`, with tile_size 64, but only for `device.is_cuda`. Everything else gets one
-  thread per (row, sub-row), summing the row's blocks serially.
+- Warp's `bsr_mv` chooses between two kernels
+  ([`warp/_src/sparse.py`](https://github.com/pulipakaa24/warp/blob/95f6f121b7e67025958335c7c15e338ac04a798a/warp/_src/sparse.py),
+  `bsr_mv`). The tiled kernel is used when `nnz * block_size > 2 * tile_size * rows`, with tile_size 64, but only for
+  `device.is_cuda`. Everything else gets one thread per (row, sub-row), summing the row's blocks serially.
   - The L4's nsys profile shows exactly one tiled and one untiled product per iteration:
     `runs/mpm/profile/kernels_l4/twoway_coupling*_cuda_gpu_kern_sum.csv` (204 launches each over 4 frames).
 - On Metal, Newton's `_ListedRowsMv` (in [my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim-1.5.2))
   uses the untiled body for both products.
 - The Metal `tile_sum` of [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim)
-  (`warp/native/tile_reduce.h`, `metal_reduce::block_reduce`) uses the same per-SIMD-group shuffle-down tree as CUDA's
-  `warp_reduce`. It then folds the group partials in index order, as CUDA's `block_combine_thread_results` does with its
-  warp partials.
+  ([`warp/native/tile_reduce.h`](https://github.com/pulipakaa24/warp/blob/95f6f121b7e67025958335c7c15e338ac04a798a/warp/native/tile_reduce.h),
+  `metal_reduce::block_reduce`) uses the same per-SIMD-group shuffle-down tree as CUDA's `warp_reduce`. It then folds
+  the group partials in index order, as CUDA's `block_combine_thread_results` does with its warp partials.
   - So with the same kernel choice, Metal sums the long rows in the L4's order: 64 strided lane sums, then the tree.
   - FMA placement follows `fuse_fp` on both, as in every other kernel.
 
@@ -57,7 +58,8 @@ and logs are in `runs/mpm/coupled_speed/`.
 
 **Kept from the reading ([my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) at
 [`95f6f121`](https://github.com/pulipakaa24/warp/commit/95f6f121b7e67025958335c7c15e338ac04a798a),
-`warp/_src/context.py`)**, since the module-option machinery is shared, e.g. by `BatchSimOptions(deterministic=True)`:
+[`warp/_src/context.py`](https://github.com/pulipakaa24/warp/blob/95f6f121b7e67025958335c7c15e338ac04a798a/warp/_src/context.py))**,
+since the module-option machinery is shared, e.g. by `BatchSimOptions(deterministic=True)`:
 - `set_module_options` updates the options and calls `mark_modified()` (clears hashers, keeps execs).
 - `Module.load` re-hashes and recompiles on a mismatch. The deterministic mode is part of the hash and salts it.
 - Kernel mangled names follow `kernel.hash`.

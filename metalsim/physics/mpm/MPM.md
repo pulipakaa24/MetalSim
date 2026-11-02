@@ -57,7 +57,7 @@ Research behind every choice: `docs/research/mpm_2026-10-09.md` (notes in `docs/
   [Lube 2005][lube2005] (1.2a = 2.4).
 * **Coverage:** column, plate (RFT), and Newton's granular, multi_material, viscous, twoway_coupling (454k particles)
   and anymal (486k particles, [MuJoCo Warp][mjw] robot) examples run on Metal; snow_ball and beam_twist need the fix
-  [`abd59275`][] in [my fork of Warp][warp-fork] (branch `metalsim-fem-threadgroup`, `upstream/warp-innate-tgfix`: a
+  [`abd59275`][] in [my fork of Warp][warp-fork] (branch `metalsim-fem-threadgroup`: a
   `wp.static(x) > 1` condition kept an unused 75 KB `tile_sum` in `warp.fem`'s bilinear dispatch kernel).
 * **Newton behaviour to account for:** with `separate_worlds`, two identical worlds give different trajectories
   (Gauss-Seidel color order differs per world), so per-environment comparisons must pair the same environment index.
@@ -154,7 +154,7 @@ nodes exactly equidistant from two collider faces, and last-bit rounding everywh
 
 1. **FMA contraction.** Warp's `fuse_fp` module option (documented default: on) compiles CUDA with `--fmad=true`, so
    `a*b+c` is one rounding; my fork's Metal path ignored it (strict IEEE, two roundings). Fix: branch
-   `metalsim-fp-contract` (`upstream/warp-innate-fpcontract`): `#pragma clang fp contract(fast)` in the Metal
+   `metalsim-fp-contract`: `#pragma clang fp contract(fast)` in the Metal
    prelude when `fuse_fp` is on. Metal then reproduces CUDA bit for bit on every tested expression shape (a*b+c,
    a*b+-c*d, three-term sums and squares, (a-b)*(c-d)+e, c-a*b). This changes rounding in every Metal Warp kernel,
    so it is a separate branch: merging it means re-running the rigid-body parity suite. (**Done:** merged into my
@@ -226,7 +226,7 @@ microbenchmarks.
 | GPU-decided solver stop (indirect execution range zeroed by a gate kernel; `newton_compat gpu_exit`) | metalsim | granular 72.8 -> 63.3 ms (interleaved A/B); same stopping iterations |
 | solver loop inside an outer capture (unrolled gated chunks) -> the examples' whole-step capture works on Metal | metalsim | two-way captured, bitwise equal to eager |
 
-Merged Warp tree: `metalsim-mpm-fast` (`upstream/warp-innate-fast`, = FMA + LBVH + ray fix + sort + BSR + volume).
+Merged Warp tree: `metalsim-mpm-fast` (= FMA + LBVH + ray fix + sort + BSR + volume).
 Timing-class runs, 2 s, ms/frame, Metal (eager / captured) vs L4 best: column a=2 11.7 vs 20.4 (Metal 1.7x faster);
 ANYmal 44.5 / 32.2 vs 24.2; plate drag 49.6 vs 35.7; granular 53.8 vs 35.8; column a=8 43.2 vs 28.6; multi_material
 63.2 vs 35.5; two-way 87.2 / 61 vs 31.0 (two-way frame cost grows over the run: ~53 ms in the first second, 62 in the
@@ -438,8 +438,8 @@ grid; the Metal path drained the device before a free that is already deferred: 
 Warp's `capture_while` constraint loop reads the condition before every iteration (anymal 15.5 of 18 waits per frame,
 twoway 8 of 12); the opt-in eager conditionals cut anymal 17 -> 10 and twoway 11.9 -> 5.1 waits per frame
 (bitwise; frame time -0.6 / -0.3 ms). Bitwise: unlogged recordings of all six floor scenes after steps 2, 3 and 4 equal
-the step-1 recordings byte for byte (`bitwise_report.py`, `runs/mpm/speed_rec/s{1..4}_*_nolog`), and the eager
-conditionals reproduce anymal and twoway (`s5_eagercond_nolog`).
+the step-1 recordings byte for byte (`bitwise_report.py`, `runs/mpm/speed_rec/`: `s1_fastmath_nolog` to
+`s4_batch_nolog`), and the eager conditionals reproduce anymal and twoway (`s5_eagercond_nolog`).
 
 ### 3. Fixed per-dispatch cost: argument address space
 
@@ -467,9 +467,9 @@ Tests: Warp `test_metal.py` (26, 3 new), `test_metal_primitives.py`, `test_metal
 
 ## 8b. Integrated branches (2026-10-11)
 
-[My fork of Warp][warp-fork]: `metalsim-integrated` (`upstream/warp-innate-integrated`) = `metalsim-mpm-scale` +
+[My fork of Warp][warp-fork]: `metalsim-integrated` = `metalsim-mpm-scale` +
 `metalsim-mpm-speed` + `metalsim-metal-det-sort` merged on [`c160f7e4`][]; [my fork of Newton][newton-fork-152]:
-`metalsim-integrated` (`upstream/newton-integrated`) = `metalsim-mpm-scale` + `metalsim-rigid-det-sort` on
+`metalsim-integrated` = `metalsim-mpm-scale` + `metalsim-rigid-det-sort` on
 [`53a903d7`][]. On top of the merges:
 
 * Deterministic launches honour `wp.launch(..., dim_limit=)` in every kernel pass (the passes after the kernel read

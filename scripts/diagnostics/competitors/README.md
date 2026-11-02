@@ -31,6 +31,8 @@ scripts/diagnostics/competitors/elliptic_fidelity_g1.sh MJW_WORKTREE rec|transfe
 python scripts/diagnostics/competitors/so101_creep.py --engine c|warp             # SO-101 in-hand creep per cone / impratio
 ```
 `elliptic_presets.py` registers the elliptic variants of the adopted G1 preset and runs another script. `MENAGERIE`
-defaults to `scripts/diagnostics/competitors/menagerie`; this machine's checkout is `upstream/mujoco_menagerie`.
+defaults to `scripts/diagnostics/competitors/menagerie`, a sparse checkout of
+[MuJoCo Menagerie](https://github.com/google-deepmind/mujoco_menagerie) with `unitree_go2` and `unitree_g1` (not
+committed); this machine's checkout is `upstream/mujoco_menagerie`.
 The scripts write `ctrl` and reset state through Warp after `sim.synchronize()` (a torch/MPS write into the shared
 buffer races with a still-running graph; `metalsim_step.py` keeps the torch write, which is harmless for timing).

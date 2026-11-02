@@ -5,8 +5,8 @@ the test wanted 37 + 24·4 = 133), the task default (njmax 112, test 144), and "
 Versions: [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) at
 [`95f6f121`](https://github.com/pulipakaa24/warp/commit/95f6f121b7e67025958335c7c15e338ac04a798a) (1.18.0.dev20260917),
 [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) at
-[`cf0f8ad`](https://github.com/pulipakaa24/mujoco_warp/commit/cf0f8adc8f99f0c559cf8580cb667952e473bd07)
-(`upstream/mujoco_warp`), [MuJoCo](https://github.com/google-deepmind/mujoco) 3.14.0, `.venv`.
+[`cf0f8ad`](https://github.com/pulipakaa24/mujoco_warp/commit/cf0f8adc8f99f0c559cf8580cb667952e473bd07),
+[MuJoCo](https://github.com/google-deepmind/mujoco) 3.14.0, `.venv`.
 
 ## Rows per contact
 

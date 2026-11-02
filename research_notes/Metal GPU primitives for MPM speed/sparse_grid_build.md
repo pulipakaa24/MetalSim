@@ -1,8 +1,8 @@
 # Sparse-grid (NanoVDB) construction for Newton implicit MPM: the CUDA path, its primitives, and a Metal port
 
 Sources were read locally and checked against upstream on 2026-10-10:
-- **Warp.** The [innate-inc Warp fork](https://github.com/innate-inc/warp) at `upstream/warp-innate-mpm` (1.18.0.dev20260917). These files are byte-identical (md5) to NVIDIA/warp tag `v1.18.0`: `volume_builder.cu`, `volume_builder.cpp`, `volume_builder.h`, `fem/geometry/nanogrid.py`, `fem/utils.py`, `fem/space/partition.py` and `native/sort.cpp`. `volume.cpp` differs, because it contains the fork's Metal bridge.
-- **Newton.** Newton at `upstream/newton-1.5.2` (tag [v1.5.2](https://github.com/newton-physics/newton/tree/v1.5.2), upstream commit [`cf5378db`](https://github.com/newton-physics/newton/commit/cf5378db6002b5c19b86344737cdd40cb8e08f0c)).
+- **Warp.** The [innate-inc Warp fork](https://github.com/innate-inc/warp), a local checkout (1.18.0.dev20260917). These files are byte-identical (md5) to NVIDIA/warp tag `v1.18.0`: `volume_builder.cu`, `volume_builder.cpp`, `volume_builder.h`, `fem/geometry/nanogrid.py`, `fem/utils.py`, `fem/space/partition.py` and `native/sort.cpp`. `volume.cpp` differs, because it contains the fork's Metal bridge.
+- **Newton.** Newton at tag [v1.5.2](https://github.com/newton-physics/newton/tree/v1.5.2) (upstream commit [`cf5378db`](https://github.com/newton-physics/newton/commit/cf5378db6002b5c19b86344737cdd40cb8e08f0c)).
 - **Short names.** "W118" below means `https://github.com/NVIDIA/warp/blob/v1.18.0/` and "N152" means `https://github.com/newton-physics/newton/blob/v1.5.2/`.
 
 ## Q1. How Warp (1.16-1.18) builds a NanoVDB grid from points on the GPU, what is CUDA-only, and the CPU path
@@ -117,7 +117,7 @@ Downstream, the particle binning (`PicQuadrature` → `compress_node_indices`) a
 **Stability**
 - **CUB's sort is stable.** `radix_sort_pairs` on CUDA uses `cub::DeviceRadixSort::SortPairs` on `cub::DoubleBuffer`s. — [W118 native/sort.cu](https://github.com/NVIDIA/warp/blob/v1.18.0/warp/native/sort.cu). CCCL documents "DeviceRadixSort is stable." — [CCCL DeviceRadixSort](https://nvidia.github.io/cccl/unstable/cub/api/structcub_1_1DeviceRadixSort.html)
 - **The CPU sort is stable too.** `radix_sort_pairs_host` is an LSD counting sort with 16-bit digits per pass, scattering with `histogram[b]++` in input order. — [W118 native/sort.cpp](https://github.com/NVIDIA/warp/blob/v1.18.0/warp/native/sort.cpp)
-- **The Metal fork runs these utilities on the host.** `warp.utils` sorts, RLE and scans run host-side on Metal (`_runs_on_host`). During capture they are recorded as host calls (`metal_record_host_call`; native `wp_metal_capture_host_op`, "the Python utilities such as array_scan and radix_sort_pairs run on the host for Metal"). — local fork `warp/_src/utils.py`, `warp/native/metal.mm`
+- **The Metal fork runs these utilities on the host.** `warp.utils` sorts, RLE and scans run host-side on Metal (`_runs_on_host`). During capture they are recorded as host calls (`metal_record_host_call`; native `wp_metal_capture_host_op`, "the Python utilities such as array_scan and radix_sort_pairs run on the host for Metal"). — innate-inc fork [`warp/_src/utils.py`](https://github.com/innate-inc/warp/blob/ce15f6bb2545e2d6c4a4c1fac8e40bb800db7265/warp/_src/utils.py), [`warp/native/metal.mm`](https://github.com/innate-inc/warp/blob/ce15f6bb2545e2d6c4a4c1fac8e40bb800db7265/warp/native/metal.mm)
 
 ### Inferences
 - **Results depend on stability.**

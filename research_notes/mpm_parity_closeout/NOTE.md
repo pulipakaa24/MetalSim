@@ -39,11 +39,12 @@ node mass and momentum from particle-to-grid already differed:
 
 ## 2. Root causes (all of class (b): Metal took a different algorithm path than CUDA)
 
-1. **warp.fem's dispatched assembly is tiled on CUDA only.** In `warp/_src/fem/integrate.py`
+1. **warp.fem's dispatched assembly is tiled on CUDA only.** In
+   [`warp/_src/fem/integrate.py`](https://github.com/NVIDIA/warp/blob/v1.16.0/warp/_src/fem/integrate.py)
    (`_generate_auxiliary_kernels`; the same code in the L4's Warp 1.16.0, lines 1308-1325), a linear form whose
    quadrature is "long" (`qp_count * node_element_count >= 3 * 32 * node_count * element_count`) is summed by 32
    lanes per node: strided per-lane sums, then `tile_sum`, which is the warp shuffle-down tree in
-   `native/tile_reduce.h`.
+   [`native/tile_reduce.h`](https://github.com/NVIDIA/warp/blob/v1.16.0/warp/native/tile_reduce.h).
    * The condition starts `not device.is_cuda or ...`, so Metal (and the CPU) always summed sequentially. That is a
      different summation order for every node's mass and momentum.
    * The L4 takes the tiled path in 5 of the 6 floor scenes (`tile_decisions.py`: multi_material, granular,
@@ -71,7 +72,8 @@ node mass and momentum from particle-to-grid already differed:
    The PTX ISA bounds `ex2.approx` at 2 ulp and leaves its bits to the hardware
    ([PTX ISA](https://docs.nvidia.com/cuda/parallel-thread-execution/index.html)). No L4 perturbation changes these
    functions: they are not in fast_math kernels, and NVRTC's `--fmad` does not touch libdevice's explicit `fma`.
-3. **svd3 / eig3 use `::rsqrt` on CUDA and `1 / sqrt` elsewhere** (`native/svd.h`, `recipSqrt`). CUDA's float
+3. **svd3 / eig3 use `::rsqrt` on CUDA and `1 / sqrt` elsewhere**
+   ([`native/svd.h`](https://github.com/NVIDIA/warp/blob/v1.16.0/warp/native/svd.h), `recipSqrt`). CUDA's float
    `rsqrt` is always `rsqrt.approx.f32`, which is MUFU.RSQ (compiled evidence in
    `research_notes/Metal MPM speed and scalable determinism/cuda_approx_math.md`). MUFU.RSQ is correctly rounded on
    78 % of [1, 4); Metal's `1/sqrt` equals it on 67 % (`rsqrt_check.py`). Newton calls `svd3` per particle per step
@@ -82,7 +84,8 @@ node mass and momentum from particle-to-grid already differed:
 ## 3. Fixes (Warp fork, branch `metalsim`)
 
 * `integrate.py`: Metal takes CUDA's tiling choice (`tiles_ok = device.is_cuda or device.is_metal`).
-* `native/metal_cuda_libm.h`: `wp_cuda_logf` / `wp_cuda_expf` / `wp_cuda_sinhf`, built as follows:
+* [`native/metal_cuda_libm.h`](https://github.com/pulipakaa24/warp/blob/metalsim/warp/native/metal_cuda_libm.h):
+  `wp_cuda_logf` / `wp_cuda_expf` / `wp_cuda_sinhf`, built as follows:
   * They follow the PTX operation by operation: `fma` where the PTX has `fma.rn`, and `fma(a, b, signed 0)` for
     single-rounded products, so the Metal compiler cannot contract them.
   * `fma.rm(s, 252, 12582913)` is computed exactly as an integer floor.
@@ -92,8 +95,9 @@ node mass and momentum from particle-to-grid already differed:
     ([pyxis-roc/sass-math](https://github.com/pyxis-roc/sass-math), MIT, `ex2.c` and `reduction/rro_ex2.c`). This is
     the same multifunction-interpolator family as [Oberman & Siu, ARITH-17 2005](https://doi.org/10.1109/ARITH.2005.7).
   * **Equal to the L4 on all 2^32 inputs of each function**: every 4,096-input chunk fingerprint matches.
-* `native/metal_cuda_fast_math.h`: `wp_cuda_rsqrt` is MUFU.RSQ through sass-math's rsqrt table, plus the subnormal
-  pre-scale that ptxas emits for the non-ftz form. It is bitwise equal to the numpy model (`mufu_model.py`, already
+* [`native/metal_cuda_fast_math.h`](https://github.com/pulipakaa24/warp/blob/metalsim/warp/native/metal_cuda_fast_math.h):
+  `wp_cuda_rsqrt` is MUFU.RSQ through sass-math's rsqrt table, plus the subnormal pre-scale that ptxas emits for the
+  non-ftz form. It is bitwise equal to the numpy model (`mufu_model.py`, already
   validated bitwise on the L4 over all of [1, 4)) on all 2^24 inputs in [1, 4) and over exponent shifts 4^-63..4^62.
   `svd.h` uses it on Metal.
 * `warp.config.metal_cuda_libm` (`WP_METAL_CUDA_LIBM`, default on) selects both. When on, every module hash is

@@ -8,8 +8,9 @@ side does. Source reading of [my fork of Warp](https://github.com/pulipakaa24/wa
 [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) and
 [Newton](https://github.com/newton-physics/newton) 1.5.2's `SolverMuJoCo`; the coupled-speed agent's note
 (`research_notes/coupled_speed/NOTE.md` on its branch) reached the same conclusions independently.
-`W` = `upstream/warp-innate/warp/_src`, `MJW` = `upstream/mujoco_warp/mujoco_warp/_src`,
-`N` = `upstream/newton-metalsim-1.5.2/newton/_src`.
+`W` = [`warp/_src`](https://github.com/pulipakaa24/warp/tree/95f6f121b7e67025958335c7c15e338ac04a798a/warp/_src),
+`MJW` = [`mujoco_warp/_src`](https://github.com/pulipakaa24/mujoco_warp/tree/f1b35e2b3ddc80b197b0c665bf6d71523d175daf/mujoco_warp/_src),
+`N` = [`newton/_src`](https://github.com/pulipakaa24/newton/tree/metalsim-1.5.2/newton/_src) (my fork of Newton, `metalsim-1.5.2`).
 
 ## How the mode reaches a kernel (verified)
 

@@ -20,8 +20,9 @@ two-way coupled with the robot, N worlds, rendered by `render/particles.py`; par
 - Found: GS + separate_worlds is not run-to-run repeatable, in Newton's own 1.5.2 too (Jacobi and 1 world are):
   `runs/mpm_main/repeat/mwrep1.log`, `mwrep2.log`. Root cause (code reading): environment-first strain partition vs
   `fill_uniform_color_block_indices` (cell * npe) -> invalid coloring -> data race. Fix written for [my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim-1.5.2)
-  (`runs/mpm_main/fork/b`, kernel `make_partition_color_block_indices_kernel`); CPU dense/fixed multi-env grids VALID
-  with it (sparse multi-env grids only build on GPU).
+  ([`99843d09`](https://github.com/pulipakaa24/newton/commit/99843d09840f89ac16c82104ad66ae792e45eb91), kernel
+  `make_partition_color_block_indices_kernel`); CPU dense/fixed multi-env grids VALID with it (sparse multi-env grids
+  only build on GPU).
 
 ## batch_01 results (15:07): fork fix validated (old INVALID, 930 conflicts; new VALID; 12/12 repeatable); column
 bitwise; box pair bitwise until contact then 1.7e-7 m; neutrality; GS repeatable at 1/64/256/1,024; timing measured

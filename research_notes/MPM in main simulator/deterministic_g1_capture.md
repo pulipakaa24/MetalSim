@@ -1,7 +1,7 @@
 # Deterministic BatchSim on the G1 task: research before the fix (2026-10-14)
 
-Status: research and experiment design. The experiment is batch_18 (`scratch/b18/batch_18.sh`). Its results go at the
-end of this file. Rounds batch_13 to batch_17 tested hypotheses from code reading by toggling switches (the
+Status: research and experiment design. The experiment is batch_18 (`runs/mpm_main/batch_18/batch_18.sh`). Its results
+go at the end of this file. Rounds batch_13 to batch_17 tested hypotheses from code reading by toggling switches (the
 solver loop's early exit, the fused update, capture reuse, ICB replay). That was confounded: each toggle changed the
 solver trajectory and so whether a world reached the iteration cap, which is the event this note identifies as the
 trigger (section 3). Toggles are not used as evidence of causation below.
@@ -75,12 +75,13 @@ mode. That is a design question for
 [#29](https://github.com/pulipakaa24/MetalSim/commit/ab67d3202d6abd4f3a433a8dd4199304e1885cfc) beyond this bug
 (section 5).
 
-## 2. What flag bit 2 means (Warp fork `metalsim`, `warp/native/metal_deterministic.h`, `warp/_src/metal_deterministic.py`)
+## 2. What flag bit 2 means (Warp fork `metalsim`, [`warp/native/metal_deterministic.h`](https://github.com/pulipakaa24/warp/blob/metalsim/warp/native/metal_deterministic.h), [`warp/_src/metal_deterministic.py`](https://github.com/pulipakaa24/warp/blob/metalsim/warp/_src/metal_deterministic.py))
 
 A kernel with consumed-return counters (`slot = atomic_add(counter, i, n)` with the result used) runs as two passes:
 - **phase 0**: global array stores, non-counter atomics (`WP_DET_SIDE_EFFECT_IF_ACTIVE`; integer `+=` on an array is
-  one of them, `warp/_src/deterministic.py`) and printf suppressed. Each counter call records (destination, count) at
-  `thread * records_per_thread + call` and returns 0.
+  one of them, [`warp/_src/deterministic.py`](https://github.com/pulipakaa24/warp/blob/metalsim/warp/_src/deterministic.py))
+  and printf suppressed. Each counter call records (destination, count) at `thread * records_per_thread + call` and
+  returns 0.
 - Then sort, scan and phase 1, where each call returns its slot. The writeback then publishes the totals and zeroes
   every thread's two call cursors (phase 0 and phase 1).
 
@@ -95,7 +96,8 @@ The sticky flag (`state.overflow`, one int32) gets:
   - (c) after phase 1, `det_counter_writeback` finds a thread whose phase-0 and phase-1 call counts differ.
 
 So bit 2 alone cannot say which of (a), (b) or (c) happened, or whether the phase-0 count was a real count or a stale
-cursor. batch_18 uses a diagnostic Warp build (`upstream/warp-diag`, not pushed) that sets distinct bits:
+cursor. batch_18 uses a diagnostic Warp build (not pushed; its header:
+`runs/mpm_main/batch_18/warp_diag_metal_deterministic.h`) that sets distinct bits:
 - 2: (a) with a phase-0 count of 0 (no phase-0 record at all);
 - 16: (a) with a nonzero phase-0 count;
 - 8: (b);
@@ -156,9 +158,9 @@ worlds that reached the iteration cap (`OverflowType.ITERATIONS` in `d.overflow`
 2. The same **captured**. M1 predicts the same kernel, kind and steps.
 3. G1, 64 and 1,024 worlds, captured, everything on (as batch_16 failed it). M1 predicts trips only in steps with cap
    worlds, `_solve_done`, kind 2.
-4. 1–3 with the M1 fix (MuJoCo Warp copy `upstream/mjw-solvedone`: count kept in a local; the counter consumed only
-   with the early exit). M1-only predicts all clean. Then G1 deterministic at 64 and 1,024 worlds, captured, everything
-   on, the configuration batch_16 failed, with BatchSim.check_overflow.
+4. 1–3 with the M1 fix (MuJoCo Warp with `runs/mpm_main/batch_18/solvedone.diff`: count kept in a local; the counter
+   consumed only with the early exit). M1-only predicts all clean. Then G1 deterministic at 64 and 1,024 worlds,
+   captured, everything on, the configuration batch_16 failed, with BatchSim.check_overflow.
 
 Decision rule (in the batch, no stop to report):
 - If 1 trips in `_solve_done` with kind 2 only in cap steps, and every run of 4 is clean: M1 is confirmed and the fix

@@ -4,7 +4,7 @@ Researched 2026-10-11. "Measured" means a probe run on this machine: Apple M4 Ma
 Darwin 25.6, GPUCompiler 32023, the integrated-2 Warp tree (`warp-i2`, see [MPM.md](../../metalsim/physics/mpm/MPM.md) section 8c; the
 code that refuses 64-bit CAS on Metal, same refusal as [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) at
 [`152808b7`](https://github.com/pulipakaa24/warp/commit/152808b7e33ce08fcc17c898c5ce11d567d60795)), through
-`scripts/gpu_run.sh` (kind `check`). Probe sources and logs are in the session scratchpad, not in the repo.
+`scripts/gpu_run.sh` (kind `check`). Probe sources and logs are not published.
 Everything else is cited or read from the code (file and branch named).
 
 ## Summary
@@ -69,13 +69,13 @@ Consequences:
   (below, and that fix's own test).
 
 ### What the Warp fork does with each 64-bit op on Metal (code read, `warp-i2`)
-- `warp/native/metal_atomics.h`:
+- [`warp/native/metal_atomics.h`](https://github.com/pulipakaa24/warp/blob/152808b7e33ce08fcc17c898c5ce11d567d60795/warp/native/metal_atomics.h):
   - `wp_metal_atomic_min/max(unsigned long*)` = a plain pre-read `old = *p`, then `atomic_min/max_explicit`, then
     return `old`. The comment says the returned value "may be stale under contention". The update itself is atomic.
   - 64-bit add/and/or/xor are two 32-bit atomics, each on its own half. The final value is exact; the returned or
     concurrently read value can be torn.
   - 64-bit CAS/exch and signed min/max fall to a generic template that rejects 64-bit types at compile time.
-- `warp/_src/codegen.py` `METAL_UNSUPPORTED_ATOMICS_64`:
+- [`warp/_src/codegen.py`](https://github.com/pulipakaa24/warp/blob/152808b7e33ce08fcc17c898c5ce11d567d60795/warp/_src/codegen.py) `METAL_UNSUPPORTED_ATOMICS_64`:
   - Refuses `atomic_cas` and `atomic_exch` on int64/uint64, and `atomic_min` / `atomic_max` on int64.
   - The kernel compiles with a stand-in and raises at launch on Metal ("Apple GPUs have no 64-bit compare-and-swap
     ...").

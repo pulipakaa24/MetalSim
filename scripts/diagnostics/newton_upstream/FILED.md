@@ -47,5 +47,5 @@ none merged. The EasyCLA check and review state were not re-read.
 
 All six still open. EasyCLA still fails on #4316-#4318 ("Missing CLA Authorization"); the external-PR workflows wait
 for a maintainer's manual approval. No human review yet; CodeRabbit left 6 actionable comments and 2 nitpicks, all
-valid. Fixes are prepared locally (branches `review/*` in `upstream/newton`, not pushed; #4318 would need a force push
+valid. Fixes are prepared locally (branches `review/*`, not pushed; #4318 would need a force push
 because it is stacked). Details, EasyCLA steps for the owner and draft replies: `REVIEW_2026-09-26.md`.

@@ -7,14 +7,14 @@ with [MuJoCo](https://github.com/google-deepmind/mujoco) 3.14 and the [Newton](h
 (`.venv-newton152`, `metalsim/physics/mpm/MPM.md`).
 
 Two research rounds feed this note: (1) [Isaac Lab 3.0-EA](https://github.com/isaac-sim/IsaacLab/tree/v3.0.0-EA) /
-Newton 1.5.2 from source (local checkouts: `upstream/IsaacLab3`, `upstream/newton-metalsim-1.5.2`, `.venv`'s Newton
-1.7), (2) other systems (web + source:
+Newton 1.5.2 from source (Isaac Lab 3.0-EA, [my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim-1.5.2)
+branch `metalsim-1.5.2`, `.venv`'s Newton 1.7), (2) other systems (web + source:
 [Genesis](https://github.com/Genesis-Embodied-AI/genesis-world)
 [`efc81f3b`](https://github.com/Genesis-Embodied-AI/genesis-world/commit/efc81f3b57b67ade583e4453c06dc9ea81747434),
 Newton main [`dcd9106a`](https://github.com/newton-physics/newton/commit/dcd9106af1aaca96ba143a2ebbc0ffe16934fe62),
 [ManiSkill2](https://arxiv.org/abs/2302.04659), [Drake](https://drake.mit.edu), [MuJoCo docs](https://mujoco.readthedocs.io)).
-Citations are file:line in those trees (`F` = `upstream/newton-metalsim-1.5.2/newton/_src`,
-`IL` = `upstream/IsaacLab3/source`).
+Citations are file:line in those trees (`F` = [`newton/_src`](https://github.com/pulipakaa24/newton/tree/metalsim-1.5.2/newton/_src)
+on `metalsim-1.5.2`, `IL` = Isaac Lab's [`source`](https://github.com/isaac-sim/IsaacLab/tree/v3.0.0-EA/source) at v3.0.0-EA).
 
 ## 1. How Isaac Lab 3.0-EA couples MPM to MuJoCo Warp (verified from source)
 

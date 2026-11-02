@@ -2,7 +2,7 @@
 
 Scope: what to port into [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim)'s Metal backend to replace the host versions of `warp.utils.radix_sort_pairs`, `runlength_encode` and `array_scan` (~130 ms per step today for 0.5-2M-element sorts, plus a GPU drain per call). The target is an M4 Max with 40 cores, 32-wide SIMD groups and 32 KB threadgroup memory.
 
-Reference point in [Warp](https://github.com/NVIDIA/warp) itself, read from the local Warp source checkout at `scratch/deformable/patchtest/fresh/w/warp/native/`:
+Reference point in [Warp](https://github.com/NVIDIA/warp) itself, read from a local Warp source checkout ([`warp/native/`](https://github.com/NVIDIA/warp/tree/main/warp/native) upstream):
 - The CUDA path calls `cub::DeviceRadixSort::SortPairs` with `cub::DoubleBuffer` and `begin_bit`/`end_bit`, which is why Warp's API requires keys and values buffers of size 2n (`sort.cu`).
 - `scan.cu` calls `cub::DeviceScan::InclusiveSum`/`ExclusiveSum`.
 - `runlength_encode.cu` calls `cub::DeviceRunLengthEncode::Encode`.

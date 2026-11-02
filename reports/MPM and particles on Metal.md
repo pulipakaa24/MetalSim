@@ -97,7 +97,7 @@ The probe scene was 1,000 particles at voxel 0.1 and dt 1/60 on a ground plane, 
 - **Repeatability:** two Metal runs of each grid type gave identical `particle_q` MD5 hashes.
 - **Dense vs sparse on Metal:** minimum z **0.0017** (sparse) against 0.0026 (dense), and mean z 0.0342 against 0.0311.
 
-The probe scripts were in this session's scratchpad (`mpm_metal_probe.py` and `mpm_metal_probe_f32.py`, not in the repo). The last result matters for parity: **grid type is part of the physics spec**, so references must be recorded with the grid type metalsim will run.
+Probe scripts: `metalsim/physics/mpm/probes/mpm_metal_probe.py` and `mpm_metal_probe_f32.py` (the committed versions run 5 steps). The last result matters for parity: **grid type is part of the physics spec**, so references must be recorded with the grid type metalsim will run.
 
 Determinism is structurally favourable:
 
@@ -188,7 +188,7 @@ The last item closes a loophole. A port that "wins" by hitting `max_iterations` 
 
 ### Measured: Apple's atomics invert the CUDA playbook
 
-Microbenchmarks on this M4 Max (in the session scratchpad at `bench/p2g.swift`) found three constraints that the published CUDA playbook does not anticipate:
+Microbenchmarks on this M4 Max (`metalsim/physics/mpm/probes/p2g.swift`) found three constraints that the published CUDA playbook does not anticipate:
 
 - **`threadgroup atomic_float` does not compile** under MSL 3.0 through 4.0.
 - **64-bit device `fetch_add` and compare-exchange do not compile either.** Only 64-bit max compiles, even though Apple's feature table says "the full set of 64-bit atomic operations" is available from Apple9 ([Metal feature set tables](https://developer.apple.com/metal/limits)).
