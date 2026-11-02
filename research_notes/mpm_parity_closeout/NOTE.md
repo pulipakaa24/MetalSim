@@ -5,7 +5,7 @@ NVIDIA L4 GPU's own spread (1.15x the largest of 16 perturbed L4 runs, in every 
 at frames 4-6 real? Method: the column work's, one level deeper. Find the first step where Metal leaves the L4 by more
 than the L4's own arithmetic perturbations do, then the first array, then the first operation. Everything below was
 measured on the M4 Max and on the L4
-(`l4a`, Isaac Lab 3.0-EA's Warp 1.16.0 / Newton 1.5.2, driver 580.178.04). The scripts are in this
+(Isaac Lab 3.0-EA's Warp 1.16.0 / Newton 1.5.2, driver 580.178.04). The scripts are in this
 directory. Data: `runs/parity/isaaclab3_mpm_closeout/` (L4) and `runs/mpm/closeout/` (Metal). Particle recordings
 are not committed.
 

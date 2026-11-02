@@ -2,7 +2,7 @@
 
 State as of 2026-10-09. Every literature number names its GPU. "Measured here" means a microbenchmark run for these notes on
 this machine (Apple M4 Max, macOS 26.7.1, runtime-compiled MSL, default language version plus checks under MSL 3.0–4.0).
-Benchmark source: `/private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-ac36-4ecff3ac4bc1/scratchpad/bench/p2g.swift`
+Benchmark source: `p2g.swift`, a scratch benchmark that is not in the repository
 (scratchpad, not in the repo). "Estimate" marks anything inferred and not measured.
 
 **Correction to the task premise, measured here:** on this M4 Max, `atomic_float` add is available in **device** memory

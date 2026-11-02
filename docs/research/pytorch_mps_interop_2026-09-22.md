@@ -120,4 +120,4 @@ dispatch_sync(torch::mps::get_dispatch_queue(), ^{
 4. **Low** — `torch.compile` on MPS for hot pointwise chains only; do not plan on it for whole-step fusion, and there is no graph replay on MPS.
 5. **Optional** — MLX as an alternative learner via the same DLPack-Metal handles (mlx ≥ 0.29, PR #3531); no Python event API, so sync stays `mx.eval()`/`torch.mps.synchronize()` based.
 
-Key files (local copies in `/private/tmp/claude-501/-Users-aditya/7ceab845-25d9-459e-a466-a4b793f72f5c/scratchpad/`): `DLConvertor.cpp`, `mps_init.py`, `MPSStream.h`, `MPSEvent.h`, `MetalShaderLibrary.h`, `torch_mps.h`, `mps_Module.cpp`, `mps_extension.mm`, `MPSAllocatorInterface.h`, `mlx_convert.cpp`, `mlx_device.h`, `mlx_event.h`.
+Key files (read from local copies of the PyTorch and MLX sources): `DLConvertor.cpp`, `mps_init.py`, `MPSStream.h`, `MPSEvent.h`, `MetalShaderLibrary.h`, `torch_mps.h`, `mps_Module.cpp`, `mps_extension.mm`, `MPSAllocatorInterface.h`, `mlx_convert.cpp`, `mlx_device.h`, `mlx_event.h`.

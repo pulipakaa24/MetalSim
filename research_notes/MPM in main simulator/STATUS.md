@@ -4,8 +4,7 @@ Goal: MPM material (sand, snow, ...) in metalsim's main simulator (`.venv`: Batc
 [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) for MuJoCo 3.14, Newton 1.7 line),
 two-way coupled with the robot, N worlds, rendered by `render/particles.py`; parity with the `.venv-newton152`
 ([my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim-1.5.2) at 1.5.2,
-[Isaac Lab 3.0-EA](https://github.com/isaac-sim/IsaacLab/tree/v3.0.0-EA)) results. Branch `mpm-main-sim` (worktree
-`.claude/worktrees/agent-ab17e9d0efefed741`).
+[Isaac Lab 3.0-EA](https://github.com/isaac-sim/IsaacLab/tree/v3.0.0-EA)) results. Branch `mpm-main-sim`.
 
 ## Decided (2026-10-13; design approved by the coordinator)
 - Option (b), `NOTE.md`: vendored copy of the `implicit_mpm` of

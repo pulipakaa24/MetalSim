@@ -71,7 +71,7 @@ Now:
   Default descriptors read 0).
 - Flat past 2^24 instances is built with extended limits and traced with the `extended_limits` intersector.
 
-Measured on the 16-inch MacBook Pro (M4 Max, macOS 26), 4 ground planes, 6.28 M grains: two-level build 121 ms
+Measured on an M4 Max MacBook Pro (macOS 26), 4 ground planes, 6.28 M grains: two-level build 121 ms
 (rebuild 77 ms) vs flat 117 ms (79 ms); build + one 256x144 trace pass 82 ms vs 84 ms. A 480x270, 64 spp,
 [OIDN][oidn] frame differs from flat in 5.7 % of pixels by at most 11/255 (mean relative HDR difference 3.5e-4:
 path-tracer and denoiser noise from ulp-level differences in the nested transforms). The 16-inch refuses builds past
