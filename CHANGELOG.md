@@ -4,8 +4,9 @@ What landed between 2026-09-22 and 2026-10-13, grouped by area. The September se
 commit order; the October sections, newest first, summarise each merged pull request with its main commits (`git log`
 for the full messages). Dates are the commit dates (month-day).
 
-## Memory: allocations past the working set fail; which Mac fits (2026-11-01)
+## Memory and GPU errors: allocations past the working set fail; which Mac fits; the GPU watchdog (2026-11-01)
 
+- 11-01 PPOWarp waits for the rollout on the host before the update (a GPU-side wait held PyTorch's first update command buffer for the whole rollout; past macOS's ~4-5 s GPU watchdog it was aborted and, PyTorch 2.14 ignoring the error, the update trained on zeros); the PyTorch bridge raises `MPSCommandBufferError` for an aborted command buffer. Three 2026-09-25 runs were hit; `isaaclab3_like_for_like_2026-09-25.md` §6.3 corrected (`docs/research/gpu_watchdog_handover_2026-11-01.md`).
 - 11-01 Warp pin [`52c09cdd`](https://github.com/pulipakaa24/warp/commit/52c09cdd82f79e8564b5ae17cdcee7b52d10d075) -> [`23e0fa98`](https://github.com/pulipakaa24/warp/commit/23e0fa9824684684cde02d68efcce01e6bae072b) (my fork's `metalsim` branch): an allocation that would pass the Metal working set raises "out of Metal memory" instead of warning once (past it kernels read non-resident buffers without an error); `WP_METAL_WORKING_SET_GB` sets the limit. Whole-branch fallback diff `patches/warp/metalsim-23e0fa98.diff`.
 - 11-01 README "Which Mac": requirements (macOS 15 or later), peak GPU allocation and footprint per workload measured with the new `scripts/diagnostics/peak_memory.py` (`runs/peak_memory_2026-11-01/`), advice by memory size; `docs/DEMO.md` gives each demo's memory.
 

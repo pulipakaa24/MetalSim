@@ -114,6 +114,11 @@ on them:
 
 - **Speed:** fewer GPU cores and less memory bandwidth make every run slower, and a fanless MacBook Air throttles under
   sustained load such as a long training run (neither measured here).
+- **The GPU watchdog:** macOS aborts a command buffer that stays on the GPU for more than about 4-5 s, waiting
+  included, so work that is fine on an M4 Max can pass it on a slower GPU. Before 2026-11-01 a PPO rollout that
+  long silently zeroed the next update; PPOWarp now waits for the rollout on the host, and the PyTorch bridge
+  raises for an aborted command buffer instead of continuing
+  ([research note](docs/research/gpu_watchdog_handover_2026-11-01.md)).
 - **M1 and M2** trace rays without ray-tracing hardware (it arrived with M3), so the lidar, the height scanner and the
   tier-1 and tier-2 renderers run slower there (not measured).
 - **M1** has no 64-bit atomic min / max (Apple's feature tables list it from M2 on). Warp's `atomic_min` /
