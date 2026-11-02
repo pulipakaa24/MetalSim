@@ -115,15 +115,18 @@ Earlier cells, kept with their media in this directory but no longer on the fron
   each, 25.1 M grain instances, path traced at 1920x1080, 128 spp (32 passes x 4),
   [OIDN](https://www.openimagedenoise.org). 3.0-8.0 s of the 8 s clip, 150 frames at 33 ms, 3.34 MB (above MuJoCo Warp's
   largest clip, 2.0 MB).
-- **Source:** the clip's PNG frames 0090-0239, `~/metalsim-fresh/runs_render/sand25m/demo/frames` on the 14-inch,
-  outside the repository (with `anymal_sand_25m_twolevel.mp4` and `log.txt` beside them). They were rendered on
-  2026-10-13 by `runs_render/sand25m/demo.sh` (two-level grain structures, `ramp.py` driving
-  `scripts/particle_demo/render_anymal.py`) from the simulation in `runs_render/sim1`.
+- **Source:** the clip's PNG frames 0090-0239, from a 240-frame render (948 MB of PNGs, not published) made on
+  2026-10-13 by [`demo.sh`](../../runs/readme_media/records/anymal_sand/demo.sh) (two-level grain structures,
+  [`ramp.py`](../../runs/readme_media/records/anymal_sand/ramp.py) driving `scripts/particle_demo/render_anymal.py`;
+  its log: [`demo_log.txt`](../../runs/readme_media/records/anymal_sand/demo_log.txt)) from one simulation run
+  ([`sim1_meta.json`](../../runs/readme_media/records/anymal_sand/sim1_meta.json),
+  [`sim1_log.txt`](../../runs/readme_media/records/anymal_sand/sim1_log.txt)).
 - **Reproduce:** the clip: [`docs/DEMO.md`, "The 25 M-grain render"](../DEMO.md#the-25-m-grain-render-anymal-on-sand-at-demo-scale)
   (`scripts/particle_demo/sim_anymal.py` in the Newton venv, then `render_anymal.py --frames 0:240 --width 1920
   --height 1080 --passes 32 --grains 27`). This file, centred 1440x1080 crop
   (command from `runs/readme_media/assets/anymal_sand.webp.json`):
-  `python -m metalsim.render.film.encode webp ~/metalsim-fresh/runs_render/sand25m/demo/frames docs/renders/anymal_sand.webp --start 3 --seconds 5`.
+  `python -m metalsim.render.film.encode webp <frames dir> docs/renders/anymal_sand.webp --start 3 --seconds 5`, with
+  `<frames dir>` the directory `render_anymal.py` wrote.
 - **Provenance:** `metalsim/render/PARTICLES.md`, "Demo" (the 2026-10-12 result at these settings, timings, and the
   credits: [MuJoCo Menagerie](https://github.com/google-deepmind/mujoco_menagerie) `anybotics_anymal_c` BSD-3, Poly
   Haven `goegap` HDRI and `coast_sand_01` texture CC0, Newton's example and policy Apache-2.0);

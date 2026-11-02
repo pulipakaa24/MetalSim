@@ -1,0 +1,39 @@
+{
+ "frame_dt": 0.02,
+ "frames": 451,
+ "particle_count": 669372,
+ "bed": [
+  -0.6,
+  -0.6,
+  0.0,
+  0.6,
+  4.0,
+  0.1
+ ],
+ "speed": 0.4,
+ "yaw_rate": 0.0,
+ "settle": 0.6,
+ "voxel_size": 0.03,
+ "particles_per_cell": 3.0,
+ "particle_radius": 0.004999999888241291,
+ "step_ms_mean": 113.65364975399442,
+ "step_ms_median": 45.01044750213623,
+ "wall_s": 51.586905002593994,
+ "device": "metal:0",
+ "labels": [
+  "anymal/base",
+  "anymal/LF_HIP",
+  "anymal/LF_THIGH",
+  "anymal/LF_SHANK",
+  "anymal/RF_HIP",
+  "anymal/RF_THIGH",
+  "anymal/RF_SHANK",
+  "anymal/LH_HIP",
+  "anymal/LH_THIGH",
+  "anymal/LH_SHANK",
+  "anymal/RH_HIP",
+  "anymal/RH_THIGH",
+  "anymal/RH_SHANK"
+ ],
+ "source": "newton 1.5.2 examples/mpm/example_mpm_anymal.py (policy anymal_walking_policy_physx.onnx)"
+}
