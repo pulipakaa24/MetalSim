@@ -1,14 +1,15 @@
 # Deterministic BatchSim: stacked-boxes divergence (2/256 worlds from step 139) — root cause and fix (2026-10-13)
 
-Suspects first (source reading, before any run), then the batch_05 evidence, the root cause and the fix (end of file).
+Suspects first (source reading, before any run), then the batch_05 evidence (run on the 16-inch MacBook Pro (M4 Max)),
+the root cause and the fix (end of file).
 
-* Box-box pairs go through MuJoCo Warp's CCD kernel (GJK -> EPA -> multicontact; collision_driver.py:78, 866-870;
-  collision_convex.py:885-1003); plane-box is the primitive path. The single-box and panda scenes never launch CCD (they
-  repeat). Box-box contact starts at about step 138.
-* Warp's RUN_TO_RUN on Metal makes consumed int32 counters two-phase: phase 0 runs the kernel with global stores
-  suppressed (except counter targets and zeroed scratch) and counter_add returning 0, then a sort / scan, then phase 1.
-  Nothing checks that phase 1 makes the same counter calls as phase 0 (metal_deterministic.py:225-246;
-  metal_deterministic.h:175-194, 259-271).
+* Box-box pairs go through [MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp)'s CCD kernel (GJK -> EPA ->
+  multicontact; collision_driver.py:78, 866-870; collision_convex.py:885-1003); plane-box is the primitive path. The
+  single-box and panda scenes never launch CCD (they repeat). Box-box contact starts at about step 138.
+* Warp's RUN_TO_RUN on Metal ([my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim)) makes consumed int32
+  counters two-phase: phase 0 runs the kernel with global stores suppressed (except counter targets and zeroed scratch)
+  and counter_add returning 0, then a sort / scan, then phase 1. Nothing checks that phase 1 makes the same counter
+  calls as phase 0 (metal_deterministic.py:225-246; metal_deterministic.h:175-194, 259-271).
 * ccd_kernel has two consumed counters (nccd_in for EPA scratch rows, nacon_out in write_contact). In phase 0 every
   thread gets ccdid 0 and runs EPA on scratch row 0 with its polytope stores suppressed, reading uninitialised or stale
   wp.empty memory, so its contact count (and nacon reservations) can differ from phase 1. Extra phase-1 calls read stale
@@ -17,12 +18,12 @@ Suspects first (source reading, before any run), then the batch_05 evidence, the
 * Lesser suspects: single-threadgroup in-kernel finalize (WP_METAL_DET_TG_FINALIZE=0), small-launch counter resolve
   (WP_METAL_DET_SMALL_RECORDS=0). BatchSim.check_determinism does not cover `module="unique"` kernels (name prefix).
 * Diagnostics: mjDSBL_NATIVECCD A/B (box-box via primitive box_box); env A/Bs; contact audit with a sentinel worldid
-  at steps 137-140; per-launch hashing; a phase-mismatch tripwire in the Warp fork.
-* Fixes: MuJoCo Warp fork — split CCD into a counter-free solve kernel (scratch indexed by collision id) and a
-  write_contact kernel; Warp fork — permanent phase-mismatch tripwire; BatchSim — check unique modules via the graph's
-  module execs.
-* Newton's SolverMuJoCo uses the same module-option scheme; with use_mujoco_contacts=True (its default) it would hit the
-  same CCD path; Newton's determinism tests cover only its own collision pipeline.
+  at steps 137-140; per-launch hashing; a phase-mismatch tripwire in my fork of Warp.
+* Fixes: [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) — split CCD into a
+  counter-free solve kernel (scratch indexed by collision id) and a write_contact kernel; my fork of Warp — permanent
+  phase-mismatch tripwire; BatchSim — check unique modules via the graph's module execs.
+* [Newton](https://github.com/newton-physics/newton)'s SolverMuJoCo uses the same module-option scheme; with
+  use_mujoco_contacts=True (its default) it would hit the same CCD path; Newton's determinism tests cover only its own collision pipeline.
 
 ## Evidence (batch_05, 16-inch, runs/mpm_main/batch_05)
 
@@ -79,12 +80,13 @@ take the plane path, which uses no scratch and repeats. `BatchSim.check_determin
 
 ## Tripwire (Warp fork, branch `metalsim-det-tripwire`; `patches/warp/det-phase-mismatch-tripwire.diff`)
 
-Upstream Warp documents the hazard as a limitation ("Side effects in the counting pass" in
-docs/user_guide/execution_and_performance/deterministic_execution.rst: counter calls must not depend on scratch writes
-made earlier in the launch) but checks nothing, on CUDA or in the Metal port: phase 1 (CUDA: `record_slots`; Metal:
-the record at `thread * records_per_thread + call`) simply returns whatever slot the record holds. On Metal both phases
-already count each thread's calls (`cursors[0:dim]` phase 0, `cursors[dim:2 dim]` phase 1, cleared by
-`det_counter_writeback`), so the check is cheap:
+Upstream [Warp](https://github.com/NVIDIA/warp) documents the hazard as a limitation ("Side effects in the counting
+pass" in docs/user_guide/execution_and_performance/deterministic_execution.rst: counter calls must not depend on scratch
+writes made earlier in the launch) but checks nothing, on CUDA or in the Metal port
+([my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim)): phase 1 (CUDA: `record_slots`; Metal: the record
+at `thread * records_per_thread + call`) simply returns whatever slot the record holds. On Metal both phases already
+count each thread's calls (`cursors[0:dim]` phase 0, `cursors[dim:2 dim]` phase 1, cleared by `det_counter_writeback`),
+so the check is cheap:
 
 * in phase 1, `counter_add` compares the call with phase 0's record of it: a call number beyond phase 0's count, or a
   different destination or count, sets bit 2 of the sticky deterministic flag (bit 1 stays the overflow);
@@ -99,6 +101,6 @@ false positive in any MuJoCo Warp kernel would show.
 
 ## Validation (batch_06, 16-inch, runs/mpm_main/batch_06)
 
-With both fork branches first on `PYTHONPATH`: Warp's Metal deterministic tests 15 OK (the tripwire tests included); stacked boxes at 4 worlds take the split kernels (`ccd_det_kernels_builder` modules, RUN_TO_RUN); at 256 worlds and 200 steps, two runs in one process and three processes (two cold kernel caches, one warm) are bitwise identical; the contact audit gives every world the same box-box contact count at every step 130-160 and no state difference; tests/test_batch_deterministic.py 7 passed. Tripwire A/B: the single CCD kernel (`MJW_CCD_DET_SPLIT=0`) at 256 worlds now stops with "Warp deterministic-mode counter phase mismatch" from `BatchSim.check_overflow` instead of diverging silently.
+With both fork branches ([`metalsim-det-ccd`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-det-ccd) of [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim), [`metalsim-det-tripwire`](https://github.com/pulipakaa24/warp/tree/metalsim-det-tripwire) of [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim)) first on `PYTHONPATH`: Warp's Metal deterministic tests 15 OK (the tripwire tests included); stacked boxes at 4 worlds take the split kernels (`ccd_det_kernels_builder` modules, RUN_TO_RUN); at 256 worlds and 200 steps, two runs in one process and three processes (two cold kernel caches, one warm) are bitwise identical; the contact audit gives every world the same box-box contact count at every step 130-160 and no state difference; tests/test_batch_deterministic.py 7 passed. Tripwire A/B: the single CCD kernel (`MJW_CCD_DET_SPLIT=0`) at 256 worlds now stops with "Warp deterministic-mode counter phase mismatch" from `BatchSim.check_overflow` instead of diverging silently.
 
-Pinned on 2026-10-13 (batch_08): MuJoCo Warp `4d05cb7` (code `cfa290b`), Warp `52c09cdd` (code `9346cf72`, rebased onto the coupled-speed pin `31cf79d7`). Newton's `SolverMuJoCo(deterministic=True)` with MuJoCo contacts takes the same CCD path and gets the fix once its MuJoCo Warp includes it.
+Pinned on 2026-10-13 (batch_08): my fork of MuJoCo Warp at [`4d05cb7`](https://github.com/pulipakaa24/mujoco_warp/commit/4d05cb7d4453d82c94d19ab9fb392df2c62b1acd) (code [`cfa290b`](https://github.com/pulipakaa24/mujoco_warp/commit/cfa290b8831dfaf6f2e71ba0c5cd6d3f0c42c97d)), my fork of Warp at [`52c09cdd`](https://github.com/pulipakaa24/warp/commit/52c09cdd82f79e8564b5ae17cdcee7b52d10d075) (code [`9346cf72`](https://github.com/pulipakaa24/warp/commit/9346cf72bd96888c687f63b3937d706f84039450), rebased onto the coupled-speed pin [`31cf79d7`](https://github.com/pulipakaa24/warp/commit/31cf79d781e4b10d8ff85c8cbd98fc0e40f75953), `research_notes/coupled_speed/NOTE.md`). Newton's `SolverMuJoCo(deterministic=True)` with MuJoCo contacts takes the same CCD path and gets the fix once its MuJoCo Warp includes it.

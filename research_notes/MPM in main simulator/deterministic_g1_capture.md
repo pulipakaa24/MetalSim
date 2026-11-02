@@ -13,9 +13,11 @@ trigger (section 3). Toggles are not used as evidence of causation below.
   - Under Warp's `wp.config.deterministic`, the convex narrowphase silently loses contacts. The cause is the same one
     MetalSim found on 2026-10-13: EPA keeps its polytope in global scratch, so "the counting pass reads back values it
     was never allowed to write" and the two passes take different branches.
-  - Their fix is the same split as MetalSim's `metalsim-det-ccd`: stage per-collision results, then write contacts in a
-    second kernel. They also split the heightfield kernel, which MetalSim does not; MetalSim refuses heightfield GJK/EPA
-    in deterministic mode.
+  - Their fix is the same split as MetalSim's
+    [`metalsim-det-ccd`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-det-ccd) branch of
+    [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim): stage per-collision results,
+    then write contacts in a second kernel. They also split the heightfield kernel, which MetalSim does not; MetalSim
+    refuses heightfield GJK/EPA in deterministic mode.
   - They note that under graph capture Warp's overflow checks are off, so failures are silent. They measured 64.8x on
     humanoid at 256 worlds captured.
   - The PR author argues that MuJoCo Warp's own `opt.deterministic` track is the better primary path.
@@ -23,10 +25,11 @@ trigger (section 3). Toggles are not used as evidence of causation below.
   - Sources:
     - #562 umbrella: https://github.com/google-deepmind/mujoco_warp/issues/562
     - #1422 (johnnynunez, open): https://github.com/google-deepmind/mujoco_warp/pull/1422
-    - #1687 (Taylor Howell, the determinism API), and #1775 (huster-wgm, "Rebase determinism API onto main and fix
-      deterministic arithmetic", open): https://github.com/google-deepmind/mujoco_warp/pull/1775
-    - Newton #4631 / #4632 (set the option before the model constants are computed):
-      https://github.com/newton-physics/newton/pull/4632
+    - [#1687](https://github.com/google-deepmind/mujoco_warp/pull/1687) (Taylor Howell, the determinism API), and #1775
+      (huster-wgm, "Rebase determinism API onto main and fix deterministic arithmetic", open):
+      https://github.com/google-deepmind/mujoco_warp/pull/1775
+    - Newton [#4631](https://github.com/newton-physics/newton/issues/4631) / #4632 (set the option before the model
+      constants are computed): https://github.com/newton-physics/newton/pull/4632
   - Approach, in MuJoCo Warp's own kernels rather than Warp's two-pass mode:
     - contacts sorted into a stable permutation after the narrowphase (int64 keys, world first);
     - constraint rows allocated by count / scan / emit instead of atomic slot grabbing;
@@ -37,34 +40,40 @@ trigger (section 3). Toggles are not used as evidence of causation below.
     while body ("Conditional body graph contains an unsupported operation (memory allocation)").
   - Cost reported: about 1.8x per step at 256 worlds (−31 % to −81 % throughput, 1 to 8,192 worlds).
   - Status: open. #1775 still has placeholder ordering hooks, and "ALL ... does not yet promise deterministic full
-    simulation". As of 2026-10-10 a commenter on #562 reports bit-identical replicas with the #1533 head.
+    simulation". As of 2026-10-10 a commenter on #562 reports bit-identical replicas with the
+    [#1533](https://github.com/google-deepmind/mujoco_warp/pull/1533) head.
   - The official answer is still "run on CPU for determinism" (MJWarp FAQ: https://mujoco.readthedocs.io/en/latest/mjwarp/).
-- **Warp** (deterministic mode, #1443 / PR #1355, Warp 1.15;
+- **Warp** (deterministic mode, #1443 / PR [#1355](https://github.com/NVIDIA/warp/pull/1355), Warp 1.15;
   https://github.com/NVIDIA/warp/issues/1443,
   https://nvidia.github.io/warp/latest/user_guide/execution_and_performance/deterministic_execution.html).
   - Documented limits: "Side effects in the counting pass" (the counting pass suppresses array writes, non-counter
     atomics and printf; a kernel must not decide its counter calls from data it writes in the same launch); overflow
     checks are disabled during capture and replay; deterministic kernels are not supported inside `capture_while` /
     `capture_if` bodies.
-  - Upstream has no runtime check for a phase mismatch. MetalSim's tripwire (Warp fork `metalsim`, 2026-10-13) is
-    MetalSim's own.
+  - Upstream has no runtime check for a phase mismatch. MetalSim's tripwire
+    ([my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim), 2026-10-13) is MetalSim's own.
   - I found no Warp issue on a deterministic counter that misbehaves only under capture.
 - **Early-exit iterative solvers elsewhere**:
-  - PhysX's GPU solver (TGS / PGS) runs fixed position and velocity iteration counts per step. It has no convergence
-    early exit, and run-to-run determinism additionally needs `PxSceneFlag::eENABLE_ENHANCED_DETERMINISM`. These are
-    general PhysX docs (O3DE, Unity notes; https://www.docs.o3de.org/docs/user-guide/interactivity/physics/nvidia-physx/),
-    not checked against the GPU pipeline's source.
-  - MuJoCo CPU stops on tolerance and is deterministic, because the stopping test is evaluated in a fixed order.
+  - [PhysX](https://github.com/NVIDIA-Omniverse/PhysX)'s GPU solver (TGS / PGS) runs fixed position and velocity
+    iteration counts per step. It has no convergence early exit, and run-to-run determinism additionally needs
+    `PxSceneFlag::eENABLE_ENHANCED_DETERMINISM`. These are general PhysX docs (O3DE, Unity notes;
+    https://www.docs.o3de.org/docs/user-guide/interactivity/physics/nvidia-physx/), not checked against the GPU
+    pipeline's source.
+  - [MuJoCo](https://github.com/google-deepmind/mujoco) CPU stops on tolerance and is deterministic, because the
+    stopping test is evaluated in a fixed order.
   - Jolt is deterministic with a fixed iteration count (https://github.com/jrouwe/JoltPhysics/discussions/617).
-  - MJX: I found nothing primary on early exit and determinism. Genesis: not found. Both unverified.
+  - [MJX](https://mujoco.readthedocs.io/en/stable/mjx.html): I found nothing primary on early exit and determinism.
+    [Genesis](https://github.com/Genesis-Embodied-AI/genesis-world): not found. Both unverified.
   - The general lesson: an early exit is not itself a determinism problem when the convergence test and the iteration
     counter are computed deterministically per world. The problem below is how Warp's two-pass counters interact with
     a counter call that depends on data the same kernel writes.
 
 Conclusion: the CCD part of the problem was found independently upstream and fixed the same way (#1636, unmerged). The
 solver iteration count / early exit interaction with Warp's two-pass counters (sections 2 and 3) is not covered by any
-prior art I found. Upstream's direction for MuJoCo Warp determinism is its own kernels (`opt.deterministic`), not
-Warp's mode. That is a design question for #29 beyond this bug (section 5).
+prior art I found. Upstream's direction for MuJoCo Warp determinism is its own kernels (`opt.deterministic`), not Warp's
+mode. That is a design question for
+[#29](https://github.com/pulipakaa24/MetalSim/commit/ab67d3202d6abd4f3a433a8dd4199304e1885cfc) beyond this bug
+(section 5).
 
 ## 2. What flag bit 2 means (Warp fork `metalsim`, `warp/native/metal_deterministic.h`, `warp/_src/metal_deterministic.py`)
 
@@ -97,7 +106,8 @@ Uncaptured launches are checked after each launch. In a capture the flag is read
 
 ## 3. `_solve_done` and the candidate mechanisms
 
-`_solve_done` (MuJoCo Warp fork, `solver.py`, Newton path; one thread per world, launched once per solver iteration):
+`_solve_done` ([my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim), `solver.py`, Newton
+path; one thread per world, launched once per solver iteration):
 
 ```
 if ctx_done_in[w]: return
@@ -141,7 +151,8 @@ worlds that reached the iteration cap (`OverflowType.ITERATIONS` in `d.overflow`
 `scripts/diagnostics/det_step_probe.py`; the diagnostic Warp build is first on `PYTHONPATH`.
 
 1. Stack scene, 64 worlds, iteration cap 2 (every world reaches it every step), deterministic, **uncaptured**, current
-   MuJoCo Warp pin. M1 predicts a trip in `_solve_done`, kind 2, every step; M2–M4 predict none.
+   pin of [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim). M1 predicts a trip in
+   `_solve_done`, kind 2, every step; M2–M4 predict none.
 2. The same **captured**. M1 predicts the same kernel, kind and steps.
 3. G1, 64 and 1,024 worlds, captured, everything on (as batch_16 failed it). M1 predicts trips only in steps with cap
    worlds, `_solve_done`, kind 2.
@@ -151,9 +162,11 @@ worlds that reached the iteration cap (`OverflowType.ITERATIONS` in `d.overflow`
 
 Decision rule (in the batch, no stop to report):
 - If 1 trips in `_solve_done` with kind 2 only in cap steps, and every run of 4 is clean: M1 is confirmed and the fix
-  works. Then commit the fix to the MuJoCo Warp fork (branch `metalsim-det-solvedone`), run
+  works. Then commit the fix to my fork of MuJoCo Warp (branch
+  [`metalsim-det-solvedone`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-det-solvedone)), run
   tests/test_batch_deterministic.py (new `test_iteration_cap_repeats`), time G1 and the coupled box in deterministic
-  mode against default mode, move the MuJoCo Warp pin, and update #29 and this note.
+  mode against default mode, move the MuJoCo Warp pin, and update
+  [#29](https://github.com/pulipakaa24/MetalSim/commit/ab67d3202d6abd4f3a433a8dd4199304e1885cfc) and this note.
 - If 1 is clean but 2 trips (capture-only): M2–M4. Classify by kind and kernel from 2, keep the fix uncommitted, and
   record.
 - If 4 still trips: record the kernel and kind of the remaining trip for the next round.
@@ -171,7 +184,7 @@ CCD one duplicates #1636.
 
 ## 6. Results (batch_18, 16-inch)
 
-The runs do not match any single mechanism's prediction: see the per-run lines.
+The runs (on the 16-inch MacBook Pro (M4 Max)) do not match any single mechanism's prediction: see the per-run lines.
 
 - `pre_stack_eager` (stack, 64 worlds, capture 0, cap 2): steps with cap worlds 0/20, steps with trips 0, trips only in cap steps True, kernels {}, flag values {}
 - `pre_stack_capt` (stack, 64 worlds, capture 1, cap 2): steps with cap worlds 0/40, steps with trips 0, trips only in cap steps True, kernels {}, flag values {}
@@ -277,10 +290,15 @@ default-mode correctness and parity issue?
 
 **Prior art.**
 - **Ours is a MetalSim-only fusion of the dense path.**
-  - `_update_constraint_gradient_fused` comes from MuJoCo Warp fork commit `dd42c23`, for the dense pyramidal
-    incremental path. Commit `5d0d165` added the elliptic path.
-  - It is not in upstream v3.14 (`88af9cc`). Upstream's only "fused" pieces in `solver.py` are the line search's
-    `jv`.
+  - `_update_constraint_gradient_fused` comes from
+    [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) commit
+    [`dd42c23`](https://github.com/pulipakaa24/mujoco_warp/commit/dd42c23b14287ebdc05fdb6a2c762e9aa3422bc5), for the
+    dense pyramidal incremental path. Commit
+    [`5d0d165`](https://github.com/pulipakaa24/mujoco_warp/commit/5d0d1656637247834ebb10e30aff2e8fa91cc066) added the
+    elliptic path.
+  - It is not in upstream v3.14
+    ([`88af9cc`](https://github.com/google-deepmind/mujoco_warp/commit/88af9cc682d42e2e925daa0bae25f53277999f7b)).
+    Upstream's only "fused" pieces in `solver.py` are the line search's `jv`.
 - **Upstream is building its own fusion of the sparse path.**
   - [#1643](https://github.com/google-deepmind/mujoco_warp/pull/1643) (closed, superseded) fused Jᵀf, the gradient
     and its norm for small sparse pyramidal models; it reported matching iteration statistics.
@@ -307,8 +325,8 @@ default-mode correctness and parity issue?
   - The incremental Hessian update would then apply wrong rows, which is consistent with worse convergence and a
     world at the cap in every step.
 - This is a hypothesis taken from the code; the check below tests it.
-- The pin from #29 already takes the unfused update in deterministic mode. If the hypothesis holds, nothing more
-  needs fixing.
+- The pin from [#29](https://github.com/pulipakaa24/MetalSim/commit/ab67d3202d6abd4f3a433a8dd4199304e1885cfc) already
+  takes the unfused update in deterministic mode. If the hypothesis holds, nothing more needs fixing.
 
 **Hypotheses.**
 - **H-det:** only deterministic mode is affected. In default mode the fused and unfused updates agree within
@@ -339,11 +357,11 @@ default-mode correctness and parity issue?
     2. Metal: compare per iteration from the same dumped state (`g1_state_dump.py`), A against B.
     3. Reference: MuJoCo C's iteration counts on the saved G1 states (`runs/competitors/g1_states`,
        `scripts/diagnostics/competitors/g1_newton_iters.py`).
-    4. Optionally an L4 run of upstream MuJoCo Warp (CUDA, unfused, upstream's form) on the same states.
+    4. Optionally an NVIDIA L4 GPU run of upstream MuJoCo Warp (CUDA, unfused, upstream's form) on the same states.
 - **Reference.** No CUDA/L4 G1 iteration-count reference exists for our fused form, because it has no CUDA
   counterpart. The comparable references are MuJoCo C's iteration counts and upstream MuJoCo Warp, unfused.
 
-**Result (batch_22, 16-inch, main with MuJoCo Warp pin 8eb51fe):** **H-det holds:** in default mode the fused update converges like the unfused one (within Metal's run-to-run floor), so the D vs E difference is specific to deterministic mode (consistent with the in-launch counter hypothesis above, not proven by it); #29's pin already takes the unfused update there. Nothing to change.
+**Result (batch_22, 16-inch, main with my fork of MuJoCo Warp pinned at [`8eb51fe`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624)):** **H-det holds:** in default mode the fused update converges like the unfused one (within Metal's run-to-run floor), so the D vs E difference is specific to deterministic mode (consistent with the in-launch counter hypothesis above, not proven by it); #29's pin already takes the unfused update there. Nothing to change.
 
 - A, default mode, fused: steps with cap worlds 6/60, cap world-steps 6, mean solver_niter 3.777, fused kernel ran True
 - B, default mode, unfused: 6/60, 6, 3.801

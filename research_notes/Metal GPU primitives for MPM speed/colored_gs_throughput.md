@@ -1,8 +1,8 @@
 # Colored Gauss-Seidel throughput for the implicit-MPM stress solve on Metal
 
-Scope: how to make each iteration of Newton 1.5.2's `SolverImplicitMPM` colored GS / nonsmooth projected GS stress solve cheaper on an Apple M4 Max without changing results. Baseline profile from the brief: ~250 iterations per step; each iteration is 8 color dispatches (~20 us each, a few thousand strain nodes per color), a contact solve (~25 us), and a residual every 5 iterations. Dispatch latency is ~3-4.5 us.
+Scope: how to make each iteration of [Newton](https://github.com/newton-physics/newton) 1.5.2's `SolverImplicitMPM` colored GS / nonsmooth projected GS stress solve cheaper on an Apple M4 Max without changing results. Baseline profile from the brief: ~250 iterations per step; each iteration is 8 color dispatches (~20 us each, a few thousand strain nodes per color), a contact solve (~25 us), and a residual every 5 iterations. Dispatch latency is ~3-4.5 us.
 
-Primary sources used: the Mixed MPM paper PDF (Daviet, TOG 45(4) art. 151, SIGGRAPH 2026, [project page](https://research.nvidia.com/labs/prl/mixed_mpm/), [PDF](https://research.nvidia.com/labs/prl/mixed_mpm/files/mixed_mpm.pdf)); the local Newton checkout at `upstream/newton` (commit `90e23324`, 2026-09-24), files `newton/_src/solvers/implicit_mpm/{solve_rheology.py, rheology_solver_kernels.py, solver_implicit_mpm.py, implicit_mpm_solver_kernels.py}`. Line numbers below refer to that checkout. Web sources are cited inline.
+Primary sources used: the Mixed MPM paper PDF (Daviet, TOG 45(4) art. 151, SIGGRAPH 2026, [project page](https://research.nvidia.com/labs/prl/mixed_mpm/), [PDF](https://research.nvidia.com/labs/prl/mixed_mpm/files/mixed_mpm.pdf)); the local checkout of [my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim) at `upstream/newton` (commit [`90e23324`](https://github.com/pulipakaa24/newton/commit/90e23324521fa86710e483e01d02e80d1dac0060), 2026-09-24), files `newton/_src/solvers/implicit_mpm/{solve_rheology.py, rheology_solver_kernels.py, solver_implicit_mpm.py, implicit_mpm_solver_kernels.py}`. Line numbers below refer to that checkout. Web sources are cited inline.
 
 ## What NVIDIA's own implementation and paper do (Newton implicit_mpm on CUDA), and published CUDA numbers
 
@@ -84,7 +84,7 @@ The graphics literature (Vivace, Chebyshev/PD course notes, Mixed MPM) treats mu
   — [philipturner/metal-benchmarks](https://github.com/philipturner/metal-benchmarks)
 - **Concurrent dispatch on Apple GPUs.** "The M1 Max has 32 GPU cores, but can perform up to 96 compute commands simultaneously", so several independent small dispatches can overlap on the GPU. — [metal-benchmarks](https://github.com/philipturner/metal-benchmarks)
 - **Metal dispatch types.** `MTLDispatchTypeConcurrent` runs encoded dispatches in a pass concurrently. The developer must synchronize memory between dependent dispatches ("you're responsible for synchronizing the memory operations"), using `memoryBarrierWithScope:` / `memoryBarrier(resources:)`. — [Apple docs: MTLDispatchType.concurrent](https://developer.apple.com/documentation/metal/mtldispatchtype/concurrent.md), [mlx-native CommandEncoder docs](https://docs.rs/mlx-native/0.9.5/mlx_native/struct.CommandEncoder.html)
-- **Launch-count reduction measured locally.** In this repo on this machine, fusing 5 of 9 launches per solver iteration gave +3.9% env-steps/s for the MuJoCo Warp fork. — local note `docs/research/mpm_2026-10-09_notes/performance.md:216` (citing `docs/research/throughput_2026-09-26.md` §2c)
+- **Launch-count reduction measured locally.** In this repo on this machine, fusing 5 of 9 launches per solver iteration gave +3.9% env-steps/s for [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim). — local note `docs/research/mpm_2026-10-09_notes/performance.md:216` (citing `docs/research/throughput_2026-09-26.md` §2c)
 
 ### Inferences
 

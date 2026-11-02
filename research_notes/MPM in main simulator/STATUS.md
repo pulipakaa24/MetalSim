@@ -1,23 +1,26 @@
 # MPM in the main simulator: status (resume here)
 
-Goal: MPM material (sand, snow, ...) in metalsim's main simulator (`.venv`: BatchSim on MuJoCo Warp 3.14 fork,
-Newton 1.7 line), two-way coupled with the robot, N worlds, rendered by `render/particles.py`; parity with the
-`.venv-newton152` (Newton 1.5.2 fork, Isaac Lab 3.0-EA) results. Branch `mpm-main-sim` (worktree
+Goal: MPM material (sand, snow, ...) in metalsim's main simulator (`.venv`: BatchSim on
+[my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) for MuJoCo 3.14, Newton 1.7 line),
+two-way coupled with the robot, N worlds, rendered by `render/particles.py`; parity with the `.venv-newton152`
+([my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim-1.5.2) at 1.5.2,
+[Isaac Lab 3.0-EA](https://github.com/isaac-sim/IsaacLab/tree/v3.0.0-EA)) results. Branch `mpm-main-sim` (worktree
 `.claude/worktrees/agent-ab17e9d0efefed741`).
 
 ## Decided (2026-10-13; design approved by the coordinator)
-- Option (b), `NOTE.md`: vendored copy of the fork's `implicit_mpm` (`scripts/vendor_mpm152.py`, Apache-2.0 notices,
-  drift test), `MPMCoupling` (`metalsim/physics/mpm/coupled.py`) reproducing Isaac's `SolverCoupledProxy` with BatchSim
+- Option (b), `NOTE.md`: vendored copy of the `implicit_mpm` of
+  [my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim-1.5.2) (`scripts/vendor_mpm152.py`, Apache-2.0
+  notices, drift test), `MPMCoupling` (`metalsim/physics/mpm/coupled.py`) reproducing Isaac's `SolverCoupledProxy` with BatchSim
   as the rigid entry. Licensing + drift requirements from the coordinator: done (NOTICE.txt, THIRD_PARTY_NOTICES,
-  `tests/test_mpm_main.py`, MPM.md section 11).
+  `tests/test_mpm_main.py`, `metalsim/physics/mpm/MPM.md` section 11).
 
 ## Done (measured)
-- Vendored copy in `.venv` bitwise = Newton 1.5.2's own solver (column, every frame; 16-inch).
-- Box on sand vs Isaac's `SolverCoupledProxy` (.venv-newton152), GS, 2 worlds, 14-inch: box height within 1.1e-6 m,
-  wrench within ~1e-2 N after the proxies take end-of-step kinematics (`runs/mpm_main/box_on_sand/`).
+- Vendored copy in `.venv` bitwise = Newton 1.5.2's own solver (column, every frame; 16-inch MacBook Pro (M4 Max)).
+- Box on sand vs Isaac's `SolverCoupledProxy` (.venv-newton152), GS, 2 worlds, 14-inch MacBook Pro (M4 Max): box
+  height within 1.1e-6 m, wrench within ~1e-2 N after the proxies take end-of-step kinematics (`runs/mpm_main/box_on_sand/`).
 - Found: GS + separate_worlds is not run-to-run repeatable, in Newton's own 1.5.2 too (Jacobi and 1 world are):
   `runs/mpm_main/repeat/mwrep1.log`, `mwrep2.log`. Root cause (code reading): environment-first strain partition vs
-  `fill_uniform_color_block_indices` (cell * npe) -> invalid coloring -> data race. Fix written for the fork
+  `fill_uniform_color_block_indices` (cell * npe) -> invalid coloring -> data race. Fix written for [my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim-1.5.2)
   (`runs/mpm_main/fork/b`, kernel `make_partition_color_block_indices_kernel`); CPU dense/fixed multi-env grids VALID
   with it (sparse multi-env grids only build on GPU).
 
@@ -33,9 +36,11 @@ PASS unconditionally: a bug; and a collapse deposit is not a repose angle).
 - Repose (lift, corrected): 25.4 / 26.3 / 27.2 deg at R/dx 5 / 10 / 15 for mu 0.68 (atan 34.2); 14.7 (0.4), 32.6
   (0.9); lift-speed plateau; iterations no effect. 7-9 deg below atan(mu), solver-level.
 - Determinism: stacked boxes 2/256 worlds from step 139 (suspect CCD two-phase counters,
-  `deterministic_ccd_divergence.md`). Coordinator decision: split onto branch `batchsim-deterministic` (draft PR),
-  the MPM PR goes without it. batch_04 commits the merge with main (resolved by the agent), the split, reruns tests,
-  measures bearing with Isaac's default solve and repose at R/dx 20, then opens the MPM PR if green.
+  `deterministic_ccd_divergence.md`). Coordinator decision: split onto branch `batchsim-deterministic`
+  ([draft PR](https://github.com/pulipakaa24/MetalSim/commit/ab67d3202d6abd4f3a433a8dd4199304e1885cfc)),
+  [the MPM PR](https://github.com/pulipakaa24/MetalSim/commit/44b9259b55b80d07a901179dacb0c302c89ee5b1) goes without it.
+  batch_04 commits the merge with main (resolved by the agent), the split, reruns tests, measures bearing with Isaac's
+  default solve and repose at R/dx 20, then opens the MPM PR if green.
 
 ## batch_02 results (15:59) and batch_03
 - Rigid side: MuJoCo Warp not repeatable by default (box on floor diverges at step 18 at 1,024 worlds);
@@ -51,13 +56,13 @@ PASS unconditionally: a bug; and a collapse deposit is not a repose angle).
 
 ## Earlier: batch_02 (`runs/mpm_main/batch_02/batch_02.sh`): per-part divergence diagnosis, new opt-in
 `BatchSimOptions(deterministic=True)`, rigid regression, collapse parity vs Newton alone, slow-lift repose, bearing
-settlement matrix, tests, then fork push + PR if green.
+settlement matrix, tests, then push to my fork of Newton + PR if green.
 
 ## Earlier: batch_01 (`runs/mpm_main/batch_01/batch_01.sh`, run by the user outside the sandbox)
-Fork commit + pin move + re-vendor, coloring check old/new on Metal, multi-world repeat, column bitwise, box-on-sand
-Jacobi pair (bitwise before contact), rigid neutrality, angle of repose, 1/64/256/1024-world repeatability, full
-tests, 16-inch timing, fork push, commit + push, PR if green. Logs: `runs/mpm_main/batch_01/logs/`, summary
-`runs/mpm_main/batch_01/STATUS.txt`.
+Commit to [my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim-1.5.2) + pin move + re-vendor, coloring check
+old/new on Metal, multi-world repeat, column bitwise, box-on-sand Jacobi pair (bitwise before contact), rigid
+neutrality, angle of repose, 1/64/256/1024-world repeatability, full tests, 16-inch timing, push to my fork of Newton,
+commit + push, PR if green. Logs: `runs/mpm_main/batch_01/logs/`, summary `runs/mpm_main/batch_01/STATUS.txt`.
 
 ## Next
 - Read batch_01 logs; write the numbers into MPM.md section 11, PARITY/GAPS rows, NOTE.md; update the PR body.

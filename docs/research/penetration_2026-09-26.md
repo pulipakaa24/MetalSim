@@ -1,11 +1,12 @@
 # Peak contact penetration at impact: closing the gap to PhysX (G1 1 m drop), 2026-09-26
 
-Question: find the most PhysX-faithful MuJoCo Warp contact setting that closes the landing-penetration gap to PhysX
-(Isaac Sim 5.1 GPU PhysX 0.51 mm, `isaac_side_session_2026-09-26.md` §1) as far as MuJoCo's constraint model allows,
+Question: find the most PhysX-faithful MuJoCo Warp contact setting that closes the landing-penetration gap to [PhysX](https://github.com/NVIDIA-Omniverse/PhysX)
+([Isaac Sim](https://github.com/isaac-sim/IsaacSim) 5.1 GPU PhysX 0.51 mm, `isaac_side_session_2026-09-26.md` §1) as far as
+[MuJoCo](https://github.com/google-deepmind/mujoco)'s constraint model allows,
 without losing what already matches (impulses, 20 ms impact forces, joint limits, slide, transfer, learning), and
-recommend one. All numbers are **measured** on this machine (M4 Max, MuJoCo Warp fork f824af1 on Metal, every GPU job
+recommend one. All numbers are **measured** on this machine (M4 Max, [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) at [`f824af1`](https://github.com/pulipakaa24/mujoco_warp/commit/f824af1c5f482791cca90c1a6ca6fe5adb19ce63) on Metal, every GPU job
 through `scripts/gpu_run.sh`) unless marked otherwise. Scope: one asset (Isaac's G1 minimal USD, mesh-box feet), the three
-open-loop protocols of PARITY §1.7 replayed from Isaac's recording (4 identical envs per run, each run repeated for the
+open-loop protocols of [PARITY](../PARITY.md) §1.7 replayed from Isaac's recording (4 identical envs per run, each run repeated for the
 key settings), Isaac's PhysX-trained checkpoint 1000 in closed loop (1024 envs × 1000 steps, seeds 1 and 2), Isaac's
 checkpoints 500 / 1000 / 1499 for transfer (4 envs).
 
@@ -17,7 +18,7 @@ checkpoints 500 / 1000 / 1499 for transfer (4 envs).
    contact: 6.5 kN are applied in the step whose pre-solve separation is +1.82 mm. That is the mechanism that bounds
    PhysX's penetration, not a shifted zero, so 0.51 mm is directly comparable to MuJoCo's `contact.dist`. No rest-offset
    accounting is needed. (§1)
-2. **On the stock fork, nothing closes the gap without losing what already matches.** The landing foot peak under the
+2. **On my stock [fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim), nothing closes the gap without losing what already matches.** The landing foot peak under the
    default is **13.25 mm** (12.79 mm at PhysX's 5 ms cadence). No setting of MuJoCo's soft constraint goes below
    **8.4 mm** at the 2.5 ms step. Every setting that gets near that floor loses a match that holds today:
    - foot slide of Isaac's policy drops 20–25 % below Isaac's (at 5–10× the seed noise);
@@ -35,8 +36,8 @@ checkpoints 500 / 1000 / 1499 for transfer (4 envs).
    (the first edge is detected at 1.16 mm; the other edge is first seen at 8.23 mm). PhysX detects every corner 13–20 mm early (contact offset) and
    stops each one at the surface. A `margin` detects early too, but MuJoCo centres the spring on dist = margin, so the
    robot then rests a margin high. (§2, §4)
-4. **A speculative-contact prototype closes most of the gap, but it is not default-ready.** The prototype is a fork
-   worktree, not a preset (`upstream/mujoco_warp-spec`, branch `metalsim-spec-proto`, bc83fb0). It gives contacts
+4. **A speculative-contact prototype closes most of the gap, but it is not default-ready.** The prototype is a worktree
+   of my fork, not a preset (`upstream/mujoco_warp-spec`, branch [`metalsim-spec-proto`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-spec-proto), [`bc83fb0`](https://github.com/pulipakaa24/mujoco_warp/commit/bc83fb0fecf345090a02cbb13fba400e9f1ad97e)). It gives contacts
    inside the ground `gap` constraint rows whose reference is PhysX's speculative bias a_ref = −(v + dist/h)/h.
    With τ 5 ms it reaches:
 
@@ -53,7 +54,7 @@ checkpoints 500 / 1000 / 1499 for transfer (4 envs).
    - Isaac's checkpoints walk 10–14 cm further than in Isaac: transfer error 0.117 m vs 0.060 m for the default.
    - The drop-torso 5 ms force is 4 % over PhysX's bound.
 
-   It is also an unreviewed fork change. It is archived as the next step (§5).
+   It is also an unreviewed change to my fork. It is archived as the next step (§5).
 
 ## 1. The definition question
 
@@ -69,7 +70,7 @@ checkpoints 500 / 1000 / 1499 for transfer (4 envs).
   (`PxSimulationEventCallback.h:466`). The tensor view copies it unchanged (`CpuRigidContactView.cpp:443`).
 - `PxShape.h:423`: "Two shapes will come to rest at a distance equal to the sum of their restOffset values. If the
   restOffset is 0, they should converge to touching exactly."
-- Isaac Lab's G1_CFG sets no collision offsets (`isaaclab_assets/robots/unitree.py:272–288`). The recorded foot colliders
+- [Isaac Lab](https://github.com/isaac-sim/IsaacLab)'s G1_CFG sets no collision offsets (`isaaclab_assets/robots/unitree.py:272–288`). The recorded foot colliders
   author −inf, i.e. PhysX's automatic contact offset with rest offset 0 (session note §1).
 - On CPU PhysX the full contact report and the tensor view agree to 1e-7 m (session note). So the GPU tensor numbers
   report the same quantity.
@@ -95,18 +96,18 @@ PhysX's 5 ms cadence. The "5 ms tick" columns below do exactly that. The per-sub
 
 ## 2. MuJoCo's constraint model and what bounds penetration
 
-- **Force law** (modeling.html#solver-parameters): a_ref = −b v − k r with b = 2/(d_w τ), k = d(r)/(d_w² τ² ζ²)
+- **Force law** ([modeling.html#solver-parameters](https://mujoco.readthedocs.io/en/stable/modeling.html#solver-parameters)): a_ref = −b v − k r with b = 2/(d_w τ), k = d(r)/(d_w² τ² ζ²)
   (standard form). The realised acceleration is a = d·a_ref + (1 − d)·a_u. The resting violation is
   r = a_u (1 − d) τ² ζ². The impedance d(r) ramps from d0 to d_w over `width` and is clamped to [0.0001, 0.9999].
-- **refsafe**: "the solver uses max(solref[0], 2*timestep)" (XMLreference, option/flag). MuJoCo Warp applies the same
+- **refsafe**: "the solver uses max(solref[0], 2*timestep)" ([XMLreference, option/flag](https://mujoco.readthedocs.io/en/stable/XMLreference.html#option-flag)). MuJoCo Warp applies the same
   clamp (`constraint.py:103–104`). The direct form (negative solref) is not clamped, but only b ≤ 1/h avoids overshoot,
   so the direct form adds only stiffer springs (ζ < 1) at the same damping. At τ = 2h the contact is deadbeat: it removes
   the approach velocity in one substep.
 - **Hard constraints**: "If we forced the solution to reach y = a_ref, which we could do by taking the limit R → 0, we
-  would obtain a hard constraint model. This limit is not allowed in MuJoCo" (computation/index.html).
+  would obtain a hard constraint model. This limit is not allowed in MuJoCo" ([computation/index.html](https://mujoco.readthedocs.io/en/stable/computation/index.html)).
 - **margin / gap**: "Active contact (distance ≤ margin) … The constraint impedance function is applied to the quantity
-  distance − margin"; contacts in (margin, margin + gap] are detected but generate no force (computation/index.html
-  #coMarginGap). MuJoCo Warp: `pos = dist − includemargin` with includemargin = margin (`constraint.py:4359–4360`), and
+  distance − margin"; contacts in (margin, margin + gap] are detected but generate no force
+  ([computation/index.html#coMarginGap](https://mujoco.readthedocs.io/en/stable/computation/index.html#comargingap)). MuJoCo Warp: `pos = dist − includemargin` with includemargin = margin (`constraint.py:4359–4360`), and
   rows only where pos < 0 (`constraint.py:2785–2792`). So the spring is centred on dist = margin. MuJoCo has no
   equivalent of PhysX's "detect early, rest at 0".
 - **What bounds the landing peak** (measured, MuJoCo C and MuJoCo Warp CPU device on the same drop, per-corner contacts):
@@ -119,16 +120,16 @@ PhysX's 5 ms cadence. The "5 ms tick" columns below do exactly that. The per-sub
     nothing to the peak (the corner that has no row sets it); (iii) only early detection (margin, or a smaller dt)
     reaches the lag.
 - **Published MuJoCo humanoid / quadruped settings** (sources checked by a research sub-agent, quotes in the run log):
-  - MuJoCo Playground G1 / H1 / T1 / Berkeley Humanoid / Op3 / Go1 keep MuJoCo's default solref / solimp and pyramidal
+  - [MuJoCo Playground](https://github.com/google-deepmind/mujoco_playground) G1 / H1 / T1 / Berkeley Humanoid / Op3 / Go1 keep MuJoCo's default solref / solimp and pyramidal
     cones (G1: 2 ms, 3 iterations). Go1's only non-default is foot solimp width 0.023 (the foot radius). The paper
-    (arXiv 2502.08844) states no contact rationale.
-  - Menagerie `unitree_g1/scene_mjx.xml` uses foot-floor `solref="0.008 1"` at a 4 ms step, i.e. the refsafe floor 2 dt.
+    ([arXiv 2502.08844](https://arxiv.org/abs/2502.08844)) states no contact rationale.
+  - [Menagerie](https://github.com/google-deepmind/mujoco_menagerie) `unitree_g1/scene_mjx.xml` uses foot-floor `solref="0.008 1"` at a 4 ms step, i.e. the refsafe floor 2 dt.
   - Menagerie Go2 uses elliptic cones with impratio 100, `margin="0.001"`.
-  - mjlab keeps defaults for the G1. For the Go1 it sets `solref=(0.01, 1)` with the comment "Harden all collision
+  - [mjlab](https://github.com/mujocolab/mjlab) keeps defaults for the G1. For the Go1 it sets `solref=(0.01, 1)` with the comment "Harden all collision
     geoms", plus elliptic cones and impratio 10: the same τ and cone as our default.
-  - arXiv 2503.04613 (MuJoCo MPC, H1): "the moderate ground penetration from the softness of the contact model does not
+  - [arXiv 2503.04613](https://arxiv.org/abs/2503.04613) (MuJoCo MPC, H1): "the moderate ground penetration from the softness of the contact model does not
     cause issues in the sim-to-real transfer".
-  - arXiv 2504.13619 randomizes foot solref in (0.02, 0.4) and attributes a sharp force peak to "contact penetration".
+  - [arXiv 2504.13619](https://arxiv.org/abs/2504.13619) randomizes foot solref in (0.02, 0.4) and attributes a sharp force peak to "contact penetration".
   - None of them targets millimetre penetration. Our default is already as stiff as the stiffest published setting that
     keeps τ above the floor.
 - **PhysX TGS** reaches near-rigid contact through the speculative bias above, applied at each TGS sub-iteration
@@ -148,7 +149,8 @@ PhysX's 5 ms cadence. The "5 ms tick" columns below do exactly that. The per-sub
   (env 0, max over all contacts, torso included). At cap 20 the default's drop maximum is 13.25 mm, from the feet.
 - `scripts/diagnostics/bench_contact_tuning.py` uses the preset's cap too (before: always 10).
 - `scripts/diagnostics/penetration/`:
-  - `sweep.sh` runs the stages rec / transfer / air / cost / cap; `MJW=` selects a fork worktree, `DT=` the step,
+  - `sweep.sh` runs the stages rec / transfer / air / cost / cap; `MJW=` selects a worktree of
+    [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim), `DT=` the step,
     `TAG=_r2` makes a repeat run.
   - `summarize.py` builds the full table (`runs/penetration/sweep_table.md`, all 48 rows × 14 columns, and
     `summary.jsonl`).
@@ -245,16 +247,16 @@ already inside the contact offset / gap. PhysX's time axis includes its settle s
 
 **Mechanism.** MuJoCo's primal solver already treats a contact row as unilateral through its reference acceleration: a
 row pushes only while J·a would fall below a_ref. So a row at positive distance behaves speculatively by itself, if it
-exists. The prototype makes it exist and gives it PhysX's reference (fork worktree `upstream/mujoco_warp-spec`, branch
-`metalsim-spec-proto`, commits 2b424a4 + bc83fb0, patch `runs/penetration/spec_prototype.patch`, active only with
+exists. The prototype makes it exist and gives it PhysX's reference (worktree `upstream/mujoco_warp-spec` of [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim), branch
+[`metalsim-spec-proto`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-spec-proto), commits [`2b424a4`](https://github.com/pulipakaa24/mujoco_warp/commit/2b424a4bf4e068e96ac081d371f100e9a5103d6a) + [`bc83fb0`](https://github.com/pulipakaa24/mujoco_warp/commit/bc83fb0fecf345090a02cbb13fba400e9f1ad97e), patch `runs/penetration/spec_prototype.patch`, active only with
 `MJW_SPECULATIVE_GAP=1`):
-1. `plane_convex` detects out to margin + gap. The stock fork passes only margin, so gap-zone plane contacts never
+1. `plane_convex` detects out to margin + gap. My stock fork passes only margin, so gap-zone plane contacts never
    existed.
 2. Every detected contact gets rows (`constraint.py`, the two row-allocation kernels).
 3. A row with pos = dist − margin > 0 gets a_ref = −(v + pos/h)/h at impedance d0.
 
 Item 3 is PhysX's v(t+h) ≥ −pos/h. Rows at pos ≤ 0 are unchanged, so resting contact is MuJoCo's. The presets
-`ellip10_*specgap*` put the gap on the ground. On the stock fork gap contacts are inactive, and those presets equal
+`ellip10_*specgap*` put the gap on the ground. On my stock fork gap contacts are inactive, and those presets equal
 their base presets.
 
 **Validation.**
@@ -292,8 +294,8 @@ Next steps:
 
 ## 6. Recommendation
 
-**Keep `recommended` = `tau10_impact_hardlimits_ellip10` (no change; no training run).** Evidence: §4. On the stock fork
-every penetration reduction below the default's 13.25 mm costs one of the matches the default holds:
+**Keep `recommended` = `tau10_impact_hardlimits_ellip10` (no change; no training run).** Evidence: §4. On my stock
+[fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) every penetration reduction below the default's 13.25 mm costs one of the matches the default holds:
 - **Slide.** Isaac's policy slides −0.0130 in ours vs −0.0127 in Isaac (2 %). Every τ ≤ 7.5 ms foot setting gives
   −0.0096 … −0.0116, 9–25 % less sliding than Isaac, at 5–10× the seed noise.
 - **Chatter.** τ 5 ms at ζ = 1 raises closed-loop short contact phases 36 → 51 %, the median contact phase 120 → 17 ms,
@@ -307,7 +309,7 @@ every penetration reduction below the default's 13.25 mm costs one of the matche
   d0 0.99 raises open-loop chatter 120 → 168. dmax 0.9999 raises the substeps at the cap 15×. Unlike joint limits, it
   does not diverge for contacts.
 
-**Best trade-off on the stock fork, quantified** (for an owner who weights penetration higher): **feet-only τ 7.5 ms**
+**Best trade-off on my stock fork, quantified** (for an owner who weights penetration higher): **feet-only τ 7.5 ms**
 (`ellip10_feet_tau7p5`).
 - Gains:
   - foot peak −17 % (13.25 → 11.02 mm), settle −43 % (0.25 → 0.14 mm), depth at 55 ms 1.53 → 0.69 mm;

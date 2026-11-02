@@ -1,9 +1,12 @@
 # BatchSimOptions(deterministic=True): how Warp's deterministic mode reaches MuJoCo Warp's kernels (2026-10-13)
 
-Why: batch_02's diagnosis showed MuJoCo Warp itself is not run-to-run repeatable at 1,024 worlds (a box resting on the
-floor, no sand: two runs differ from step 18; the coupled Jacobi scene from step 34 in every part at once,
-`runs/mpm_main/batch_02/STATUS.txt`). The coupled scene can only repeat if the rigid side does. Source reading of the
-Warp fork (`95f6f121`), MuJoCo Warp fork and Newton 1.5.2's `SolverMuJoCo`; the coupled-speed agent's note
+Why: batch_02's diagnosis showed [MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp) itself is not run-to-run
+repeatable at 1,024 worlds (a box resting on the floor, no sand: two runs differ from step 18; the coupled Jacobi scene
+from step 34 in every part at once, `runs/mpm_main/batch_02/STATUS.txt`). The coupled scene can only repeat if the rigid
+side does. Source reading of [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) at
+[`95f6f121`](https://github.com/pulipakaa24/warp/commit/95f6f121b7e67025958335c7c15e338ac04a798a),
+[my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) and
+[Newton](https://github.com/newton-physics/newton) 1.5.2's `SolverMuJoCo`; the coupled-speed agent's note
 (`research_notes/coupled_speed/NOTE.md` on its branch) reached the same conclusions independently.
 `W` = `upstream/warp-innate/warp/_src`, `MJW` = `upstream/mujoco_warp/mujoco_warp/_src`,
 `N` = `upstream/newton-metalsim-1.5.2/newton/_src`.
@@ -54,7 +57,7 @@ inside `_scoped_mujoco_warp_execution` (3820-3825): re-apply options changed by 
    and that value is read both at hash time and at build time; a module hashed under one value and built after a change
    poisons a cold cache. Pre-existing; logged for the owner of BatchSim.
 
-Metal limits of the fork's deterministic mode (verified): 64-bit CAS / exchange and int64 min/max refused at launch;
+Metal limits of the deterministic mode in [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) (verified): 64-bit CAS / exchange and int64 min/max refused at launch;
 deterministic float accumulation for f16 / f32 / bf16 only; negative-stride destinations refused; at most 8
 consumed-return counter targets per kernel; `deterministic_debug` is a no-op on Metal; RUN_TO_RUN = exact integer bins
 (bitwise independent of thread order), GPU_TO_GPU = record-and-sort path sized by max_records.

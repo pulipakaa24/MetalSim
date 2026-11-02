@@ -1,6 +1,6 @@
 # Cross-platform floating-point determinism and simulator parity (survey, as of 2026-10-10)
 
-Context: metalsim runs NVIDIA Newton/Warp implicit MPM on Apple Metal and wants parity with Isaac Lab on CUDA. Below, "verified" means I read the primary source (doc page, source file, or changelog) during this session. Source dates are given where available.
+Context: metalsim runs NVIDIA [Newton](https://github.com/newton-physics/newton)/[Warp](https://github.com/NVIDIA/warp) implicit MPM on Apple Metal and wants parity with [Isaac Lab](https://github.com/isaac-sim/IsaacLab) on CUDA. Below, "verified" means I read the primary source (doc page, source file, or changelog) during this session. Source dates are given where available.
 
 ## Q1. What do game/physics engines with cross-platform determinism actually do (FMA, fast-math, transcendentals, reduction order, GPU)?
 

@@ -1,21 +1,32 @@
 # PhysX 5 deformable solvers: formulation, port feasibility to Warp/Metal, and the Newton VBD alternative
 
-2026-09-25. Scope: what PhysX 5's GPU deformable solvers (PBD particle cloth, FEM deformable volume, FEM
-deformable surface) actually compute, how far each is from the solvers MetalSim already has (MetalSim
-`XPBDSim`, MuJoCo Warp flex) and from Newton's (VBD, XPBD), and what a faithful Warp/Metal port would take.
-Companion: `newton_vbd_metal_2026-09-25.md` (Newton VBD and the coupled MuJoCo Warp + VBD solver on Metal,
-the Isaac Lab 3.0 path). **Measured** = run here; **source** = read in the cited file; **estimated** = judgement.
+2026-09-25. Scope: what [PhysX](https://github.com/NVIDIA-Omniverse/PhysX) 5's GPU deformable solvers (PBD particle
+cloth, FEM deformable volume, FEM deformable surface) actually compute, how far each is from the solvers MetalSim
+already has (MetalSim `XPBDSim`, [MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp) flex) and from
+[Newton](https://github.com/newton-physics/newton)'s (VBD, XPBD), and what a faithful
+[Warp](https://github.com/NVIDIA/warp)/Metal port would take. Companion:
+[`newton_vbd_metal_2026-09-25.md`](newton_vbd_metal_2026-09-25.md) (Newton VBD and the coupled MuJoCo Warp + VBD solver
+on Metal, the [Isaac Lab](https://github.com/isaac-sim/IsaacLab) 3.0 path). **Measured** = run here; **source** = read
+in the cited file; **estimated** = judgement.
 
 Sources (all BSD-3 unless noted):
-* [PX] `upstream/PhysX` = github.com/NVIDIA-Omniverse/PhysX `main` at da950a35 (2026-09-16, PhysX 5.11.0,
-  ovphysx 0.6.3), shallow clone.
-* [PX561] `upstream/PhysX-5.6.1` = tag `107.3-physx-5.6.1` (5ca9f472, PhysX 5.6.1.b07ddd12): the PhysX of
-  Isaac Sim 5.1, which recorded every Isaac reference so far and is the last release with particle cloth.
-* [OMNI] `upstream/PhysX-omni-5.6.1` = tag `107.3-omni-and-physx-5.6.1` (09ff24f3): the same PhysX plus the
-  omni.physx Kit extensions (USD parsing, `particleUtils.py`), i.e. the code between Isaac Sim 5.1's USD and PhysX.
+* [PX] `upstream/PhysX` = [github.com/NVIDIA-Omniverse/PhysX](https://github.com/NVIDIA-Omniverse/PhysX) `main` at
+  [`da950a35`](https://github.com/NVIDIA-Omniverse/PhysX/commit/da950a3537927784951853c66618036f332ca0ce) (2026-09-16,
+  PhysX 5.11.0, ovphysx 0.6.3), shallow clone.
+* [PX561] `upstream/PhysX-5.6.1` = tag
+  [`107.3-physx-5.6.1`](https://github.com/NVIDIA-Omniverse/PhysX/tree/107.3-physx-5.6.1)
+  ([`5ca9f472`](https://github.com/NVIDIA-Omniverse/PhysX/commit/5ca9f472105a90d70d957c243cb0ef36fe251a9f), PhysX
+  5.6.1.b07ddd12): the PhysX of [Isaac Sim](https://github.com/isaac-sim/IsaacSim) 5.1, which recorded every Isaac
+  reference so far and is the last release with particle cloth.
+* [OMNI] `upstream/PhysX-omni-5.6.1` = tag
+  [`107.3-omni-and-physx-5.6.1`](https://github.com/NVIDIA-Omniverse/PhysX/tree/107.3-omni-and-physx-5.6.1)
+  ([`09ff24f3`](https://github.com/NVIDIA-Omniverse/PhysX/commit/09ff24f3279b735e672ff27b155cbf49f6296f4d)): the same
+  PhysX plus the omni.physx Kit extensions (USD parsing, `particleUtils.py`), i.e. the code between Isaac Sim 5.1's USD
+  and PhysX.
 * File paths below are relative to `physx/source/` of [PX561] unless prefixed.
-* Cross-check: `deformables_2026-09-25.md` §9 (the fitting agent, same sources) reaches the same formulations; this
-  note adds the partition/copy/blend scheme, the exact spring and contact update formulas, the TGS schedule
+* Cross-check: [`deformables_2026-09-25.md`](deformables_2026-09-25.md) §9 (the fitting agent, same sources) reaches the
+  same formulations; this note adds the partition/copy/blend scheme, the exact spring and contact update formulas, the
+  TGS schedule
   (iteration count raised for the whole island, bias coefficient, forward projection, finalisation), the hidden
   omni.physx cooker, code sizes and the port. §9 additionally notes the soft-body Jacobi fallback above
   `SB_PARTITION_LIMIT`.
@@ -27,7 +38,7 @@ Sources (all BSD-3 unless noted):
 | PBD particle cloth, `PxParticleClothBuffer` (Isaac Sim ≤ 5.1 "particle cloth"; the other agent's recorded cloth scene) | per TGS position iteration (= substep of dt/16): implicit spring-damper distance constraints on cooked springs (stretch/shear/bend classes), partitioned Gauss–Seidel through 8 combined partitions with per-particle copies blended by 1/(max copies + 1); particle–shape contacts from a once-per-step contact list with accumulated-impulse clamping and Coulomb friction, relaxation 0.5; self-collision through a hash grid, Jacobi-averaged with rest-pose filtering | MetalSim `XPBDSim` (small-step XPBD, coloured Gauss–Seidel distance constraints) and Newton `SolverXPBD` springs (same implicit spring-damper algebra, Jacobi) | new spring cooking (PhysX cooker's classes and bend pairs), PhysX's damping term and clamp, the copy/blend partition scheme, the once-per-step contact list with rest/contact offsets and accumulated impulses, velocity finalisation — a new backend, not a patch (§4, prototype `metalsim/physics/physx_cloth.py`) |
 | FEM deformable volume, `PxDeformableVolume` (Isaac Lab's `DeformableObject` on PhysX; Isaac Sim 6's `DeformablePrim` volumes) | XPBD on tetrahedra of a voxel simulation mesh: co-rotational (default) = ARAP constraint ‖F − R‖ with compliance 1/(2μV) + volume constraint det F − 1 with compliance 1/(λV), XPBD damping from `elasticityDamping`; or Macklin-style Neo-Hookean; partitioned Gauss–Seidel with copies; embedded collision mesh; two-way rigid coupling inside every TGS iteration | Newton `SolverXPBD.solve_tetrahedra` (XPBD, but Neo-Hookean-style deviatoric + volume, Jacobi) | co-rotational ARAP + volume constraints, polar rotation per tet, voxel sim mesh + embedded collision mesh, PhysX partitioning, TGS schedule, rigid contact/impulse exchange per iteration |
 | FEM deformable surface, `PxDeformableSurface` ("FEM cloth"; the only PhysX cloth from PhysX 5.9 / Isaac Sim 6.0) | XPBD fixed-corotated membrane (ARAP 2×2 + area constraint, compliance from E, ν, thickness) + XPBD discrete-shell bending on triangle pairs, partitioned with copies | none (MuJoCo flex `elastic2d` is StVK; Newton VBD is a different energy and solver) | a new backend |
-| Newton VBD (Isaac Lab 3.0's Newton deformable path) | block-descent Newton per vertex on stable Neo-Hookean membranes (`particle_vbd_kernels.py:504`) + dihedral bending (`:666`) / stable Neo-Hookean tets (`:150`), penalty contacts; AVBD for rigid bodies | Newton itself: 1.5.2 runs unchanged on Metal, Newton main after one Warp fork fix (companion doc) | — |
+| Newton VBD (Isaac Lab 3.0's Newton deformable path) | block-descent Newton per vertex on stable Neo-Hookean membranes (`particle_vbd_kernels.py:504`) + dihedral bending (`:666`) / stable Neo-Hookean tets (`:150`), penalty contacts; AVBD for rigid bodies | Newton itself: 1.5.2 runs unchanged on Metal, Newton main after one fix in [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) (companion doc) | — |
 
 Throughput is not the deciding factor for any of these: the formulations differ in what they converge to per
 step (iteration counts are part of the model in position-based solvers), so fidelity to PhysX requires

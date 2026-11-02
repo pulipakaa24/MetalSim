@@ -4,10 +4,11 @@ Sections are a dated log: statements such as "being ported" or "in progress" are
 **Done** / **Resolved** note points to where the result landed. Summary of the current state: `docs/STATUS.md`
 ("Deferred work items") and `docs/GAPS.md` (MPM row).
 
-Isaac Lab 3.0-EA's only MPM is Newton 1.5.2's `SolverImplicitMPM` (an implicit Drucker-Prager rheology + frictional
-contact solve per step, after Daviet & Bertails-Descoubes 2016 and NVIDIA's "Mixed MPM" 2026); PhysX dropped its MPM in
-5.4 and Isaac Lab does not use PhysX's PBD particles. metalsim therefore runs **that solver** on Metal, made to mean
-on the M4 Max what it means on Isaac's L4, and accelerates it only with changes that reproduce it bit for bit.
+[Isaac Lab][isaaclab] 3.0-EA's only MPM is [Newton 1.5.2][newton-v1.5.2]'s `SolverImplicitMPM` (an implicit
+Drucker-Prager rheology + frictional contact solve per step, after [Daviet & Bertails-Descoubes 2016][daviet2016] and
+NVIDIA's ["Mixed MPM" 2026][mixed-mpm]); [PhysX][physx] dropped its MPM in 5.4 and Isaac Lab does not use PhysX's PBD
+particles. metalsim therefore runs **that solver** on Metal, made to mean on the M4 Max what it means on Isaac's NVIDIA
+L4 GPU, and accelerates it only with changes that reproduce it bit for bit.
 Research behind every choice: `docs/research/mpm_2026-10-09.md` (notes in `docs/research/mpm_2026-10-09_notes/`).
 
 ## 1. Layers
@@ -15,8 +16,8 @@ Research behind every choice: `docs/research/mpm_2026-10-09.md` (notes in `docs/
 | layer | where | what |
 |---|---|---|
 | oracle | Newton 1.5.2 tag + `newton_compat.py` (stock: `scripts/setup_newton152.sh` with `METALSIM_NEWTON152_REF=v1.5.2`, see section 10) | Newton's solver unchanged, with the semantic fixes below |
-| Newton fork | [pulipakaa24/newton](https://github.com/pulipakaa24/newton) branch `metalsim-1.5.2` off v1.5.2, pinned by `scripts/setup_newton152.sh` into `.venv-newton152` (`METALSIM_CHANGES.md` there lists every commit) | Metal launch configuration and device-side paths that CUDA already had, scale bounds, repeatable sums, rigid collision at scale; upstreamable |
-| Warp fork | [pulipakaa24/warp](https://github.com/pulipakaa24/warp) branch `metalsim`, pinned by `scripts/setup_warp.sh` (one checkout shared by every environment) | Metal GPU primitives, deterministic mode, launch bounds, argument space, replay batching, fast_math forms |
+| Newton fork | [my fork of Newton][newton-fork-152], branch `metalsim-1.5.2` off v1.5.2, pinned by `scripts/setup_newton152.sh` into `.venv-newton152` ([`METALSIM_CHANGES.md`][newton-changes] there lists every commit) | Metal launch configuration and device-side paths that CUDA already had, scale bounds, repeatable sums, rigid collision at scale; upstreamable |
+| Warp fork | [my fork of Warp][warp-fork], branch `metalsim`, pinned by `scripts/setup_warp.sh` (one checkout shared by every environment) | Metal GPU primitives, deterministic mode, launch bounds, argument space, replay batching, fast_math forms |
 | metalsim accelerations | `newton_compat.py` (`chunk_graph`), `fused_gs.py` | opt-in, each tested bitwise against the oracle (the SIMD sweep `simd_gs.py` was removed 2026-10-14, see below) |
 | scenes / recorder / comparison | `scenes.py`, `metalsim/parity/isaac_side/record_mpm.py`, `compare.py` | the same two files run on the L4 and on the Mac |
 
@@ -32,16 +33,16 @@ Research behind every choice: `docs/research/mpm_2026-10-09.md` (notes in `docs/
    device stops at the same iteration; it also logs iterations and residuals per solve (`SOLVE_LOG`), because a speed
    number is only comparable at the residual it reached.
 3. **Metal form of Newton's `fast_math` kernels** (`metal_fast_math`, section 8, 1b): `"off"` (default: correctly
-   rounded division and sqrt), `"cuda"` (CUDA's `--use_fast_math` results bit for bit, Warp fork
-   `metalsim` from `91b8a859`; Warp's own default is `"off"` too), `"relaxed"` (Metal's fast divide / sqrt).
+   rounded division and sqrt), `"cuda"` (CUDA's `--use_fast_math` results bit for bit, my fork of
+   Warp from [`91b8a859`][]; Warp's own default is `"off"` too), `"relaxed"` (Metal's fast divide / sqrt).
 
 ### First Newton fork commits (topic branch `metalsim-mpm-1.5.2`, now the start of `metalsim-1.5.2`)
 
 | commit | change | effect |
 |---|---|---|
-| `6f6075d1` | colored Gauss-Seidel kernels launch 2 blocks per GPU core on Metal (were 1 block of 64 threads per color off CUDA) | granular strain solve 390 -> 54 ms; bitwise |
-| `00c24ef0` | dense-grid bounds on the device on Metal (host path ignored `particle_flags`, so the grid differed from CUDA's when particles are inactive) | parity fix; bitwise with all particles active |
-| `a3fa1140` | batched (separate-worlds) residual norms and system scaling use CUDA's 256-lane tiles on Metal | faster; CUDA's reduction structure; bitwise on a 2-world column |
+| [`6f6075d1`][] | colored Gauss-Seidel kernels launch 2 blocks per GPU core on Metal (were 1 block of 64 threads per color off CUDA) | granular strain solve 390 -> 54 ms; bitwise |
+| [`00c24ef0`][] | dense-grid bounds on the device on Metal (host path ignored `particle_flags`, so the grid differed from CUDA's when particles are inactive) | parity fix; bitwise with all particles active |
+| [`a3fa1140`][] | batched (separate-worlds) residual norms and system scaling use CUDA's 256-lane tiles on Metal | faster; CUDA's reduction structure; bitwise on a 2-world column |
 
 ## 2. Verified so far (Metal, measured)
 
@@ -52,11 +53,12 @@ Research behind every choice: `docs/research/mpm_2026-10-09.md` (notes in `docs/
 * **Metal vs Warp's CPU device (same float32 algorithm, a = 2, 3 s; measured on the earlier 13-wide lattice):** runout (L_f - L_i)/L_i 2.215 vs 2.205 (0.5 %),
   final height 0.5 %, deposit profile RMS 3 mm, centre of mass 0.12 mm, mean iterations 87 vs 93. Particle paths
   differ by ~1 mm RMS (chaotic granular flow), which is why the suite compares observables after the first frames.
-* **Literature sanity:** a = 2 runout 2.21 lies between Lajeunesse 2005 (a = 2.0) and Lube 2005 (1.2a = 2.4).
+* **Literature sanity:** a = 2 runout 2.21 lies between [Lajeunesse 2005][lajeunesse2005] (a = 2.0) and
+  [Lube 2005][lube2005] (1.2a = 2.4).
 * **Coverage:** column, plate (RFT), and Newton's granular, multi_material, viscous, twoway_coupling (454k particles)
-  and anymal (486k particles, MuJoCo Warp robot) examples run on Metal; snow_ball and beam_twist need the Warp fix
-  `abd59275` (branch `metalsim-fem-threadgroup`, `upstream/warp-innate-tgfix`: a `wp.static(x) > 1` condition kept an
-  unused 75 KB `tile_sum` in `warp.fem`'s bilinear dispatch kernel).
+  and anymal (486k particles, [MuJoCo Warp][mjw] robot) examples run on Metal; snow_ball and beam_twist need the fix
+  [`abd59275`][] in [my fork of Warp][warp-fork] (branch `metalsim-fem-threadgroup`, `upstream/warp-innate-tgfix`: a
+  `wp.static(x) > 1` condition kept an unused 75 KB `tile_sum` in `warp.fem`'s bilinear dispatch kernel).
 * **Newton behaviour to account for:** with `separate_worlds`, two identical worlds give different trajectories
   (Gauss-Seidel color order differs per world), so per-environment comparisons must pair the same environment index.
   Isaac Lab's grid emitter works in float32: `ceil(3 * 0.2 / 0.05) = 12` particles across a 0.2 m column (13 in
@@ -74,20 +76,20 @@ Interleaved A/B on one trajectory (all variants bitwise equal; robust to other p
 2.9x over the oracle; chunk graph 1.4-1.8x over eager all-core launches; SIMD sweep 1.0x eager / +10 % with the graph;
 fused single-threadgroup solve 0.9x (one GPU core cannot carry ~1,100 strain nodes per color).
 The SIMD sweep (`simd_gs.py`, `install(simd=True)`) was removed on 2026-10-14: opt-in and never the default, and
-since FMA contraction on Metal (Warp branch `metalsim-fp-contract`) its lane-shuffled sums are no longer bitwise
-Newton's serial loop (`test_simd_sweep_bitwise` was an xfail), so its +10 % with the chunk graph no longer came with
-the oracle's numbers. The code is in the history before the removal commit.
+since FMA contraction on Metal (branch `metalsim-fp-contract` of [my fork of Warp][warp-fork]) its lane-shuffled sums
+are no longer bitwise Newton's serial loop (`test_simd_sweep_bitwise` was an xfail), so its +10 % with the chunk
+graph no longer came with the oracle's numbers. The code is in the history before the removal commit.
 
 Where the remaining time goes (graph replay, GPU side): a color pass ~20 us (8 per iteration), contact 25 us, residual
-readback 0.23 ms every 5 iterations; grid allocation 13 ms (NanoVDB built on the host for the sparse grid) and
-scratchpad 9 ms per step. Dispatch floor measured at 3-4.5 us per dependent launch (graph), 7.8-8.9 us eager.
+readback 0.23 ms every 5 iterations; grid allocation 13 ms ([NanoVDB][nanovdb] built on the host for the sparse grid)
+and scratchpad 9 ms per step. Dispatch floor measured at 3-4.5 us per dependent launch (graph), 7.8-8.9 us eager.
 
 Not yet measured: the L4 (Isaac) numbers for the same scenes, which every speed claim must be set against.
 (Measured since: L4 timing runs in sections 7 and 8; coupled scenes re-timed against them in section 8j.)
 
 ## 4. Isaac references (L4, recorded 2026-10-10; `runs/parity/isaaclab3_mpm/`)
 
-First pass (85 runs, all exit 0), Isaac Lab 3.0-EA's Newton 1.5.2 / Warp 1.16.0 on the L4:
+First pass (85 runs, all exit 0), Isaac Lab 3.0-EA's Newton 1.5.2 / [Warp][warp] 1.16.0 on the L4:
 * **The L4 is deterministic:** host-run loop twice, bitwise equal (a = 2 column, 180 frames; granular, 60 frames).
 * **metalsim's CUDA-stopping-rule loop is bitwise equal to Newton's conditional-graph loop on CUDA** (R0_a2_host vs
   R0_a2_stock): the semantic fix reproduces what Isaac runs, not just its iteration counts. This holds for Isaac Lab
@@ -146,17 +148,18 @@ within 10 %. Speed is compared only at matched settings with iterations and resi
 Before any fix Metal departed from the L4 by 6 um after one frame (a = 2 column), ~2,000x the L4's own
 float32-vs-float64 floor. `probes/dump_first_solve.py` dumps every array of the first strain solve on both devices:
 grid, strain matrices and coloring were identical; the inputs that differed were the collider friction / normals at
-nodes exactly equidistant from two collider faces, and last-bit rounding everywhere. Two device-semantics gaps in our
-Warp fork, both measured (`probes/fp_semantics.py`, `fp_contract_patterns.py`, `mesh_query_ties.py`):
+nodes exactly equidistant from two collider faces, and last-bit rounding everywhere. Two device-semantics gaps in
+[my fork of Warp][warp-fork], both measured (`probes/fp_semantics.py`, `fp_contract_patterns.py`,
+`mesh_query_ties.py`):
 
 1. **FMA contraction.** Warp's `fuse_fp` module option (documented default: on) compiles CUDA with `--fmad=true`, so
-   `a*b+c` is one rounding; the fork's Metal path ignored it (strict IEEE, two roundings). Fix: branch
+   `a*b+c` is one rounding; my fork's Metal path ignored it (strict IEEE, two roundings). Fix: branch
    `metalsim-fp-contract` (`upstream/warp-innate-fpcontract`): `#pragma clang fp contract(fast)` in the Metal
    prelude when `fuse_fp` is on. Metal then reproduces CUDA bit for bit on every tested expression shape (a*b+c,
    a*b+-c*d, three-term sums and squares, (a-b)*(c-d)+e, c-a*b). This changes rounding in every Metal Warp kernel,
-   so it is a separate branch: merging it means re-running the rigid-body parity suite. (**Done:** merged into Warp
-   `metalsim`; the rigid suite had the same known failures before and after, `runs/fma_rigid_parity/`.)
-2. **BVH builder.** CUDA builds mesh BVHs with LBVH, the fork's Metal path falls back to host SAH; at exact ties the
+   so it is a separate branch: merging it means re-running the rigid-body parity suite. (**Done:** merged into my
+   fork's `metalsim`; the rigid suite had the same known failures before and after, `runs/fma_rigid_parity/`.)
+2. **BVH builder.** CUDA builds mesh BVHs with LBVH, my fork's Metal path falls back to host SAH; at exact ties the
    closest face differs (CUDA LBVH vs CUDA SAH alone: 4,962 / 7,126 / 3,793 tied points differ in three box cases).
    Being ported (Metal LBVH identical to CUDA's). (**Done:** results with FMA + LBVH below.)
 
@@ -207,18 +210,19 @@ plate drag 0.97 at the worst frame (`runs/mpm/closeout/floors_final.md`).
 Timing-class runs, ms/frame, Metal vs the L4 (eager / whole step captured): column a=2 14.5 vs 20.4; column a=8
 52.5 vs 28.6; plate drag 67.0 vs 35.7; granular 88.7 vs 35.8/36.0; multi_material 90.1 vs 35.5; ANYmal 107.7 vs
 58.9/24.2; two-way coupling 254.4 vs 73.0/31.0. Two-way profile: MPM step 224 ms, of which ~130 ms are CPU radix sorts
-in `warp.fem` `compress_node_indices` and ~40 ms GPU drains before host utility calls (the fork runs
-`radix_sort_pairs` / `runlength_encode` / `array_scan` on the host on Metal). Order: GPU sort/RLE/scan (in progress,
-branch `metalsim-metal-sort`; **done**, table below), GPU-driven solver loop (indirect execution ranges), residual folded into the solve,
-GPU NanoVDB grid build, whole-step capture, Gauss-Seidel layout work after microbenchmarks.
+in `warp.fem` `compress_node_indices` and ~40 ms GPU drains before host utility calls ([my fork of Warp][warp-fork]
+runs `radix_sort_pairs` / `runlength_encode` / `array_scan` on the host on Metal). Order: GPU sort/RLE/scan (in
+progress, branch `metalsim-metal-sort`; **done**, table below), GPU-driven solver loop (indirect execution ranges),
+residual folded into the solve, GPU NanoVDB grid build, whole-step capture, Gauss-Seidel layout work after
+microbenchmarks.
 
 ### Done (2026-10-10), each bitwise against the previous Metal path
 
 | change | where | effect |
 |---|---|---|
-| GPU radix sort / RLE / integer scan (stable reduce-then-scan, pass skipping) | Warp `b23d6b81` (`metalsim-metal-sort`) | two-way 242 -> 76 ms; 2M-key sort 9 -> 0.6 ms |
-| GPU BSR assembly (`bsr_set_from_triplets`, transpose) | Warp `8412a5c8` (`metalsim-metal-bsr`) | 12 drains/step gone; two-way 78 -> 70.5, granular 70.9 -> 65.4 ms |
-| GPU NanoVDB builder (`allocate_by_voxels`, `rebuild`) | Warp `93ed7138` (`metalsim-metal-volume`) | granular "Allocate grid" 12.4 -> 2.2 ms |
+| GPU radix sort / RLE / integer scan (stable reduce-then-scan, pass skipping) | Warp [`b23d6b81`][] (`metalsim-metal-sort`) | two-way 242 -> 76 ms; 2M-key sort 9 -> 0.6 ms |
+| GPU BSR assembly (`bsr_set_from_triplets`, transpose) | Warp [`8412a5c8`][] (`metalsim-metal-bsr`) | 12 drains/step gone; two-way 78 -> 70.5, granular 70.9 -> 65.4 ms |
+| GPU NanoVDB builder (`allocate_by_voxels`, `rebuild`) | Warp [`93ed7138`][] (`metalsim-metal-volume`) | granular "Allocate grid" 12.4 -> 2.2 ms |
 | GPU-decided solver stop (indirect execution range zeroed by a gate kernel; `newton_compat gpu_exit`) | metalsim | granular 72.8 -> 63.3 ms (interleaved A/B); same stopping iterations |
 | solver loop inside an outer capture (unrolled gated chunks) -> the examples' whole-step capture works on Metal | metalsim | two-way captured, bitwise equal to eager |
 
@@ -239,8 +243,9 @@ reproduces the pre-optimisation Metal recordings byte for byte.
 
 Scene: `probes/scale_pour.py --part mpm` / `probes/pour_bitwise.py` (2,048 worlds x 735 particles, one
 `SolverImplicitMPM`, separate worlds, rebuildable sparse grid, voxel 0.015, Jacobi 24 (25 run), P0 strain, pic27
-collider, Isaac's capacity rule 1,024 cells per world, ~78 used). Branches: Warp `metalsim-mpm-scale` (from
-`metalsim-metal-ordered-atomics` c160f7e4), Newton `metalsim-mpm-scale` (from `metalsim-mpm-determinism` 53a903d7).
+collider, Isaac's capacity rule 1,024 cells per world, ~78 used). Branches: [my fork of Warp][warp-fork]
+`metalsim-mpm-scale` (from `metalsim-metal-ordered-atomics` [`c160f7e4`][]), [my fork of Newton][newton-fork-152]
+`metalsim-mpm-scale` (from `metalsim-mpm-determinism` [`53a903d7`][]).
 
 * **Isaac's configuration includes a `fem.TemporaryStore`** (`NewtonMPMManager._create_solver`, also for coupler
   entries). The probe did not pass one, so every step allocated ~6.6 GB of fresh capacity-sized buffers at 2,048
@@ -286,17 +291,18 @@ worlds, eager and captured.
 Starting point (`reports/Metal MPM speed and scalable determinism.md` and the kernel profile in
 `runs/mpm/profile/kernels/`): granular 51.7 ms/frame on Metal vs 35.8 on the L4, ~75 % of it Newton's colored
 Gauss-Seidel kernel (1,820 dispatches per frame at 16.4 us each), 8 host waits per frame. Four changes, in the order
-ranked there; Warp branch `metalsim-mpm-speed` (on `metalsim-metal-ordered-atomics` `c160f7e4`), metalsim commits on
-this branch. Every step was measured as its own frozen tree, timing-class jobs (`speed_suite.sh`, 60 frames after 5,
-two repetitions; `speed_table.py`), Newton `metalsim-mpm-determinism` unchanged.
+ranked there; branch `metalsim-mpm-speed` of [my fork of Warp][warp-fork] (on `metalsim-metal-ordered-atomics`
+[`c160f7e4`][]), metalsim commits on this branch. Every step was measured as its own frozen tree, timing-class jobs
+(`speed_suite.sh`, 60 frames after 5, two repetitions; `speed_table.py`), [my fork of Newton][newton-fork-152] at
+`metalsim-mpm-determinism` unchanged.
 
 | step | change | bitwise? |
 |---|---|---|
-| 1 | Warp `f52da34`: `fast_math` modules compile on Metal as NVRTC's `--use_fast_math` does on CUDA | no (rounding; judged against the L4's floors) |
-| 2 | Warp `7409510`: Metal volume destroy without a device drain; metalsim `4cda884`: unlogged GPU-exit solves read nothing back | yes |
-| 3 | Warp `08084e0`: kernel arguments and launch bounds read through `device const` instead of `constant` | yes |
-| 4 | Warp `ea6dcfd`: graph replays share command buffers (`WP_METAL_ICB_BATCH` default 1024) | yes |
-| (opt-in) | Warp `da6adce`: eager `capture_while` / `capture_if` gated on the GPU (`WP_METAL_EAGER_CONDITIONALS=1`) | yes |
+| 1 | Warp [`f52da34`][]: `fast_math` modules compile on Metal as NVRTC's `--use_fast_math` does on CUDA | no (rounding; judged against the L4's floors) |
+| 2 | Warp [`7409510`][]: Metal volume destroy without a device drain; metalsim: unlogged GPU-exit solves read nothing back | yes |
+| 3 | Warp [`08084e0`][]: kernel arguments and launch bounds read through `device const` instead of `constant` | yes |
+| 4 | Warp [`ea6dcfd`][]: graph replays share command buffers (`WP_METAL_ICB_BATCH` default 1024) | yes |
+| (opt-in) | Warp [`da6adce`][]: eager `capture_while` / `capture_if` gated on the GPU (`WP_METAL_EAGER_CONDITIONALS=1`) | yes |
 
 ms/frame (median of two runs; host waits per frame, command buffers per frame):
 
@@ -317,10 +323,11 @@ Granular Gauss-Seidel color pass (`probes/gs_pass.py`, graph replay, sustained c
 
 ### 1. fast_math (rounding-level)
 
-NVRTC documents `--use_fast_math` as `--ftz=true --prec-div=false --prec-sqrt=false --fmad=true`; the CUDA programming
-guide maps `x/y` to `__fdividef` (2 ulp for |y| in [2^-126, 2^126]) and `sqrtf` to 1 ulp. Warp passes it for modules
-with `fast_math` (Newton's rheology kernels); the fork compiled every Metal module with `MTLMathModeSafe` and precise
-functions. The MSL specification (2026-06-04, sections 1.6.3 and 8) gives three math modes: `fast` and `relaxed` both
+[NVRTC][nvrtc] documents `--use_fast_math` as `--ftz=true --prec-div=false --prec-sqrt=false --fmad=true`; the
+[CUDA programming guide][cuda-guide] maps `x/y` to `__fdividef` (2 ulp for |y| in [2^-126, 2^126]) and `sqrtf` to 1 ulp.
+Warp passes it for modules with `fast_math` (Newton's rheology kernels); my fork of Warp compiled every Metal module
+with `MTLMathModeSafe` and precise functions. The [MSL specification][msl-spec] (2026-06-04, sections 1.6.3 and 8)
+gives three math modes: `fast` and `relaxed` both
 allow reassociation (relaxed keeps INF/NaN), `safe` allows nothing; `fast::` / `precise::` select function variants;
 fast `x / y` is 2.5 ulp, fast `sin`/`cos` 2^-13 absolute (CUDA's `__sinf`: 2^-21.4). Measured on the M4 Max
 (`probes/fast_math_modes.swift`): the fast and relaxed modes fold `(x + 2^24) - 2^24` to `x` (reassociation, which
@@ -355,7 +362,7 @@ plate exceedances are a single deterministic Metal sample against the largest of
 The next step is the one MPM.md section 5 already names: an L4 floor distribution (more perturbed runs).
 (Done: sections 1b and 8e; all six scenes inside in `"off"`.)
 
-### 1b. CUDA-faithful fast_math (Warp `11aa54c8`, on fork `metalsim` as `91b8a859`; Warp default `"off"` since `152808b7`; 2026-10-11)
+### 1b. CUDA-faithful fast_math (Warp [`91b8a859`](https://github.com/pulipakaa24/warp/commit/91b8a859291f8013cf6f03761b8264334db4939b) on my fork's `metalsim`; Warp default `"off"` since [`152808b7`](https://github.com/pulipakaa24/warp/commit/152808b7e33ce08fcc17c898c5ce11d567d60795); 2026-10-11)
 
 Research and measurements: `research_notes/Metal MPM speed and scalable determinism/cuda_approx_math.md`.
 
@@ -363,11 +370,13 @@ Research and measurements: `research_notes/Metal MPM speed and scalable determin
 every `/` is `div.approx.ftz.f32` = `MUFU.RCP` + `FMUL.FTZ` (100 % of 2^24 pairs and a special-value grid; not
 `div.full`), `wp.sqrt` is `sqrt.approx.ftz.f32` = `MUFU.SQRT`, `1/sqrt` stays `MUFU.SQRT` + `MUFU.RCP`. MUFU.RCP is
 correctly rounded on 86.79 % of inputs (biased up), MUFU.SQRT on 83.13 % (biased down, -1 ulp on 15.5 %); both are
-exponent-invariant (checked over the whole normal range). Benjamin Carleton's ptx-math / sass-math interpolator model
-(MIT) reproduces both on the L4 for every input (2^23 + 2^24 exhaustive), and Warp's compositions (`length`,
-`normalize`, `cw_div`, `x/z +- y/z`, constant divisors, ...) are exactly per-operation compositions of it.
+exponent-invariant (checked over the whole normal range). Benjamin Carleton's [ptx-math][ptx-math] /
+[sass-math][sass-math] interpolator model (MIT) reproduces both on the L4 for every input (2^23 + 2^24 exhaustive), and
+Warp's compositions (`length`, `normalize`, `cw_div`, `x/z +- y/z`, constant divisors, ...) are exactly per-operation
+compositions of it.
 
-**Metal emulation** (`warp/native/metal_cuda_fast_math.h`, `warp.config.metal_fast_math = "cuda"`): the interpolator in
+**Metal emulation** ([`warp/native/metal_cuda_fast_math.h`][fastmath-h], `warp.config.metal_fast_math = "cuda"`): the
+interpolator in
 32-bit integer arithmetic (packed 128-row tables, the truncated squarer as a carry-free nibble-spread product), division
 as `fma(a, rcp, signed zero)` so the Metal compiler cannot contract the quotient into a following subtraction (it does
 for a plain product, even under `fp contract(off)`). Bit-identical to the L4 on all inputs of the sweeps, on 2^22
@@ -445,7 +454,7 @@ large body adds nothing, `icache_cost.swift`; private memory adds nothing, `stac
 
 ### 4. Graph replay: command buffers
 
-`probes/replay_cb.py`: one command buffer per replay (the fork's default) cost ~26 us of GPU time per boundary (a
+`probes/replay_cb.py`: one command buffer per replay (my fork of Warp's default) cost ~26 us of GPU time per boundary (a
 55-dispatch replay 103 us vs 77 us batched; raw Metal `cb_boundary.swift`: ~7 us with event, fence or queue order).
 The GPU-exit loop replays its chunk up to 50 times per solve. Replays now append to the open command buffer up to
 1024 dispatches, committed at once when nothing else is in flight: granular 58 -> 11 command buffers per frame,
@@ -458,9 +467,10 @@ Tests: Warp `test_metal.py` (26, 3 new), `test_metal_primitives.py`, `test_metal
 
 ## 8b. Integrated branches (2026-10-11)
 
-Warp `metalsim-integrated` (`upstream/warp-innate-integrated`) = `metalsim-mpm-scale` + `metalsim-mpm-speed` +
-`metalsim-metal-det-sort` merged on `c160f7e4`; Newton `metalsim-integrated` (`upstream/newton-integrated`) =
-`metalsim-mpm-scale` + `metalsim-rigid-det-sort` on `53a903d7`. On top of the merges:
+[My fork of Warp][warp-fork]: `metalsim-integrated` (`upstream/warp-innate-integrated`) = `metalsim-mpm-scale` +
+`metalsim-mpm-speed` + `metalsim-metal-det-sort` merged on [`c160f7e4`][]; [my fork of Newton][newton-fork-152]:
+`metalsim-integrated` (`upstream/newton-integrated`) = `metalsim-mpm-scale` + `metalsim-rigid-det-sort` on
+[`53a903d7`][]. On top of the merges:
 
 * Deterministic launches honour `wp.launch(..., dim_limit=)` in every kernel pass (the passes after the kernel read
   only what the threads that ran recorded).
@@ -469,7 +479,7 @@ Warp `metalsim-integrated` (`upstream/warp-innate-integrated`) = `metalsim-mpm-s
   `atomic_and` / `or` / `xor` and shared-tile int64 adds are exact. Newton's HashTable keeps its 64-bit CAS off the
   Metal build (keys with bit 63 set are refused on Metal); contact matching claims with an unsigned 64-bit minimum
   (same winner on every device).
-* Kernel arguments are read from constant memory by default again: device-memory arguments (`08084e0`) make the Metal
+* Kernel arguments are read from constant memory by default again: device-memory arguments ([`08084e0`][]) make the Metal
   compiler service fail on MuJoCo Warp's `_tendon_dot` (the Franka panda cannot step) and slow the G1 physics step
   (47.5 -> 54.4 ms at 4,096 worlds). `newton_compat.install(device_args=True)` (the default) opts MPM back in, so the
   numbers of section 8 are unchanged.
@@ -492,36 +502,39 @@ column a = 2 18.5 / 19.4. Franka-Pour ms per step (gpuexit / captured) at 1, 64,
 
 ## 8c. Integrated-2, rigid collision at scale, fast_math forms (2026-10-11)
 
-What a fresh setup installs (section 10). Warp fork `metalsim` = `c1bb061b` (integrated-2) + `91b8a859` (CUDA-faithful
-fast_math, section 8 1b) + `152808b7` (`warp.config.metal_fast_math` defaults to `"off"`). Newton fork
-`metalsim-1.5.2` = the integrated Newton `eac15793` + `c1ab1cdc` + the four rigid-scale commits + `METALSIM_CHANGES.md`.
+What a fresh setup installs (section 10). [My fork of Warp][warp-fork] (`metalsim`) = [`c1bb061b`][] (integrated-2) +
+[`91b8a859`][] (CUDA-faithful fast_math, section 8 1b) + [`152808b7`][] (`warp.config.metal_fast_math` defaults to
+`"off"`). [My fork of Newton][newton-fork-152] (`metalsim-1.5.2`) = the integrated Newton [`eac15793`][] +
+[`c1ab1cdc`][] + the four rigid-scale commits + [`METALSIM_CHANGES.md`][newton-changes].
 
-* **Integrated-2 (Warp `d4a834ee` .. `c1bb061b`, Newton `c1ab1cdc`).** Kernel-argument address space chosen per kernel
+* **Integrated-2 (Warp [`d4a834ee`][] .. [`c1bb061b`][], Newton [`c1ab1cdc`][]).** Kernel-argument address space
+  chosen per kernel
   (`warp.config.metal_device_args = "auto"`: device memory for short tile-free kernels, constant otherwise, with a
   constant twin when the Metal compiler cannot build the device form; Newton's Gauss-Seidel kernels opt in), graph
   replays larger than the batch never split across command buffers, eager batches committed early while the GPU
-  idles, small deterministic launches resolved in one threadgroup. Bitwise. ms/frame (Warp's METALSIM_CHANGES,
+  idles, small deterministic launches resolved in one threadgroup. Bitwise. ms/frame (Warp's [METALSIM_CHANGES][warp-changes],
   interleaved, fast_math honoured as in section 8): granular 33.98 -> 31.62, multi_material 37.61 -> 35.38, two-way
   67.35 -> 58.34, ANYmal 42.78 -> 36.80, column a = 2 18.94 -> 18.48; G1 MuJoCo Warp env step at 4,096 worlds 109.1 ->
   92.8 ms (flat). Runs: `runs/mpm/integrated2/`.
-* **Rigid collision at scale (Newton `c0a98819`, `555d6af8`, `1298fbbb`, `ddb015b9`; written as `de978b55`,
-  `7beedf43`, `0013572a`, `ced01724`).** Franka-Pour at 2,048 worlds on the M4 Max: the mesh-convex midphase per thread
+* **Rigid collision at scale (Newton [`c0a98819`][], [`555d6af8`][], [`1298fbbb`][], [`ddb015b9`][]).** Franka-Pour
+  at 2,048 worlds on the M4 Max: the mesh-convex midphase per thread
   on Metal (65 -> 0.26 ms per collide, same triangles), mesh threadgroups per GPU core (collide 179 -> 67 ms; the L4
   takes 90 ms at the same trajectory point), a barrier race in Newton's mesh-SDF kernels fixed (it hung the GPU at
   2,048 worlds; results unchanged where it did not fire), deterministic mode sorting only the active contacts (sort
   12.4 -> 0.2 ms, deterministic collide 192.6 -> 68.3 ms). Research: `research_notes/Metal MPM speed and scalable
-  determinism/rigid_scale_perf.md`; runs: `runs/rigid_perf/`. Ported to the Newton 1.7 lines (`metalsim` `522e2d4c`,
-  `1a398b2e`, `464c0aff`; `metalsim-hashtable-metal` the same commits): Franka-Pour collide on that line at 2,048
+  determinism/rigid_scale_perf.md`; runs: `runs/rigid_perf/`. Ported to the Newton 1.7 lines of
+  [my fork of Newton][newton-fork] (`metalsim` [`522e2d4c`][], [`1a398b2e`][], [`464c0aff`][];
+  [`metalsim-hashtable-metal`][newton-hashtable] the same commits): Franka-Pour collide on that line at 2,048
   worlds 646.8 -> 57.2 ms, deterministic contacts unchanged (`runs/rigid17/`, section 8d).
 * **fast_math.** MPM picks the form with `newton_compat.install(metal_fast_math=...)` (default `"off"`), and Warp's
   own default is `"off"` as well, so programs that did not ask for it (MuJoCo Warp ray casts, Newton ray / collision
-  helpers in the rigid stack) compile their `fast_math` kernels exactly as before `f52da34`. Section 8's timings were
+  helpers in the rigid stack) compile their `fast_math` kernels exactly as before [`f52da34`][]. Section 8's timings were
   taken with fast_math honoured (`"relaxed"`); with the default `"off"` the MPM scenes run at section 1b's "off"
   column. `--metal-fast-math relaxed` (record_mpm.py, speed_bench.py) restores section 8's configuration.
 
 ## 8d. Rigid-side loose ends (2026-10-12)
 
-* **64-bit atomics.** The Warp fork refuses 64-bit `atomic_cas` / `atomic_exch` on Metal at launch (section 8b), which
+* **64-bit atomics.** [My fork of Warp][warp-fork] refuses 64-bit `atomic_cas` / `atomic_exch` on Metal at launch (section 8b), which
   left four Newton sites unable to run there: contact-reduction finalize / rollback (the mesh-mesh SDF reduce kernel and
   the two-spatial-depth reducers; 1.7 line), the XPBD restitution manifold table (1.7), Kamino's 63-bit metric argmax
   keys (both lines) and the HashTable (fixed before). Metal protocols, CPU / CUDA unchanged (research:
@@ -529,16 +542,16 @@ fast_math, section 8 1b) + `152808b7` (`warp.config.metal_fast_math` defaults to
   plus a read-back with no rollback (slots only grow); claim the high word with a 32-bit CAS, publish with a 64-bit
   min (tagged keys); per-thread key scratch plus a per-world packed max and a finalize launch. Every claim loop is
   bounded (HashTable and XPBD manifolds: probes + 65,536 passes, then a counted failure). Newton's contact / collision /
-  SDF / heightfield / XPBD / Kamino-metrics tests on `metalsim-hashtable-metal`: 98 failures -> 13 on cpu + metal:0,
-  no new failure; the 13 are SolverMuJoCo tests that do not build against the MuJoCo Warp fork 3.14
-  (`contact_force_fn` signature; fixed 2026-10-13 on both 1.7 branches, `metalsim` `1301e8da` and `metalsim-hashtable-metal` `9d6616c6`: the contact part of upstream's `90f809a`). 1.5.2 Kamino metrics: CPU 9/9, Metal 8/9 (test_06's dense-vs-sparse `f_ncp`, 2.1e-6
+  SDF / heightfield / XPBD / Kamino-metrics tests on [`metalsim-hashtable-metal`][newton-hashtable]: 98 failures -> 13
+  on cpu + metal:0, no new failure; the 13 are SolverMuJoCo tests that do not build against
+  [my fork of MuJoCo Warp][mjw-fork] 3.14 (`contact_force_fn` signature; fixed 2026-10-13 on both 1.7 branches of [my fork of Newton][newton-fork], `metalsim` [`1301e8da`][] and `metalsim-hashtable-metal` [`9d6616c6`][]: the contact part of upstream Newton's [`90f809a`][]). 1.5.2 Kamino metrics: CPU 9/9, Metal 8/9 (test_06's dense-vs-sparse `f_ncp`, 2.1e-6
   relative vs rtol 1e-6, in a kernel these changes do not touch).
 * **Rigid-scale ports to the 1.7 line**: mesh-SDF barrier fix, per-thread mesh-convex midphase, 32 mesh threadgroups
   per core, bounded deterministic sort. Franka-Pour collide (`runs/rigid17/tools/collide17.py`, same in-contact state,
-  interleaved, Warp fork `152808b7`): 256 worlds 93.9 -> 10.1 ms (midphase 72.4 -> 0.34 ms, mesh-mesh 20.9 -> 7.5 ms);
+  interleaved, my fork of Warp at [`152808b7`][]): 256 worlds 93.9 -> 10.1 ms (midphase 72.4 -> 0.34 ms, mesh-mesh 20.9 -> 7.5 ms);
   2,048 worlds 646.8 -> 57.2 ms (two runs each); deterministic mode at 256 worlds 91.4 -> 9.4 ms with the sorted
   contacts bitwise equal (same hash before and after the ports, and across repeated collides).
-* **GPU hang (2026-10-12 02:32).** Newton's tests on the *unported* 1.7 tree (`fe7f5bd4`, none of the changes above)
+* **GPU hang (2026-10-12 02:32).** Newton's tests on the *unported* 1.7 tree ([`fe7f5bd4`][], none of the changes above)
   hung the GPU in `TestDeterministicPipeline.test_cylinder_scale_update_keeps_generic_stage_metal_0` (cylinder on a
   plane: no mesh, HashTable, reducer or manifold code); the watchdog killed the job after 150 s, the process stayed
   stuck in exit holding the GPU. The same test passed in three other runs (ported trees and the unported
@@ -559,14 +572,16 @@ fast_math, section 8 1b) + `152808b7` (`warp.config.metal_fast_math` defaults to
   circumstantial: the wedge was not reproduced on purpose and the test was not run on a GPU known to be free of
   ownerless work. Fixed on the particle side since: grains are a two-level structure in chunks of at most
   2^24 - 1 (`as_limits.check` refuses larger ones without an extended-limits path). The 25 M scene now builds and
-  renders on both Macs: the 14-inch (macOS 27) and the 16-inch (macOS 26.7.1, 654 ms build, 5.1 s 1080p frame).
+  renders on both Macs: the 14-inch MacBook Pro (M4 Max, macOS 27) and the 16-inch MacBook Pro (M4 Max, macOS 26.7.1,
+  654 ms build, 5.1 s 1080p frame).
   See `metalsim/render/PARTICLES.md` and `runs/sand25m_16in/`.
 * **Newton-engine contact buffer** (`metalsim/physics/newton_backend.py`): sized per contact pair
   (`rigid_contact_capacity`); 64 G1 worlds on rough terrain went from 1,000 slots (about half the contacts dropped) to
   7,680; `tests/test_g1_newton_engine.py::test_no_rigid_contacts_dropped`.
 * **MPM timings** (granular 35.1 / column 20.9 ms now vs 31.7 / 18.8 earlier): no regression. Interleaved A/B of the
-  pinned build against integrated-2 agrees within 0.4 ms in every window; both moved together by 8-11 % between
-  windows minutes apart (machine state; CPU load alone moves granular +14 %). `runs/mpm/regress_check/`.
+  pinned build (what a fresh setup installs, section 8c) against integrated-2 agrees within 0.4 ms in every window;
+  both moved together by 8-11 % between windows minutes apart (machine state; CPU load alone moves granular +14 %).
+  `runs/mpm/regress_check/`.
 ## 8e. Parity close-out: multi_material and ANYmal (2026-10-12)
 
 Research note with every measurement and source: `research_notes/mpm_parity_closeout/NOTE.md`; scripts in the same
@@ -589,12 +604,12 @@ were 35-43 nm, and the Metal modes were 36-42 nm from each other. The cause sat 
 3. **svd3 / eig3 use `rsqrt.approx` (MUFU.RSQ) on CUDA and `1 / sqrt` elsewhere.** The two differ on 33 % of
    inputs. This does not affect the first multi_material frames; it is fixed for faithfulness.
 
-Fixes (Warp fork `metalsim`):
+Fixes ([my fork of Warp][warp-fork], `metalsim`):
 
-* `3c4e251e`: Metal takes CUDA's tiling choice. Metal's SIMD-group `tile_sum` is the CUDA shuffle tree.
-* `47a4031d`: `warp.config.metal_cuda_libm` (default on) adds `native/metal_cuda_libm.h`, the PTX of
-  `__nv_logf` / `__nv_expf` / `__nv_sinhf` with MUFU.EX2 through sass-math's model, and adds MUFU.RSQ to
-  `metal_cuda_fast_math.h`.
+* [`3c4e251e`][]: Metal takes CUDA's tiling choice. Metal's SIMD-group `tile_sum` is the CUDA shuffle tree.
+* [`47a4031d`][]: `warp.config.metal_cuda_libm` (default on) adds [`native/metal_cuda_libm.h`][libm-h], the PTX of
+  `__nv_logf` / `__nv_expf` / `__nv_sinhf` with MUFU.EX2 through [sass-math][sass-math]'s model, and adds MUFU.RSQ to
+  [`metal_cuda_fast_math.h`][fastmath-h].
   * Measured equal to the L4 on all 2^32 inputs of each of the three functions.
   * MUFU.RSQ equals the L4-validated model on all of [1, 4) and across exponents.
   * When on, every module hash is salted once; when off, behaviour and hashes are those of before.
@@ -638,7 +653,7 @@ With `"cuda"` fast math:
   This is a near-threshold stop, the kind the L4's own no-FMA run takes at solve 11; only the fast_math kernels
   differ between the two modes. It does mean `"cuda"` now fails the strict column T1, and the default stays `"off"`.
 
-Verification of the pushed Warp tree (`43ffc6dd`, rebuilt):
+Verification of the pushed Warp tree ([`43ffc6dd`][], rebuilt):
 
 * The six floor recordings equal the development tree's bit for bit.
 * Attribution (multi_material / ANYmal, worst-frame ratio):
@@ -648,7 +663,7 @@ Verification of the pushed Warp tree (`43ffc6dd`, rebuilt):
   `metrics_closeout_libm.txt`):
   * The option off and on both give the same five known failures and 273 passes.
   * 29 captured locals in 4 tests differ stably between the two settings: the Warp policy MLP (activations in the 7th
-    digit) and one MuJoCo-C flex error (8.971145e-3 vs 8.971146e-3). The other differences are run-to-run noise
+    digit) and one [MuJoCo][mujoco]-C flex error (8.971145e-3 vs 8.971146e-3). The other differences are run-to-run noise
     (336 locals, 68 tests).
   * Bitwise hashes of MuJoCo Warp BatchSim cannot test neutrality: it is not run-to-run repeatable
     (`runs/mpm/closeout/rigid_neutral.log`).
@@ -665,7 +680,8 @@ JSON: `runs/mpm/step_at_scale/`. Tools: `probes/section_kprof.py` (per-section, 
 dispatch attributed), `probes/pour_occupancy.py` (does the grid occupancy repeat?), `probes/first_launch.py` (first
 launches of changed kernels with a host-side completion timeout).
 
-Profile at 2,048 worlds (base: Warp `43ffc6dd`, Newton `c0427fc7`; ms of GPU time per step, about 108 in all): strain
+Profile at 2,048 worlds (base: [my fork of Warp][warp-fork] at [`43ffc6dd`][], [my fork of Newton][newton-fork-152] at
+[`c0427fc7`][]; ms of GPU time per step, about 108 in all): strain
 solve 34.1 (rigidity products 8.8, transposes 9.1), scratchpad 16.1, grid rebuild 15.3, collider rasterization 14.4
 (collider-matrix sort ~6), unconstrained velocity 8.9 (APIC generic integrate 5.5), strain matrix 6.5, collider
 compliance 6.4.
@@ -675,15 +691,15 @@ Adopted, each bitwise (particle state and every `state.mpm` array hashed every 1
 
 | change | where | GPU ms per step at 2,048 worlds |
 |---|---|---|
-| rigidity operator assembled from its kept triplet slots only | Newton `27415f95` | collider compliance 6.4 -> 3.1 |
-| rigidity products in the loop on non-empty rows only (empty rows are fixed points after the initial guess; from 8,192 rows) | Newton `80e79684` | 8.8 -> 2.6 |
-| compact Metal transposes stop at the stored blocks | Warp `8631b6b0` | 9.1 -> 4.9 |
-| node-index compression skips the ignored tail | Warp `fddebdbd` | 5.9 -> 1.4 |
+| rigidity operator assembled from its kept triplet slots only | Newton [`27415f95`][] | collider compliance 6.4 -> 3.1 |
+| rigidity products in the loop on non-empty rows only (empty rows are fixed points after the initial guess; from 8,192 rows) | Newton [`80e79684`][] | 8.8 -> 2.6 |
+| compact Metal transposes stop at the stored blocks | Warp [`8631b6b0`][] | 9.1 -> 4.9 |
+| node-index compression skips the ignored tail | Warp [`fddebdbd`][] | 5.9 -> 1.4 |
 
 Captured ms per MPM step, base vs all four, two interleaved rounds: 1 world 3.96 / 3.84 vs 4.00 / 3.99; 64 worlds
 8.00 / 7.75 vs 7.87 / 7.46; 256 worlds 15.40 / 15.53 vs 14.19 / 14.16; 1,024 worlds 45.97 / 46.77 vs 41.38 / 41.07;
 **2,048 worlds 91.16 / 90.50 vs 78.95 / 78.88**. Franka-Pour policy step (`franka_pour_ppo bench --mode step`, 2,048
-envs, this Mac): 2.06 -> 1.81 s. `tests/test_mpm.py` 14 passed, 1 xfailed.
+envs, M4 Max): 2.06 -> 1.81 s. `tests/test_mpm.py` 14 passed, 1 xfailed.
 
 Evaluated and not adopted (all bitwise; `runs/mpm/step_at_scale/rejected/`): reusing the grid when the occupancy
 repeats (it never does: 0 of 199 consecutive steps keep the (world, cell) set at 64 or 2,048 worlds, ~46 % of the
@@ -692,19 +708,19 @@ barriers between passes; faster at 64 worlds, 7.71 -> 7.05 ms, slower from 256 o
 of a node's dofs in one thread for the generic APIC integrate (no change); a row-ordered presort instead of the radix
 sort for fem's triplets (79.2 -> 85.8 ms).
 
-Pins: Newton `metalsim-1.5.2` is pinned at `3fd1f052` (the two Newton commits). The Warp commits are on the fork's
-`metalsim` (`3342e5d8`), on top of `41b7bc45`, which faults on a one-world captured Franka-Pour step (base tree too);
-the Warp pin stayed at `43ffc6dd` until that was fixed (section 8g; pinned `85b92466`, then `f0df4cf8`). What a fresh setup gets now (Warp `43ffc6dd`, Newton `3fd1f052`) is verified on its own: bitwise against the base at 1 / 64 / 2,048 worlds, eager and captured; `tests/test_mpm.py` 14 passed, 1 xfailed; captured ms per step at 1 / 64 / 256 / 1,024 / 2,048 worlds 3.81 / 7.58 / 15.53 / 46.45 / 90.61 (base) vs 3.78 / 8.07 / 15.15 / 44.15 / 84.41, second round 3.94 / 7.76 / 15.35 / 46.00 / 90.54 vs 3.82 / 7.73 / 14.80 / 43.58 / 84.97.
+Pins: Newton `metalsim-1.5.2` is pinned at [`3fd1f052`][] (the two Newton commits). The Warp commits are on my fork's
+`metalsim` ([`3342e5d8`][]), on top of [`41b7bc45`][], which faults on a one-world captured Franka-Pour step (base tree
+too); the Warp pin (the commit `scripts/setup_warp.sh` installs) stayed at [`43ffc6dd`][] until that was fixed (section 8g; pinned [`85b92466`][], then [`f0df4cf8`][]). What a fresh setup gets now (Warp [`43ffc6dd`][], Newton [`3fd1f052`][]) is verified on its own: bitwise against the base at 1 / 64 / 2,048 worlds, eager and captured; `tests/test_mpm.py` 14 passed, 1 xfailed; captured ms per step at 1 / 64 / 256 / 1,024 / 2,048 worlds 3.81 / 7.58 / 15.53 / 46.45 / 90.61 (base) vs 3.78 / 8.07 / 15.15 / 44.15 / 84.41, second round 3.94 / 7.76 / 15.35 / 46.00 / 90.54 vs 3.82 / 7.73 / 14.80 / 43.58 / 84.97.
 
-`warp.config.metal_cuda_libm` (Warp `43ffc6dd`, default on) costs nothing measurable: on vs off, three interleaved
+`warp.config.metal_cuda_libm` (Warp [`43ffc6dd`][], default on) costs nothing measurable: on vs off, three interleaved
 runs each, twice: granular 40.5 vs 40.7 ms/frame, multi_material 50.6 vs 50.7, Franka-Pour 2,048 worlds 90.6 vs 90.7
 ms per captured step (`runs/mpm/step_at_scale/libm/`).
 
-## 8g. Graph capture memory (2026-10-12; Warp `41b7bc45..85b92466`)
+## 8g. Graph capture memory (2026-10-12; Warp [`41b7bc45..85b92466`](https://github.com/pulipakaa24/warp/compare/41b7bc45077b4cd665e976ae9475f1b19f9fd57a...85b924669629838c2d2637f3e1e51ef650b3a8d6))
 
 Isaac Lab's Franka-Pour policy step captured as one graph (4 sim steps: 16 MPM solves, 4 collides, 24 MuJoCo
-substeps) replayed NaN arm state at 2,048 worlds on Warp `152808b7` / `43ffc6dd`. It was correct at 1,024 worlds and
-with one graph per sim step.
+substeps) replayed NaN arm state at 2,048 worlds on [my fork of Warp][warp-fork] at [`152808b7`][] / [`43ffc6dd`][]. It
+was correct at 1,024 worlds and with one graph per sim step.
 
 * Cause: a Metal capture kept every capture-time allocation in its own buffer for the graph's lifetime, so a graph of
   several steps held every step's temporaries (MuJoCo Warp's per-solve contexts and the rest) at once. Allocated at
@@ -720,39 +736,39 @@ with one graph per sim step.
   The M4 Max's working set (`recommendedMaxWorkingSetSize`) is 55.7 GB. In the failing run the residency set held
   35.4 GB of the 70.7 GB, and the first replay made the arm state NaN in 2,004-2,048 worlds with no error.
   `WP_METAL_ICB=0` (per-dispatch replay) replays NaN too.
-* `41b7bc45`: memory freed during a capture goes to a per-capture pool that later allocations of the same capture
+* [`41b7bc45`][]: memory freed during a capture goes to a per-capture pool that later allocations of the same capture
   draw from (replays are serial, as with a CUDA graph's memory pool). Policy-step graph: 37.4 GB, finite.
-* `41b7bc45` then faulted on a one-world captured MPM step (`kIOGPUCommandBufferCallbackErrorPageFault`). A solve's
+* [`41b7bc45`][] then faulted on a one-world captured MPM step (`kIOGPUCommandBufferCallbackErrorPageFault`). A solve's
   80-byte indirect-execution-range array (the host writes its fields at each range's end) had taken the buffer of a
   2,940-byte fem temporary freed earlier in the capture. Every replay, the temporary's recorded dispatches overwrote
   the ranges first, and garbage ranges ran.
   * Found by zeroing one reuse at a time on the GPU and logging the allocation stacks
     (`pour_bitwise.py record --worlds 1 --mode capture`).
-  * Reuse was opt-in for the interim (`270660b1`).
-* `85b92466` turns reuse back on with three changes:
+  * Reuse was opt-in for the interim ([`270660b1`][]).
+* [`85b92466`][] turns reuse back on with three changes:
   * Only buffers of 64 KiB or more are pooled or served. The arrays the host fills while recording are smaller.
   * A large range array that lands in reused memory raises at `metal_capture_range_begin`.
   * Deterministic scratch pools allocated during a capture record their zeroing.
   * The setting is `warp.config.metal_capture_reuse` / `WP_METAL_CAPTURE_REUSE`.
-* `732b6e83`: buffers held only by graphs stay in the address table. Before, kernels that reach an array through a
+* [`732b6e83`][]: buffers held only by graphs stay in the address table. Before, kernels that reach an array through a
   descriptor stored in device memory read zeros once the array was freed.
 
-Verification of `85b92466`:
+Verification of [`85b92466`][]:
 
 * Warp's Metal test files and `tests/test_mpm.py` (14 passed, 1 xfailed) pass.
 * Pour recordings (`pour_bitwise.py`) at 1 / 64 / 2,048 worlds finish, eager and captured. Captured is bitwise equal
   with reuse on and off.
-* With Newton `3fd1f052`, every recording at 1 / 64 / 2,048 worlds, eager and captured, is bitwise that of Warp
-  `43ffc6dd`; `tests/test_mpm.py` passes with that pair too.
-* The six floor recordings are bitwise those of `43ffc6dd` (`bitwise_dirs.py`).
+* With [my fork of Newton][newton-fork-152] at [`3fd1f052`][], every recording at 1 / 64 / 2,048 worlds, eager and
+  captured, is bitwise that of Warp [`43ffc6dd`][]; `tests/test_mpm.py` passes with that pair too.
+* The six floor recordings are bitwise those of [`43ffc6dd`][] (`bitwise_dirs.py`).
 * The policy-step graph at 2,048 worlds is finite.
 
 Default `capture_unit` stays `"sim"` (Isaac's granularity); `"policy"` now works.
 
-`f0df4cf8` (pinned after `85b92466`) changes only deterministic kernels. The phase-0 store guard's counter-target
+[`f0df4cf8`][] (pinned after [`85b92466`][]) changes only deterministic kernels. The phase-0 store guard's counter-target
 check is now a function call instead of being inlined at every guarded store. Under global deterministic mode, the
 inlined form crashed the Metal compiler service on Newton's narrow-phase kernel. Results are unchanged:
-`tests/test_mpm.py` passes and the six floor recordings are bitwise those of `43ffc6dd`.
+`tests/test_mpm.py` passes and the six floor recordings are bitwise those of [`43ffc6dd`][].
 
 Run-to-run repeatability of Franka-Pour (newton_compat, same day): the scene differed between two runs from the first
 uncaptured step, even with `rigid_deterministic=True`. `SolverCoupled` compacts each entry's contacts with an atomic
@@ -763,7 +779,7 @@ modules in RUN_TO_RUN mode on Metal. The scene then repeats bitwise at 64 and 2,
 eager, one graph per sim step and one graph per policy step all agree. Cost per step is unchanged.
 Test: `test_coupled_contact_filter_keeps_source_order`.
 
-## 8h. Franka-Pour GPU memory at 2,048 worlds (2026-10-12; Warp `95f6f121`)
+## 8h. Franka-Pour GPU memory at 2,048 worlds (2026-10-12; Warp [`95f6f121`](https://github.com/pulipakaa24/warp/commit/95f6f121b7e67025958335c7c15e338ac04a798a))
 
 Tools (`scripts/diagnostics/franka_pour_memory/`, run with the `metalsim-franka-pour` branch's `metalsim` on the
 path): `mem_attrib.py`
@@ -772,7 +788,8 @@ records every Metal allocation Warp makes (size, phase, owner from the Python st
 borrow/redeem traces, and what a captured graph keeps alive; `grid_demand.py` the NanoVDB node and collision demand
 over a rollout; `franka_bitwise.py` per-step trajectory hashes. Logs: `runs/mpm/memory_2048/`.
 
-Where the 37.6 GB (device allocations after the first policy step, Warp `f0df4cf8`, one graph per sim step) go:
+Where the 37.6 GB (device allocations after the first policy step, [my fork of Warp][warp-fork] at [`f0df4cf8`][], one
+graph per sim step) go:
 
 | owner | GB |
 |---|---|
@@ -796,9 +813,9 @@ recordings at 1 / 64 / 2,048 worlds, eager and captured, equal; `tests/test_mpm.
 
 | change | where | device GB after the first policy step (2,048 worlds) | policy step |
 |---|---|---|---|
-| base | Warp `f0df4cf8`, Newton `3fd1f052` | 37.64 | 1.84 s |
-| tight temporary pools (exact sizes, no array > 1.25x a request of >= 1 MiB) | Warp `95f6f121` (default on Metal) | 34.48 | MPM step 81.2 / 81.5 vs 81.5 / 81.4 ms |
-| + measured NanoVDB node budgets (16 leaves, 4.5 lower nodes per world, 80+ upper; 4x the peak of 600 random-action policy steps) | Franka-Pour `mpm_grid_budget="measured"` (opt-in; written on local branch `franka-pour-memory`, merged with the Franka-Pour task in PR #6, `fe3c1f2f`) | 24.85 | 1.79 s |
+| base | Warp [`f0df4cf8`][], Newton [`3fd1f052`][] | 37.64 | 1.84 s |
+| tight temporary pools (exact sizes, no array > 1.25x a request of >= 1 MiB) | Warp [`95f6f121`][] (default on Metal) | 34.48 | MPM step 81.2 / 81.5 vs 81.5 / 81.4 ms |
+| + measured NanoVDB node budgets (16 leaves, 4.5 lower nodes per world, 80+ upper; 4x the peak of 600 random-action policy steps) | Franka-Pour `mpm_grid_budget="measured"` (opt-in; [`36c4738f`][], merged with the Franka-Pour task in [PR #6](https://github.com/pulipakaa24/MetalSim/commit/c7a62c37416134ded7abc8d6e64434de9040cb15)) | 24.85 | 1.79 s |
 | + cell reservation 256 per world (peak use 80) | Franka-Pour `mpm_cells_per_world=256` (opt-in) | 15.66 | 1.44 s |
 
 The two task options are capacities: a grid within them is the same grid, and an overflow is reported (the PPO loop
@@ -815,7 +832,7 @@ read them).
 Section 7b's probe mirrored the scene with scripted cup motion; `metalsim/learn/franka_pour*.py` now runs Isaac's task
 end to end: Isaac's own assets (Franka USD, cups, table, the 20,000-row reset dataset), Isaac Lab's coupled solver
 (`SolverCoupledProxy`: MuJoCo Warp arm entry + this section's `SolverImplicitMPM` as the media entry, proxy mass x
-1000, staggered), Isaac's MDP and the task's rsl_rl PPO. Parity rows and tests: `docs/PARITY.md` §1b; reading notes:
+1000, staggered), Isaac's MDP and the task's [rsl_rl][rsl_rl] PPO. Parity rows and tests: `docs/PARITY.md` §1b; reading notes:
 `docs/research/franka_pour_2026-10-11.md`; usage: `docs/GUIDE.md` (Franka-Pour).
 
 * `newton_compat.install(accumulate="float32", loop="cuda", chunk_graph, gpu_exit, metal_fast_math="off",
@@ -823,11 +840,13 @@ end to end: Isaac's own assets (Franka USD, cups, table, the 20,000-row reset da
   `NewtonCfg.deterministic_mode`).
 * Capture: one graph per `sim.step` (collide + 2 coupled steps: 6 MuJoCo + 4 MPM solves), as Isaac's
   `_simulate_physics_only`; the arm-target kernel runs between replays. A single graph per policy step (4 sim steps,
-  `PourPhysicsConfig(capture_unit="policy")`) replayed NaN joint state at 2,048 worlds on Warp `152808b7` / `43ffc6dd`.
-  It was correct at 1,024 worlds. Fixed in Warp `41b7bc45`: the capture held every step's temporaries (70.7 GB, past
+  `PourPhysicsConfig(capture_unit="policy")`) replayed NaN joint state at 2,048 worlds on [my fork of Warp][warp-fork]
+  at [`152808b7`][] / [`43ffc6dd`][]. It was correct at 1,024 worlds. Fixed in Warp [`41b7bc45`][]: the capture held
+  every step's temporaries (70.7 GB, past
   the 55.7 GB working set). Now 37.4 GB and finite at 2,048 worlds; see sections 8g-8h.
 * Per policy step at 2,048 worlds (M4 Max): about 2 s (step only); the L4 cannot hold Isaac's own task at 2,048 envs
-  (CUDA out of memory creating the graph, and out of memory eager), so the matched comparison is at 1,024 envs (§1b.4).
+  (CUDA out of memory creating the graph, and out of memory eager), so the matched comparison is at 1,024 envs
+  (`docs/PARITY.md` §1b.4).
 * Section 8h's opt-in memory budgets (`mpm_grid_budget="measured"`, `mpm_cells_per_world=256`) hold on the trained
   policy: a deterministic 2,048-episode evaluation of the 300-iteration policy gives success 0.470 vs 0.477 with
   Isaac's capacities (same rows; within the 0.011 standard error), the same pour metrics, and no grid overflow (`docs/PARITY.md` §1b.5, `runs/franka_pour/eval/`).
@@ -842,8 +861,9 @@ end to end: Isaac's own assets (Franka USD, cups, table, the 20,000-row reset da
 
 ## 8j. Coupled scenes against the L4, re-timed (2026-10-13)
 
-Logs, JSON and scripts: `runs/mpm/coupled_retime/`. The run used the 16-inch M4 Max (macOS 26.7.1), main `52469d93`,
-Warp `95f6f121`, Newton `3fd1f052`, MuJoCo Warp 3.11.0 (`.venv-newton152`, `env_check.log`).
+Logs, JSON and scripts: `runs/mpm/coupled_retime/`. The run used the 16-inch M4 Max (macOS 26.7.1), MetalSim main [`e25f15cb`][],
+[my fork of Warp][warp-fork] at [`95f6f121`][], [my fork of Newton][newton-fork-152] at [`3fd1f052`][], MuJoCo Warp 3.11.0
+(`.venv-newton152`, `env_check.log`).
 * Every run was its own exclusive `timing` job through `scripts/gpu_run.sh`. Utilisation was 0 % at the start of
   each job, with no process at 10 % or more.
 * Three repetitions were interleaved: for each repetition, for each mode, for each scene, run the L4's protocol, then
@@ -870,7 +890,7 @@ eager launch on the L4, 1 us per graph node; `kernels_l4/chain.json`), which is 
 fair comparison is the captured rows, and there Metal is slower on both scenes.
 
 **Where the time goes** (`profile.sh`; per-kernel GPU time with each dispatch isolated, calibrated for the empty
-command-buffer cost, joined with the L4's nsys sums in `profile/joined.md` and `joined_late.md`):
+command-buffer cost, joined with the L4's [nsys][nsys] sums in `profile/joined.md` and `joined_late.md`):
 
 * **Two-way: the frame cost grows during the run on Metal only.** Mean ms/frame per 20-frame window, captured,
   1st repetition: 36 at the start, 50-66 from 0.2 s, then about 53. On the L4 the 2 s median (31.0) is about its
@@ -879,7 +899,7 @@ command-buffer cost, joined with the L4's nsys sums in `profile/joined.md` and `
   * The growth is one kernel, `_bsr_mv_listed_rows`: 0.6 ms/frame early and 19.3 ms/frame late, over 100 launches
     per frame. It is the rigidity correction inside the rheology loop: two products per iteration,
     `IJtm @ delta_impulse` and `J @ delta_body_qd`.
-  * Newton `80e79684` (section 8f) switched both products to a one-thread-per-row loop on Metal whenever J has at
+  * Newton [`80e79684`][] (section 8f) switched both products to a one-thread-per-row loop on Metal whenever J has at
     least 8,192 rows. That loop is Warp's off-CUDA `bsr_mv` body.
   * IJtm has one row per body degree of freedom, and each row holds one block per collider node the body touches. As
     the boxes sink into the sand those rows grow to thousands of blocks, and each is summed serially by one thread.
@@ -899,7 +919,7 @@ command-buffer cost, joined with the L4's nsys sums in `profile/joined.md` and `
 
 **What would close it** (as written on 2026-10-13; item 1 and the body-force sum are done, section 8k):
 1. **Two-way growth.** On Metal, run the long-row product (IJtm) through a row-tiled reduction (CUDA's
-   `bsr_mv_tiled_kernel` choice, as Warp `3c4e251e` did for warp.fem's dispatched assembly), or swap the IJtm product
+   `bsr_mv_tiled_kernel` choice, as Warp [`3c4e251e`][] did for warp.fem's dispatched assembly), or swap the IJtm product
    for a J^T product over J's short rows. Expected: the late window back to about the early cost (36-37 ms), giving
    two-way captured about 1.2x the L4. It changes summation order. A CUDA-faithful tiled order would bring Metal
    closer to the L4, but the floor ensemble must be re-run either way.
@@ -907,7 +927,7 @@ command-buffer cost, joined with the L4's nsys sums in `profile/joined.md` and `
    The MuJoCo Warp small-kernel cost belongs to the rigid stack's own performance work, not to MPM. The body-force sum
    (3.0 ms here against 0.45 ms in section 7b) needs a look first.
 
-## 8k. Coupled scenes: closing the gap (2026-10-13; Warp `31cf79d7`, Newton `addd10cb`)
+## 8k. Coupled scenes: closing the gap (2026-10-13; Warp [`31cf79d7`](https://github.com/pulipakaa24/warp/commit/31cf79d781e4b10d8ff85c8cbd98fc0e40f75953), Newton [`addd10cb`](https://github.com/pulipakaa24/newton/commit/addd10cbeb25e946b3a4c2bb1d4097acc7a98ca2))
 
 Research: `research_notes/coupled_speed/NOTE.md`. Logs, JSON and the batch scripts: `runs/mpm/coupled_speed/`
 (batch_02 to batch_08, bf1/, hv1/, any1/, b08/). Every timing ran on the 16-inch as an exclusive `timing` job on an
@@ -920,9 +940,11 @@ the two in-loop products separately (eager, synchronized):
 
 Warp's `bsr_mv` sums such rows with its tiled kernel on CUDA only (`nnz * block_size > 2 * 64 * rows`; the L4's nsys
 profile shows one tiled and one untiled product per iteration). Metal summed every row serially in one thread.
-- Warp `31cf79d7`: `warp.config.metal_bsr_mv_tiles` (default on, `WP_METAL_BSR_MV_TILES=0` off) makes CUDA's choice
+- [My fork of Warp][warp-fork], [`31cf79d7`][]: `warp.config.metal_bsr_mv_tiles` (default on, `WP_METAL_BSR_MV_TILES=0`
+  off) makes CUDA's choice
   on Metal. Metal's `tile_sum` is CUDA's shuffle tree, so the summation order is the L4's.
-- Newton `addd10cb` (first of three commits): `_ListedRowsMv` sends a matrix that `bsr_mv` would tile through `bsr_mv`
+- [My fork of Newton][newton-fork-152], [`addd10cb`][] (first of three commits): `_ListedRowsMv` sends a matrix that
+  `bsr_mv` would tile through `bsr_mv`
   itself.
 - First launches: `probes/bsr_mv_tiles_check.py`, under a watchdog.
 - IJtm: 29-40 -> 12.1-12.9 ms per 50 calls.
@@ -930,7 +952,7 @@ profile shows one tiled and one untiled product per iteration). Metal summed eve
 
 **2. The ordered body-force sum** (two-way example, 3.0 ms per frame). Every body scanned all 655,360 grid nodes, in
 every substep.
-- Newton `addd10cb` (third commit): compact the nodes in contact with a body first (flag, integer scan, scatter;
+- Newton [`addd10cb`][] (third commit): compact the nodes in contact with a body first (flag, integer scan, scatter;
   capture-safe), then the 256 fixed lanes run over that list.
 - 1.05 -> 0.38 ms per call (`probes/body_force_compact_check.py`, exact compaction, 5e-7 from float64).
 - `NEWTON_METAL_BODY_FORCE_COMPACT=0` restores the full scan.
@@ -938,7 +960,7 @@ every substep.
 **3. The proxy-wrench harvest** (`SolverImplicitMPM.coupling_harvest_proxy_wrenches`, used by Franka-Pour's
 `SolverCoupledProxy` and section 11's MPMCoupling). With one world, every proxy body scanned every active collider
 node.
-- Newton `addd10cb` (second commit): the same compaction, per world range.
+- Newton [`addd10cb`][] (second commit): the same compaction, per world range.
 - `probes/harvest_compact_check.py`: one world, 16 or 64 bodies, 1.6 -> 0.33 ms per call.
 - `NEWTON_METAL_HARVEST_COMPACT=0` restores the full scan.
 
@@ -969,8 +991,9 @@ compaction on or off.
 - Each switch off restores the previous behaviour bitwise:
   - Franka-Pour with the tiled choice off equals the trees without the change (batch_06);
   - with the harvest compaction off, it equals the trees without that change (batch_hv1).
-- On the pinned commits: `tests/test_mpm.py` 15 passed, 1 xfailed; `tests/test_mpm_main.py` 15 passed. The vendored
-  `implicit_mpm` equals `addd10cb` (`scripts/vendor_mpm152.py --check`).
+- On the pinned commits (those in this section's heading): `tests/test_mpm.py` 15 passed, 1 xfailed;
+  `tests/test_mpm_main.py` 15 passed. The vendored `implicit_mpm` equals [`addd10cb`][]
+  (`scripts/vendor_mpm152.py --check`).
 
 **ANYmal: where the 1.2x is** (`probes/anymal_probe.py`, per frame, captured robot graph + eager sand step):
 - Robot 8.3 ms, sand 22.2 ms.
@@ -1011,7 +1034,8 @@ Probes (`probes/`): `ab_timing.py` (interleaved A/B), `profile_sections.py` (New
 
 ## 10. Reproducing from a fresh clone
 
-Everything above runs from a clone of MetalSim plus the three forks; nothing depends on local branches.
+Everything above runs from a clone of MetalSim plus the three forks ([my fork of Warp][warp-fork],
+[my fork of Newton][newton-fork-152], [my fork of MuJoCo Warp][mjw-fork]); nothing depends on local branches.
 
 ```
 # after the install of README / docs/GUIDE.md (.venv, scripts/setup_warp.sh, the MuJoCo Warp fork):
@@ -1021,21 +1045,22 @@ scripts/gpu_run.sh test_mpm check 15 -- .venv-newton152/bin/python -m pytest tes
 
 | what | where it lives | how a fresh setup gets it |
 |---|---|---|
-| Warp changes | pulipakaa24/warp `metalsim`, pinned `52c09cdd` | `scripts/setup_warp.sh` (fallback: innate-inc/warp `ce15f6bb` + `patches/warp/metalsim-52c09cdd.diff`) |
-| Newton changes (MPM, Franka-Pour rigid) | pulipakaa24/newton `metalsim-1.5.2`, pinned `addd10cb` | `scripts/setup_newton152.sh` (fallback: v1.5.2 + `patches/newton/metalsim-1.5.2-addd10cb.diff`) |
-| Newton 1.7 Metal fixes for the rigid stack | pulipakaa24/newton `metalsim-hashtable-metal` `9d6616c6` (`.venv`'s `newton` extra) and `metalsim` `1301e8da` (`.venv-newtonfork`) | `pip install -e ".[newton]"`, `scripts/setup_newton.sh` |
+| Warp changes | [my fork of Warp][warp-fork] (`metalsim`), pinned [`52c09cdd`][] | `scripts/setup_warp.sh` (fallback: [innate-inc/warp][innate-warp] [`ce15f6bb`][] + `patches/warp/metalsim-52c09cdd.diff`) |
+| Newton changes (MPM, Franka-Pour rigid) | [my fork of Newton][newton-fork-152] (`metalsim-1.5.2`), pinned [`addd10cb`][] | `scripts/setup_newton152.sh` (fallback: v1.5.2 + `patches/newton/metalsim-1.5.2-addd10cb.diff`) |
+| Newton 1.7 Metal fixes for the rigid stack | [my fork of Newton][newton-fork]: [`metalsim-hashtable-metal`][newton-hashtable] [`9d6616c6`][] (`.venv`'s `newton` extra) and `metalsim` [`1301e8da`][] (`.venv-newtonfork`) | `pip install -e ".[newton]"`, `scripts/setup_newton.sh` |
 | compat layer, scenes, probes, tests, Isaac-side recorders | this repository | the clone |
 | logs, JSON, reports of every run | `runs/mpm/`, `runs/parity/isaaclab3_mpm*/`, `runs/rigid_perf/`, `runs/fma_rigid_parity/` | the clone |
 | Metal particle recordings (`.npz`, ~6.6 GB) | not committed | `record_metal_suite.sh`, `record_variant_suite.sh OUT - - .` (one GPU job per run; deterministic, so a re-recording is bitwise the original on the same trees) |
 | L4 recordings (`runs/parity/isaaclab3_mpm*`, ~31 GB incl. tarballs) | not committed | on the L4 machine: copy `record_mpm.py`, `record_mpm_il3.py`, `scenes.py`, `newton_compat.py` to `~/parity3_scripts/mpm/`, run `isaaclab3/stage_mpm.sh`, `stage_mpm_floors.sh`, `stage_mpm_floors2.sh`, `stage_mpm_timing.sh` (Isaac Lab 3.0-EA install: `isaaclab3/`) |
 | kernel caches, L4 scale logs > 1 MB | not committed | rebuilt on first run / re-run `probes/scale_pour.py` on the L4 |
-| Franka panda model | MuJoCo Menagerie (not vendored) | `git clone https://github.com/google-deepmind/mujoco_menagerie upstream/mujoco_menagerie` or `PANDA_XML` |
+| Franka panda model | [MuJoCo Menagerie][menagerie] (not vendored) | `git clone https://github.com/google-deepmind/mujoco_menagerie upstream/mujoco_menagerie` or `PANDA_XML` |
 
 ## 11. MPM in the main simulator (`.venv`, BatchSim)
 
 Design and research: `research_notes/MPM in main simulator/NOTE.md` (status: `STATUS.md` there). The main environment
-has Newton 1.7, whose own implicit MPM is a later algorithm than Isaac Lab 3.0-EA's, so MetalSim carries the 1.5.2
-fork's solver package as a generated, Apache-2.0 copy in `metalsim/physics/mpm/implicit_mpm/` (licence and the list of
+has Newton 1.7, whose own implicit MPM is a later algorithm than Isaac Lab 3.0-EA's, so MetalSim carries the solver
+package of [my fork of Newton][newton-fork-152]'s 1.5.2 branch as a generated, Apache-2.0 copy in
+`metalsim/physics/mpm/implicit_mpm/` (licence and the list of
 modifications: its `NOTICE.txt`, `THIRD_PARTY_NOTICES.md`). `metalsim.physics.mpm.solver.solver_class()` returns
 Newton's own `SolverImplicitMPM` on the 1.5.2 line (`.venv-newton152`) and the copy elsewhere
 (`METALSIM_MPM_SOLVER=newton|vendored` forces one); `newton_compat.install` patches both. The copy run against Newton
@@ -1077,9 +1102,10 @@ Newton's default) on a sparse grid with `separate_worlds`, in Newton's own 1.5.2
 a discontinuous strain basis (P0) are built as `cell * nodes_per_cell`, while environment-first strain partitions
 number a cell's nodes in environment-major order. A NanoVDB environment grid does not store cells environment by
 environment (negative coordinates sort after positive ones), so the blocks were a permutation of other cells' nodes and
-strain nodes solved concurrently in one color shared velocity nodes: a data race, on CUDA as on Metal. Fixed on the
-fork (`99843d09`, blocks from each cell's partition node index; single-environment grids keep the old kernel) and
-re-pinned. `probes/gs_coloring_check.py` (2 worlds, sparse grid, on Metal): the old fork's coloring has 930 velocity-node
+strain nodes solved concurrently in one color shared velocity nodes: a data race, on CUDA as on Metal. Fixed on my
+fork of Newton ([`99843d09`][], blocks from each cell's partition node index; single-environment grids keep the old
+kernel) and re-pinned. `probes/gs_coloring_check.py` (2 worlds, sparse grid, on Metal): my fork's coloring before the
+fix has 930 velocity-node
 write conflicts within colors (all 8 colors), the fixed one none, every strain node once per sweep; the fixed solver
 repeats bitwise in all 12 multi-world configurations of `probes/multiworld_repeat.py` (`runs/mpm_main/batch_01/`).
 
@@ -1143,7 +1169,8 @@ repeats bitwise in all 12 multi-world configurations of `probes/multiworld_repea
   Lift speed 1.25 / 2.5 / 5 cm/s at R/dx 10: 26.6 / 26.3 / 25.4 deg (plateau within 0.3 deg below 2.5 cm/s); 4x the
   iterations: 26.6 deg. The angle rises monotonically with resolution (+0.9 deg per refinement) and with friction
   (slope 0.89 against atan(mu)), but sits 7-9 deg below atan(mu) at the finest resolution run: the published MPM heaps
-  also stop at or below atan(mu) (Dunatunga & Kamrin 2015), and on a slope this cone can yield below the simple-shear
+  also stop at or below atan(mu) ([Dunatunga & Kamrin 2015][dunatunga2015]), and on a slope this cone can yield below
+  the simple-shear
   stopping angle whenever the lateral stresses differ from the vertical one; the remaining gap to physical sand
   (repose ~ the friction angle) is a property of the solver Isaac Lab ships, not of the coupling. Not yet converged in
   resolution: +0.9 / +0.6 deg per step from R/dx 10 to 15 to 20 (batch 04: 27.8 deg with 658,080 particles,
@@ -1186,9 +1213,9 @@ the device: bitwise the solver's full reset when the world is selected, nothing 
 
 ### Re-vendoring when the fork pin moves
 
-The copy must always be the commit `scripts/setup_newton152.sh` pins. After a Newton fork change:
+The copy must always be the commit `scripts/setup_newton152.sh` pins. After a change to my fork of Newton:
 
-1. Push the fork branch (`metalsim-1.5.2`) and move `PIN` in `scripts/setup_newton152.sh` (and the fallback patch
+1. Push my fork's branch (`metalsim-1.5.2`) and move `PIN` in `scripts/setup_newton152.sh` (and the fallback patch
    `patches/newton/metalsim-1.5.2-<sha>.diff`, as before).
 2. Set the same commit as `PIN` in `scripts/vendor_mpm152.py`, then regenerate:
    `python scripts/vendor_mpm152.py upstream/newton-metalsim-1.5.2` (a checkout at the new pin; without an argument it
@@ -1197,5 +1224,92 @@ The copy must always be the commit `scripts/setup_newton152.sh` pins. After a Ne
    `test_vendored_pin_is_the_setup_pin` fails until both pins agree, `test_vendored_copy_regenerates_from_the_pin`
    regenerates from the pinned commit and fails on any difference, `test_vendored_files_keep_the_licence_header`
    checks every file still starts with Newton's SPDX header and the modification notice.
-4. If the fork's package now imports something new from outside `implicit_mpm`, extend `rewrite()` in the generator
+4. If my fork's package now imports something new from outside `implicit_mpm`, extend `rewrite()` in the generator
    (and the modification list in its `NOTICE_TXT`).
+
+<!-- Link targets. Commits: my forks of Newton and Warp, upstream Newton, innate-inc/warp, MetalSim. -->
+
+[`6f6075d1`]: https://github.com/pulipakaa24/newton/commit/6f6075d1f69036511b780fb5f6ac812f9c627ee4
+[`00c24ef0`]: https://github.com/pulipakaa24/newton/commit/00c24ef07a8ae09134a6b94d3fc5880eb4ff44ef
+[`a3fa1140`]: https://github.com/pulipakaa24/newton/commit/a3fa114084de2213a59e36f8b98d44fa5ada1e28
+[`53a903d7`]: https://github.com/pulipakaa24/newton/commit/53a903d77dbf1673b5a8960ab3e5b35d9de0a778
+[`eac15793`]: https://github.com/pulipakaa24/newton/commit/eac15793ced3fdabf4c36e78e8183ccfb58a8baa
+[`c1ab1cdc`]: https://github.com/pulipakaa24/newton/commit/c1ab1cdc28e96c55ab157548219684d4bbbc6b44
+[`c0a98819`]: https://github.com/pulipakaa24/newton/commit/c0a98819e16f331dff32c4a7a922c5642a820d5c
+[`555d6af8`]: https://github.com/pulipakaa24/newton/commit/555d6af8b7b880881d722c82afae8b2e38d3d3fa
+[`1298fbbb`]: https://github.com/pulipakaa24/newton/commit/1298fbbb709181d1efaac8efea37945574b18bc4
+[`ddb015b9`]: https://github.com/pulipakaa24/newton/commit/ddb015b970d2fc1ef1c5f39f0fdf27fedb9696f5
+[`522e2d4c`]: https://github.com/pulipakaa24/newton/commit/522e2d4cfbcd8de6c097ec81d446c29c9fcc45a1
+[`1a398b2e`]: https://github.com/pulipakaa24/newton/commit/1a398b2e505330493ba25b0591be7d09ad302d50
+[`464c0aff`]: https://github.com/pulipakaa24/newton/commit/464c0affe9efb57931c72ebb0e98a1e551e3d582
+[`1301e8da`]: https://github.com/pulipakaa24/newton/commit/1301e8da2002541f6f189b6e459e1ed5e6db5731
+[`9d6616c6`]: https://github.com/pulipakaa24/newton/commit/9d6616c64ca018dd9119f67fca3316d715a26704
+[`fe7f5bd4`]: https://github.com/pulipakaa24/newton/commit/fe7f5bd48010fcab428eac6373e85ba3317f7a42
+[`c0427fc7`]: https://github.com/pulipakaa24/newton/commit/c0427fc78ba79d1f8482c7c9f18847568f135ef0
+[`27415f95`]: https://github.com/pulipakaa24/newton/commit/27415f9597823da986007b8d45cb804e7761c444
+[`80e79684`]: https://github.com/pulipakaa24/newton/commit/80e79684b5e99bfcbda0bbbbe95334c0050a6c4d
+[`3fd1f052`]: https://github.com/pulipakaa24/newton/commit/3fd1f052a5ad031578960d9642aaaedc03834e4d
+[`addd10cb`]: https://github.com/pulipakaa24/newton/commit/addd10cbeb25e946b3a4c2bb1d4097acc7a98ca2
+[`99843d09`]: https://github.com/pulipakaa24/newton/commit/99843d09840f89ac16c82104ad66ae792e45eb91
+[`90f809a`]: https://github.com/newton-physics/newton/commit/90f809add3ab32fca9dd7aac82ed6cd18236246a
+[`91b8a859`]: https://github.com/pulipakaa24/warp/commit/91b8a859291f8013cf6f03761b8264334db4939b
+[`abd59275`]: https://github.com/pulipakaa24/warp/commit/abd592755066e596191275a439e3610a6675954e
+[`b23d6b81`]: https://github.com/pulipakaa24/warp/commit/b23d6b81acba4496ab5d36482ed68fe4ca2e856f
+[`8412a5c8`]: https://github.com/pulipakaa24/warp/commit/8412a5c811f2394e23b93cc3eaa26f22be28c359
+[`93ed7138`]: https://github.com/pulipakaa24/warp/commit/93ed71389919fb44371b5d6407800b6972133a98
+[`c160f7e4`]: https://github.com/pulipakaa24/warp/commit/c160f7e4cec381563b7a657a5621dcf5afcc43a5
+[`f52da34`]: https://github.com/pulipakaa24/warp/commit/f52da3484b0ca8f83d6738ef07e06b35772792e1
+[`7409510`]: https://github.com/pulipakaa24/warp/commit/7409510469b226659e4a0058221bdecf000206a3
+[`08084e0`]: https://github.com/pulipakaa24/warp/commit/08084e08c05270a3f5e4715da04e5047d6607980
+[`ea6dcfd`]: https://github.com/pulipakaa24/warp/commit/ea6dcfdc4679603ffb8f8fa538dd704a310d20a0
+[`da6adce`]: https://github.com/pulipakaa24/warp/commit/da6adce30586cf453aa33907fe1e6ddf625bee1c
+[`c1bb061b`]: https://github.com/pulipakaa24/warp/commit/c1bb061bb3707166c1e25b207793c9da10ce1e44
+[`152808b7`]: https://github.com/pulipakaa24/warp/commit/152808b7e33ce08fcc17c898c5ce11d567d60795
+[`d4a834ee`]: https://github.com/pulipakaa24/warp/commit/d4a834eeb0ef433d299641cfb121628b7ba49257
+[`3c4e251e`]: https://github.com/pulipakaa24/warp/commit/3c4e251e35c19e397952cb8bd7be833f1194fc0c
+[`47a4031d`]: https://github.com/pulipakaa24/warp/commit/47a4031de5d56ea4543a63fb846b8aba4b772cc0
+[`43ffc6dd`]: https://github.com/pulipakaa24/warp/commit/43ffc6dd544ccaa8ae18772ba67b0d292bf01371
+[`8631b6b0`]: https://github.com/pulipakaa24/warp/commit/8631b6b0f479cb30291da6163ec188259205ed25
+[`fddebdbd`]: https://github.com/pulipakaa24/warp/commit/fddebdbd9150f78c8a51d0fcb72d64a2223ca1af
+[`3342e5d8`]: https://github.com/pulipakaa24/warp/commit/3342e5d8f27e2e10dd2cb2c189f66707dbe6417a
+[`41b7bc45`]: https://github.com/pulipakaa24/warp/commit/41b7bc45077b4cd665e976ae9475f1b19f9fd57a
+[`85b92466`]: https://github.com/pulipakaa24/warp/commit/85b924669629838c2d2637f3e1e51ef650b3a8d6
+[`f0df4cf8`]: https://github.com/pulipakaa24/warp/commit/f0df4cf8b291c0fcc5590d5286f0e7341a692ab1
+[`270660b1`]: https://github.com/pulipakaa24/warp/commit/270660b128392b3b8f2f4c0a4fee29f4bbbf64bd
+[`732b6e83`]: https://github.com/pulipakaa24/warp/commit/732b6e836656b2109dfbaca11fe83bc22d74b533
+[`95f6f121`]: https://github.com/pulipakaa24/warp/commit/95f6f121b7e67025958335c7c15e338ac04a798a
+[`31cf79d7`]: https://github.com/pulipakaa24/warp/commit/31cf79d781e4b10d8ff85c8cbd98fc0e40f75953
+[`52c09cdd`]: https://github.com/pulipakaa24/warp/commit/52c09cdd82f79e8564b5ae17cdcee7b52d10d075
+[`ce15f6bb`]: https://github.com/innate-inc/warp/commit/ce15f6bb2545e2d6c4a4c1fac8e40bb800db7265
+[`e25f15cb`]: https://github.com/pulipakaa24/MetalSim/commit/e25f15cb347d9810d01da9701b2519dd7c749d9c
+[`36c4738f`]: https://github.com/pulipakaa24/MetalSim/commit/36c4738fda80bd8959d134182d2baad4d3f899be
+[warp-fork]: https://github.com/pulipakaa24/warp/tree/metalsim
+[warp-changes]: https://github.com/pulipakaa24/warp/blob/metalsim/METALSIM_CHANGES.md
+[fastmath-h]: https://github.com/pulipakaa24/warp/blob/metalsim/warp/native/metal_cuda_fast_math.h
+[libm-h]: https://github.com/pulipakaa24/warp/blob/metalsim/warp/native/metal_cuda_libm.h
+[newton-fork-152]: https://github.com/pulipakaa24/newton/tree/metalsim-1.5.2
+[newton-changes]: https://github.com/pulipakaa24/newton/blob/metalsim-1.5.2/METALSIM_CHANGES.md
+[newton-fork]: https://github.com/pulipakaa24/newton/tree/metalsim
+[newton-hashtable]: https://github.com/pulipakaa24/newton/tree/metalsim-hashtable-metal
+[mjw-fork]: https://github.com/pulipakaa24/mujoco_warp/tree/metalsim
+[innate-warp]: https://github.com/innate-inc/warp
+[isaaclab]: https://github.com/isaac-sim/IsaacLab
+[newton-v1.5.2]: https://github.com/newton-physics/newton/tree/v1.5.2
+[warp]: https://github.com/NVIDIA/warp
+[mjw]: https://github.com/google-deepmind/mujoco_warp
+[mujoco]: https://github.com/google-deepmind/mujoco
+[menagerie]: https://github.com/google-deepmind/mujoco_menagerie
+[physx]: https://github.com/NVIDIA-Omniverse/PhysX
+[nanovdb]: https://github.com/AcademySoftwareFoundation/openvdb/tree/master/nanovdb
+[rsl_rl]: https://github.com/leggedrobotics/rsl_rl
+[ptx-math]: https://github.com/bcarlet/ptx-math
+[sass-math]: https://github.com/pyxis-roc/sass-math
+[nvrtc]: https://docs.nvidia.com/cuda/nvrtc/index.html
+[cuda-guide]: https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html
+[msl-spec]: https://developer.apple.com/metal/Metal-Shading-Language-Specification.pdf
+[nsys]: https://developer.nvidia.com/nsight-systems
+[mixed-mpm]: https://research.nvidia.com/labs/prl/mixed_mpm/index.html
+[daviet2016]: https://doi.org/10.1145/2897824.2925877
+[lajeunesse2005]: https://doi.org/10.1063/1.2087687
+[lube2005]: https://doi.org/10.1103/PhysRevE.72.041301
+[dunatunga2015]: https://doi.org/10.1017/jfm.2015.383

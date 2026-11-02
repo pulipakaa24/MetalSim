@@ -1,23 +1,30 @@
 # Isaac Lab 3.0-EA like-for-like: the 3.0 G1 task, Isaac's own MuJoCo-Warp settings, training (2026-09-25)
 
-Question: what does it take to compare MetalSim's G1 training against Isaac Lab 3.0.0-EA's own runs
-(`runs/parity3/isaac/`: flat Newton/MuJoCo-Warp +27.4 and PhysX +28.7 at iteration 1499, rough Newton +14.5 /
-level 5.8) like for like, given that 3.0's task is harder than the 2.3.2 one MetalSim's port matches, and that
-Isaac's default backend is itself MuJoCo Warp with settings of its own?
+Question: what does it take to compare MetalSim's G1 training against [Isaac Lab](https://github.com/isaac-sim/IsaacLab)
+3.0.0-EA's own runs (`runs/parity3/isaac/`: flat [Newton](https://github.com/newton-physics/newton)/MuJoCo-Warp +27.4 and
+[PhysX](https://github.com/NVIDIA-Omniverse/PhysX) +28.7 at iteration 1499, rough Newton +14.5 / level 5.8) like for like,
+given that 3.0's task is harder than the 2.3.2 one MetalSim's port matches, and that Isaac's default backend is itself
+[MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp) with settings of its own?
 
-Sources: Isaac Lab tag `v3.0.0-EA` (commit ae37b028, 2026-09-16) cloned to `upstream/IsaacLab3`; Isaac Lab tag
-`v2.3.2` (37ddf626) sparse-cloned to `upstream/IsaacLab232`; Newton 1.5.2 (cf5378db, Isaac Lab 3.0's pin) in
-`upstream/newton-1.5.2`; the live settings recorded on the L4 (`runs/parity3/isaac/newton_mjwarp_settings.json`,
+Sources: Isaac Lab tag [`v3.0.0-EA`](https://github.com/isaac-sim/IsaacLab/tree/v3.0.0-EA) (commit
+[`ae37b028`](https://github.com/isaac-sim/IsaacLab/commit/ae37b028ea415c91ea2bc32609efcd759ed2b974), 2026-09-16) cloned to
+`upstream/IsaacLab3`; Isaac Lab tag [`v2.3.2`](https://github.com/isaac-sim/IsaacLab/tree/v2.3.2)
+([`37ddf626`](https://github.com/isaac-sim/IsaacLab/commit/37ddf626871758333d6ed89cf64ad702aef127d0)) sparse-cloned to
+`upstream/IsaacLab232`; upstream Newton [1.5.2](https://github.com/newton-physics/newton/tree/v1.5.2)
+([`cf5378db`](https://github.com/newton-physics/newton/commit/cf5378db6002b5c19b86344737cdd40cb8e08f0c), Isaac Lab 3.0's
+pin) in `upstream/newton-1.5.2`; the live settings recorded on the NVIDIA L4 GPU
+(`runs/parity3/isaac/newton_mjwarp_settings.json`,
 `runs/parity3/isaac/fidelity/newton_mjwarp/{meta.json,newton_generated.xml}`). Paths below are relative to each
 repository's `source/` unless stated. Every number is measured unless marked otherwise.
 
 > **Correction (2026-09-25, 19:50).** The two il3 training runs in §3 (flat +24.9, rough +6.1 / 1,615 blow-ups) and the
-> transfer table in §2.2 ran a **mixed preset**. Since e3ba79f the task applies `contact_cfg="recommended"` before
-> `solver_cfg`, and `solver_presets.apply` did not set the joint-limit impedance or the geom margin. The runs therefore
-> combined Isaac's soft limit solref with the hard-limit impedance 0.99–0.999 instead of Isaac's 0.9–0.95. Those numbers
-> are **superseded** (logs kept, `runs/il3/SUPERSEDED_mixed_preset.md`; reproducible as
-> `solver_cfg="isaaclab3_mixed_recommended_limits"`). The fidelity table in §2.2 is unaffected (`record_g1` does not use
-> the task). Re-runs follow in §6.
+> transfer table in §2.2 ran a **mixed preset**. Since
+> [`b147342`](https://github.com/pulipakaa24/MetalSim/commit/b14734296ec0c692ac889ef661f672e2ee273e94) the task applies
+> `contact_cfg="recommended"` before `solver_cfg`, and `solver_presets.apply` did not set the joint-limit impedance or
+> the geom margin. The runs therefore combined Isaac's soft limit solref with the hard-limit impedance 0.99–0.999
+> instead of Isaac's 0.9–0.95. Those numbers are **superseded** (logs kept, `runs/il3/SUPERSEDED_mixed_preset.md`;
+> reproducible as `solver_cfg="isaaclab3_mixed_recommended_limits"`). The fidelity table in §2.2 is unaffected
+> (`record_g1` does not use the task). Re-runs follow in §6.
 
 ## 1. The 3.0 G1 task differences, ported (`reward_cfg="flat_il3"` / `"rough_il3"`)
 
@@ -50,7 +57,8 @@ Code: `metalsim/learn/g1_il3.py` (kernels, constants, citations), switches in `G
   `isaaclab/assets/articulation/base_articulation_data.py:1384-1398`; 2.3.2 `articulation_data.py:1041`). The 2.3.2
   ports (and their tests) used MuJoCo's free-joint velocity, i.e. the pelvis frame origin, 7.6 cm above the pelvis COM
   (difference ω × r, up to ~4 cm/s at 0.5 rad/s). **This is a defect of the 2.3.2 ports**, found here; the il3
-  configs use the COM velocity (checked against MuJoCo C's `mj_objectVelocity`); the 2.3.2 configs are left as they
+  configs use the COM velocity (checked against [MuJoCo](https://github.com/google-deepmind/mujoco) C's
+  `mj_objectVelocity`); the 2.3.2 configs are left as they
   were (rule: keep them untouched; ledger row below).
 * **Rough terrain on Newton is a heightfield.** 3.0's `ROUGH_TERRAINS_CFG` sets `convert_to_heightfield=True` on every
   sub-terrain (`isaaclab/terrains/config/rough.py`; the hf terrains default to True), and the terrain importer tags the
@@ -64,7 +72,7 @@ Code: `metalsim/learn/g1_il3.py` (kernels, constants, citations), switches in `G
   `kernels.py` `contact_params`; Isaac Lab 3.0 does not pass PhysX's `friction_combine_mode="multiply"`), so the G1's
   contacts use max(robot 0.8, ground 1.0) = **1.0** on Isaac's Newton backend and 0.8 × 1.0 = 0.8 on PhysX. MetalSim's
   model has robot geoms at 1.0 and the ground at 0.8, and MuJoCo also takes the maximum: 1.0, i.e. Newton's value
-  (the PARITY §1.2 row "friction 0.8/0.6 fixed" describes the config, not what MuJoCo applies).
+  (the [PARITY](../PARITY.md) §1.2 row "friction 0.8/0.6 fixed" describes the config, not what MuJoCo applies).
 
 ### 1.3 Unchanged between the tags (diff)
 
@@ -76,7 +84,8 @@ heading control (`velocity_command.py`: only new success metrics); terminations 
 `terrain_levels_vel`; terrain generator and `ROUGH_TERRAINS_CFG` values (only `convert_to_heightfield`); actuator gains,
 armature and effort limits (`G1_CFG`: `effort_limit_sim` → `joint_effort_limit`); decimation 4, `sim.dt` 0.005, 20 s
 episodes; PPO hyper-parameters (flat 1500 iterations; rough `max_iterations` 5000 on Newton, 3000 otherwise; the
-reference runs used 1500). Quaternions are XYZW in 3.0; no observation contains one. The asset (Isaac Sim 6.1 USD, as
+reference runs used 1500). Quaternions are XYZW in 3.0; no observation contains one. The asset
+([Isaac Sim](https://github.com/isaac-sim/IsaacSim) 6.1 USD, as
 Newton built it, `newton_generated.xml`) matches MetalSim's 5.1 copy: 44 bodies, masses within 4e-6 relative, COMs
 within 4e-7 m, inertias within 5e-6 relative, all 37 joint ranges and armatures, and all 37 kp / kd equal (measured
 from the recording).
@@ -219,7 +228,7 @@ configuration, 4096 envs, 2.5 ms physics, seed 0). Log `runs/il3/train_flat_il3_
 (dof_invweight0 ratios 0.95–1.05, joint-limit time-constant ratios 0.98–1.02); 139,712 pushes over the run (≈0.8 per
 finished full episode, as a 10–15 s timer on 20 s episodes gives).
 
-Isaac Lab 3.0 (newton_mjwarp, isaacsim_physx; rsl_rl 5.4.1, last-100-episode means, 0-based it) vs MetalSim runs/il3/train_flat_il3_isaaclab3_every_substep_cap20_s0.log (PPOWarp, episodes finished in the iteration, 1-based it; ±5-iteration mean in brackets)
+Isaac Lab 3.0 (newton_mjwarp, isaacsim_physx; [rsl_rl](https://github.com/leggedrobotics/rsl_rl) 5.4.1, last-100-episode means, 0-based it) vs MetalSim runs/il3/train_flat_il3_isaaclab3_every_substep_cap20_s0.log (PPOWarp, episodes finished in the iteration, 1-based it; ±5-iteration mean in brackets)
 | iteration | Isaac newton_mjwarp: length / return / lin track / yaw track | Isaac isaacsim_physx: length / return / lin track / yaw track | MetalSim: length / return / lin track / yaw track |
 |---|---|---|---|
 | 50 | 53 / -5.0 / 0.012 / 0.004 | 51 / -5.0 / 0.013 / 0.004 | 50 (50) / -5.3 (-5.3) / 0.010 / 0.004 |
@@ -301,10 +310,12 @@ Reading (one seed on each side; MetalSim's three 2.3.2-task seeds spread ±1.3 a
   during iterations ≈870–1500; the per-block rates show no step there (42.46 K at 801–900, 42.36 K at 901–1000), so the
   rate is reported as measured with that caveat.
 
-**Queue bug found on the way (fixed, 18:17)**: `scripts/gpu_lock.py` (e10a80c) declared a positional `cmd` and an option
-`--cmd`; the option overwrote the sub-command, so `acquire` printed the status and returned at once and every
-`gpu_run.sh` job launched 17:53–18:16 started without the lock. Fixed with `dest="job_cmd"`; the coordinator kept the fix and
-added `tests/test_gpu_queue.py` (8c208bf). No timing number in this note was taken in that window (bench re-take 16:07).
+**Queue bug found on the way (fixed, 18:17)**: `scripts/gpu_lock.py`
+([`5fd70a4`](https://github.com/pulipakaa24/MetalSim/commit/5fd70a43843faf9042fcc2b12efe7a9cd42af331)) declared a
+positional `cmd` and an option `--cmd`; the option overwrote the sub-command, so `acquire` printed the status and
+returned at once and every `gpu_run.sh` job launched 17:53–18:16 started without the lock. Fixed with `dest="job_cmd"`;
+the coordinator kept the fix and added `tests/test_gpu_queue.py`. No timing number in this note was taken in that window
+(bench re-take 16:07).
 
 ### 3.2 Rough (measured 2026-09-25, 18:30–19:36) — SUPERSEDED, mixed preset
 
@@ -406,8 +417,8 @@ Between MetalSim's `flat_il3` / `rough_il3` run and Isaac Lab 3.0's `Isaac-Veloc
    CUDA does not exist.
 4. **Learner**: MetalSim's PPOWarp (checked against rsl_rl 3.1.2, PARITY §1.5) vs rsl_rl 5.4.1 with the same
    hyper-parameters; different random generators and noise streams.
-5. **Randomness**: same distributions, different generators (torch CUDA Philox vs Warp's `rand_init`/numpy); the mass
-   draw per env, push timers and reset draws are therefore not the same values.
+5. **Randomness**: same distributions, different generators (torch CUDA Philox vs [Warp](https://github.com/NVIDIA/warp)'s
+   `rand_init`/numpy); the mass draw per env, push timers and reset draws are therefore not the same values.
 6. **Logging statistic**: Isaac's "Mean reward" / "Mean episode length" = mean of the last 100 finished episodes;
    Episode_Reward terms = per-step means over reset envs, averaged over the iteration's steps with resets. MetalSim: means
    over the episodes finished in that iteration (≈100 per iteration once episodes are full), per-term episode sums /
@@ -525,7 +536,8 @@ notes one sum made deterministic by visiting contacts in row order; the contact 
 state left out of the reload (e.g. the contact buffer order) is covered, so part of the floor may be the reload itself,
 not the atomics.
 
-A deterministic mode exists upstream but not for Metal. Warp (our fork's base, `warp/config.py`) has
+A deterministic mode exists upstream but not for Metal. Warp (the base of
+[my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim), `warp/config.py`) has
 `warp.config.deterministic = DeterministicMode.RUN_TO_RUN | GPU_TO_GPU` (`warp/_src/deterministic.py`: scatter-sort-reduce
 for accumulating atomics, a two-pass scheme for counter atomics). Newton 1.5.2 drives it for MuJoCo Warp's modules
 (`SolverMuJoCo._set_mujoco_warp_module_options`: per-module `deterministic` and `deterministic_max_records`, with a
@@ -657,7 +669,7 @@ Evidence (`runs/il3/transient_trace.py` / `.log`, PPOWarp-initialised policy, se
   corrected flat run fall in the same window (iterations 11–13) and come from the same mechanism.
 * Fix: `PPOWarp.prepare()` resets every env through the task before the first rollout (`initial_reset=True`, default;
   test `test_trainer_first_observation_comes_from_the_task_reset`). The qpos0 start is archived. This affects every
-  earlier PPOWarp G1 run's first episode (PARITY §1.5 note, DECISIONS row).
+  earlier PPOWarp G1 run's first episode (PARITY §1.5 note, [DECISIONS](../DECISIONS.md) row).
 
 
 ### 6.8 Corrected rough 3.0 run (`il3fix_rough_s0`, 2026-09-26 03:00–04:00)
@@ -812,7 +824,9 @@ Newton puts the same limit on the joint (actuatorfrcrange, applied after the act
 implicit, so Isaac never blows a finger.**
 
 Sources: MuJoCo C `engine_derivative.c:2416` (mjd_actuator_vel: "skip if force is clamped by forcerange") and MuJoCo Warp
-`_src/derivative.py:133` (fork 9b4e96a) zero a clamped actuator's velocity derivative. `engine_forward.c:998` /
+`_src/derivative.py:133` ([my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) at
+[`9b4e96a`](https://github.com/pulipakaa24/mujoco_warp/commit/9b4e96af2ddec285e0f58595fbba27c31a64852a)) zero a clamped
+actuator's velocity derivative. `engine_forward.c:998` /
 `forward.py:1595` clamp `qfrc_actuator` by `jnt_actfrcrange` after the sum. Newton writes the G1 as two `<general>`
 actuators per joint (kp and kd) with the ±effort on the joint's actuatorfrcrange (newton_generated.xml). Every other finger
 field is identical (range, limit solref/solimp, armature 0.001, zero damping, friction and margin, kp 40, kd 10); Newton
@@ -845,8 +859,11 @@ Final runs queued with both fixes (reset start, joint clamp): flat 3.0 seeds 0, 
 
 `runs/il3/final_flat_il3_s{0,1,2}.log` (2026-09-26 06:30–09:26), flat_il3, `isaaclab3_every_substep_cap20` on contact_cfg
 "recommended", 4096 envs, 1500 iterations. Per-seed curves in `runs/il3/curves_final_flat_s*.md`. Seeds 0–1 ran on
-mujoco_warp 9b4e96a, seed 2 on edae7b7 (the throughput agent's register L'DL, described as float-noise equivalent for the
-G1). Return (±5-iteration mean; Isaac: last-100-episode mean, one seed per backend):
+[my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) at
+[`9b4e96a`](https://github.com/pulipakaa24/mujoco_warp/commit/9b4e96af2ddec285e0f58595fbba27c31a64852a), seed 2 on
+[`edae7b7`](https://github.com/pulipakaa24/mujoco_warp/commit/edae7b761a81b67a882375e2cf6c2424a1a237b7) (the register
+L'DL of the [throughput note](throughput_2026-09-26.md) §11.3, described as float-noise equivalent for the G1). Return
+(±5-iteration mean; Isaac: last-100-episode mean, one seed per backend):
 
 | iteration | seed 0 | seed 1 | seed 2 | mean ± sd | Isaac Newton | Isaac PhysX |
 |---|---|---|---|---|---|---|

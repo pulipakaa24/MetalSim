@@ -1,8 +1,8 @@
 # Coupled MPM scenes on Metal vs the L4: research before building (2026-10-13)
 
-Context: `metalsim/physics/mpm/MPM.md` 8j. Captured two-way is 1.76x the L4's time and captured ANYmal 1.29x. This
-note covers four questions and records what is verified from code or measurement versus what is inferred. Batches and
-logs are in `runs/mpm/coupled_speed/`.
+Context: `metalsim/physics/mpm/MPM.md` 8j. Captured two-way is 1.76x the NVIDIA L4 GPU's time and captured ANYmal 1.29x.
+This note covers four questions and records what is verified from code or measurement versus what is inferred. Batches
+and logs are in `runs/mpm/coupled_speed/`.
 
 ## A. The two-way growth: the rigidity product IJtm
 
@@ -19,10 +19,12 @@ logs are in `runs/mpm/coupled_speed/`.
   thread per (row, sub-row), summing the row's blocks serially.
   - The L4's nsys profile shows exactly one tiled and one untiled product per iteration:
     `runs/mpm/profile/kernels_l4/twoway_coupling*_cuda_gpu_kern_sum.csv` (204 launches each over 4 frames).
-- On Metal, Newton's `_ListedRowsMv` (fork commit `80e79684`) uses the untiled body for both products.
-- Warp's Metal `tile_sum` (`warp/native/tile_reduce.h`, `metal_reduce::block_reduce`) uses the same per-SIMD-group
-  shuffle-down tree as CUDA's `warp_reduce`. It then folds the group partials in index order, as CUDA's
-  `block_combine_thread_results` does with its warp partials.
+- On Metal, Newton's `_ListedRowsMv` (in [my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim-1.5.2))
+  uses the untiled body for both products.
+- The Metal `tile_sum` of [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim)
+  (`warp/native/tile_reduce.h`, `metal_reduce::block_reduce`) uses the same per-SIMD-group shuffle-down tree as CUDA's
+  `warp_reduce`. It then folds the group partials in index order, as CUDA's `block_combine_thread_results` does with its
+  warp partials.
   - So with the same kernel choice, Metal sums the long rows in the L4's order: 64 strided lane sums, then the tree.
   - FMA placement follows `fuse_fp` on both, as in every other kernel.
 
@@ -31,8 +33,8 @@ logs are in `runs/mpm/coupled_speed/`.
 - Per 50 calls: 29-40 ms untiled vs 12.1-12.9 ms tiled. The figures include a host synchronization per call.
 - J (655,360 rows, at most 2 blocks each) is unchanged, at about 9.3-11.8 ms.
 
-**Consequence.** The fix is to make CUDA's kernel choice on Metal, in Warp (`warp.config.metal_bsr_mv_tiles`). Newton's
-listed-rows path then defers to `bsr_mv` for matrices that would be tiled.
+**Consequence.** The fix is to make CUDA's kernel choice on Metal, in my fork of Warp
+(`warp.config.metal_bsr_mv_tiles`). Newton's listed-rows path then defers to `bsr_mv` for matrices that would be tiled.
 - Two-way changes rounding: it now follows the L4's order.
 - Pure-MPM scenes and ANYmal do not use `bsr_mv` and stay bitwise (batch_03: floors bitwise equal; two-way repeatable
   and still inside the L4 ensemble at 0.83).
@@ -53,8 +55,9 @@ listed-rows path then defers to `bsr_mv` for matrices that would be tiled.
 - Fix in the batches: `python -P -m pytest` (Python 3.11+: do not prepend the cwd). batch_06 verifies.
 - **Every agent launching `python -m ...` through gpu_run.sh from a worktree hits this.**
 
-**Kept from the reading (Warp fork 95f6f121, `warp/_src/context.py`)**, since the module-option machinery is shared,
-e.g. by `BatchSimOptions(deterministic=True)`:
+**Kept from the reading ([my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) at
+[`95f6f121`](https://github.com/pulipakaa24/warp/commit/95f6f121b7e67025958335c7c15e338ac04a798a),
+`warp/_src/context.py`)**, since the module-option machinery is shared, e.g. by `BatchSimOptions(deterministic=True)`:
 - `set_module_options` updates the options and calls `mark_modified()` (clears hashers, keeps execs).
 - `Module.load` re-hashes and recompiles on a mismatch. The deterministic mode is part of the hash and salts it.
 - Kernel mangled names follow `kernel.hash`.
@@ -89,9 +92,10 @@ e.g. by `BatchSimOptions(deterministic=True)`:
   - It still reads O(bodies x nodes), and the order changes too.
 - Preferred: (b). It lowers both the work and the latency, and the reductions use Warp's explicit-tree `tile_sum`.
   Metal's `simd_sum` does not document its internal order, so it is avoided for repeatable results.
-  - Pitfalls from MLX and llama.cpp reduction kernels: partial SIMD groups and inactive lanes give wrong two-level sums
-    unless the group count is rounded up; MLX's `ops.h` shuffle reduction is reported wrong on M1/M2 with inactive
-    lanes. Warp's `metal_reduce` handles inactive lanes with an explicit mask.
+  - Pitfalls from [MLX](https://github.com/ml-explore/mlx) and [llama.cpp](https://github.com/ggml-org/llama.cpp)
+    reduction kernels: partial SIMD groups and inactive lanes give wrong two-level sums unless the group count is
+    rounded up; MLX's `ops.h` shuffle reduction is reported wrong on M1/M2 with inactive lanes. Warp's `metal_reduce`
+    handles inactive lanes with an explicit mask.
 - **Implemented: option (b)** (`runs/mpm/coupled_speed/patches/newton_body_force_compact.diff`, Newton example).
   - Three steps: `flag_body_nodes`, then an integer `array_scan`, then `compact_body_nodes`. The kept node indices stay
     in increasing order and their count is read on the device. `compute_body_forces_compact_lanes` then runs 256 lanes
@@ -121,24 +125,33 @@ Q1-Q4, `apple_vs_nvidia_gpu.md` Q2 and Q4):
 
 **Measured** (MPM.md 8j, isolated-dispatch profile):
 - The Gauss-Seidel kernel takes 8.5 vs 3.3 ms per frame over 400 launches.
-- MuJoCo Warp tree passes (`_crb_accumulate`, `_cfrc_backward`, 20 launches each) take 3-11x the L4's time per
-  launch. Isolated-dispatch times overstate small kernels inside a replayed graph.
+- [MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp) tree passes (`_crb_accumulate`, `_cfrc_backward`, 20
+  launches each) take 3-11x the L4's time per launch. Isolated-dispatch times overstate small kernels inside a replayed
+  graph.
 
 **Next.**
 - Measure ANYmal captured by subtraction: replay variants with groups of kernels removed or made empty, so the real
   in-graph share of each group is known before choosing.
 - The MuJoCo Warp side belongs to the rigid stack's own performance work. Report it, don't fork it here.
 
-Sources: Warp "Deterministic Execution" guide (nvidia.github.io/warp/latest/user_guide/execution_and_performance/deterministic_execution.html);
-`warp.set_module_options` API page; PyTorch PR #150566 (MPS simd reductions, MLX `ops.h` caveat); llama.cpp PR #16559
-(two-level simd_sum); MLX issue #3533 (two-level reduction timing on M2); local code and notes cited inline.
+Sources: Warp ["Deterministic Execution" guide](https://nvidia.github.io/warp/latest/user_guide/execution_and_performance/deterministic_execution.html);
+[`warp.set_module_options` API page](https://nvidia.github.io/warp/latest/api_reference/_generated/warp.set_module_options.html);
+PyTorch PR [#150566](https://github.com/pytorch/pytorch/pull/150566) (MPS simd reductions, MLX `ops.h` caveat);
+llama.cpp PR [#16559](https://github.com/ggml-org/llama.cpp/pull/16559) (two-level simd_sum); MLX issue
+[#3533](https://github.com/ml-explore/mlx/issues/3533) (two-level reduction timing on M2); local code and notes cited
+inline.
 
 ## Outcome (2026-10-13; MPM.md 8k)
 
-- A: Warp `31cf79d7` + Newton `addd10cb`. Captured two-way 54.8 -> 40.0 ms/frame.
+- A: [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) at
+  [`31cf79d7`](https://github.com/pulipakaa24/warp/commit/31cf79d781e4b10d8ff85c8cbd98fc0e40f75953) +
+  [my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim-1.5.2) at
+  [`addd10cb`](https://github.com/pulipakaa24/newton/commit/addd10cbeb25e946b3a4c2bb1d4097acc7a98ca2). Captured two-way
+  54.8 -> 40.0 ms/frame.
 - C: compaction in the two-way example (40.0 -> 37.6 ms/frame captured, 1.21x the L4) and in the solver's proxy harvest.
   MPMCoupling: harvest 15.6 -> 1.5 ms, coupled step 49.3 -> 34.2 ms at 16 bodies. Franka-Pour unchanged.
 - D: the colour-launch threadgroup count (1/2/4/8 per core) and `gs-soa` are bitwise equal to the current solver, and
   neither is faster. ANYmal's remaining 1.21x is mostly the MuJoCo Warp robot graph (8.3 ms vs about 1.4 ms of L4
   kernel time).
-- B: a harness artifact, fixed in `scripts/gpu_run.sh` (PR "gpu_run.sh: run the job in the caller's directory").
+- B: a harness artifact, fixed in `scripts/gpu_run.sh` (PR
+  ["gpu_run.sh: run the job in the caller's directory"](https://github.com/pulipakaa24/MetalSim/commit/3b7902b3b93c00dedc2b4fe6a09660e2f43e000c)).

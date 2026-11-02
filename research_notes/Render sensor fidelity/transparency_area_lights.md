@@ -9,11 +9,13 @@ documented by the vendor, **[src]** read from source, **[meas]** measured here, 
 ## 1. References: what each one does with transparency
 
 ### MuJoCo (the parity reference for depth, segmentation and `mj_ray`)
-- **[src]** `ray_eliminate` (src/engine/engine_ray.c, main @147dc67, lines ~68-95) skips a geom when: its body is
+- **[src]** `ray_eliminate` (src/engine/engine_ray.c, main
+  @[`147dc67`](https://github.com/google-deepmind/mujoco/commit/147dc67d052a76eb13f55e8a2463b211a58956fb),
+  lines ~68-95) skips a geom when: its body is
   `bodyexclude`; `geom_matid < 0 && geom_rgba[3] == 0`; `geom_matid >= 0 && mat_rgba[3] == 0` (with a material, the
   material's alpha decides); `!flg_static && body_weldid == 0`; `geomgroup != NULL && geomgroup[clamp(group,0,5)] == 0`.
   **Alpha exactly 0, no threshold**: alpha 0.3 is hit. https://github.com/google-deepmind/mujoco/blob/main/src/engine/engine_ray.c
-  MuJoCo Warp mirrors it (`mujoco_warp/_src/ray.py::_ray_eliminate`, read locally).
+  [MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp) mirrors it (`mujoco_warp/_src/ray.py::_ray_eliminate`, read locally).
 - **[src]** Rangefinder: `mj_ray(m, d, origin, site_z, NULL, 1, site_bodyid, ...)` (engine_sensor.c:752): no group
   filter, static geoms included, the site's body excluded.
 - **[src]** Renderer (render_gl3.c ~972): a geom is transparent when `rgba[3] < 0.995` (or a plane seen from behind);
@@ -66,11 +68,11 @@ documented by the vendor, **[src]** read from source, **[meas]** measured here, 
   normal incidence [physics].
 - Foster et al. ICRA 2013: glass "behaves like a diffuse object in a minimal range of angles (near-normal
   incidence)". https://web.eecs.umich.edu/~kuipers/papers/Foster-icra-13.pdf
-- Cartographer_glass (arXiv 2212.08633): near normal "most of the incident beam is reflected directly back ... a sharp
+- Cartographer_glass (arXiv [2212.08633](https://arxiv.org/abs/2212.08633)): near normal "most of the incident beam is reflected directly back ... a sharp
   increase in intensity", otherwise "most of it passes through".
-- HDL-32E reflection study (arXiv 1909.12483): intensity peaks at perpendicular incidence and "drops quickly"; mirror
+- HDL-32E reflection study (arXiv [1909.12483](https://arxiv.org/abs/1909.12483)): intensity peaks at perpendicular incidence and "drops quickly"; mirror
   ghosts: "The sensor, unaware of the reflection, will report the reflected point to be located behind the glass."
-- 3DRef (arXiv 2403.06538; Ouster OS0-128, Livox Avia, Hesai QT64): glass points are 0.9-7.8 % of a cloud, 99.6 % of
+- 3DRef (arXiv [2403.06538](https://arxiv.org/abs/2403.06538); Ouster OS0-128, Livox Avia, Hesai QT64): glass points are 0.9-7.8 % of a cloud, 99.6 % of
   them first returns; "as the incident angle increases, fewer specular returns persist".
 - Return modes: Velodyne Strongest / Last / Dual (strongest + last; when the strongest is the last, the second
   strongest; VLP-16 manual https://usermanual.wiki/Pdf/VLP16Manual.1719942037/html, arXiv 1909.12483); Ouster dual =
@@ -139,7 +141,7 @@ Scenes without transparent geoms or lidar materials take the previous code paths
   the plane through the receiver and edge i. Used directly (any receiver position / orientation) in the tests.
 - Sphere (radius R, distance d to the centre, receiver facing it): E = pi L (R/d)^2.
 
-## 4. Results (2026-10-13, M4 Max, Warp 95f6f121, on main f3b5c62e)
+## 4. Results (2026-10-13, M4 Max, [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) at [`95f6f121`](https://github.com/pulipakaa24/warp/commit/95f6f121b7e67025958335c7c15e338ac04a798a), on main [`692cb13e`](https://github.com/pulipakaa24/MetalSim/commit/692cb13e99e1de89601e5bc5abc64221d352c45f))
 
 Full tables in the repo: `docs/RENDER_COVERAGE.md` §3e, `docs/PARITY.md`.
 - Depth "surface" equals `mj_ray` through every pixel to < 0.2 mm; "behind" / `alpha_threshold` as specified.

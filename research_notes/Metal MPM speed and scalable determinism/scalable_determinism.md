@@ -8,9 +8,9 @@ Researched 2026-10-10. Versions are cited inline. "Local measurement" means a pr
 Warp added `wp.config.deterministic` / `wp.DeterministicMode` in **1.15.0 (2026-07-07)**, not 1.10–1.14. It is a compile-time rewrite with two paths. Accumulation atomics whose return value is unused become **scatter-to-buffer, then a CUB radix sort by (dest, thread id), then reduce-by-key**. Atomics whose return value is consumed (counters) become a **two-pass count, sort, segmented-scan, re-execute**. Under high contention the sort path is *faster* than native float atomics (0.13x time at 1M writes into 1 output). Under low contention it is 10–24x slower, because the sort dominates (RTX 4090 numbers).
 
 ### Cited Findings
-- **Version and API.** Introduced in Warp 1.15.0 (2026-07-07): "Add a deterministic execution mode for supported atomic operations ... `wp.config.deterministic` or per module via the `"deterministic"` module option, using `wp.DeterministicMode.RUN_TO_RUN` for bit-exact repeatable results on the same GPU, or `wp.DeterministicMode.GPU_TO_GPU` to also target consistency across GPU architectures." It covers accumulation into array elements and counters that hand out slots, and it extends to autodiff backward reductions. Also new: `wp.config.deterministic_max_records` (GH-1443). — [Warp CHANGELOG 1.15.0](https://github.com/NVIDIA/warp/blob/main/CHANGELOG.md)
-- 1.16.0 (2026-08-03) fixed "kernel launches using stale deterministic launch metadata after switching a module's `deterministic` mode, which could execute consumed-return counter atomics twice or crash" (GH-1637). The 1.17.0 (2026-08-31) and 1.18.0 (2026-10-05) changelogs have no further determinism entries. — [Warp CHANGELOG](https://github.com/NVIDIA/warp/blob/main/CHANGELOG.md)
-- The original implementation PR is NVIDIA/warp#1355 by mmacklin. — [Newton issue #2479 comment by eric-heiden](https://github.com/newton-physics/newton/issues/2479)
+- **Version and API.** Introduced in Warp 1.15.0 (2026-07-07): "Add a deterministic execution mode for supported atomic operations ... `wp.config.deterministic` or per module via the `"deterministic"` module option, using `wp.DeterministicMode.RUN_TO_RUN` for bit-exact repeatable results on the same GPU, or `wp.DeterministicMode.GPU_TO_GPU` to also target consistency across GPU architectures." It covers accumulation into array elements and counters that hand out slots, and it extends to autodiff backward reductions. Also new: `wp.config.deterministic_max_records` ([GH-1443](https://github.com/NVIDIA/warp/issues/1443)). — [Warp CHANGELOG 1.15.0](https://github.com/NVIDIA/warp/blob/main/CHANGELOG.md)
+- 1.16.0 (2026-08-03) fixed "kernel launches using stale deterministic launch metadata after switching a module's `deterministic` mode, which could execute consumed-return counter atomics twice or crash" ([GH-1637](https://github.com/NVIDIA/warp/issues/1637)). The 1.17.0 (2026-08-31) and 1.18.0 (2026-10-05) changelogs have no further determinism entries. — [Warp CHANGELOG](https://github.com/NVIDIA/warp/blob/main/CHANGELOG.md)
+- The original implementation PR is [NVIDIA/warp#1355](https://github.com/NVIDIA/warp/pull/1355) by mmacklin. — [Newton issue #2479 comment by eric-heiden](https://github.com/newton-physics/newton/issues/2479)
 - **Modes.** `NOT_GUARANTEED` is the default. `RUN_TO_RUN` is "bit-exact reproducibility across repeated runs on the same GPU architecture". `GPU_TO_GPU` is the "stronger reduction path intended to preserve identical results across GPU architectures". — [Warp design doc deterministic-execution.md](https://github.com/NVIDIA/warp/blob/main/design/deterministic-execution.md)
 - **Ops covered:** `atomic_add`, `atomic_sub`, `atomic_min`, `atomic_max`.
   - Float add/sub/min/max with an unused return value go through scatter-sort-reduce. This includes vec/mat/quat/transform leaves.
@@ -61,7 +61,7 @@ Warp added `wp.config.deterministic` / `wp.DeterministicMode` in **1.15.0 (2026-
   - Mixing determinism settings with a **warm kernel cache** silently reused non-deterministic modules. — [mujoco_warp #1590](https://github.com/google-deepmind/mujoco_warp/issues/1590)
 
 ### Inferences
-- The sort-based path costs roughly a constant 0.08–0.2 ms per deterministic kernel launch on a 4090 at these sizes, mostly radix sort over records plus temporary buffers. It wins only where native atomics serialize on a hot address. For a batched simulator with many deterministic scatter kernels per step, the per-launch cost adds up. That matches the 30–80% throughput hit MuJoCo Warp saw with a blanket rewrite (Q2).
+- The sort-based path costs roughly a constant 0.08–0.2 ms per deterministic kernel launch on a 4090 at these sizes, mostly radix sort over records plus temporary buffers. It wins only where native atomics serialize on a hot address. For a batched simulator with many deterministic scatter kernels per step, the per-launch cost adds up. That matches the 30–80% throughput hit MuJoCo Warp (MJW) saw with a blanket rewrite (Q2).
 - Warp's own guidance and MJW experience both point to the same conclusion: hand-written **gathers / count-scan-emit** for hot paths, with sort-reduce only as a fallback.
 
 ### Gaps
@@ -72,10 +72,10 @@ Warp added `wp.config.deterministic` / `wp.DeterministicMode` in **1.15.0 (2026-
 
 ### Takeaway
 - **MuJoCo Warp:** the released version (3.15.0, 2026-10-05) is *not* GPU-deterministic. The official answer is "run on CPU".
-  - An opt-in `opt.deterministic` is in open PRs. #1422/#1425 use contact sort, count-scan-emit row allocation and gathers. #1687 is the official API; #1775 integrates the two.
+  - An opt-in `opt.deterministic` is in open PRs. [#1422](https://github.com/google-deepmind/mujoco_warp/pull/1422)/[#1425](https://github.com/google-deepmind/mujoco_warp/pull/1425) use contact sort, count-scan-emit row allocation and gathers. [#1687](https://github.com/google-deepmind/mujoco_warp/pull/1687) is the official API; [#1775](https://github.com/google-deepmind/mujoco_warp/pull/1775) integrates the two.
   - Measured cost of #1425: about **−36% throughput, roughly flat in world count** (from 1 to 8192 worlds). The earlier version cost −31% to −81%.
 - **Newton:** per-solver `deterministic` flags since 1.4.0. The collision pipeline uses a sort-based `deterministic` since 1.2.0, and hydroelastic contacts use fixed-point accumulation since 1.5.0.
-- **Isaac Lab 3.0 / PhysX:** rigid bodies and articulations are deterministic on the same hardware and version. Enhanced determinism costs performance but publishes no numbers. Non-rigid bodies are not guaranteed.
+- **[Isaac Lab](https://github.com/isaac-sim/IsaacLab) 3.0 / [PhysX](https://github.com/NVIDIA-Omniverse/PhysX):** rigid bodies and articulations are deterministic on the same hardware and version. Enhanced determinism costs performance but publishes no numbers. Non-rigid bodies are not guaranteed.
 
 ### Cited Findings
 - **MJW docs:** "Is MJWarp on GPU deterministic? No. There may be ordering or *small* numerical differences ... characteristic of non-deterministic atomic operations on GPU. Set device to CPU with `wp.set_device("cpu")` for deterministic results." — [MuJoCo Warp docs](https://mujoco.readthedocs.io/en/latest/mjwarp/index.html)
@@ -112,8 +112,8 @@ Warp added `wp.config.deterministic` / `wp.DeterministicMode` in **1.15.0 (2026-
   — [#562 comment 2026-10-10](https://github.com/google-deepmind/mujoco_warp/issues/562); [Newton #4631](https://github.com/newton-physics/newton/issues/4631)
 - **Newton:**
   - 1.2.0 (2026-05-12) added a "`deterministic` flag to `CollisionPipeline` and `NarrowPhase` for GPU-thread-scheduling-independent contact ordering via radix sort and deterministic fingerprint tiebreaking in contact reduction".
-  - 1.4.0 (2026-07-16) added a "`deterministic` constructor argument to `SolverXPBD`, `SolverSemiImplicit`, `SolverFeatherstone`, `SolverVBD`, and `SolverMuJoCo` ... the default inherits `wp.config.deterministic`" (#3300).
-  - 1.5.0 (2026-08-11) made hydroelastic contacts deterministic, with "overflow-safe fixed-point pressure accumulation" (#3661).
+  - 1.4.0 (2026-07-16) added a "`deterministic` constructor argument to `SolverXPBD`, `SolverSemiImplicit`, `SolverFeatherstone`, `SolverVBD`, and `SolverMuJoCo` ... the default inherits `wp.config.deterministic`" ([#3300](https://github.com/newton-physics/newton/pull/3300)).
+  - 1.5.0 (2026-08-11) made hydroelastic contacts deterministic, with "overflow-safe fixed-point pressure accumulation" ([#3661](https://github.com/newton-physics/newton/pull/3661)).
   - The latest release is v1.6.1 (2026-10-05), with v1.7.0rc1 on 2026-10-08.
 
   — [Newton CHANGELOG](https://github.com/newton-physics/newton/blob/main/CHANGELOG.md)

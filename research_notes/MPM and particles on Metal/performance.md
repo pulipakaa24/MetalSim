@@ -38,7 +38,8 @@ best is a **SIMD-group segmented reduction plus device float atomics** at 0.50 m
 - P2G method: particles sorted by cell; warp-level reduction (shuffle) of same-node writes inside each warp; shared-memory
   accumulation for cross-warp conflicts; bulk write to global memory. "Crossing-warp conflicts only infrequently happen
   such that the negative impact caused by atomic-adds to the shared memory is almost negligible" (on their hardware).
-- Measured: their P2G-MLS is **23× faster than atomic-only scattering and 15× faster than GVDB gathering**. Hardware: about
+- Measured: their P2G-MLS is **23× faster than atomic-only scattering and 15× faster than
+  [GVDB](https://github.com/NVIDIA/gvdb-voxels) gathering**. Hardware: about
   7M uniformly sampled particles at Δx = 1/128, NVIDIA TITAN Xp (Fig. 6, read off the plot: the axis tops out at 180 ms,
   which is the scale of the naive atomic and GVDB P2G times).
 - Against SIMD CPU code (18-core Xeon Gold 6140): P2G and G2P are more than 16× faster than CPU FLIP, and about 8× and 13×
@@ -57,7 +58,7 @@ best is a **SIMD-group segmented reduction plus device float atomics** at 0.50 m
   The paper's teaser: 4.2M particles, 256³ grid, 10.5 s per frame.
 - Memory: 2.4 GB for 7M particles, 900K cells, 17K blocks; 70 MB for 95K particles.
 
-**Wang et al. 2020, "A Massively Parallel and Scalable Multi-GPU MPM" (SIGGRAPH / TOG 39(4), claymore)** — [paper](https://yzhu.io/publication/mpmgpu2020siggraph/paper.pdf), [project](https://yzhu.io/publication/mpmgpu2020siggraph/)
+**Wang et al. 2020, "A Massively Parallel and Scalable Multi-GPU MPM" (SIGGRAPH / TOG 39(4), [claymore](https://github.com/penn-graphics-research/claymore))** — [paper](https://yzhu.io/publication/mpmgpu2020siggraph/paper.pdf), [project](https://yzhu.io/publication/mpmgpu2020siggraph/)
 - G2P2G: fuses G2P, the particle update and the next step's P2G into one kernel. Removes two transfer kernels; particle
   velocity becomes kernel-local. Needs double-buffered particles and an "off-by-two" staggered block mapping so particles
   touch only 2×2×2 grid blocks (4×4×4 nodes each) in shared memory.
@@ -96,8 +97,8 @@ best is a **SIMD-group segmented reduction plus device float atomics** at 0.50 m
 - They use G2P2G only below about 100K particles per GPU, and kernel merging otherwise. Fast-math intrinsics: negligible
   error (stress error ≤ 0.12 dyne/cm² on 3.1M sand particles).
 
-**Hu et al. 2019 Taichi (sparse SNodes)** — numbers via Wang 2020 Table 2 above (P6000: 4.3 ms per step for 775K
-particles). Taichi's MPM was the reference "state of the art" in 2020. [Wang 2020](https://yzhu.io/publication/mpmgpu2020siggraph/paper.pdf)
+**Hu et al. 2019 [Taichi](https://doi.org/10.1145/3355089.3356506) (sparse SNodes)** — numbers via Wang 2020 Table 2
+above (P6000: 4.3 ms per step for 775K particles). Taichi's MPM was the reference "state of the art" in 2020. [Wang 2020](https://yzhu.io/publication/mpmgpu2020siggraph/paper.pdf)
 
 **QuanTaichi (Hu et al. 2021)** — [project](https://yuanming.taichi.graphics/publication/2021-quantaichi/), [repo](https://github.com/taichi-dev/quantaichi)
 - 1.7× compression per MPM particle; 235M MPM particles on one GPU. Speed is described only qualitatively ("often run as
@@ -199,7 +200,7 @@ saturates the GPU alone (0.48 vs 0.46 ms/M at 16.8M for V6); 10K–50K-particle 
   Untouched blocks are marked and skipped. [Fei 2021](https://arxiv.org/abs/2111.00699)
 - Wang 2020: grid blocks of 4×4×4, spatially hashed. Particle blocks are allocated by count with "a lightweight exclusive
   scan" to map block id to bin id. [Wang 2020](https://yzhu.io/publication/mpmgpu2020siggraph/paper.pdf)
-- Newton `SolverImplicitMPM` (Warp, current main) — [source](https://raw.githubusercontent.com/newton-physics/newton/main/newton/_src/solvers/implicit_mpm/solver_implicit_mpm.py)
+- Newton `SolverImplicitMPM` ([Warp](https://github.com/NVIDIA/warp), current main) — [source](https://raw.githubusercontent.com/newton-physics/newton/main/newton/_src/solvers/implicit_mpm/solver_implicit_mpm.py)
   - `grid_type` is one of `"sparse"` (default, NanoVDB, rebuilt in place within a capacity), `"dense"` or `"fixed"`;
     default `voxel_size` 0.1.
   - Multi-world: "Multi-world models retain the shared FEM topology by default", i.e. one combined grid.
@@ -214,7 +215,8 @@ saturates the GPU alone (0.48 vs 0.46 ms/M at 16.8M for V6); 10K–50K-particle 
   particle was about flat from 2.1M to 16.8M particles. At 0.26M it was the same or slightly worse (V6: 0.51 vs 0.48
   ms/M), so one dispatch of about 0.25M particles fills most of the 40-core GPU.
 - Local context, measured in this repo on this machine: launch-count reduction paid off on Metal. Fusing 5 of 9 launches
-  per solver iteration gave +3.9% env-steps/s for the 4096-env MuJoCo Warp fork. A SIMD-group sum of per-lane partials
+  per solver iteration gave +3.9% env-steps/s at 4096 envs on
+  [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim). A SIMD-group sum of per-lane partials
   replaced atomic adds there. — `docs/research/throughput_2026-09-26.md` §2c
 
 ### Inferences
@@ -260,8 +262,8 @@ at about 1.04× slowdown (CUDA), but it is a memory optimization, not a speed on
 - QuanTaichi: 1.7× per-particle compression for MPM, "often run as fast as" full precision. [QuanTaichi](https://yuanming.taichi.graphics/publication/2021-quantaichi/)
 - Automatic Quantization (2022): 2.15–2.21× MLS-MPM memory compression meeting a precision target; 1.04× slower on CUDA;
   dithering costs up to 8× on CPU. [arXiv 2207.04658](https://arxiv.org/pdf/2207.04658)
-- PyTorch's Metal atomic header (secondary copy): "as of Metal 3.2" half-precision atomics are unsupported and emulated with
-  CAS on 32-bit atomics. [c10/metal/atomic.h copy](https://generationalwealth.duckdns.org/venv/lib/python3.13/site-packages/torch/include/c10/metal/atomic.h)
+- PyTorch's Metal atomic header: "as of Metal 3.2" half-precision atomics are unsupported and emulated with CAS on 32-bit
+  atomics. [c10/metal/atomic.h](https://github.com/pytorch/pytorch/blob/main/c10/metal/atomic.h)
 - Philip Turner (M1/M2): Apple GPUs "only support 32-bit atomics on pointer values"; M2 (Apple8) added non-returning UInt64
   min/max. [metal-benchmarks](https://github.com/philipturner/metal-benchmarks) This is consistent with the M4 Max compile
   tests here (64-bit max OK; 64-bit add and CAS not available).
@@ -333,9 +335,9 @@ On the M4 Max:
     0.44M keys in 0.2 ms (≈2.2 Gkeys/s, launch-bound).
   - A single-pass Onesweep with a local reorder before the scatter is listed there as the next optimization (not yet done).
 - forge-sort (Rust, Metal, self-reported, M4 Pro): 3,432 Mkeys/s at 1M and 4,131 Mkeys/s at 16M u32 keys with zero-copy
-  input; 836 and 2,784 Mkeys/s via plain `sort_u32`. MSD+LSD hybrid in 4 dispatches. Notes that MPS has no sort primitive.
-  [forge-sort](https://docs.rs/forge-sort)
-- Onesweep (NVIDIA A100): 29.4 Gkeys/s for 256M 32-bit keys, about 1.5× CUB. [Onesweep](https://arxiv.org/abs/2206.01784v1)
+  input; 836 and 2,784 Mkeys/s via plain `sort_u32`. MSD+LSD hybrid in 4 dispatches. Notes that Metal Performance Shaders
+  (MPS) has no sort primitive. [forge-sort](https://docs.rs/forge-sort)
+- Onesweep (NVIDIA A100): 29.4 Gkeys/s for 256M 32-bit keys, about 1.5× [CUB](https://github.com/NVIDIA/cccl). [Onesweep](https://arxiv.org/abs/2206.01784v1)
 
 ### Inferences
 - MPM sort cost on the M4 Max (estimate from the in-repo sort rate):
@@ -354,8 +356,8 @@ On the M4 Max:
 ### Gaps
 - No public microbenchmark of Apple GPU atomic throughput against NVIDIA was found. Only the P2G-pattern measurements here
   exist.
-- No published MPS sort exists (forge-sort says MPS has no sort primitive). No Metal port of FidelityFX Parallel Sort with
-  published numbers was found.
+- No published MPS sort exists (forge-sort says MPS has no sort primitive). No Metal port of
+  [FidelityFX Parallel Sort](https://github.com/GPUOpen-Effects/FidelityFX-ParallelSort) with published numbers was found.
 - No Metal Onesweep numbers.
 
 ---
@@ -364,8 +366,8 @@ On the M4 Max:
 
 ### Takeaway
 I found **no published particle-step throughput for any MPM on Apple Silicon GPUs**: not Taichi Metal, Genesis on Mac,
-MLX, Apple sample code or WebGPU demos on Macs. The P2G numbers measured here (0.33–0.5 ms per million particles on the M4
-Max) appear to be the only Metal MPM kernel timings available.
+[MLX](https://github.com/ml-explore/mlx), Apple sample code or WebGPU demos on Macs. The P2G numbers measured here
+(0.33–0.5 ms per million particles on the M4 Max) appear to be the only Metal MPM kernel timings available.
 
 ### Cited findings
 - Taichi has a Metal backend (since v0.5.0; initially dense SNodes and 32-bit types only). Its official benchmark repo
@@ -400,13 +402,14 @@ coarse Δx, where only a few substeps per control step are needed and each step 
 
 ### Cited findings
 - Newton `SolverImplicitMPM` — [source](https://raw.githubusercontent.com/newton-physics/newton/main/newton/_src/solvers/implicit_mpm/solver_implicit_mpm.py)
-  - References DOI 10.1145/2897824.2925877 (Daviet & Bertails-Descoubes, SIGGRAPH 2016).
+  - References DOI [10.1145/2897824.2925877](https://doi.org/10.1145/2897824.2925877) (Daviet & Bertails-Descoubes,
+    SIGGRAPH 2016).
   - Config: `max_iterations` 250, `tolerance` 1e-4, `transfer_scheme` "apic", `velocity_basis` "Q1" (or "B2"/"B3"),
     `strain_basis` "P0", `collider_basis` "S2", `grid_type` "sparse".
   - Built on `warp.fem` / `warp.sparse`. Colliders are rasterized to the grid.
 - Isaac Lab wrapper: the `"auto"` solver picks Gauss-Seidel for Q1 and batched GS for B2/B3. Jacobi, CG/CR and GMRES are
   available, and a tuple runs a warm-start sequence (e.g. `("cr","gs")`). Colliders are resolved at grid level, with an
-  optional `project_outside` Coulomb push-out. [Isaac Lab mpm_manager_cfg](https://isaac-sim.github.io/IsaacLab/release/3.0.0/_modules/isaaclab_newton/physics/mpm_manager_cfg.html)
+  optional `project_outside` Coulomb push-out. [Isaac Lab mpm_manager_cfg](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/source/isaaclab_newton/isaaclab_newton/physics/mpm_manager_cfg.py)
 - Newton v1.4.0: inactive MPM particles no longer take part in grid transfers. [changelog](https://data.safetycli.com/packages/pypi/newton/changelog)
 - Gao 2018 (implicit Krylov, matrix-free) — [Gao 2018](https://people.csail.mit.edu/kuiwu/GPU_MPM/GPU_MPM.pdf)
   - "each iteration consists of a call to the P2G kernel and a call to the G2P kernel".
@@ -438,6 +441,6 @@ coarse Δx, where only a few substeps per control step are needed and each step 
 
 ### Gaps
 - No published Newton ImplicitMPM timings (per step, per particle, per iteration count) were found.
-- The Daviet & Bertails-Descoubes 2016 paper text and the HAL preprint (hal-05070887) could not be retrieved (bot
-  protection), so their GS iteration counts and timings are missing.
+- The Daviet & Bertails-Descoubes 2016 paper text and the HAL preprint ([hal-05070887](https://hal.science/hal-05070887))
+  could not be retrieved (bot protection), so their GS iteration counts and timings are missing.
 - Typical iteration counts actually reached for robot-manipulation scenes in Newton are unknown.

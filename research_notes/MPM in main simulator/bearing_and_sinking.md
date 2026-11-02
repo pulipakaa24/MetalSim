@@ -9,18 +9,21 @@ coupling algebra.
 ## Expected physics
 
 * **What `mpm:friction` is.** The solver's yield surface is a Drucker-Prager cone sqrt(J2) <= mu p (stress stored as a
-  6-vector with r_N = tr(sigma)/sqrt(6), |r_T| = sqrt(J2); `YieldParamVec.from_values` stores mu p_max against
-  sqrt(3/2) p_max: `implicit_mpm/rheology_solver_kernels.py:68-74, 100`; Warp `fem/space/dof_mapper.py:220-226`).
-  Matched to Mohr-Coulomb, mu = 0.7 is phi = 30.3 deg (triaxial-compression / outer cone), 35 deg (naive tan), 44 deg
-  (plane strain, non-dilatant). A 3D footing sits between: take phi ~ 30 deg as the conservative value.
-* **Static bearing capacity** (B = 0.1 m square on the surface, gamma = 14.7 kN/m^3): Vesic 10.3 kPa (phi 30.3),
-  21 kPa (35), Meyerhof / Hansen similar; the box loads 1.96 kPa, a safety factor of 5-10. A thin layer on a rough rigid
-  base (H/B = 0.8) raises it further (Mandel & Salencon 1972, Meyerhof & Chaplin 1953). Static failure needs
-  phi < ~19 deg, i.e. mu < ~0.3-0.4. With a rigid-plastic material below capacity the static settlement is ~0 (in a
-  grid method: within about half a voxel plus a particle spacing, ~1-2 mm here).
+  6-vector with r_N = tr(sigma)/sqrt(6), |r_T| = sqrt(J2); `YieldParamVec.from_values` stores mu p_max against sqrt(3/2)
+  p_max: `implicit_mpm/rheology_solver_kernels.py:68-74, 100`; [Warp](https://github.com/NVIDIA/warp)
+  `fem/space/dof_mapper.py:220-226`). Matched to Mohr-Coulomb, mu = 0.7 is phi = 30.3 deg (triaxial-compression / outer
+  cone), 35 deg (naive tan), 44 deg (plane strain, non-dilatant). A 3D footing sits between: take phi ~ 30 deg as the
+  conservative value.
+* **Static bearing capacity** (B = 0.1 m square on the surface, gamma = 14.7 kN/m^3): Vesic 10.3 kPa (phi 30.3), 21 kPa
+  (35), Meyerhof / Hansen similar; the box loads 1.96 kPa, a safety factor of 5-10. A thin layer on a rough rigid base
+  (H/B = 0.8) raises it further ([Mandel & Salencon 1972](https://doi.org/10.1680/geot.1972.22.1.79),
+  [Meyerhof & Chaplin 1953](https://doi.org/10.1088/0508-3443/4/1/305)). Static failure needs phi < ~19 deg, i.e. mu <
+  ~0.3-0.4. With a rigid-plastic material below capacity the static settlement is ~0 (in a grid method: within about
+  half a voxel plus a particle spacing, ~1-2 mm here).
 * **Dynamic penetration** of the 1.7 m/s impact (2.94 J): energy balance against a flat-punch resistance growing with
-  depth gives 2.2 cm (phi 30), 1.2 cm (35); Uehara et al. 2003's sphere law (an upper bound for a flat face) gives
-  2.8-3.1 cm; Katsuragi & Durian 2007's force law behaves alike. Expected: **bottom-out 1-2.5 cm, then no creep**.
+  depth gives 2.2 cm (phi 30), 1.2 cm (35); [Uehara et al. 2003](https://doi.org/10.1103/PhysRevLett.90.194301)'s sphere
+  law (an upper bound for a flat face) gives 2.8-3.1 cm; [Katsuragi & Durian 2007](https://doi.org/10.1038/nphys583)'s
+  force law behaves alike. Expected: **bottom-out 1-2.5 cm, then no creep**.
 
 So 7 cm is not a sand-strength result unless the effective friction were below ~0.3.
 
@@ -57,14 +60,20 @@ standing on sand must be `"lagged"` (staggered stays available for Isaac's Frank
   convergence in 50 iterations relies on the impulse warm start.
 * `critical_fraction` 0: the sand resists any compression; nothing pushes over-dense regions apart, so particle
   clustering can accumulate under a sustained load.
-* Upstream issue newton#4277 (fixed by #4291, Sep 2026, after 1.5.2): `_symmetric_part_transposed_op` multiplies by
-  `b * 0.5` (`rheology_solver_kernels.py:135`). For a cohesionless rigid cone the cone is scale-invariant, so it should
-  not weaken this case; it halves elastic response and the yield caps. Isaac Lab 3.0-EA ships it; MetalSim keeps
-  Isaac's behaviour (noted in GAPS).
-* Related upstream reports: newton#2697 (particles penetrate *moving* kinematic walls), #3954, #3473; no issue about
-  bearing / sinking. Isaac Lab's MPM docs call the coupling experimental and suggest smaller dt / substeps.
+* Upstream issue [newton#4277](https://github.com/newton-physics/newton/issues/4277) (fixed by
+  [#4291](https://github.com/newton-physics/newton/pull/4291), Sep 2026, after 1.5.2): `_symmetric_part_transposed_op`
+  multiplies by `b * 0.5` (`rheology_solver_kernels.py:135`). For a cohesionless rigid cone the cone is scale-invariant,
+  so it should not weaken this case; it halves elastic response and the yield caps.
+  [Isaac Lab 3.0-EA](https://github.com/isaac-sim/IsaacLab/tree/v3.0.0-EA) ships it; MetalSim keeps Isaac's behaviour
+  (noted in `docs/GAPS.md`).
+* Related upstream reports: [newton#2697](https://github.com/newton-physics/newton/issues/2697) (particles penetrate
+  *moving* kinematic walls), [#3954](https://github.com/newton-physics/newton/issues/3954),
+  [#3473](https://github.com/newton-physics/newton/issues/3473); no issue about bearing / sinking.
+  [Isaac Lab's MPM docs](https://isaac-sim.github.io/IsaacLab/develop/source/concepts/using_mpm.html) call the coupling
+  experimental and suggest smaller dt / substeps.
 * `harvest="last_substep"` with `mpm_substeps > 1` divides the last substep's impulse by the coupled dt: Isaac's
-  convention (MPM.md 8i), under-reporting support by the substep count; MetalSim offers `harvest="mean"`.
+  convention (`metalsim/physics/mpm/MPM.md` 8i), under-reporting support by the substep count; MetalSim offers
+  `harvest="mean"`.
 
 ## Probe design for batch_03 (expected outcome if the physics is right)
 

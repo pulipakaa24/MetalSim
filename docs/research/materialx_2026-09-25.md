@@ -1,14 +1,14 @@
 # MaterialX materials: what Isaac Sim reads, what our renderer can carry (2026-09-25)
 
-Scope: USD scenes whose materials are authored in MaterialX, either as `.mtlx` documents referenced
-from USD (UsdMtlx) or as MaterialX node networks written directly as UsdShade prims
+Scope: USD scenes whose materials are authored in [MaterialX](https://materialx.org/), either as `.mtlx` documents
+referenced from USD (UsdMtlx) or as MaterialX node networks written directly as UsdShade prims
 (`outputs:mtlx:surface`, shader `info:id = ND_*`). Goal: flatten them into the per-geom material
 table of `metalsim/render/scene_tables.py` (rgba, metallic, roughness, specular, emission, one RGB
 texture with repeat, reflectance).
 
 ## (a) Isaac Sim 5.x and MaterialX
 
-* Isaac Sim 5.0 runs on Kit 107.3.x (5.0.0 release notes: "updated to Kit 107.3.1"); 6.0 moved to
+* Isaac Sim 5.0 runs on Kit 107.3.x (5.0.0 release notes [9]: "updated to Kit 107.3.1"); 6.0 moved to
   Kit 110.1. In Omniverse, "Materials ... are supported using MDL, and MaterialX using an MDL
   backend" [1]: RTX never shades MaterialX natively; the document (from a `.mtlx` reference or from
   UsdShade prims) is translated to MDL with the MaterialX SDK's MDL code generator
@@ -36,12 +36,12 @@ texture with repeat, reflectance).
 
 ## (b) Packages here
 
-* PyPI `MaterialX` latest = **1.39.5** (queried 2026-09-25; requires Python ≥ 3.9); installed in
+* PyPI `MaterialX` [10] latest = **1.39.5** (queried 2026-09-25; requires Python ≥ 3.9); installed in
   `.venv` = 1.39.5, with the data libraries (`stdlib`, `pbrlib`, `bxdf` incl. `open_pbr_surface.mtlx`,
   `usd_preview_surface.mtlx`, `gltf_pbr.mtlx` and the translation graphs
   `standard_surface_to_usd`, `open_pbr_to_standard_surface`, `standard_surface_to_open_pbr`),
   807 node definitions, and the MDL/GLSL/MSL/OSL/Slang generators.
-* `usd-core` 26.8 (PyPI wheel): **`from pxr import UsdMtlx` fails** (ImportError) and no `.mtlx`
+* [`usd-core`](https://pypi.org/project/usd-core/) 26.8 (PyPI wheel): **`from pxr import UsdMtlx` fails** (ImportError) and no `.mtlx`
   Sdf file format is registered (`Sdf.FileFormat.FindAllFileFormatExtensions()` = usd, usda, usdc,
   usdz). The PyPI wheel is built without MaterialX support. Consequence: a `references = @x.mtlx@`
   arc fails to compose ("Cannot determine file format for @x.mtlx:SDF_FORMAT_ARGS:target=usd@")

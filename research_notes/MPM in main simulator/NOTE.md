@@ -1,13 +1,20 @@
 # MPM in MetalSim's main simulator: research and design (2026-10-13)
 
 Question: how to put MPM material (sand, snow, viscous, ...) into a scene whose robot is simulated by MetalSim's own
-stack (`BatchSim`: MuJoCo Warp fork on Metal, `.venv` with MuJoCo 3.14 and the Newton 1.7 line), two-way coupled, at N
-worlds, without losing the Isaac-parity results of the Newton 1.5.2 path (`.venv-newton152`, `metalsim/physics/mpm/MPM.md`).
+stack (`BatchSim`: [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) on Metal, `.venv`
+with [MuJoCo](https://github.com/google-deepmind/mujoco) 3.14 and the [Newton](https://github.com/newton-physics/newton)
+1.7 line), two-way coupled, at N worlds, without losing the Isaac-parity results of the Newton 1.5.2 path
+(`.venv-newton152`, `metalsim/physics/mpm/MPM.md`).
 
-Two research rounds feed this note: (1) Isaac Lab 3.0-EA / Newton 1.5.2 from source (local checkouts:
-`upstream/IsaacLab3`, `upstream/newton-metalsim-1.5.2`, `.venv`'s Newton 1.7), (2) other systems (web + source:
-Genesis `efc81f3b`, Newton main `dcd9106a`, ManiSkill2, Drake, MuJoCo docs). Citations are file:line in those trees
-(`F` = `upstream/newton-metalsim-1.5.2/newton/_src`, `IL` = `upstream/IsaacLab3/source`).
+Two research rounds feed this note: (1) [Isaac Lab 3.0-EA](https://github.com/isaac-sim/IsaacLab/tree/v3.0.0-EA) /
+Newton 1.5.2 from source (local checkouts: `upstream/IsaacLab3`, `upstream/newton-metalsim-1.5.2`, `.venv`'s Newton
+1.7), (2) other systems (web + source:
+[Genesis](https://github.com/Genesis-Embodied-AI/genesis-world)
+[`efc81f3b`](https://github.com/Genesis-Embodied-AI/genesis-world/commit/efc81f3b57b67ade583e4453c06dc9ea81747434),
+Newton main [`dcd9106a`](https://github.com/newton-physics/newton/commit/dcd9106af1aaca96ba143a2ebbc0ffe16934fe62),
+[ManiSkill2](https://arxiv.org/abs/2302.04659), [Drake](https://drake.mit.edu), [MuJoCo docs](https://mujoco.readthedocs.io)).
+Citations are file:line in those trees (`F` = `upstream/newton-metalsim-1.5.2/newton/_src`,
+`IL` = `upstream/IsaacLab3/source`).
 
 ## 1. How Isaac Lab 3.0-EA couples MPM to MuJoCo Warp (verified from source)
 
@@ -32,7 +39,7 @@ fingers are not MPM colliders), `mass_scale=1000`, `mode="staggered"`, 1 iterati
   `v -= dt M_proxy^-1 F` (`implicit_mpm/solver_implicit_mpm.py:1757-1783`); MPM steps in place (both substeps see the
   same synced collider pose; `collider_velocity_mode="forward"`: `v + w x r` at the contact point); harvest
   `coupling_harvest_proxy_wrenches` (`:1785-1830`): `F = impulse / dt_outer`, torque about the world COM, fixed-order
-  lane sums on Metal (fork commit `6d746225`).
+  lane sums on Metal (in [my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim-1.5.2)).
 * **Inside the MPM solve** the proxy is a *compliant collider*: finite mass + inertia enter a Delassus operator
   `J M^-1 J^T` in the rheology iterations (`rasterized_collisions.py:516-567, 792-879`), so the sand sees the body's
   inertia implicitly within the step; feedback to MuJoCo is lagged by one coupled step.
@@ -52,31 +59,32 @@ fingers are not MPM colliders), `mass_scale=1000`, `mode="staggered"`, 1 iterati
 
 | system | MPM | coupling to rigid | determinism / batching |
 |---|---|---|---|
-| Genesis (`couplers/legacy_coupler.py:128-465`) | explicit MLS-MPM | rigid steps first; grid nodes inside a geom SDF get a PlasticineLab-style velocity projection (softness, friction, restitution), `-dm v / dt` accumulated as a wrench applied in the **next** rigid substep: lagged explicit exchange, rigid = infinite mass inside MPM | dense grid per env; P2G and wrench accumulation by float atomics (not bitwise) |
-| ManiSkill2 (arXiv 2302.04659) | Warp MLS-MPM | rigid SDFs; particle-level penalty forces per MPM substep, summed to the body and applied after the soft steps | per-env |
-| Newton `SolverCoupledProxy` | implicit MPM | proxy with effective mass (above); design note (G. Daviet, 2026-04-23, linked from newton PR #2848): lagged iteration contracts iff `r = (1-s)/(1+qs)` has |r| < 1 with `s = M_proxy / M_eff`, `q = M_eff / M_other`; s in [0.5, 1] recommended | `separate_worlds`: one NanoVDB, per-world FEM environments |
+| Genesis (`couplers/legacy_coupler.py:128-465`) | explicit MLS-MPM | rigid steps first; grid nodes inside a geom SDF get a [PlasticineLab](https://github.com/hzaskywalker/PlasticineLab)-style velocity projection (softness, friction, restitution), `-dm v / dt` accumulated as a wrench applied in the **next** rigid substep: lagged explicit exchange, rigid = infinite mass inside MPM | dense grid per env; P2G and wrench accumulation by float atomics (not bitwise) |
+| ManiSkill2 ([arXiv 2302.04659](https://arxiv.org/abs/2302.04659)) | Warp MLS-MPM | rigid SDFs; particle-level penalty forces per MPM substep, summed to the body and applied after the soft steps | per-env |
+| Newton `SolverCoupledProxy` | implicit MPM | proxy with effective mass (above); design note (G. Daviet, 2026-04-23, linked from [newton PR #2848](https://github.com/newton-physics/newton/pull/2848)): lagged iteration contracts iff `r = (1-s)/(1+qs)` has |r| < 1 with `s = M_proxy / M_eff`, `q = M_eff / M_other`; s in [0.5, 1] recommended | `separate_worlds`: one NanoVDB, per-world FEM environments |
 | Newton examples | implicit MPM | `twoway_coupling`: body mass as collider mass, wrench lagged into `body_f`, velocity rewind before the MPM step; `anymal`: kinematic robot, one-way | |
-| Drake (arXiv 2403.13783, 2503.05046) | convex MPM | monolithic convex contact with articulated rigid bodies; async GPU variant | |
-| MuJoCo / MuJoCo Warp | none (flex is a Lagrangian mesh, no plasticity; mujoco_warp#232 deferred MPM to Newton) | `xfrc_applied` is the documented injection point | |
-| PhysX | PBD particles; MPM / FLIP removed in 5.4 | | |
+| Drake ([arXiv 2403.13783](https://arxiv.org/abs/2403.13783), [2503.05046](https://arxiv.org/abs/2503.05046)) | convex MPM | monolithic convex contact with articulated rigid bodies; async GPU variant | |
+| MuJoCo / MuJoCo Warp | none (flex is a Lagrangian mesh, no plasticity; [mujoco_warp#232](https://github.com/google-deepmind/mujoco_warp/issues/232) deferred MPM to Newton) | `xfrc_applied` is the documented injection point | |
+| [PhysX](https://github.com/NVIDIA-Omniverse/PhysX) | PBD particles; MPM / FLIP removed in 5.4 | | |
 
-Stability (Newton design note; added-mass literature arXiv 1208.3511): a kinematic collider with lagged explicit
+Stability (Newton design note; added-mass literature [arXiv 1208.3511](https://arxiv.org/abs/1208.3511)): a kinematic collider with lagged explicit
 feedback is s -> infinity, r -> -M_mpm / M_link: it oscillates and diverges once the sand engaged per step outweighs a
 light link (feet, fingers). The proxy with effective mass (s ~ 1) is the stable explicit scheme; monolithic solves
 (Drake) are the unconditional ones but would mean rewriting MuJoCo Warp's constraint solver.
 
-Determinism: MetalSim's fork already makes the implicit MPM bitwise repeatable on Metal at 2,048 worlds (MPM.md 7b, 8b,
-8g) and the proxy harvest fixed-order; Warp's deterministic mode is CUDA/CUB-based upstream but implemented on Metal in
-the fork.
+Determinism: [my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim-1.5.2) already makes the implicit
+MPM bitwise repeatable on Metal at 2,048 worlds (MPM.md 7b, 8b, 8g) and the proxy harvest fixed-order; Warp's
+deterministic mode is CUDA/CUB-based upstream but implemented on Metal in
+[my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim).
 
 ## 3. Options for MetalSim
 
 | | what | parity with Isaac / the Metal results | one environment | maintenance |
 |---|---|---|---|---|
 | (a1) | install Newton 1.5.2 next to 1.7 in `.venv` | - | impossible: same package name, and MuJoCo 3.11 vs 3.14 for the two MuJoCo Warp builds | - |
-| (a2) | port the fork's MPM commits (and parity work) onto Newton 1.7's `implicit_mpm` | 1.7's MPM differs from 1.5.2's (reset from authored Jp, cylinder `barrel_radius`, new surface code, rewritten parts of `solve_rheology`): the L4 floors would have to be re-established against a solver Isaac Lab 3.0-EA does not ship | yes | high: every fork change twice; changes `.venv`'s Newton pin, which the Newton-engine G1 task also uses |
-| **(b)** | **vendor the fork's `implicit_mpm` package (pinned `3fd1f052`, the commit `setup_newton152.sh` installs) into `metalsim/physics/mpm/implicit_mpm/`, generated by a script that only rewrites its six package-external imports; run it against `.venv`'s Newton 1.7 types; MetalSim coupler with `BatchSim` as the rigid entry** | kernels byte-identical to the fork: checkable bitwise against `.venv-newton152` on the same inputs | yes | low: regenerate on re-pin; a test checks the copy equals the pin |
-| (c) | own explicit MPM (Genesis / ManiSkill lineage) | statistical at best (DECISIONS 2026-10-09 already rejected it) | yes | high |
+| (a2) | port the MPM commits (and parity work) of [my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim-1.5.2) onto Newton 1.7's `implicit_mpm` | 1.7's MPM differs from 1.5.2's (reset from authored Jp, cylinder `barrel_radius`, new surface code, rewritten parts of `solve_rheology`): the NVIDIA L4 GPU floors would have to be re-established against a solver Isaac Lab 3.0-EA does not ship | yes | high: every fork change twice; changes `.venv`'s Newton pin, which the Newton-engine G1 task also uses |
+| **(b)** | **vendor the `implicit_mpm` package of my fork of Newton (pinned [`3fd1f052`](https://github.com/pulipakaa24/newton/commit/3fd1f052a5ad031578960d9642aaaedc03834e4d), the commit `setup_newton152.sh` installs) into `metalsim/physics/mpm/implicit_mpm/`, generated by a script that only rewrites its six package-external imports; run it against `.venv`'s Newton 1.7 types; MetalSim coupler with `BatchSim` as the rigid entry** | kernels byte-identical to the fork: checkable bitwise against `.venv-newton152` on the same inputs | yes | low: regenerate on re-pin; a test checks the copy equals the pin |
+| (c) | own explicit MPM (Genesis / ManiSkill lineage) | statistical at best (`docs/DECISIONS.md`, 2026-10-09, already rejected it) | yes | high |
 | (d) | drive `.venv-newton152`'s solver from another process sharing GPU buffers | bitwise | no | fragile IPC, two Python processes per scene |
 
 Compatibility facts behind (b) (checked by import and by comparison, CPU): every `newton` symbol the 1.5.2 package uses
@@ -85,11 +93,13 @@ exists in 1.7 with the same values (`BodyFlags.PROXY` 4, `ParticleFlags`, `Shape
 `SolverBase`, `CouplingInterface` with all 11 hook signatures identical); the collider mesh helpers
 (`Mesh.create_sphere/capsule/cylinder/cone/box/plane`) give bitwise-identical vertices and indices in 1.5.2 and 1.7 for
 the arguments the MPM passes; the coupled-solver files (`interface.py`, `solver_coupled_proxy.py`, `proxy_utils.py`)
-are identical across stock 1.5.2, the fork and 1.7. Remaining dependencies are on the shared Warp fork.
+are identical across stock 1.5.2, my fork of Newton and 1.7. Remaining dependencies are on
+[my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim), which both environments share.
 
 ## 4. Recommendation and design (b)
 
-1. **Solver**: the vendored fork copy (`scripts/vendor_mpm152.py`; `metalsim.physics.mpm.solver.solver_class()` picks
+1. **Solver**: the vendored copy from [my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim-1.5.2)
+   (`scripts/vendor_mpm152.py`; `metalsim.physics.mpm.solver.solver_class()` picks
    Newton's own on the 1.5.2 line and the copy elsewhere). `newton_compat.install` patches both copies (CUDA stopping
    rule, float32 accumulation, chunk graph / GPU exit); in the main simulator it is called with
    `rigid_deterministic=None, device_args=None` so it changes nothing MuJoCo Warp compiles.

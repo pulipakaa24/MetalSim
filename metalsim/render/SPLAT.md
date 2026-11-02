@@ -3,8 +3,8 @@
 Written 2026-10-08, ported to main 2026-10-13. Machine for every timing: M4 Max (40-core GPU), 64 GB.
 
 **Status:** working. Verified against an independent float64 reference on synthetic scenes (tests, always run) and on a
-public InteriorGS scene (§4). Renders N cameras per call into tier0-layout buffers and composites `Tier0Renderer`
-meshes (robot, objects) with correct occlusion.
+public [InteriorGS][interiorgs] scene (§4). Renders N cameras per call into tier0-layout buffers and composites
+`Tier0Renderer` meshes (robot, objects) with correct occlusion.
 
 **Headline numbers** (640×360):
 - InteriorGS showroom (0.97M splats): 0.5–0.8 ms per camera, about 1,300–2,000 cameras/s batched (§5).
@@ -13,15 +13,16 @@ meshes (robot, objects) with correct occlusion.
 
 A compute-shader, tile-based 3DGS rasterizer on native Metal. It renders N cameras per call and writes RGB / depth straight
 into learner-owned Warp/MPS buffers in tier0's layout: `rgb` (N, H, W, 3) uint8 and `depth` (N, H, W) float32, planar metres,
-0 = nothing. Optional outputs are `depth_expected` and `alpha`. Cameras follow tier0's conventions: MuJoCo camera frames
-from `cam_xpos` / `cam_xmat` plus the same 28-float `CameraSpec` per env (intrinsics, pose deltas, `cam_id`). It has a
+0 = nothing. Optional outputs are `depth_expected` and `alpha`. Cameras follow tier0's conventions: [MuJoCo][mujoco]
+camera frames from `cam_xpos` / `cam_xmat` plus the same 28-float `CameraSpec` per env (intrinsics, pose deltas,
+`cam_id`). It has a
 GPU path (`render(sim)`, event-ordered against BatchSim and torch, no host sync) and a host path (`render_host`).
 Robot and objects drawn by a `Tier0Renderer` are composited with correct occlusion (`mesh=`).
 
 | file | content |
 |---|---|
 | `render/splat/__init__.py` | the public API (§7): `load_scene`, `make_transform`, `floor_plane_transform`, `SplatRenderer` (lazy) |
-| `render/splat/formats.py` | loaders → `GaussianCloud`: SPZ v1–3 (gzip), 3DGS `.ply`, SuperSplat compressed `.ply` (InteriorGS), antimatter15 `.splat`, NVIDIA NuRec `.nurec` (§7d); `save_ply` |
+| `render/splat/formats.py` | loaders → `GaussianCloud`: [SPZ][spz] v1–3 (gzip), 3DGS `.ply`, [SuperSplat][supersplat] compressed `.ply` (InteriorGS), [antimatter15][antimatter15] `.splat`, [NVIDIA NuRec][nurec] `.nurec` (§7d); `save_ply` |
 | `render/splat/scene.py` | `prepare` / `load_scene`: affine file→sim transform, crop, alpha cull, Morton order, GPU packing, disk cache; `make_transform`, `floor_plane_transform` |
 | `render/splat/renderer.py` | `SplatRenderer` (batched, GPU/host paths, mesh composite, profiling, capacity management) |
 | `render/shaders/splat.metal` | kernels: cull, project (EWA + SH), emit keys, scans, 5-pass radix sort, blend |
@@ -38,34 +39,36 @@ Robot and objects drawn by a `Tier0Renderer` are composited with correct occlusi
 
 Research pass on 2026-10-08. Summary:
 
-- **Original 3DGS rasterizer** (Kerbl et al. 2023, graphdeco-inria/diff-gaussian-rasterization):
+- **Original 3DGS rasterizer** ([Kerbl et al. 2023][kerbl2023], [graphdeco-inria/diff-gaussian-rasterization][diff-gauss-rast]):
   - 16×16 tiles; 64-bit keys `(tile << 32) | float depth` sorted by a CUB radix sort.
   - 3σ circle radius, 0.3 px² dilation, α ≤ 0.99, skip α < 1/255, stop at T < 1e-4, near cull z ≤ 0.2.
   - Code: `forward.cu:82-111, 229-232, 336-347`, `rasterizer_impl.cu:101-104, 300-308`.
-- **gsplat** (Ye et al. 2024, arXiv 2409.06765):
-  - The same math, plus an opacity-aware box `extend = min(3.33, sqrt(2 ln(255 o)))` (from StopThePop).
-  - `rasterize_mode="antialiased"` multiplies opacity by `sqrt(det Σ / det(Σ + 0.3 I))` (Mip-Splatting 2D filter).
+- **[gsplat][gsplat]** (Ye et al. 2024, [arXiv 2409.06765][gsplat-paper]):
+  - The same math, plus an opacity-aware box `extend = min(3.33, sqrt(2 ln(255 o)))` (from [StopThePop][stopthepop]).
+  - `rasterize_mode="antialiased"` multiplies opacity by `sqrt(det Σ / det(Σ + 0.3 I))` ([Mip-Splatting][mip-splatting] 2D filter).
   - Batched cameras share one sort through image-id key bits (`IntersectTile.cu`).
 - **Faster binning:**
-  - Speedy-Splat (2412.00578): SnugBox (exact α = 1/255 box) + AccuTile, about 2× together.
-  - FlashGS (2408.07967): exact ellipse/tile test.
-  - Balanced-3DGS / AdR-Gaussian: load balance and early culling.
-  - GSCore (ASPLOS'24): subtile skipping, 15.9× vs a mobile GPU.
+  - [Speedy-Splat][speedy-splat] (2412.00578): SnugBox (exact α = 1/255 box) + AccuTile, about 2× together.
+  - [FlashGS][flashgs] (2408.07967): exact ellipse/tile test.
+  - [Balanced-3DGS][balanced-3dgs] / [AdR-Gaussian][adr-gaussian]: load balance and early culling.
+  - [GSCore][gscore] (ASPLOS'24): subtile skipping, 15.9× vs a mobile GPU.
 - **Apple / web:**
-  - MetalSplatter: hardware quads, CPU sort.
-  - msplat: Metal compute tiles, per-tile bitonic sort ≤ 2048 entries, about 350 fps on M4 Max (resolution not stated).
-  - Spark: WebGL2 quads, CPU counting sort over 16-bit depth buckets, LOD in 2.0.
-  - antimatter15: CPU 16-bit counting sort.
-  - Brush: wgpu compute tiles, GPU radix sort.
-  - PlayCanvas WebGPU: compute cull + GPU radix sort + quads. On **M4 Max at 1298×962: 8M splats at 125 fps, 20M at 98 fps**,
+  - [MetalSplatter][metalsplatter]: hardware quads, CPU sort.
+  - [msplat][msplat]: Metal compute tiles, per-tile bitonic sort ≤ 2048 entries, about 350 fps on M4 Max (resolution not stated).
+  - [Spark][spark]: WebGL2 quads, CPU counting sort over 16-bit depth buckets, LOD in 2.0.
+  - [antimatter15][antimatter15]: CPU 16-bit counting sort.
+  - [Brush][brush]: wgpu compute tiles, GPU radix sort.
+  - [PlayCanvas][playcanvas] WebGPU: compute cull + GPU radix sort + quads. On **M4 Max at 1298×962: 8M splats at 125 fps, 20M at 98 fps**,
     the only published Apple-silicon number at this scale.
-- **Hardware rasterization:** 2505.18764 (fragment-shader blending, 3× faster training), GauRast, HTGS. These win when
+- **Hardware rasterization:** [2505.18764][hw-raster] (fragment-shader blending, 3× faster training), [GauRast][gaurast],
+  HTGS. These win when
   there are few cameras and full-screen views at VR resolutions.
-- **LOD:** Hierarchical 3DGS (2406.12080), Octree-GS, LODGE, FLoD, Spark-2 LOD trees. All need a precomputed hierarchy,
+- **LOD:** [Hierarchical 3DGS][h3dgs] (2406.12080), [Octree-GS][octree-gs], [LODGE][lodge], [FLoD][flod], Spark-2 LOD
+  trees. All need a precomputed hierarchy,
   which common capture formats (SPZ, 3DGS `.ply`) do not carry.
-- **Robotics batching:** GaussGym (2510.15352), > 100k steps/s at 4,096 envs on a 4090, 640×480 at 10 Hz camera.
-- **Depth and compositing:** gsplat's "ED" expected depth, RaDe-GS median depth. Compositing practice: opaque mesh first,
-  splats depth-tested against it.
+- **Robotics batching:** [GaussGym][gaussgym] (2510.15352), > 100k steps/s at 4,096 envs on a 4090, 640×480 at 10 Hz camera.
+- **Depth and compositing:** gsplat's "ED" expected depth, [RaDe-GS][rade-gs] median depth. Compositing practice: opaque
+  mesh first, splats depth-tested against it.
 - **SPZ:** an open format with an MIT-licensed reference library (`spz`, `load-spz.cc`, `splat-utils.h`); its decode
   formulas are reimplemented in numpy, no code copied. The `0x1` flag means trained antialiased. Positions are stored RUB.
 - **SuperSplat compressed PLY:** PlayCanvas engine (MIT) `gsplat-compressed-data.js` formulas, reimplemented.
@@ -197,7 +200,7 @@ times come from `profile_frame` (each stage in its own command buffer). Taken un
 - PlayCanvas WebGPU on M4 Max: 8M splats at 125 fps for one 1298×962 view (156 Mpix/s), possibly with streaming/LOD.
   Ours: 451 Mpix/s on the 1M-splat InteriorGS scene in batches of 640×360 cameras, with 24-bit sorting and exact 3DGS
   rules.
-- msplat (Metal compute) reports about 350 fps on Mip-NeRF 360 scenes (resolution not stated).
+- msplat (Metal compute) reports about 350 fps on [Mip-NeRF 360][mipnerf360] scenes (resolution not stated).
 - No published batched multi-camera Apple numbers exist that we could compare with.
 
 ## 6. Options considered (archived)
@@ -264,8 +267,9 @@ seen in front of the scene (robot, objects); keep floor / wall collision proxies
 `Tier0Renderer(..., include_planes=False, draw_hfields=False, max_group=k)` with the proxies in a geom group ≥ `k` (not drawn).
 
 **Transforms.** `make_transform(up=, scale=, yaw_deg=, translate=)` covers the usual cases: InteriorGS is z-up metres with
-the floor at z = 0 (identity); SPZ and many NuRec volumes are +y up (`up="y"`); COLMAP-frame 3DGS training output is
-usually -y up (`up="-y"`). `floor_plane_transform(normal, point)` levels a tilted floor exactly (a shear). Any other
+the floor at z = 0 (identity); SPZ and many NuRec volumes are +y up (`up="y"`); [COLMAP][colmap]-frame 3DGS training
+output is usually -y up (`up="-y"`). `floor_plane_transform(normal, point)` levels a tilted floor exactly (a shear).
+Any other
 affine (A, t) works; a non-affine map (e.g. a ground warp) is baked into a prepared `.npz` with `PackedSplats.save` and
 loaded with an identity transform.
 
@@ -283,8 +287,8 @@ command when the data is absent.
 | set | what | licence | access |
 |---|---|---|---|
 | `interiorgs` (default reference) | InteriorGS scene `0204_840158`: showroom, 972,596 splats, SH 3, SuperSplat compressed `.ply` (60 MB), + `structure.json`; pinned dataset revision and SHA-256 | InteriorGS Terms of Use (below) | gated: accept the terms on Hugging Face once, then `HF_TOKEN` or a Hugging Face CLI login |
-| `dxgl` | `modern_arm_chair.ply` from dxgl/multiview-datasets: nerfstudio splatfacto, standard 3DGS `.ply`, SH 3, trained on renders of a Poly Haven model | CC0-1.0 | open |
-| `nurec_lounge` (optional) | NVIDIA PhysicalAI-Robotics-NuRec `zh_lounge/usd/export_last.nurec`: indoor lounge, 3DGUT, 118 MB | CC-BY-4.0 (attribution: NVIDIA) | gated by a contact-information click-through; same token handling |
+| `dxgl` | `modern_arm_chair.ply` from [dxgl/multiview-datasets][dxgl]: [nerfstudio splatfacto][splatfacto], standard 3DGS `.ply`, SH 3, trained on renders of a [Poly Haven][polyhaven] model | CC0-1.0 | open |
+| `nurec_lounge` (optional) | [NVIDIA PhysicalAI-Robotics-NuRec][nurec-dataset] `zh_lounge/usd/export_last.nurec`: indoor lounge, 3DGUT, 118 MB | CC-BY-4.0 (attribution: NVIDIA) | gated by a contact-information click-through; same token handling |
 
 - **Hugging Face access** (InteriorGS, NuRec). Before downloading, the fetch script checks access with a one-byte
   request. On failure it prints the next step instead of a curl error, and exits with 3:
@@ -294,10 +298,11 @@ command when the data is absent.
 
   The token is read from `HF_TOKEN` or the file that `hf auth login` writes, and is never printed.
   (2026-10-14: the first version deleted its auth-header file early, because a zsh EXIT trap set inside a function
-  fires when that function returns, so curl failed with rc 26 on both Macs.)
-- **InteriorGS** (SpatialVerse / Manycore, https://huggingface.co/datasets/spatialverse/InteriorGS; Miao et al., arXiv
-  2510.21307). 1,000 indoor scenes as `3dgs_compressed.ply`, the SuperSplat/PlayCanvas chunk-quantised PLY
-  (`splat-transform`): per 256-splat chunk position, log-scale and colour ranges; per splat 11-10-11 position and
+  fires when that function returns, so curl failed with rc 26 on both Macs: the 14-inch and the 16-inch MacBook Pro (M4 Max).)
+- **InteriorGS** (SpatialVerse / Manycore, https://huggingface.co/datasets/spatialverse/InteriorGS; Miao et al.,
+  [arXiv 2510.21307][interiorgs-paper]). 1,000 indoor scenes as `3dgs_compressed.ply`, the SuperSplat/PlayCanvas
+  chunk-quantised PLY ([`splat-transform`][splat-transform]): per 256-splat chunk position, log-scale and colour ranges;
+  per splat 11-10-11 position and
   log-scale, 2-10-10-10 smallest-three quaternion, 8-8-8-8 colour + opacity, uint8 SH (b·8/255 − 4). Decoded by
   `formats.load_ply_compressed`; loads in 0.1–0.34 s. Frame: z-up metres, floor at z = 0 (README "XYZ = (Right, Back,
   Up)"; `structure.json` right-handed z-up), so the sim transform is the identity. No antialiasing metadata: classic
@@ -311,9 +316,10 @@ command when the data is absent.
   ten object splats of CC0 Poly Haven models. Used for the plain 3DGS `.ply` path on a real trained file.
 - **Other public sources checked** (2026-10-13): NVIDIA PhysicalAI-Robotics-NuRec (Hugging Face, CC-BY-4.0, gated,
   78.5 GB of NuRec scenes; `zh_lounge` is the optional `nurec_lounge` set above, the only scene there shipped as a
-  plain `.nurec`; the others are USDZ); the original 3DGS pretrained models (Gaussian-Splatting
-  License, non-commercial); Mip-NeRF 360 / Tanks and Temples trained splats on Hugging Face (mostly the 3DGS licence or
-  unstated). InteriorGS was chosen as the reference because it is indoor, robot-scale, z-up metric with floor at 0 and
+  plain `.nurec`; the others are USDZ); the original 3DGS pretrained models
+  ([Gaussian-Splatting License][gs-license], non-commercial); Mip-NeRF 360 / [Tanks and Temples][tnt] trained splats on
+  Hugging Face (mostly the 3DGS licence or unstated). InteriorGS was chosen as the reference because it is indoor,
+  robot-scale, z-up metric with floor at 0 and
   ships room polygons for placing cameras.
 
 ## 7d. NVIDIA Omniverse NuRec scenes (`.nurec`, 3DGUT)
@@ -342,8 +348,8 @@ Date 2026-10-09.
 **How the conventions were verified** (7 NVIDIA warehouse / lab scenes):
 - SH order: mean r/g/b correlation within a band 0.85–0.90 read coefficient-major vs −0.06…0.04 channel-major.
 - Quaternion order: disc-shaped floor splats' thin axis vs the floor normal, median |cos| 0.68–0.79 (wxyz) vs 0.61 (xyzw); and
-  visually: xyzw renders are streaky/smeared, wxyz are sharp. 3DGRUT's PLY import/export passes `rot_0..3` through, i.e. the
-  3DGS wxyz order.
+  visually: xyzw renders are streaky/smeared, wxyz are sharp. [3DGRUT][3dgrut]'s PLY import/export passes `rot_0..3`
+  through, i.e. the 3DGS wxyz order.
 - Frame: Gaussians are in the proxy mesh's frame. Some scenes are **+y-up** although the stage says `upAxis = "Z"` (no
   transform authored; use `make_transform(up="y")`); others have +z-up Gaussians and a +y-up `mesh.usd` with an
   `over "mesh"` x+90° transform in `gauss.usda`. `mesh.usd` claims `metersPerUnit 0.01`, but its points are metres (they
@@ -370,8 +376,8 @@ Metal = float64 EWA to the digit, so the remaining gap is the EWA linearisation 
 quality matters (cost: a 3×3 matrix per record instead of the conic).
 
 **Colour.** `ccm` rows are identity in every scene and `default.usda` sets `rtx:post:registeredCompositing:invertToneMap 1`,
-i.e. Isaac treats the NuRec radiance as display-referred: SH colour is written as is (no tone map). No Isaac Sim reference
-renders were available; the check is splat vs proxy mesh and vs the 3DGUT reference above.
+i.e. Isaac treats the NuRec radiance as display-referred: SH colour is written as is (no tone map). No
+[Isaac Sim][isaacsim] reference renders were available; the check is splat vs proxy mesh and vs the 3DGUT reference above.
 
 **Splat vs proxy mesh** (tier0 depth of the 2 cm vertex-clustered proxy mesh, 16–40 robot-camera views per scene): median
 |Δ| 1.0–3.0 cm in 6 scenes, 4.3 cm in an outdoor lot; bias +0.5…+1.8 cm; 91–97 % within 10 cm (outdoor lot 74 %); 0 % holes.
@@ -406,3 +412,48 @@ their licence is unknown, so nothing from them is in the repo. Use the CC-BY-4.0
      power/exp path) and an exact early-out per simdgroup.
   2. **Sort**: a single-pass "onesweep" radix sort with a local reorder before the scatter, for coalesced writes.
   3. **Project**: SH evaluation could be skipped for records whose support misses every tile.
+
+<!-- Link targets. -->
+
+[interiorgs]: https://huggingface.co/datasets/spatialverse/InteriorGS
+[interiorgs-paper]: https://arxiv.org/abs/2510.21307
+[mujoco]: https://github.com/google-deepmind/mujoco
+[spz]: https://github.com/nianticlabs/spz
+[supersplat]: https://github.com/playcanvas/supersplat
+[antimatter15]: https://github.com/antimatter15/splat
+[nurec]: https://docs.nvidia.com/nurec/
+[kerbl2023]: https://arxiv.org/abs/2308.04079
+[diff-gauss-rast]: https://github.com/graphdeco-inria/diff-gaussian-rasterization
+[gsplat]: https://github.com/nerfstudio-project/gsplat
+[gsplat-paper]: https://arxiv.org/abs/2409.06765
+[stopthepop]: https://arxiv.org/abs/2402.00525
+[mip-splatting]: https://arxiv.org/abs/2311.16493
+[speedy-splat]: https://arxiv.org/abs/2412.00578
+[flashgs]: https://arxiv.org/abs/2408.07967
+[balanced-3dgs]: https://arxiv.org/abs/2412.17378
+[adr-gaussian]: https://arxiv.org/abs/2409.08669
+[gscore]: https://doi.org/10.1145/3620666.3651385
+[metalsplatter]: https://github.com/scier/MetalSplatter
+[msplat]: https://pypi.org/project/msplat/
+[spark]: https://github.com/sparkjsdev/spark
+[brush]: https://github.com/ArthurBrussee/brush
+[playcanvas]: https://github.com/playcanvas/engine
+[hw-raster]: https://arxiv.org/abs/2505.18764
+[gaurast]: https://arxiv.org/abs/2503.16681
+[h3dgs]: https://arxiv.org/abs/2406.12080
+[octree-gs]: https://arxiv.org/abs/2403.17898
+[lodge]: https://arxiv.org/abs/2505.23158
+[flod]: https://arxiv.org/abs/2408.12894
+[gaussgym]: https://arxiv.org/abs/2510.15352
+[rade-gs]: https://arxiv.org/abs/2406.01467
+[mipnerf360]: https://jonbarron.info/mipnerf360/
+[colmap]: https://github.com/colmap/colmap
+[dxgl]: https://huggingface.co/datasets/dxgl/multiview-datasets
+[splatfacto]: https://docs.nerf.studio/nerfology/methods/splat.html
+[polyhaven]: https://polyhaven.com
+[nurec-dataset]: https://huggingface.co/datasets/nvidia/PhysicalAI-Robotics-NuRec
+[splat-transform]: https://github.com/playcanvas/splat-transform
+[gs-license]: https://github.com/graphdeco-inria/gaussian-splatting/blob/main/LICENSE.md
+[tnt]: https://www.tanksandtemples.org/
+[3dgrut]: https://github.com/nv-tlabs/3dgrut
+[isaacsim]: https://github.com/isaac-sim/IsaacSim

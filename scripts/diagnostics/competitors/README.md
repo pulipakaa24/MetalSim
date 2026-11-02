@@ -1,4 +1,4 @@
-# Cross-engine benchmarks (MetalSim vs Genesis vs MuJoCo-MLX-Cpp)
+# Cross-engine benchmarks (MetalSim vs [Genesis](https://github.com/Genesis-Embodied-AI/Genesis) vs [MuJoCo-MLX-Cpp](https://github.com/20niship/MuJoCo-MLX-Cpp))
 
 Findings: `docs/HANDOFF_elliptic_cone_perf.md` (the elliptic-cone issue) and `docs/research/competitors_2026-09-25.md`
 (the full survey and every measured result). Logs: `runs/competitors/`. `*_contacts.py`: contacts per world.

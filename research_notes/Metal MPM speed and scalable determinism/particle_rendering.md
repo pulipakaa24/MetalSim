@@ -1,8 +1,8 @@
 # Rendering MPM particles (granular media) in metalsim's own renderer
 
 Question: how should metalsim's tier-2 path tracer (Metal hardware ray tracing) and tier-0 rasterizer draw the
-particles of Newton's implicit MPM (sand, ~0.5-1 M particles per scene) so that a path-traced frame reads as sand,
-and batched camera observations see the same material?
+particles of [Newton](https://github.com/newton-physics/newton)'s implicit MPM (sand, ~0.5-1 M particles per scene)
+so that a path-traced frame reads as sand, and batched camera observations see the same material?
 
 ## Findings
 
@@ -15,7 +15,7 @@ and batched camera observations see the same material?
   (grains as spheres with precomputed scattering) — [project page](https://cg.ivd.kit.edu/granular_media.php).
   Their explicit-path-tracing baseline is the method used here; the multi-scale speedup (12x on tens of millions of
   specular grains) targets scenes far beyond ours (opaque diffuse grains, 5 bounces).
-- Newton 1.5.2 ships the simulation-side half: `SolverImplicitMPM.sample_render_grains` / `update_render_grains`
+- [Newton 1.5.2](https://github.com/newton-physics/newton/tree/v1.5.2) ships the simulation-side half: `SolverImplicitMPM.sample_render_grains` / `update_render_grains`
   (`newton/_src/solvers/implicit_mpm/render_grains.py`, `examples/mpm/example_mpm_grain_rendering.py`) upsample each
   particle into points sampled uniformly in its cube (side 2 x particle radius), advected each step by the particle's
   velocity gradient plus the grid velocity and projected back into the particle's deformed ellipsoid; Newton's viewer
@@ -33,7 +33,7 @@ and batched camera observations see the same material?
   (search 2026-10-12 found no documented cap; the only explicit maximum is `maxInstanceCount` of the indirect
   descriptor, which we do not use). **Measured** on the M4 Max (64 GB): 22.4 M grain instances + 136 scene instances
   build and trace correctly; structure 4.6 GB (~206 B per instance) plus 64 B per instance descriptor; a 1920 x 1080
-  frame at 128 spp with OIDN in 8 s including the rebuild (`metalsim/render/PARTICLES.md` has the table).
+  frame at 128 spp with [OIDN](https://www.openimagedenoise.org/) in 8 s including the rebuild (`metalsim/render/PARTICLES.md` has the table).
 - Masked-out instances (mask 0) are skipped by traversal but still occupy the structure, so culling by mask saves
   shading, not memory. True compaction would need the indirect instance descriptor (GPU-written count, per-instance
   `MTLResourceID`) or a deterministic prefix scan; not needed at these sizes.

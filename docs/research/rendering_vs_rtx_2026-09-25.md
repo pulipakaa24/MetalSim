@@ -1,8 +1,10 @@
 # Tier 2 vs Isaac Sim RTX on the G1 parity scene: what RTX computes, and the plan to match it
 
-2026-09-25. Scope: close the measured rendering gap between MetalSim tier 2 and Isaac Sim 5.1's RTX renderer on
-the fidelity-protocol scene (PARITY §1.7: G1, sun DistantLight 3000 (1, 0.98, 0.95) rotated 50° about y, dome 400
-(0.75, 0.8, 0.9), grey PreviewSurface ground diffuse 0.5 roughness 0.7, camera (3.2, −2.4, 1.4) → (0.3, 0, 0.6),
+2026-09-25. Scope: close the measured rendering gap between MetalSim tier 2 and
+[Isaac Sim](https://github.com/isaac-sim/IsaacSim) 5.1's RTX renderer on the fidelity-protocol scene
+([PARITY §1.7](../PARITY.md#17-fidelity-protocol-against-isaac-sim-51-on-an-l4-recorded-2026-09-24-physx--rtx): G1,
+sun DistantLight 3000 (1, 0.98, 0.95) rotated 50° about y, dome 400 (0.75, 0.8, 0.9), grey PreviewSurface ground
+diffuse 0.5 roughness 0.7, camera (3.2, −2.4, 1.4) → (0.3, 0, 0.6),
 42° vertical FOV, 1024×576). Numbers are **measured** unless labelled **estimated**; "unverified" means no primary
 source was found.
 
@@ -78,7 +80,8 @@ by the layer's directional reflectance rather than by F(V·H), Storm uses k = al
   [USDImporter.cpp](https://github.com/NVIDIAGameWorks/Falcor/blob/master/Source/plugins/importers/USDImporter/USDImporter.cpp));
   exposure = 0.01·ISO / (shutter·N²) = 8.0·10⁻⁴ (Falcor's ToneMapper formula; RTX's own formula unverified).
   Default operator, white point, `cm2Factor` and auto-exposure: **unverified** (no defaults on the docs page).
-  Isaac Sim 5.1's `isaacsim.exp.base.kit` and Isaac Lab's `apps/*.kit` set no tonemap keys, so Kit's defaults apply.
+  Isaac Sim 5.1's `isaacsim.exp.base.kit` and [Isaac Lab](https://github.com/isaac-sim/IsaacLab)'s `apps/*.kit` set no
+  tonemap keys, so Kit's defaults apply.
 * **Measured**: the RTX sky reads (168.0, 173.0, 179.9) for a dome radiance of (300, 320, 360) nits. A linear
   exposure + sRGB can match the sky alone (k = 1.27·10⁻³) but then puts the lit ground at 200 vs 230; the Narkowicz
   ACES fit with k = 8.7·10⁻⁴ and π·I sun matches sky and ground to 0.9 levels, and also reproduces the sky's
@@ -102,7 +105,8 @@ by the layer's directional reflectance rather than by F(V·H), Storm uses k = al
 
 * Isaac Sim 5.1 `SimulationApp` defaults ([simulation_app.py v5.1.0](https://github.com/isaac-sim/IsaacSim/blob/v5.1.0/source/extensions/isaacsim.simulation_app/isaacsim/simulation_app/simulation_app.py)):
   renderer `RaytracedLighting`, anti-aliasing 3 (DLSS), `samples_per_pixel_per_frame` 64 written to the path
-  tracer's `spp`/`totalSpp`, `denoiser` True → `/rtx/pathtracing/optixDenoiser/enabled`. PT mode: OptiX AI denoiser
+  tracer's `spp`/`totalSpp`, `denoiser` True → `/rtx/pathtracing/optixDenoiser/enabled`. PT mode:
+  [OptiX](https://developer.nvidia.com/rtx/ray-tracing/optix) AI denoiser
   ([rtx-renderer_pt](https://docs.omniverse.nvidia.com/materials-and-rendering/latest/rtx-renderer_pt.html));
   our recording ran PT at 32 spp. RT mode: Real-Time 2.0 uses DLSS Ray Reconstruction "if supported by the GPU and
   not optional" ([rtx-renderer_rt](https://docs.omniverse.nvidia.com/materials-and-rendering/latest/rtx-renderer_rt.html));
@@ -118,19 +122,23 @@ by the layer's directional reflectance rather than by F(V·H), Storm uses k = al
     2.3.1 (`oidnNewMetalDevice`, `oidnNewSharedBufferFromMetal`) ([CHANGELOG](https://github.com/RenderKit/oidn/blob/master/CHANGELOG.md),
     [README](https://github.com/RenderKit/oidn)); used by Blender Cycles on Apple GPUs since 4.1
     ([release notes](https://developer.blender.org/docs/release_notes/4.1/cycles/)). **Installable here**: PyPI
-    `pyoidn` 2.5.0.1 bundles `libOpenImageDenoise` 2.5.0 with `libOpenImageDenoise_device_metal`; Homebrew
-    `open-image-denoise` 2.5.1 is bottled. We call its C API through ctypes on the renderer's own command queue with
-    zero-copy buffers (`metalsim/render/denoise.py`). Inputs: HDR colour, albedo, normal (`cleanAux` when the aux
-    images are sample-averaged).
+    [`pyoidn`](https://pypi.org/project/pyoidn/) 2.5.0.1 bundles `libOpenImageDenoise` 2.5.0 with
+    `libOpenImageDenoise_device_metal`; Homebrew
+    [`open-image-denoise`](https://formulae.brew.sh/formula/open-image-denoise) 2.5.1 is bottled. We call its C API
+    through ctypes on the renderer's own command queue with zero-copy buffers (`metalsim/render/denoise.py`). Inputs:
+    HDR colour, albedo, normal (`cleanAux` when the aux images are sample-averaged).
   * **MPSSVGF / MPSSVGFDenoiser / MPSTemporalAA** (MetalPerformanceShaders, macOS 10.15+, not deprecated,
     [MPSSVGF](https://developer.apple.com/documentation/metalperformanceshaders/mpssvgf)): texture-based, needs
     packed depth+normal textures and (optional) motion vectors, encodes into an external command buffer. Usable in
     principle, but it works on 2-D textures one image at a time (our batch is N env tiles in one buffer) and its
     value is temporal reprojection, which progressive tier-2 accumulation already provides for static cameras.
-  * **MetalFX `MTLFXTemporalDenoisedScaler`** (macOS 26): denoise + upscale, needs colour, depth, motion, normal,
-    diffuse/specular albedo, roughness and camera matrices; single image per call; not tried here (tier-1 candidate).
+  * **MetalFX [`MTLFXTemporalDenoisedScaler`](https://developer.apple.com/documentation/metalfx/mtlfxtemporaldenoisedscaler)**
+    (macOS 26): denoise + upscale, needs colour, depth, motion, normal, diffuse/specular albedo, roughness and camera
+    matrices; single image per call; not tried here (tier-1 candidate).
   * Core Image `CINoiseReduction`: an LDR sharpening/noise filter, not a Monte-Carlo denoiser; not suitable.
-  * Not on Metal: NVIDIA NRD (D3D/Vulkan only), OptiX, DLSS-RR; Mitsuba 3 (LLVM/CUDA), pbrt-v4 GPU (CUDA), Falcor.
+  * Not on Metal: NVIDIA [NRD](https://github.com/NVIDIA-RTX/NRD) (D3D/Vulkan only), OptiX, DLSS-RR;
+    [Mitsuba 3](https://github.com/mitsuba-renderer/mitsuba3) (LLVM/CUDA), [pbrt-v4](https://github.com/mmp/pbrt-v4) GPU
+    (CUDA), Falcor.
   * Costs from the literature: SVGF 4.4 ms at 720p / 10.2 ms at 1080p on a Titan X
     ([Schied et al. 2017](https://research.nvidia.com/sites/default/files/pubs/2017-07_Spatiotemporal-Variance-Guided-Filtering%3A//svgf_preprint.pdf));
     edge-avoiding à-trous 5 iterations 42.6 ms at 1080p on a GTX 285 ([Dammertz et al. 2010](https://jo.dreggn.org/home/2010_atrous.pdf));
@@ -247,7 +255,8 @@ Exposure 1.0 washes out a scene authored for a linear-clamp display; 0.25 maps i
 and the learning signal matches the legacy run over the first 10 iterations (same seed). Cost: +26 ms per 1024-env
 step, all from 4 spp (the tone map and sun disk are free); −22 % end-to-end PPO throughput.
 
-**Full 8 M-step run** (`runs/camera_cartpole_physical_full.log`, train queue, 2026-09-25): physical tier 2, 4 spp, 1024
+**Full 8 M-step run** (`runs/camera_cartpole_physical_full.log`, `train` class of the GPU job queue
+`scripts/gpu_run.sh`, 2026-09-25): physical tier 2, 4 spp, 1024
 envs: return 7.8 / 45.7 / 70.0 / 82.8 / 89.4 / 86.0 at iterations 1 / 10 / 20 / 40 / 80 / 123 (mean of the last 20
 iterations 85.3), vs tier 0 (`runs/camera_cartpole_tier0.log`) 7.0 / 47.1 / 67.8 / 83.9 / 86.9 / 85.4 (86.3);
 8,788 env-steps/s including training. An earlier attempt failed at iteration 1 with NaN losses: its PPO-update MPS
@@ -315,7 +324,7 @@ PSNR/SSIM on a white robot punish at every edge. Tier 0 is unchanged (8.1 dB who
 
 ## 6. Textured dome light: HDR environment map with importance sampling and MIS (ported 2026-09-25)
 
-Ported from the handoff `docs/HANDOFF_tier2_hdri_envmap.md` (patch on `4e6d663`) onto the restructured
+Ported from the handoff `docs/HANDOFF_tier2_hdri_envmap.md` (patch on [`8f87de2`](https://github.com/pulipakaa24/MetalSim/commit/8f87de2922b3bd499d1ac31ef7bbde9885e3e331)) onto the restructured
 tier 2. What Isaac has: a `DomeLight` with `inputs:texture:file` is the background and image-based light of
 most Isaac scenes (Isaac Lab's default grid room uses a textureless dome; the Franka stack visuomotor task
 randomizes dome textures per episode). MetalSim had only `dome=(intensity, color)` (uniform radiance).
@@ -330,16 +339,17 @@ randomizes dome textures per episode). MetalSim had only `dome=(intensity, color
   · color. `set_environment(hdr, intensity, exposure, color)` applies exactly that (`test_env_map_furnace`: a
   0.5 map at intensity 2, exposure 1, colour (1, 0.5, 0.25) reads 0.5 · 4 · colour).
 - **Parameterisation**. `inputs:texture:format = latlong` is the equirectangular map; the USD doc string
-  "Latitude as X, longitude as Y" is the schema's (inverted) wording; the `DomeLight` doc defers to the OpenEXR
-  latlong specification: "pixel coordinates map x to longitude, y to latitude; the minimum coordinates have
-  latitude +π/2 and longitude +π, the maximum latitude −π/2 and longitude −π; latitudes correspond to the y
-  direction, and latitude 0 / longitude 0 points into +z" (`schema.usda`, class DomeLight; OpenEXR
-  `ImfEnvmap.h`). So in the light's own frame: pole +y, image centre (u = 0.5) faces +z, u = 0.25 faces +x, the
-  image is what an observer at the centre sees looking outward (no mirroring).
+  "Latitude as X, longitude as Y" is the schema's (inverted) wording; the `DomeLight` doc defers to the
+  [OpenEXR](https://github.com/AcademySoftwareFoundation/openexr) latlong specification: "pixel coordinates map x to
+  longitude, y to latitude; the minimum coordinates have latitude +π/2 and longitude +π, the maximum latitude −π/2 and
+  longitude −π; latitudes correspond to the y direction, and latitude 0 / longitude 0 points into +z" (`schema.usda`,
+  class DomeLight; OpenEXR `ImfEnvmap.h`). So in the light's own frame: pole +y, image centre (u = 0.5) faces +z,
+  u = 0.25 faces +x, the image is what an observer at the centre sees looking outward (no mirroring).
 - **Pole axis**. USD's `DomeLight` "default orientation is such that its top pole is aligned with the world's
   +Y axis"; on a z-up stage the spec expects an authored rotation (`UsdLuxDomeLight::OrientToStageUpAxis`
   adds a +90° x-rotation); USD 24.03's `DomeLight_1` adds `inputs:poleAxis` = scene | Y | Z, fallback "scene"
-  = the stage's up axis. **Kit/RTX does not follow the +Y rule**: NVIDIA's own `usd-exchange-samples`
+  = the stage's up axis. **Kit/RTX does not follow the +Y rule**: NVIDIA's own
+  [`usd-exchange-samples`](https://github.com/NVIDIA-Omniverse/usd-exchange-samples)
   (`source/createLights/README.md`) states "Kit/RTX treats the DomeLight environment as Z-up, unlike the
   OpenUSD +Y pole convention" and "does not currently render this authored DomeLight rotation correctly";
   Isaac Lab's `spawn_light` (`isaaclab/sim/spawners/lights/lights.py`) authors no rotation on a DomeLight and
@@ -354,10 +364,10 @@ randomizes dome textures per episode). MetalSim had only `dome=(intensity, color
   the image. It could not be verified against an RTX frame: the Isaac recordings in `runs/parity*/isaac` were
   made with a uniform dome on purpose (`record_g1.py`: "lighting that MetalSim can reproduce").
   `set_environment(yaw=...)` corrects any azimuth offset once measured; PARITY §1.7 carries the caveat.
-- **Sampling**. PBRT 3rd ed. §12.6 / §14.2.4 (`InfiniteAreaLight`): a 2-D piecewise-constant distribution over
-  the image with weights luminance × sin θ (the Jacobian of the latlong map), solid-angle pdf
-  p(ω) = p(u, v) / (2π² sin θ), next-event estimation from it and the power heuristic (Veach 1997, β = 2)
-  against BSDF sampling. Implemented as in the handoff: `env_sampling_table` (numpy area average onto a
+- **Sampling**. [PBRT 3rd ed.](https://pbr-book.org/3ed-2018/contents) §12.6 / §14.2.4 (`InfiniteAreaLight`): a 2-D
+  piecewise-constant distribution over the image with weights luminance × sin θ (the Jacobian of the latlong map),
+  solid-angle pdf p(ω) = p(u, v) / (2π² sin θ), next-event estimation from it and the power heuristic (Veach 1997,
+  β = 2) against BSDF sampling. Implemented as in the handoff: `env_sampling_table` (numpy area average onto a
   512×256 grid, luminance floor 1e-6 × max so every cell has support), two binary searches on the GPU,
   MIS on both sides (the miss of a BSDF-sampled ray is weighted by p_bsdf² / (p_bsdf² + p_env²); the env NEE by
   the mirror weight, with the BSDF pdf being main's diffuse/GGX mixture pdf `pd · cos/π + (1 − pd) · D · N·H /
@@ -379,11 +389,12 @@ randomizes dome textures per episode). MetalSim had only `dome=(intensity, color
   with cached GPU resources, `set_fovy`, `set_materials`, and the opt-in firefly clamp.
 - **Bit-for-bit**: the parity presets (`usd_scene_kwargs` on the G1 parity scene, 2 × 1024×576, 16 spp;
   `mujoco_scene_kwargs` on Cartpole-RGB, 64 × 100×100, 4 spp) rendered from the previous commit's renderer and
-  from this one, no map set: **bit-for-bit identical** (`runs/render/envmap/run_before.log`: before = HEAD 98a41c1 in a worktree, after = this change; SHA-256 equal and max |diff| = 0 on all five arrays: G1 hdr / rgb / depth, Cartpole hdr / rgb) (`scripts/diagnostics/tier2_envmap_regression.py`,
+  from this one, no map set: **bit-for-bit identical** (`runs/render/envmap/run_before.log`: before = HEAD [`1209b4e`](https://github.com/pulipakaa24/MetalSim/commit/1209b4e40e87d38372f4ba74974c0199a234c619) in a worktree, after = this change; SHA-256 equal and max |diff| = 0 on all five arrays: G1 hdr / rgb / depth, Cartpole hdr / rgb) (`scripts/diagnostics/tier2_envmap_regression.py`,
   `runs/render/envmap/run_all.log`). Without `FLAG_ENVMAP` the shader consumes no extra random numbers and
   evaluates the same expressions; `PTConsts` grew from 16 to 28 words.
 - **Cost** (`scripts/diagnostics/tier2_envmap_cost.py`, `timing` queue class, host path with
-  synchronisation, median of timed frames; Poly Haven `lebombo` 2048×1024, table 512×256):
+  synchronisation, median of timed frames; [Poly Haven `lebombo`](https://polyhaven.com/a/lebombo) 2048×1024, table
+  512×256):
 
   | configuration | no map: ms / frame | with map: ms / frame | ms per spp (no map / map) | map cost |
   |---|---|---|---|---|

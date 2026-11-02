@@ -1,33 +1,39 @@
 # Closed-loop mechanisms on MetalSim: Newton Kamino on Metal vs MuJoCo Warp soft loop closure
 
 2026-09-25, low priority. Scope: kinematic loops (four-bar linkages, parallel-linkage legs like Digit's, coupled
-hands) ahead of a user robot that may have them. **Measured** = run here (M4 Max); Metal and every Warp/Newton
-run (including Warp's CPU device) went through `scripts/gpu_run.sh NAME low MIN` with `gpu_lock.py status` at the
-top of each log; pure MuJoCo C / numpy runs ran directly. **Source** = read in the cited file or page.
+hands) ahead of a user robot that may have them. **Measured** = run here (M4 Max); Metal and every
+[Warp](https://github.com/NVIDIA/warp)/[Newton](https://github.com/newton-physics/newton) run (including Warp's CPU
+device) went through `scripts/gpu_run.sh NAME low MIN` with `gpu_lock.py status` at the top of each log; pure
+[MuJoCo](https://github.com/google-deepmind/mujoco) C / numpy runs ran directly. **Source** = read in the cited file or
+page.
 
 Scripts: `scripts/diagnostics/closed_loops/` (`mechanisms.py` defines the test mechanisms once and emits MJCF, a
-Newton builder and an exact planar reference; `mjw_loops.py` MuJoCo C / MuJoCo Warp; `kamino_probe.py`
+Newton builder and an exact planar reference; `mjw_loops.py` MuJoCo C /
+[MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp); `kamino_probe.py`
 SolverKamino; `ref_traj.py`; `analyze.py`; `c_sweep.sh`, `kamino_jobs.sh`, `mjw_jobs.sh`, `run_kamino_tests.py`).
 Data and logs: `runs/closed_loops/`.
 
 ## Summary (2026-09-26)
 
 * **The user robot has no loops in simulation.** TRON1 WF (`neq = 0`, pure tree); nothing to close today.
-* **Kamino runs on Metal.** SolverKamino (PADMM backend, the default) in Newton 1.5.2 and the 1.7.0.dev fork runs
-  on the Metal Warp fork with no code change, and matches the CPU device to **1.0e-3 rad after 5 s** (four-bar,
-  2.5 ms; 1e-5 rad at 0.5 s) and 9e-5 rad on the leg (measured, queued). Two Metal defects found, neither in our
+* **Kamino runs on Metal.** SolverKamino (PADMM backend, the default) in upstream Newton 1.5.2 and in
+  [my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim) (1.7.0.dev) runs on Metal through
+  [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) with no code change, and matches the CPU device
+  to **1.0e-3 rad after 5 s** (four-bar, 2.5 ms; 1e-5 rad at 0.5 s) and 9e-5 rad on the leg (measured, queued). Two
+  Metal defects found, neither in our
   mechanisms' path: (1) the blocked-Cholesky (LLTB) **backward solve is wrong on Metal for matrices larger than one
   16-row block** (x error up to 2.3 in Newton's own tests) because a Newton native snippet stages tiles in
   `__shared__` arrays only under `__CUDA_ARCH__` and in per-thread arrays otherwise; Newton's switch
   `NEWTON_KAMINO_DISABLE_TILE_TRANSPOSE_UPDATE=1` selects the generic path (verification queued); (2) the DVI
-  backend's factorisation kernel asks for 82,432 bytes of threadgroup memory, the M4 Max allows 32,768: DVI does not
-  run on Metal (70 of 607 fork tests error on it). Throughput: single-world steps take ~100 ms (200 host-synchronised
-  PADMM iterations); 1024-world numbers queued.
+  backend's factorisation kernel asks for 82,432 bytes of threadgroup memory, the M4 Max allows 32,768: DVI does not run
+  on Metal (70 of the 607 tests of my fork of Newton error on it). Throughput: single-world steps take ~100 ms (200
+  host-synchronised PADMM iterations); 1024-world numbers queued.
 * **Hard vs soft closure, both measured against an exact reference** (planar DAE, 1e-11 m): at 2.5 ms Kamino's
   closure error is 0.58 mm at its default Baumgarte α 0.01 and **0.044 mm at α 0.5**; MuJoCo's soft `connect` is
   0.36–1.16 mm (solref 5–20 ms). But Kamino at its default α loses **32 % of the energy in 5 s** on the undamped
-  four-bar (α 0.1, Isaac Lab 3.0's value: −14 %; α 0.5: −1.0 %), against −1.1 to −5.2 % for MuJoCo; trajectory
-  error after 5 s: Kamino α 0.5 0.38 rad, MuJoCo best 0.56 rad, Kamino default 2.6 rad. With joint damping and 3σ
+  four-bar (α 0.1, [Isaac Lab](https://github.com/isaac-sim/IsaacLab) 3.0's value: −14 %; α 0.5: −1.0 %), against −1.1
+  to −5.2 % for MuJoCo; trajectory error after 5 s: Kamino α 0.5 0.38 rad, MuJoCo best 0.56 rad, Kamino default 2.6 rad.
+  With joint damping and 3σ
   torques all are within 0.08–0.5 rad over 5 s.
 * **MuJoCo Warp soft closure is adequate at 2.5 ms and 5 ms** for these mechanisms: MuJoCo Warp (float32, CPU
   device) reproduces MuJoCo C's closure numbers (four-bar 1.19 vs 1.07 mm, leg 0.35 vs 0.35 mm at 2.5 ms) and its
@@ -35,13 +41,16 @@ Data and logs: `runs/closed_loops/`.
   torques, 1024 worlds × 8 s in MuJoCo C: 0 blown, closure max 5.6 / 11.7 mm (four-bar, 2.5 / 5 ms) and 14.7 /
   25.6 mm (leg). Metal-device MuJoCo Warp runs (agreement, 1024-world stress, throughput) are queued (`cl_mjw`).
 * **Verdict** (§5): MuJoCo Warp's soft closure is adequate for learning on loop-legged robots at 2.5 ms with the
-  loop equalities stiffened (solref ≈ 5–10 ms, as Menagerie's Cassie does), mm-level closure; Kamino is the more
-  accurate closure on Metal (hard, 0.04 mm at α 0.5) but is 1–2 orders slower per step here and beta.
+  loop equalities stiffened (solref ≈ 5–10 ms, as [Menagerie](https://github.com/google-deepmind/mujoco_menagerie)'s
+  Cassie does), mm-level closure; Kamino is the more accurate closure on Metal (hard, 0.04 mm at α 0.5) but is 1–2
+  orders slower per step here and beta.
 
 ## 1. Does the user robot have loops?
 
 No, not in its simulation model. `metalsim/tron1/sim.py` builds LimX's `WF_TRON1A` MJCF
-(`assets/tron1/WF_TRON1A/xml/robot.xml`): `neq = 0`, 9 joints (free + abad/hip/knee/wheel per side), 11 bodies in a
+(`assets/tron1/WF_TRON1A/xml/robot.xml`, from
+[limxdynamics/robot-description](https://github.com/limxdynamics/robot-description)): `neq = 0`, 9 joints (free +
+abad/hip/knee/wheel per side), 11 bodies in a
 pure tree (measured: `build_model(SimParams(payload_mass=0))`). The URDF (`urdf/robot.urdf`) models each knee as a
 single revolute joint with a `SimpleTransmission`, reduction 1. Whether the hardware drives the knee through a
 rod from a hip-mounted motor could not be established from a primary LimX source (spec page lists three 48 V
@@ -52,10 +61,13 @@ which is how the controller sees it (`knee_*_Joint` in the SDK's motor order).
 
 ### 2.1 Newton's SolverKamino (Disney Research)
 
-Sources: [K] `upstream/newton/newton/_src/solvers/kamino/` (Newton fork 1.7.0.dev, 90e23324) and
-`upstream/newton-1.5.2/...` (tag v1.5.2); [TR] Tsounis, Grandia, Bächer, "On Solving the Dynamics of Constrained
-Rigid Multi-Body Systems with Kinematic Loops", arXiv:2504.19771 (v1, 2025-04-28); [IL3] Isaac Lab `v3.0.0-EA`
-sparse clone `upstream/IsaacLab3`.
+Sources: [K] `upstream/newton/newton/_src/solvers/kamino/`
+([my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim), 1.7.0.dev,
+[`90e23324`](https://github.com/pulipakaa24/newton/commit/90e23324521fa86710e483e01d02e80d1dac0060)) and
+`upstream/newton-1.5.2/...` (upstream tag [v1.5.2](https://github.com/newton-physics/newton/tree/v1.5.2)); [TR] Tsounis,
+Grandia, Bächer, "On Solving the Dynamics of Constrained Rigid Multi-Body Systems with Kinematic Loops",
+[arXiv:2504.19771](https://arxiv.org/abs/2504.19771) (v1, 2025-04-28); [IL3] Isaac Lab
+[`v3.0.0-EA`](https://github.com/isaac-sim/IsaacLab/tree/v3.0.0-EA) sparse clone `upstream/IsaacLab3`.
 
 * **Status.** "`SolverKamino` is currently in BETA (`BETA 1`) ... we discourage users of Newton from depending on
   it ... A more stable `BETA 2` version is planned for release during the summer of 2026" ([K] README.md).
@@ -70,8 +82,9 @@ sparse clone `upstream/IsaacLab3`.
   the articulation, `newton/tests/utils/basics.py` `build_boxes_fourbar`), rank deficiency from redundant loop rows
   handled by the proximal regularisation.
 * **Solver.** Default backend Proximal-ADMM ("realizes the Proximal-ADMM algorithm described in [TR] and is based on
-  the work of J. Carpentier et al." (arXiv:2405.17020), diagonal preconditioning, Nesterov acceleration with the
-  Goldstein et al. fast-ADMM restart, optional residual-balancing penalty updates; `_src/solvers/padmm/__init__.py`).
+  the work of J. Carpentier et al." ([arXiv:2405.17020](https://arxiv.org/abs/2405.17020)), diagonal preconditioning,
+  Nesterov acceleration with the Goldstein et al. fast-ADMM restart, optional residual-balancing penalty updates;
+  `_src/solvers/padmm/__init__.py`).
   Defaults: 200 iterations, primal/dual/complementarity tolerance 1e-6, warm start from containers
   (`config.py` `PADMMSolverConfig`). Opt-in `"dvi"` backend: projected iterations with a direct bilateral block
   solve (`solver_kamino.py` `Config.dynamics_solver`). The iteration loop is a `wp.capture_while` on
@@ -84,7 +97,7 @@ sparse clone `upstream/IsaacLab3`.
   collision detector) (`solver_kamino.py` `Config.integrator`; `_src/integrators/`).
 * **Drives.** Effort (explicit `joint_f`) and implicit PD (`POSITION_VELOCITY` target mode with `target_ke/kd`,
   armature, viscous damping as "dynamic" constraint rows; `_src/core/conversions.py`), joint Coulomb friction and
-  effort limits (Newton v1.6.0 release notes).
+  effort limits (Newton [v1.6.0 release notes](https://github.com/newton-physics/newton/releases/tag/v1.6.0)).
 * **Limits (beta 1).** Refuses particles, springs, triangles/edges/tets, muscles, `DISTANCE` and `ROD` joints, and
   bodies with singular inertia (`solver_kamino.py` `_validate_model_compatibility`); immovability decided once at
   construction; several joint-property changes require recreating the solver (`notify_model_changed`).
@@ -99,11 +112,13 @@ sparse clone `upstream/IsaacLab3`.
 
 * **Mechanism.** Equality constraints over a spanning tree: `connect` (3 rows, ball joint at a point), `weld`
   (6 rows, `relpose`), `joint` (polynomial coupling of two scalar joints). For `connect`, "the position of body2's
-  anchor is determined such that it coincides with body1's anchor in the initial configuration (qpos0)" (MuJoCo
-  XML reference, equality/connect), so the model must be assembled closed at qpos0 (ours are, to 5e-16 m).
+  anchor is determined such that it coincides with body1's anchor in the initial configuration (qpos0)"
+  ([MuJoCo XML reference](https://mujoco.readthedocs.io/en/latest/XMLreference.html), equality/connect), so the model
+  must be assembled closed at qpos0 (ours are, to 5e-16 m).
 * **Softness.** Every constraint is soft. Reference acceleration a_ref = −b v − k r with b = 2/(d_max·timeconst),
-  k = d(r)/(d_max² timeconst² dampratio²); regulariser R = (1−d)/d · Â (MuJoCo documentation, Computation >
-  Parameters). Defaults solref "0.02 1", solimp "0.9 0.95 0.001 0.5 2"; with `refsafe`, timeconst is clamped to
+  k = d(r)/(d_max² timeconst² dampratio²); regulariser R = (1−d)/d · Â (MuJoCo documentation,
+  [Computation](https://mujoco.readthedocs.io/en/latest/computation/index.html) > Parameters). Defaults solref "0.02 1",
+  solimp "0.9 0.95 0.001 0.5 2"; with `refsafe`, timeconst is clamped to
   ≥ 2·timestep. So a loop closure is a critically damped spring-like constraint with 20 ms time constant and
   impedance 0.9–0.95 unless tuned.
 * **MuJoCo's own guidance.** "equality constraints can be used to create 'loop joints' ... Gaming engines represent
@@ -113,22 +128,26 @@ sparse clone `upstream/IsaacLab3`.
   plantar-rod loops with four `connect` equalities whose default class stiffens them to solref "0.005 1" (`upstream/mujoco_menagerie/agility_cassie/cassie.xml:10, 228-233`): the model author chose a 5 ms time constant (4x stiffer than the default) at a 0.5 ms timestep (line 4).
 * **MuJoCo Warp.** `EqType` implements CONNECT, WELD, JOINT, TENDON, FLEX, FLEXSTRAIN; DISTANCE unsupported
   (`upstream/mujoco_warp/mujoco_warp/_src/types.py:729-747`); kernels `_equality_connect` / `_equality_weld` in
-  `constraint.py`. No Metal-specific code path for equality rows in the fork; the only Metal caveat is general
+  `constraint.py`. No Metal-specific code path for equality rows in
+  [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim); the only Metal caveat is general
   (graph conditionals off, `m.opt.graph_conditional = False`, so all solver iterations launch;
   `docs/research/mjwarp_throughput_2026-09-25.md`).
 
 ### 2.3 Isaac Lab 3.0 / PhysX and Digit
 
-* Isaac Lab 3.0 EA release notes: "Closed-loop Digit articulations remain PhysX-only." Known-issues page:
-  "Closed-loop articulations are not available on Newton (e.g. Agility Digit) ... **Affects:** `physics=newton_mjwarp`,
+* Isaac Lab 3.0 EA [release notes](https://github.com/isaac-sim/IsaacLab/releases/tag/v3.0.0-EA): "Closed-loop Digit
+  articulations remain PhysX-only." Known-issues page: "Closed-loop articulations are not available on Newton (e.g.
+  Agility Digit) ... **Affects:** `physics=newton_mjwarp`,
   `physics=newton_kamino`. Robots whose USD encodes a closed kinematic loop — such as the achilles rod and toe
   push-rods on the Agility Digit — are not currently validated on the Newton backends. The Digit-based contrib tasks
   are PhysX-only and do not expose a Newton preset at all" (`upstream/IsaacLab3/docs/source/refs/issues.rst:119-136`).
   The Python config (`isaaclab_assets/robots/agility.py`, `DIGIT_V4_CFG`) has no loop handling: the loop lives in
   the USD.
-* PhysX: "Articulations must have a tree structure ... it is possible to create loops in the articulation by adding
-  rigid-body Joints between articulation links" (PhysX 5.6 docs, Articulations > Closing loops). In USD the loop
-  joint carries `physics:excludeFromArticulation` (UsdPhysics proposal, "a joint in the loop may use its
+* [PhysX](https://github.com/NVIDIA-Omniverse/PhysX): "Articulations must have a tree structure ... it is possible to
+  create loops in the articulation by adding rigid-body Joints between articulation links" (PhysX 5.6 docs,
+  [Articulations](https://nvidia-omniverse.github.io/PhysX/physx/5.6.1/docs/Articulations.html) > Closing loops). In USD
+  the loop joint carries `physics:excludeFromArticulation`
+  ([UsdPhysics proposal](https://openusd.org/release/wp_rigid_body_physics.html), "a joint in the loop may use its
   excludeFromArticulation attribute flag ... and at this point the loop is then broken"). The loop joint is a
   maximal-coordinate constraint solved by the same PGS/TGS iterations as contacts, i.e. iterative and not exactly
   closed; the reduced-coordinate tree itself has "zero joint error by design".
@@ -257,8 +276,8 @@ semi-implicit Euler. PADMM hit the 200-iteration cap on every step checked (`sta
 | MuJoCo Warp, CPU | four-bar 3σ, damped | 5 ms | 0.057 / 0.069 / 0.14 | | 3.43 / 0.61 |
 
 * **CPU vs Metal (Kamino)**: max body-angle difference 1e-5 rad at 0.5 s, 1.0e-3 rad at 5 s (four-bar, fork; 1.4e-3
-  for 1.5.2), 9e-5 rad at 2 s (leg), 2e-4 rad at 5 s (four-bar, 5 ms). Newton 1.5.2 and the fork agree to 2.4e-5 rad
-  over 5 s on the CPU.
+  for 1.5.2), 9e-5 rad at 2 s (leg), 2e-4 rad at 5 s (four-bar, 5 ms). Newton 1.5.2 and
+  [my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim) agree to 2.4e-5 rad over 5 s on the CPU.
 * Kamino's energy loss falls monotonically with the Baumgarte gain (α 0 → 0.5: −46 → −1 %). Likely mechanism (not
   verified in code): with weak stabilisation the position drift grows and each step's velocity-level constraint
   solve, applied at a drifted configuration, removes energy. At α 0.5 Kamino is the most
@@ -275,7 +294,7 @@ semi-implicit Euler. PADMM hit the 200-iteration cap on every step checked (`sta
 | suite | CPU device | Metal |
 |---|---|---|
 | Newton 1.5.2 (`newton._src.solvers.kamino.tests`, 52 modules) | 624 run, 1 fail (box-on-box tolerance), 0 err | 624 run, 12 fail, 22 err |
-| fork 1.7.0.dev (`newton.tests.kamino`, 45 modules) | 607 run, 0 fail, 0 err | 607 run, 10 fail, 70 err |
+| [fork](https://github.com/pulipakaa24/newton/tree/metalsim) 1.7.0.dev (`newton.tests.kamino`, 45 modules) | 607 run, 0 fail, 0 err | 607 run, 10 fail, 70 err |
 
 Every Metal-only failure falls in two groups: (a) `Kernel requests 82432 bytes of threadgroup memory but device
 "Apple M4 Max" supports at most 32768 bytes` in `llt_blocked_factorize_kernel` / `llt_blocked_rcm_factorize_kernel`
@@ -309,7 +328,7 @@ remaining steps are re-queued as 2 s runs, one ticket each, with a 600 s per-ste
   here (throughput queued).
 * **Isaac / PhysX reference.** Isaac Lab 3.0 keeps closed-loop Digit PhysX-only; PhysX closes loops with iterative
   maximal-coordinate joints next to the reduced-coordinate tree, i.e. also not exactly closed. A PhysX recording of
-  this four-bar would place PhysX on the same axis; noted, not yet run on the L4.
+  this four-bar would place PhysX on the same axis; noted, not yet run on the NVIDIA L4 GPU.
 * **What a native hard-loop solver would need (scope only):** (1) hard loop rows in MuJoCo Warp's constraint solve
   (zero regularisation) plus a proximal/regularised treatment of the rank-deficient loop Jacobian (Kamino's P-ADMM
   does this); (2) or, cheaper, a position-level projection kernel after each MuJoCo Warp step (Gauss–Newton on the

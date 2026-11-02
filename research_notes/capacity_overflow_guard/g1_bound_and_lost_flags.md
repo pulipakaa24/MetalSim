@@ -2,7 +2,11 @@
 
 Three `tests/test_capacity.py` tests had failed on every tree since at least 2026-10-11: the G1 bound (109 rows where
 the test wanted 37 + 24·4 = 133), the task default (njmax 112, test 144), and "a too-small njmax raises" (no raise).
-Versions: Warp 95f6f121 (1.18.0.dev20260917), MuJoCo Warp cf0f8ad (`upstream/mujoco_warp`), MuJoCo 3.14.0, `.venv`.
+Versions: [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) at
+[`95f6f121`](https://github.com/pulipakaa24/warp/commit/95f6f121b7e67025958335c7c15e338ac04a798a) (1.18.0.dev20260917),
+[my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) at
+[`cf0f8ad`](https://github.com/pulipakaa24/mujoco_warp/commit/cf0f8adc8f99f0c559cf8580cb667952e473bd07)
+(`upstream/mujoco_warp`), [MuJoCo](https://github.com/google-deepmind/mujoco) 3.14.0, `.venv`.
 
 ## Rows per contact
 
@@ -14,10 +18,15 @@ pyramidal. Bound: 6 pairs × ≤ 4 contacts = 24 contacts; elliptic 37 + 72 = 10
 
 ## Timeline
 
-- 2026-09-26 04:23 `9a3ef746`: capacity bound, guard and tests, measured under the then-default pyramidal preset
-  (`recommended` = `tau10_impact_hardlimits`): njmax 144, +2.5 % full env step.
-- 2026-09-26 11:00 `7a385560`: G1 default `contact_cfg="recommended"` becomes elliptic (owner's decision). Bound →
-  109 / 112. Tests not updated. (`302bab5c`, 01:34, was the elliptic confirming run, not the switch.)
+- 2026-09-26 04:23
+  [`e1512a23`](https://github.com/pulipakaa24/MetalSim/commit/e1512a23196bd7f4f205803074e0c86423c499ea): capacity bound,
+  guard and tests, measured under the then-default pyramidal preset (`recommended` = `tau10_impact_hardlimits`): njmax
+  144, +2.5 % full env step.
+- 2026-09-26 11:00
+  [`1a1cf0db`](https://github.com/pulipakaa24/MetalSim/commit/1a1cf0db3e916878e7c8e042a1a842d1c86f9e75): G1 default
+  `contact_cfg="recommended"` becomes elliptic (owner's decision). Bound → 109 / 112. Tests not updated.
+  ([`c2f469e5`](https://github.com/pulipakaa24/MetalSim/commit/c2f469e5c6bb17d4f41d7ecb50036991690057ff), 01:34, was the
+  elliptic confirming run, not the switch.)
 
 ## Test 3: why it did not raise
 
@@ -37,7 +46,7 @@ Measured (`runs/fixfail/cap_tests_and_probe.log`, njmax 24, 100 control steps, 6
 
 | tree | worlds that overflowed (seen after each step's physics) | worlds `check_overflow` reports at the end |
 |---|---|---|
-| origin/main 94b75be8 | 31 | 18 (13 lost to resets) |
+| origin/main | 31 | 18 (13 lost to resets) |
 | this branch | 31 | 31 |
 
 In a training run with resets between log points, an overflow confined to worlds that then terminated would be
@@ -49,24 +58,31 @@ them per log window). `CAPACITY_FLAGS` gains NVMAX ("behavior undefined") and TA
 ## Second silent drop: connect / weld blocks that end exactly at njmax
 
 mujoco_warp `constraint.py` writes a connect equality's 3 rows (weld: 6) with
-`efcid = atomic_add(nefc, worldid, 3); if efcid >= njmax - 3: return`. A block that would occupy rows
-njmax − 3 … njmax − 1 fits but is dropped, and then nefc == njmax, so `_next_time`'s `nefc > njmax` check sets no
-NEFC bit. The solver then runs on 3 stale rows (put_data's copy of MuJoCo C's initial rows). Demonstrated: a ball
-hung by a connect equality with njmax 3 sags to z = 0.921 in 0.4 s (njmax 16: 0.9996) with no flag
-(`test_equality_block_ending_at_njmax_is_flagged`). Proper fix on the fork: branch `metalsim-eq-block-njmax` of
-pulipakaa24/mujoco_warp, commit `f52488b4` on top of the pinned cf0f8ad (`efcid + 3 > njmax`, `efcid + 6 > njmax`),
-with `constraint_test.test_equality_block_ending_at_njmax` (connect / weld x dense / sparse, njmax = block size): 4
-failed on cf0f8ad (efc rows left NaN), 4 passed with the fix; constraint_test.py 96 passed / 2 skipped, the
-equality forward / solver tests 4 passed / 1 skipped (`runs/fixfail/mjw_eqfix_tests.log`). Upstream
-google-deepmind/mujoco_warp main (76707759, 2026-10-12) has the same check. Workaround here until that was pinned:
-for models with connect / weld equalities the latch counted `nefc >= njmax` as NEFC (conservative: an exactly full,
-intact buffer also raised), and `Bounds.njmax` kept one spare row above nefc for such models so the auto bound never
-tripped it. **Update 2026-10-13:** the fix is on the fork's `metalsim` branch (fast-forwarded to `f52488b4`, head
-`f1b35e2` with its METALSIM_CHANGES.md entry) and MetalSim pins `f1b35e2`; the workaround is removed.
-`test_equality_block_ending_at_njmax_is_flagged` now checks connect and weld: njmax = block size holds the ball with
-no flag, njmax = block size − 1 (equality switched on after `put_data`, which refuses an njmax below MuJoCo C's
-initial nefc) sets MuJoCo Warp's own NEFC bit. On this Mac at f1b35e2 (`runs/eqfix/`): `tests/test_capacity.py` 8
-passed; rigid suite (tests/ minus test_mpm.py) 415 passed, 13 skipped; render suite 173 passed, 1 skipped; fork
+`efcid = atomic_add(nefc, worldid, 3); if efcid >= njmax - 3: return`. A block that would occupy rows njmax − 3 …
+njmax − 1 fits but is dropped, and then nefc == njmax, so `_next_time`'s `nefc > njmax` check sets no NEFC bit. The
+solver then runs on 3 stale rows (put_data's copy of MuJoCo C's initial rows). Demonstrated: a ball hung by a connect equality
+with njmax 3 sags to z = 0.921 in 0.4 s (njmax 16: 0.9996) with no flag
+(`test_equality_block_ending_at_njmax_is_flagged`). Proper fix on
+[my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim): branch
+[`metalsim-eq-block-njmax`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-eq-block-njmax), commit
+[`f52488b4`](https://github.com/pulipakaa24/mujoco_warp/commit/f52488b461fb3d609e9706bdd752a7dbf3c04837) on top of the
+pinned [`cf0f8ad`](https://github.com/pulipakaa24/mujoco_warp/commit/cf0f8adc8f99f0c559cf8580cb667952e473bd07)
+(`efcid + 3 > njmax`, `efcid + 6 > njmax`), with `constraint_test.test_equality_block_ending_at_njmax` (connect / weld x
+dense / sparse, njmax = block size): 4 failed on [`cf0f8ad`](https://github.com/pulipakaa24/mujoco_warp/commit/cf0f8adc8f99f0c559cf8580cb667952e473bd07) (efc rows left NaN), 4 passed with the fix; constraint_test.py
+96 passed / 2 skipped, the equality forward / solver tests 4 passed / 1 skipped (`runs/fixfail/mjw_eqfix_tests.log`).
+Upstream [google-deepmind/mujoco_warp](https://github.com/google-deepmind/mujoco_warp) main
+([`76707759`](https://github.com/google-deepmind/mujoco_warp/commit/7670775909e8138b372a0e377bc19addd5b12e3b),
+2026-10-12) has the same check. Workaround here until that was pinned: for models with connect / weld equalities the
+latch counted `nefc >= njmax` as NEFC (conservative: an exactly full, intact buffer also raised), and `Bounds.njmax`
+kept one spare row above nefc for such models so the auto bound never tripped it. **Update 2026-10-13:** the fix is on
+the `metalsim` branch of my fork of MuJoCo Warp (fast-forwarded to
+[`f52488b4`](https://github.com/pulipakaa24/mujoco_warp/commit/f52488b461fb3d609e9706bdd752a7dbf3c04837), head
+[`f1b35e2`](https://github.com/pulipakaa24/mujoco_warp/commit/f1b35e2b3ddc80b197b0c665bf6d71523d175daf) with its
+METALSIM_CHANGES.md entry) and MetalSim pins `f1b35e2`; the workaround is removed.
+`test_equality_block_ending_at_njmax_is_flagged` now checks connect and weld: njmax = block size holds the ball with no
+flag, njmax = block size − 1 (equality switched on after `put_data`, which refuses an njmax below MuJoCo C's initial
+nefc) sets MuJoCo Warp's own NEFC bit. On this Mac at [`f1b35e2`](https://github.com/pulipakaa24/mujoco_warp/commit/f1b35e2b3ddc80b197b0c665bf6d71523d175daf) (`runs/eqfix/`): `tests/test_capacity.py` 8 passed; rigid
+suite (tests/ minus test_mpm.py) 415 passed, 13 skipped; render suite 173 passed, 1 skipped; in my fork of MuJoCo Warp,
 `constraint_test.py` 96 passed, 2 skipped, `forward_test.py` + `solver_test.py` 150 passed, 8 skipped on Metal.
 
 ## Cost
@@ -76,9 +92,9 @@ njmax 112), exclusive timing job, 5 interleaved A/B repeats (`scripts/diagnostic
 `runs/fixfail/latch_cost.log`): with latch 40,653 env-steps/s (100.75 ms per control step), without 40,628
 (100.82 ms): within run-to-run noise (−0.06 %).
 
-With the fork fix pinned (2026-10-13) the `nefc >= njmax` rule and the spare row (`Bounds.eq_blocks`) are dropped: any
-block that does not fit leaves nefc > njmax, which MuJoCo Warp flags itself. The reset latch stays (it is independent
-of this bug).
+With the fix in [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) pinned (2026-10-13)
+the `nefc >= njmax` rule and the spare row (`Bounds.eq_blocks`) are dropped: any block that does not fit leaves nefc >
+njmax, which MuJoCo Warp flags itself. The reset latch stays (it is independent of this bug).
 
 ## Real-scale training with the latched guard (2026-10-13)
 
@@ -94,8 +110,8 @@ iteration), and the run reports `overflow_flags()` (latched, so every world sinc
 | Tron1 WF (64 / 16) | 8192, 50 it | PPOWarp (its own loop has no guard) | none | ITERATIONS 1 |
 | SO-101 lift (512 / 48) | 64, 30 it | torch PPO of train_lift (no guard in its loop) | none | ITERATIONS 20 |
 | ~~G1 rough, boxes_local / heightfield, trained rough checkpoint, envs spread over levels 0–9~~ (ran the untrained weights, see below) | 4096, 150 rollouts | rollout only, curriculum on | none | – |
-| ~~same, levels frozen, checkpoint's own training settings~~ (ran the untrained weights) | 4096, 150 rollouts | 14-inch, macOS 27 | none | – |
-| G1 rough, trained checkpoint actually loaded (2026-09-26 elliptic default, `g1_rough_ellip_default_s0.pt`), envs spread over levels 0–9: boxes_local / heightfield | 4096, 150 rollouts | rollout only, curriculum on; 16-inch | none | ITERATIONS 483 / 504 |
+| ~~same, levels frozen, checkpoint's own training settings~~ (ran the untrained weights) | 4096, 150 rollouts | 14-inch MacBook Pro (M4 Max), macOS 27 | none | – |
+| G1 rough, trained checkpoint actually loaded (2026-09-26 elliptic default, `g1_rough_ellip_default_s0.pt`), envs spread over levels 0–9: boxes_local / heightfield | 4096, 150 rollouts | rollout only, curriculum on; 16-inch MacBook Pro (M4 Max) | none | ITERATIONS 483 / 504 |
 | same, levels frozen (≈ 410 envs on each of the 10 levels for 3,600 control steps): boxes_local / heightfield | 4096, 150 rollouts | 16-inch | none | ITERATIONS 478 / 523 |
 
 Logs: `runs/fixfail/train/real_*.log` (+ `.anomalies.jsonl`, every log point's flags), `runs/fixfail/train_real.log`,
@@ -121,6 +137,7 @@ per-step change of the branch):
 | Tron1 8192 | 245,713 | 246,399 | +0.28 % | 0.9 % |
 | SO-101 lift 64 (env step) | 5,122 | 5,157 | +0.69 % | 7.7 % |
 
-Branch vs main (f3b5c62e) as whole training runs, one run each, 50 iterations (`runs/fixfail/train_real.log`): G1 flat
-63,073 vs 63,595, rough 50,692 vs 50,766, rough heightfield 52,623 vs 52,719, Tron1 135,654 vs 138,114, lift 2,039 vs
-2,138 env-steps/s (cumulative incl. startup; single runs, so within their noise; the A/B above is the measurement).
+Branch vs main ([`692cb13e`](https://github.com/pulipakaa24/MetalSim/commit/692cb13e99e1de89601e5bc5abc64221d352c45f))
+as whole training runs, one run each, 50 iterations (`runs/fixfail/train_real.log`): G1 flat 63,073 vs 63,595, rough
+50,692 vs 50,766, rough heightfield 52,623 vs 52,719, Tron1 135,654 vs 138,114, lift 2,039 vs 2,138 env-steps/s
+(cumulative incl. startup; single runs, so within their noise; the A/B above is the measurement).

@@ -1,10 +1,15 @@
 # Research notes: Isaac Lab 3.0-EA's IsaacContrib-Franka-Pour (2026-10-11/12)
 
-What the port (`metalsim/learn/franka_pour*.py`) reproduces, read from Isaac's source. Isaac Lab = `upstream/IsaacLab3`
-at `ae37b028` ("[Backport release/3.0.0] Point README at v3.0.0 EA documentation", the commit installed on the L4 machine);
-`IL` = `source/`, task files relative to `IL/isaaclab_tasks/isaaclab_tasks/contrib/franka_pour/`; Newton = 1.5.2
-(`NW` = `newton/_src/`, the Metal fork `metalsim-1.5.2` at `35791a07`); rsl_rl = `rsl-rl-lib` 5.4.1 (Isaac Lab 3.0-EA's
-pin, `uv.lock:2084-2085`; read from the 5.4.1 wheel, PyPI).
+What the port (`metalsim/learn/franka_pour*.py`) reproduces, read from Isaac's source.
+[Isaac Lab](https://github.com/isaac-sim/IsaacLab) = `upstream/IsaacLab3` at
+[`ae37b028`](https://github.com/isaac-sim/IsaacLab/commit/ae37b028ea415c91ea2bc32609efcd759ed2b974)
+("[Backport release/3.0.0] Point README at v3.0.0 EA documentation", the commit installed on the NVIDIA L4 GPU machine);
+`IL` = `source/`, task files relative to `IL/isaaclab_tasks/isaaclab_tasks/contrib/franka_pour/`;
+[Newton](https://github.com/newton-physics/newton) = 1.5.2 (`NW` = `newton/_src/`, the Metal branch `metalsim-1.5.2` of
+[my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim-1.5.2) at
+[`35791a07`](https://github.com/pulipakaa24/newton/commit/35791a077dbc74d8e5b4cb9d320faa72af2f3492));
+[rsl_rl](https://github.com/leggedrobotics/rsl_rl) = `rsl-rl-lib` 5.4.1 (Isaac Lab 3.0-EA's pin, `uv.lock:2084-2085`;
+read from the [5.4.1 wheel, PyPI](https://pypi.org/project/rsl-rl-lib/5.4.1/)).
 
 ## 1. Simulation stack per policy step
 
@@ -20,7 +25,7 @@ pin, `uv.lock:2084-2085`; read from the 5.4.1 wheel, PyPI).
   (`:2630-2632`, `collision_decimation=0`), then `num_substeps=2` x `SolverCoupledProxy.step(dt=1/240)` with state
   swaps and `clear_forces` (`:2565-2577`).
 * `SolverCoupledProxy.step` (`NW/solvers/coupled/solver_coupled.py:2207-2226`, `solver_coupled_proxy.py:1369-1569`):
-  distribute parent state to entries; the `arm` entry (MuJoCo Warp, 3 substeps of 1/720) gets the previous step's
+  distribute parent state to entries; the `arm` entry ([MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp), 3 substeps of 1/720) gets the previous step's
   harvested MPM wrench as `body_f`; staggered sync writes the arm's **end** cup poses and velocities into the media
   view; the `media` entry (implicit MPM, in place, 2 substeps of 1/480) steps; `coupling_harvest_proxy_wrenches`
   (`NW/solvers/implicit_mpm/solver_implicit_mpm.py:1773-1812`) converts collider impulses to proxy wrenches for the
@@ -41,7 +46,8 @@ pin, `uv.lock:2084-2085`; read from the 5.4.1 wheel, PyPI).
   update_data_interval 1; task: `use_mujoco_contacts=False`, implicitfast, njmax 2560, nconmax 400.
 * `NewtonCollisionPipelineCfg` defaults: broad phase explicit, reduce_contacts, `max_triangle_pairs` 1,000,000,
   soft_contact_margin 0.01 (`newton_collision_cfg.py:97-172`). This scene needs more than 1M triangle pairs from
-  ~1,250 worlds (newton-physics/newton#4604, fixed upstream by #4605); the port allocates 4,096 per world.
+  ~1,250 worlds ([newton-physics/newton#4604](https://github.com/newton-physics/newton/issues/4604), fixed upstream by
+[#4605](https://github.com/newton-physics/newton/pull/4605)); the port allocates 4,096 per world.
 * Actuators: `FRANKA_PANDA_CFG.actuators` (`IL/isaaclab_assets/.../robots/franka.py:51-73`) with the task's
   `replace(effort_limit_sim=None, velocity_limit_sim=None, stiffness=None, damping=None, armature=None)`
   (`pour_env_cfg.py:344-353`). `effort_limit_sim` is a deprecated alias of `joint_effort_limit`
@@ -63,7 +69,7 @@ pin, `uv.lock:2084-2085`; read from the 5.4.1 wheel, PyPI).
 ## 3. Assets
 
 Isaac 6.1 asset root (`apps/isaaclab.python.headless.kit:206`), fetched by `scripts/fetch_isaac_assets.sh`:
-`Robots/FrankaEmika/franka_panda.usda` (+ payloads; "MuJoCo USD Converter v0.2.0" of Menagerie's `mjx_panda`),
+`Robots/FrankaEmika/franka_panda.usda` (+ payloads; "MuJoCo USD Converter v0.2.0" of [Menagerie](https://github.com/google-deepmind/mujoco_menagerie)'s `mjx_panda`),
 `Contrib/MPM/Pour/franka_pour_cups.usda`, `Contrib/MPM/Pour/reset_dataset.pt` (20,000 rows, schema 12, content
 digest `74057f08...`), `Props/Mounts/SeattleLabTable/table_instanceable.usd` + `table.usd`. The 6.2 root serves
 byte-identical Franka and cup files.

@@ -3,8 +3,8 @@
 Scope: the handoff `docs/HANDOFF_elliptic_cone_perf.md` (another machine's session) found elliptic friction
 cones 2.9–3.9× slower than pyramidal on Metal and attributed it to the launch sizing of
 `_update_gradient_JTCJ_dense` in `mujoco_warp/_src/solver.py`. This note reproduces it on this machine,
-fixes it in a worktree of the MuJoCo Warp fork (`upstream/mujoco_warp-ellip`, branch `metalsim-elliptic`,
-based on `07a51a6`), audits the fork for every other non-CUDA fallback and capacity-sized launch, and
+fixes it in a worktree of [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) (`upstream/mujoco_warp-ellip`, branch
+[`metalsim-elliptic`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-elliptic), based on [`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc)), audits my fork for every other non-CUDA fallback and capacity-sized launch, and
 re-runs the fidelity protocol with elliptic cones now that they are cheap. Every number is labelled
 **measured** (this machine, M4 Max 40-core GPU, 64 GB, through `scripts/gpu_run.sh ... timing` on an idle
 device unless stated), **published** (from a document with a citation) or **estimated** (with the
@@ -12,13 +12,13 @@ reasoning). Scripts: `scripts/diagnostics/competitors/` (`elliptic_bench.sh`, `e
 `elliptic_cpu_check.py`, `elliptic_cpu_time.py`, `elliptic_fidelity_g1.sh`, `elliptic_presets.py`,
 `so101_creep.py`); logs `runs/competitors/elliptic_*.log`, `ellip_*.log`, `so101_creep_*`.
 
-Benchmark protocol (the handoff's, `metalsim_step.py ROBOT 4096 matched`): Menagerie scene, joint-space PD
+Benchmark protocol (the handoff's, `metalsim_step.py ROBOT 4096 matched`): [Menagerie](https://github.com/google-deepmind/mujoco_menagerie) scene, joint-space PD
 to random targets around the `home` keyframe resampled every 20 steps, 4 ms step, one substep, 4096 worlds,
 Newton 10 iterations / 20 line-search iterations, 1000 timed steps after 100 warm-up, graph replay,
 synchronized; `CONE=pyramidal|elliptic` overrides the model's cone, `JAC=dense|sparse` the constraint
 Jacobian layout, `NJMAX` the row capacity (MetalSim's default 512). Physics steps/s = 4096 × 1000 / wall time.
 
-## 1. Reproduction (measured, fork `07a51a6` unpatched, this machine)
+## 1. Reproduction (measured, fork [`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc) unpatched, this machine)
 
 | model (nv, Jacobian layout) | pyramidal steps/s | elliptic steps/s | elliptic cost | handoff (other machine) |
 |---|---|---|---|---|
@@ -28,7 +28,7 @@ Jacobian layout, `NJMAX` the row capacity (MetalSim's default 512). Physics step
 | SO-101 + box (12, dense; Menagerie's own cone elliptic, impratio 10) | 1,065,380 | 441,361 | 2.41× | – |
 | DeepMind humanoid (27, dense; `mujoco_warp/test_data/humanoid`) | 958,995 | 143,607 | 6.68× | – |
 
-The throughput agent's independent measurement on the installed fork agrees
+The throughput agent's independent measurement on [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) as installed agrees
 (`docs/research/throughput_regression_2026-09-25.md`: Go2 932,628 vs 239,935, 3.9×; SO-101 lift task
 292,171 vs 122,534 env-steps/s, 2.4×; Panda 28,403 vs 9,923 env-steps/s, 2.9×).
 
@@ -44,11 +44,11 @@ Per-kernel GPU time (measured, eager mode with `WP_METAL_PROFILE=1`, sum of disp
 | humanoid | 44.98 | `_update_gradient_JTCJ_dense` | 41.13 (91.4 %) | 11 |
 
 So the handoff's diagnosis holds for every dense-Jacobian model (the cone-term launch is 60–91 % of the
-step), but **not for the Menagerie G1**: with nv 35 MuJoCo Warp's `auto` rule picks the sparse Jacobian,
+step), but **not for the Menagerie G1**: with nv 35 [MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp)'s `auto` rule picks the sparse Jacobian,
 which never launches `_update_gradient_JTCJ_dense`. Its 2.8× comes from a second non-CUDA fallback in the
 same file: the sparse Hessian assembly `_JTDACJ_sparse` broadcasts the cone curvature terms from lane 0
 through a shared tile (`tile_scatter_masked`, CUDA cooperative groups), and the Metal device patch
-(`8ce5bb0`) ran that kernel with **one lane per constraint group** off CUDA (`threads_per_group = 1`), so the
+([`8ce5bb0`](https://github.com/pulipakaa24/mujoco_warp/commit/8ce5bb0084e43158ff962b95b7ad6bae933c4564)) ran that kernel with **one lane per constraint group** off CUDA (`threads_per_group = 1`), so the
 whole per-group Hessian block was computed serially by one thread.
 
 ## 2. Fixes (fork worktree `upstream/mujoco_warp-ellip`, branch `metalsim-elliptic`)
@@ -58,7 +58,7 @@ All behind environment variables read at import (defaults in bold), so every opt
 - `MJW_JTCJ_MODE` (dense Jacobian, Newton, elliptic cones):
   - `capacity`: upstream's non-CUDA fallback, `dim_block = naconmax` (33.6 M threads per launch at 4096 Go2
     worlds), kept for A/B.
-  - `contact`: upstream's CUDA form on any device that reports a core count (Warp's Metal backend exposes
+  - `contact`: upstream's CUDA form on any device that reports a core count (Warp's Metal backend, in [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim), exposes
     `Device.sm_count` = GPU cores, 40 here): `dim_block = ceil(sm_count · k · 256 / ndof_tri)` with
     `MJW_JTCJ_SM_FACTOR` = k (upstream's 6), each thread striding over contact slots. Handoff fix 1.
   - `world`: one thread per (world, Hessian entry) scanning the world's constraint rows for CONE-state
@@ -68,8 +68,8 @@ All behind environment variables read at import (defaults in bold), so every opt
     45 MB at njmax 512 × 4096 worlds), then one thread per (world, entry) applies the list. Same arithmetic
     and order as `world`.
 - `MJW_JTDAJ_ELLIPTIC_LANES` (sparse Jacobian, elliptic): **32** = full thread groups with the cone terms
-  evaluated per lane (a handful of loads per lane instead of the shared-tile broadcast); 1 = the fork's
-  previous one-lane groups.
+  evaluated per lane (a handful of loads per lane instead of the shared-tile broadcast); 1 = the previous
+  one-lane groups of [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim).
 - `MJW_JTDAJ_GROUPS_PER_WORLD` (sparse Jacobian): constraint groups processed in parallel per world; **0** =
   Warp's occupancy query, which is (1, 1) off CUDA and gives one group per world.
 - `MJW_CCD_GRID_WAVES` (`collision_convex._ccd_grid_size`): off-CUDA CCD grid as k · cores · 256 threads
@@ -98,11 +98,11 @@ profile): Go2 `world` 1.54 ms (19.6 % of 7.86), `world2` 1.26 ms (14.0 % of 8.97
 
 What remains of the elliptic premium is the solver structure, not a launch: with elliptic cones MuJoCo Warp
 rebuilds H = M + JᵀDJ (the tiled `_update_gradient_JTDAJ_dense_tiled`: Go2 0.94–1.09 ms, G1 dense 3.65 ms)
-and refactors it every iteration, where pyramidal cones use the fork's fused incremental Hessian update +
-register Cholesky (`ccfaffb`); on the sparse path `_update_gradient_init_h_sparse` (5.5 ms on the G1) has the
+and refactors it every iteration, where pyramidal cones use my fork's fused incremental Hessian update +
+register Cholesky; on the sparse path `_update_gradient_init_h_sparse` (5.5 ms on the G1) has the
 same role. Next to it: `_update_constraint_efc` and the line search are launched over (nworld, njmax) = 2.1 M
 threads at njmax 512 (Go2 `NJMAX=64` with `world`: 608,499 steps/s, +9.9 %; the G1 task rejected njmax 128 as
-+1.8 % in DECISIONS, so this is a per-scene MetalSim option, `BatchSimOptions(njmax=)`).
++1.8 % in [DECISIONS](../DECISIONS.md), so this is a per-scene MetalSim option, `BatchSimOptions(njmax=)`).
 
 CPU device (measured, `elliptic_cpu_time.py`, Go2 elliptic, 32 worlds, 20 steps): `capacity` 12.8–13.4
 ms/step, `world` 5.8–6.0, `world2` 5.1. The "fall back for CPU" branch was slow on the CPU too.
@@ -129,17 +129,17 @@ ms/step, `world` 5.8–6.0, `world2` 5.1. The "fall back for CPU" branch was slo
   the rebuild; not implemented, kept as the next step if elliptic cones become a default anywhere.
 - **`contact` mode** (upstream's form with the SM count): 3–20 % slower than `world2` on Go2 / G1 dense
   (measured above), has a tuning factor and atomics; kept as `MJW_JTCJ_MODE=contact`.
-- **Upstream `main`'s cone math**: upstream commit `bc8ed60` (#1660, after v3.14.0) rewrote the same
+- **Upstream `main`'s cone math**: upstream commit [`bc8ed60`](https://github.com/google-deepmind/mujoco_warp/commit/bc8ed608f66273e9ead6a72779c13c6362b107c7) ([#1660](https://github.com/google-deepmind/mujoco_warp/pull/1660), after v3.14.0) rewrote the same
   contraction in a scale-invariant form (projections normalised by t, `mu·n/t` instead of `mu·n/t³`), tested by
-  `test_elliptic_hessian_scale_invariance`. The fork keeps v3.14.0's form so that physics stays within float
-  noise of the unpatched fork (the two differ only when |Jaref| of a cone contact is below ~1e-4, where the
+  `test_elliptic_hessian_scale_invariance`. My fork keeps v3.14.0's form so that physics stays within float
+  noise of my unpatched fork (the two differ only when |Jaref| of a cone contact is below ~1e-4, where the
   old form's `t³` clamp at `MJ_MINVAL` bites); adopting the new form is a separate, upstream-tracking change.
 
 ### 2.3 Physics unchanged (measured)
 
 - CPU oracle (`elliptic_cpu_check.py`, Warp CPU device vs `mj_step`, 2 worlds, PD to random targets, elliptic
   cones): Go2 max |dq| at steps 1 / 2 / 5 / 10 / 20 / 40 = 1.8e-7 / 2.3e-7 / 1.9–3.0e-7 / 6.7–6.9e-7 /
-  1.8–1.9e-6 / 2.1–2.4e-6 rad for `capacity`, `contact`, `world`, `world2` and the unpatched fork alike
+  1.8–1.9e-6 / 2.1–2.4e-6 rad for `capacity`, `contact`, `world`, `world2` and my unpatched fork alike
   (the 3.0 vs 1.9e-7 and 2.4 vs 2.1e-6 spread is the summation order: atomics vs one thread per entry);
   G1 sparse 6.7e-8 … 4.3e-7 identical for every mode (the CPU runs one lane per group, so the lanes change
   is exercised on Metal only); SO-101 2.4e-8 … 1.3e-7; humanoid 1.6e-7 … 2.9e-4 at 20 steps (the falling
@@ -161,7 +161,7 @@ ms/step, `world` 5.8–6.0, `world2` 5.1. The "fall back for CPU" branch was slo
   `elliptic_check_compare.py`.
 - A first round of these checks (`ellip_check_base.log` / `_world.log` / `_contact.log`) showed the base
   configuration 1.4e-2 rad from itself with 100 % of worlds apart at step 25, which turned out to be a
-  defect of the check script, not of the fork: it wrote `ctrl` through the torch view of the shared Metal
+  defect of the check script, not of my fork: it wrote `ctrl` through the torch view of the shared Metal
   buffer (`sim.t.ctrl.copy_` + `torch.mps.synchronize()`), which runs on torch's command queue and can land
   while the previous step's graph is still executing on Warp's queue; the slow base configuration hit it,
   the fast patched one rarely did. The scripts now write `ctrl` and the reset state through Warp after
@@ -169,18 +169,18 @@ ms/step, `world` 5.8–6.0, `world2` 5.1. The "fall back for CPU" branch was slo
   in its timing; `metalsim/learn/so101_lift.py` writes `ctrl` through the torch view before `sim.step()`
   as well (line 211) and should be checked by its owner (a stale-`ctrl` race would change actions, not
   timing).
-- MuJoCo C oracle on Metal (4 worlds, PD hold + fixed random targets, elliptic; max |dq| vs `mj_step` at
+- [MuJoCo](https://github.com/google-deepmind/mujoco) C oracle on Metal (4 worlds, PD hold + fixed random targets, elliptic; max |dq| vs `mj_step` at
   0.004 / 0.016 / 0.048 / 0.1 / 0.2 / 0.4 s, race-free re-run `ellip_oracle_*.log`): Go2 base 1.89e-7 /
   4.13e-7 / 4.98e-5 / 8.28e-5 / 7.64e-5 / 9.19e-5 rad, `world2` 1.89e-7 / 4.13e-7 / 4.99e-5 / 8.28e-5 / 7.66e-5 /
   9.20e-5; G1 sparse base 5.91e-8 / 1.23e-7 / 1.94e-7 / 6.23e-7 / 2.07e-6 / 3.46e-6, `world2` (lanes 32) 5.91e-8
   / 1.23e-7 / 1.81e-7 / 6.29e-7 / 2.13e-6 / 3.50e-6; G1 dense base 5.91e-8 / 1.23e-7 / 1.96e-7 / 6.47e-7 /
   1.80e-6 / 3.44e-6, `world2` 5.91e-8 / 1.23e-7 / 1.81e-7 / 6.29e-7 / 2.13e-6 / 3.50e-6: the same envelope
   against MuJoCo C, to the third digit at the early steps.
-- Fork test suite on Metal (`pytest` in the worktree, default `world2`, `ellip_pytest_full.log`): **1450
+- My fork's test suite on Metal (`pytest` in the worktree, default `world2`, `ellip_pytest_full.log`): **1450
   passed, 39 skipped, 2 failed** in 7.0 min; both failures (`collision_driver_test::test_hfield_maxconpair`,
   `io_test::test_put_data_nefc_zero_dense`, `AssertionError: 1 != 0`) fail identically on the unpatched
-  `07a51a6` (`ellip_pytest_hf_base.log`, `ellip_pytest_io_base.log`), so they predate this work (the flex
-  merge `8fbf965`; the handoff's "316 tests" was a subset count from an earlier tree). CPU device (`--cpu`,
+  [`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc) (`ellip_pytest_hf_base.log`, `ellip_pytest_io_base.log`), so they predate this work (the flex
+  merge [`8fbf965`](https://github.com/pulipakaa24/mujoco_warp/commit/8fbf965acb630aa32573dda802404d519c843a99); the handoff's "316 tests" was a subset count from an earlier tree). CPU device (`--cpu`,
   `solver_test`, `forward_test`, `constraint_test`): 242 passed, 10 skipped in the worktree; the upstream-PR
   worktree on `main`: 246 passed, 10 skipped.
 
@@ -197,17 +197,17 @@ Representative set at 4096 worlds: G1 task (43 dofs, dense, pyramidal, the RL pa
 | `solver._update_gradient_init_h_sparse` (nworld, nv_pad, nv_pad) | same on CUDA; 9.4 M threads per iteration | no (both) | 14 % of the G1 sparse elliptic step (measured); pyramidal skips it (incremental) | estimated fix: write only the upper triangle from the CSR list, ~2× on this kernel (7 % of the step); not done (the G1 task is dense) |
 | `solver._update_constraint_efc`, `_linesearch_jv_fused`, `_linesearch_zero_jv` (nworld, njmax) | capacity-sized on every device; 2.1 M threads per iteration at njmax 512 | no (both) | Go2 elliptic: 1.5–1.8 ms of 8–9 (measured); njmax 64 → +9.9 % (measured) | `BatchSimOptions(njmax=)` per scene (DECISIONS row of the G1: +1.8 % for 128) |
 | `solver` `graph_conditional` (`capture_while` CUDA only) | all `opt.iterations` iterations launched, converged worlds exit per kernel | yes | none at these settings: 500–3400 of 4096 worlds hit the iteration cap every step, so the batch would run all iterations on CUDA too (measured `overflow` counts) | – |
-| `solver._cholesky_factorize_solve` (`_DENSE_CHOL_MAX_OFF_CUDA`, block 32) | fork's Metal path (register Cholesky) | no (fork-optimised) | 4–17 % of the step (measured) | already decided (DECISIONS 09-25) |
+| `solver._cholesky_factorize_solve` (`_DENSE_CHOL_MAX_OFF_CUDA`, block 32) | [my fork's](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) Metal path (register Cholesky) | no (fork-optimised) | 4–17 % of the step (measured) | already decided (DECISIONS 09-25) |
 | `collision_convex._ccd_grid_size` (`naconmax` off CUDA) | 196,608-thread grid striding over `ncollision` pairs | yes | G1 pyramidal: waves 2 → −7.7 %, waves 8 → +1.0 % (measured): the idle threads are not the cost, the GJK/EPA work is (2.7 ms, 12 % of the G1 step) | knob `MJW_CCD_GRID_WAVES` kept, default 0 |
-| `collision_convex` hfield kernel `dim=naconmax` | capacity-sized on every device | no (both) | rough terrain only; the fork's per-triangle patch (`f2716b4`) is a different kernel | estimated < 2 % (one launch per step, early exit) |
+| `collision_convex` hfield kernel `dim=naconmax` | capacity-sized on every device | no (both) | rough terrain only; my fork's per-triangle patch is a different kernel | estimated < 2 % (one launch per step, early exit) |
 | `collision_primitive._primitive_narrowphase` `dim=naconmax` | capacity-sized on every device | no (both) | 0.05–0.19 ms per step (measured, < 1 %) | – |
 | `collision_driver` SAP broadphase (`wp.utils.segmented_sort_pairs`, `array_scan`: host-side on Metal) | host sorts | yes, when `opt.broadphase` is SAP | none: every model here uses the default NXN broadphase (`_nxn_broadphase` in the profiles) | flex has its device sorts (`FLEX_DEVICE_SORT`); SAP would need the same |
 | `constraint._efc_contact_init` / `_efc_contact_jac_*` `dim=naconmax` or (naconmax, nmaxdim) | capacity-sized on every device, once per step | no (both) | 0.09–0.13 ms per step (measured, < 1.5 %) | – |
 | `sensor` collision / touch / contact sensors `dim=naconmax` | capacity-sized, once per step | no (both) | only with those sensors; estimated < 1 % (one early-exit launch) | – |
 | `smooth._cfrc_ext_contact` `dim=naconmax`, `smooth` adhesion (nacttrnbody, naconmax, nv) | capacity-sized | no (both) | only with cfrc sensors / adhesion actuators; estimated < 1 % | – |
-| `smooth._factor_i_sparse` / `_solve_LD_sparse` | fork's one-world-per-thread Metal path | no (fork-optimised) | 3–5 % of the G1 step (measured) | already decided (`ad22120`) |
+| `smooth._factor_i_sparse` / `_solve_LD_sparse` | my fork's one-world-per-thread Metal path | no (fork-optimised) | 3–5 % of the G1 step (measured) | already decided ([`ad22120`](https://github.com/pulipakaa24/mujoco_warp/commit/ad2212000943ac4285afcf6e942754329bf2cf44)) |
 | `island.py`, `sleep.py` (nworld, njmax) / `naconmax` launches | capacity-sized | no (both) | islands / sleeping are off in every task here | – |
-| `collision_flex` (`_device_sort`, `dim=naconmax` launches) | device sorts on Metal (fork) | no (fork-optimised) | flex scenes only | already decided (`361f11f`) |
+| `collision_flex` (`_device_sort`, `dim=naconmax` launches) | device sorts on Metal (my fork) | no (fork-optimised) | flex scenes only | already decided ([`361f11f`](https://github.com/pulipakaa24/mujoco_warp/commit/361f11f03ed2efe0845d0090b477045d7e9af7c8)) |
 | `warp_util.check_toolkit_driver` | CUDA-only warning | – | none | – |
 
 Reading: two sites were on a Metal-specific slow path and mattered (both fixed here); the remaining
@@ -219,8 +219,8 @@ matters when a model takes the sparse Jacobian with elliptic cones.
 
 ### 4.1 G1 (Isaac-Velocity-Flat-G1 asset, PhysX reference)
 
-Protocol: PARITY §1.7 / DECISIONS 2026-09-25 (`metalsim.parity.record_g1` A_hold / B_random / C_drop vs
-Isaac 5.1's `parity_out2/rt` recording, `compare.py`, momentum-derived impulses, Isaac's checkpoints played
+Protocol: [PARITY](../PARITY.md) §1.7 / DECISIONS 2026-09-25 (`metalsim.parity.record_g1` A_hold / B_random / C_drop vs
+[Isaac Sim](https://github.com/isaac-sim/IsaacSim) 5.1's `parity_out2/rt` recording, `compare.py`, momentum-derived impulses, Isaac's checkpoints played
 on the task for transfer, `air_time_rollout.py` for feet_air_time / feet_slide of Isaac's checkpoint 1000,
 `bench_contact_tuning.py` for cost). Presets: the adopted `tau10_impact_hardlimits` plus elliptic cones at
 impratio 1 / 10 / 100 on top of it (`elliptic_presets.py` registers `tau10_impact_elliptic[_imp10|_imp100]_hardlimits`),
@@ -237,7 +237,7 @@ and the earlier `elliptic_hardlimits` for continuity with the DECISIONS row.
 Sources: `runs/parity/tuning/report_<preset>/report.json` (`compare.py`, momentum-derived impulses and
 20 ms mean forces from `contact_momentum`), `runs/competitors/ellip_fid_{rec,transfer,air,cost_world2}.log`,
 `runs/contact_research/air_time/isaac1000_<preset>.json` (mean action, seed 1, ~1140 episodes; seed noise
-±0.0006 slide, ±0.0005 air from the earlier batch). Isaac's PhysX numbers are the §1.7 references.
+±0.0006 slide, ±0.0005 air from the earlier batch). Isaac's [PhysX](https://github.com/NVIDIA-Omniverse/PhysX) numbers are the §1.7 references.
 
 Reading. Impulses per event are within 1–3 % for every preset (as before: the contact model conserves the
 same momentum). What elliptic cones change, on top of the adopted impact-only stiffening, is the force
@@ -254,7 +254,7 @@ is not usable at this budget; impratio 10 leaves 60–177 worlds at the cap (pyr
 ### 4.2 SO-101 grasp: in-hand creep (measured, MuJoCo C, `so101_creep.py`)
 
 MuJoCo's modelling guide recommends elliptic cones with a large impratio (and the Newton solver) when
-contact slip is a problem (published: mujoco.readthedocs.io/en/stable/modeling.html, "Contact slip"); the
+contact slip is a problem (published: [mujoco.readthedocs.io/en/stable/modeling.html](https://mujoco.readthedocs.io/en/stable/modeling.html#cslippage), "Contact slip"); the
 handoff cites a so101Sim / YAM grasp study with 1–2 mm elliptic vs 1–2.8 cm pyramidal creep. Our scene is the
 lift task's (`assets/so101/scene_box_rl.xml`: 4 × 4 × 6 cm box, friction 1, box solref 0.01 / 1, the arm's
 Menagerie servos, 5 ms step, Newton 10 / 20, **the scene's own setting is elliptic with impratio 10**).
@@ -282,7 +282,7 @@ pyramidal. The real gripper does not creep (rigid Coulomb friction) and PhysX's 
 grasp with drift only from its own iteration count, so on this metric pyramidal is the more faithful setting
 for the lift task, and the published recommendation does not transfer to this scene as configured. Caveats:
 one grasp pose, one box; the study the handoff cites used a different gripper and contact parameters.
-MuJoCo Warp on Metal, same protocol, 64 identical worlds, fork `c301880` (measured, `runs/competitors/so101_creep_warp.log`):
+MuJoCo Warp on Metal, same protocol, 64 identical worlds, [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) at [`c301880`](https://github.com/pulipakaa24/mujoco_warp/commit/c30188029f6729b9f7cfe69706d6b8069b7f53d2) (measured, `runs/competitors/so101_creep_warp.log`):
 pyramidal 0.85 / 1.35 / 2.82 mm, elliptic impratio 1: 4.75 / 4.96 / 6.21, impratio 10: 5.31 / 5.79 / 8.09,
 impratio 100: 1.55 / 1.81 / 4.18, elliptic 10 + impedance 0.99: 2.96 / 3.60 / 6.05 (hold / wrist_roll /
 shoulder_lift; MuJoCo C above), i.e. the Metal elliptic path reproduces MuJoCo C's creep to 0.1–0.3 mm; the
@@ -299,7 +299,7 @@ record of the defect); the race-free run matches C.
   ~60 % of the step, estimated ~1.25×). Evidence: drop-torso and hold 20 ms forces at 1.07–1.08× PhysX's instead
   of 1.23–1.70×, penetration −5 %, slide 9 % closer, everything else unchanged, except +18 % falls of a
   PhysX-trained checkpoint (a policy trained on the preset is the check, as for the adopted preset). PhysX's own
-  cone is exact (not a pyramid), so this is also the structurally faithful choice; Isaac Lab 3.0's MuJoCo-Warp
+  cone is exact (not a pyramid), so this is also the structurally faithful choice; [Isaac Lab](https://github.com/isaac-sim/IsaacLab) 3.0's MuJoCo-Warp
   G1 settings use pyramidal for cost, not fidelity (`runs/parity3/isaac/newton_mjwarp_settings.json`). The
   owner decides; the earlier "no slide gain, 3.84×" rejection no longer holds.
 - **Go2-class quadrupeds** whose Menagerie model declares elliptic cones (impratio 100): keep the model's cone
@@ -313,17 +313,17 @@ record of the defect); the race-free run matches C.
 ## 5. Upstream
 
 `scripts/diagnostics/mjwarp_upstream/DRAFT_elliptic_launch.md`: draft PR text for the world-major kernel
-as the off-CUDA path (branch `elliptic-jtcj-offcuda` on the fork, one commit `ce17a73` on upstream `main`
-`cc97eea`, using `main`'s scale-invariant cone math; CPU tests 246 passed / 10 skipped; not opened).
+as the off-CUDA path (branch [`elliptic-jtcj-offcuda`](https://github.com/pulipakaa24/mujoco_warp/tree/elliptic-jtcj-offcuda) of [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim), one commit on upstream `main`
+[`cc97eea`](https://github.com/google-deepmind/mujoco_warp/commit/cc97eea203bb6d18f5795cd5922a65da1e1051ce), using `main`'s scale-invariant cone math; CPU tests 246 passed / 10 skipped; not opened).
 
 ## 6. Status and what is left open
 
-Done: reproduction, fixes (fork commits `c301880` + `4d53712` on `metalsim-elliptic`, pushed to the fork,
+Done: reproduction, fixes (commits [`c301880`](https://github.com/pulipakaa24/mujoco_warp/commit/c30188029f6729b9f7cfe69706d6b8069b7f53d2) + [`4d53712`](https://github.com/pulipakaa24/mujoco_warp/commit/4d53712bd5e8397dfab4e99bd1d07b594222edd2) on [`metalsim-elliptic`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-elliptic), pushed to [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim),
 **not merged** into `metalsim`: the main session's approval is needed), Metal and CPU physics checks, fork
 test suite, audit, G1 fidelity re-check, SO-101 creep protocol, upstream PR draft (branch
-`elliptic-jtcj-offcuda`, pushed, not opened). Open:
+[`elliptic-jtcj-offcuda`](https://github.com/pulipakaa24/mujoco_warp/tree/elliptic-jtcj-offcuda), pushed, not opened). Open:
 
-- Merging `metalsim-elliptic` into the fork's `metalsim` (fast-forward from `07a51a6`) and fast-forwarding the
+- Merging `metalsim-elliptic` into my fork's `metalsim` (fast-forward from [`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc)) and fast-forwarding the
   shared checkout; then re-running the G1 headline throughput (pyramidal path untouched: the only shared code
   change is `_JTDACJ_sparse`'s factory signature and the `SolverContext` fields, allocated only for elliptic
   dense Newton; G1 pyramidal measured within noise in every job here).
@@ -332,15 +332,15 @@ test suite, audit, G1 fidelity re-check, SO-101 creep protocol, upstream PR draf
   of the PhysX-trained checkpoint.
 - The remaining elliptic premium (H rebuilt every iteration, §2.2) and the sparse-path `init_h_sparse` (§3)
   are the next throughput items if elliptic becomes a default.
-- The two pre-existing fork test failures are root-caused in §7 (one fixed on a fork branch, one a MuJoCo
+- The two pre-existing fork test failures are root-caused in §7 (one fixed on a branch of my fork, one a MuJoCo
   version dependence).
 - `metalsim/learn/so101_lift.py`: **no race** (correction of the first version of §2.3): its `step()` signals
   the learner event from torch after the `ctrl` write and the sim waits on it before its graph
   (`_learner_done`), and `sim.after(vs)` makes torch wait for the step's completion before the next write.
   My check scripts lacked exactly that pair. `tests/test_lift_ctrl_ordering.py` pins the order of the four
   calls per step and checks the event-ordered loop against host-synchronised stepping (§7).
-- Upstream `main`'s scale-invariant cone math (`bc8ed60`) is not in the fork (v3.14.0 form kept for
-  float-noise parity with the unpatched fork); adopting it is a separate upstream-tracking change.
+- Upstream `main`'s scale-invariant cone math ([`bc8ed60`](https://github.com/google-deepmind/mujoco_warp/commit/bc8ed608f66273e9ead6a72779c13c6362b107c7)) is not in my fork (v3.14.0 form kept for
+  float-noise parity with my unpatched fork); adopting it is a separate upstream-tracking change.
 
 ## 7. Follow-ups requested by the coordinator (2026-09-25 late evening)
 
@@ -452,40 +452,40 @@ if a stale `ctrl` reached the physics. No change to `metalsim/learn/so101_lift.p
 ### 7.4 The two pre-existing fork test failures (both fail on the CPU device too, so not Metal-specific)
 
 - `collision_driver_test::test_hfield_maxconpair` (a 2 × 2 m box resting 1 mm into a 0.2 × 0.2 m heightfield,
-  expects 4 contacts, gets 0): passes at `8ce5bb0` (Metal device patch), fails from `f2716b4` (the fork's
-  per-triangle heightfield plane contacts, MetalSim's rough-terrain fix). Root cause: that path tests every
+  expects 4 contacts, gets 0): passes at [`8ce5bb0`](https://github.com/pulipakaa24/mujoco_warp/commit/8ce5bb0084e43158ff962b95b7ad6bae933c4564) (Metal device patch), fails from [`f2716b4`](https://github.com/pulipakaa24/mujoco_warp/commit/f2716b4e7873ed40b8405c0840238610349c7e7e) (the per-triangle heightfield plane
+  contacts of [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim), MetalSim's rough-terrain fix). Root cause: that path tests every
   vertex of a mesh of ≤ 256 vertices against each triangle's column (the G1 feet), but for primitives it only
   has the single support point along the triangle normal, and a box's bottom corner lies outside every
   triangle's footprint of a heightfield smaller than the box, so no triangle claims a contact; upstream's
-  GJK/EPA against the prism clips the box instead. Fix on fork branch `metalsim-hfield-test` (`b630530`, from
-  `4d53712`): primitives take upstream's GJK/EPA path, meshes keep the plane path;
+  GJK/EPA against the prism clips the box instead. Fix on my fork's branch `metalsim-hfield-test` ([`b630530`](https://github.com/pulipakaa24/mujoco_warp/commit/b63053080fff862d41c502fbffa3a03f799ae3f2), from
+  [`4d53712`](https://github.com/pulipakaa24/mujoco_warp/commit/4d53712bd5e8397dfab4e99bd1d07b594222edd2)): primitives take upstream's GJK/EPA path, meshes keep the plane path;
   `HFIELD_PLANE_CONTACTS_PRIMITIVES = True` restores the previous form (archived). CPU: `-k hfield` 3 passed
   (was 1 failed). MetalSim's `tests/test_terrain.py::test_hfield_mesh_contacts_match_mujoco_c` (the G1 feet,
   mesh path unchanged) and `test_plane_convex_contacts.py` against that branch on Metal: 24 passed; the fork's
   own `collision_driver_test -k hfield` on Metal: 3 passed (`runs/competitors/hfield_gate_tests{,2}.log`).
   Not merged (coordinator's call; the G1 rough task uses mesh feet on the heightfield, so its contacts are
   unchanged; scenes with primitive geoms on heightfields go back to upstream's behaviour).
-  **Correction (2026-10-31):** it was merged into the fork's `metalsim` the same evening (`b630530` with its
-  METALSIM_CHANGES.md row `fe6fe71`, on the branch's first-parent line), and is in every MuJoCo Warp pin since the first,
-  `cf0f8ad` (2026-10-12), including `8eb51fe`; "not merged" above was the state when this section was written. The
-  heightfield path changed again on 2026-10-31 (pin `93e5ce1`): meshes leave the plane path for GJK/EPA, with
+  **Correction (2026-10-31):** it was merged into my fork's `metalsim` the same evening ([`b630530`](https://github.com/pulipakaa24/mujoco_warp/commit/b63053080fff862d41c502fbffa3a03f799ae3f2) with its
+  METALSIM_CHANGES.md row [`fe6fe71`](https://github.com/pulipakaa24/mujoco_warp/commit/fe6fe711edf70de2449e30fa62d54c430f6a6e7e), on the branch's first-parent line), and is in every MuJoCo Warp commit MetalSim
+  has pinned since the first, [`cf0f8ad`](https://github.com/pulipakaa24/mujoco_warp/commit/cf0f8adc8f99f0c559cf8580cb667952e473bd07) (2026-10-12), including [`8eb51fe`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624); "not merged" above was the state when this section was written. The
+  heightfield path changed again on 2026-10-31 (pin [`93e5ce1`](https://github.com/pulipakaa24/mujoco_warp/commit/93e5ce18e76854c430ce669314af00ddceb92147)): meshes leave the plane path for GJK/EPA, with
   upstream's side-wall override removed and distinct prism support indices (`docs/research/hfield_contacts_2026-10-31.md`).
 - `io_test::test_put_data_nefc_zero_dense` (`AssertionError: 1 != 0` at `self.assertEqual(mjd.nefc, 0)`): the
   assertion is on MuJoCo C's own `MjData` before MuJoCo Warp is involved. In the installed MuJoCo 3.14.0 the
   fixture's tendon with `frictionloss="0.5"` instantiates one `mjCNSTR_FRICTION_TENDON` row (nefc = 1); the test
-  (added with the v3.14.0 bump, `88af9cc`) expects none, and fails identically on upstream `main` `cc97eea` with
+  (added with the v3.14.0 bump, upstream [`88af9cc`](https://github.com/google-deepmind/mujoco_warp/commit/88af9cc682d42e2e925daa0bae25f53277999f7b)) expects none, and fails identically on upstream `main` [`cc97eea`](https://github.com/google-deepmind/mujoco_warp/commit/cc97eea203bb6d18f5795cd5922a65da1e1051ce) with
   3.14.0. Upstream's lock file pins a MuJoCo nightly from py.mujoco.org (`3.13.1.dev984848064`), where the
   fixture evidently has nefc = 0; so this is a MuJoCo-version dependence of the test, not a fork or Metal
   defect. No change; expected to fail with a released MuJoCo 3.14.0.
-- Aside noticed while bisecting: every pre-existing MetalSim commit on the fork's `metalsim` branch
-  (`f2716b4` … `07a51a6`) carries a `Co-Authored-By: Claude` trailer, so that branch's history is not
+- Aside noticed while bisecting: every pre-existing MetalSim commit on my fork's `metalsim` branch
+  ([`f2716b4`](https://github.com/pulipakaa24/mujoco_warp/commit/f2716b4e7873ed40b8405c0840238610349c7e7e) … [`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc)) carries a `Co-Authored-By: Claude` trailer, so that branch's history is not
   CLA-clean as a whole; anything for upstream has to be re-committed on a clean branch (as the PR branch
-  `elliptic-jtcj-offcuda` is: one clean commit on upstream `main`; my two `metalsim` commits carry no trailer).
+  [`elliptic-jtcj-offcuda`](https://github.com/pulipakaa24/mujoco_warp/tree/elliptic-jtcj-offcuda) is: one clean commit on upstream `main`; my two `metalsim` commits carry no trailer).
 
 ## 8. Cutting the elliptic premium (2026-09-26, coordinator's follow-up; fork branches `metalsim-elliptic2*`)
 
-Goal: make elliptic cones as cheap as they can be before the G1 default decision. Baseline at fork `fe6fe71`
-(= shared checkout `b630530`): G1 task elliptic impratio 10 at 1.42× physics / 1.44× loop vs pyramidal.
+Goal: make elliptic cones as cheap as they can be before the G1 default decision. Baseline at [`fe6fe71`](https://github.com/pulipakaa24/mujoco_warp/commit/fe6fe711edf70de2449e30fa62d54c430f6a6e7e) of [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim)
+(= shared checkout [`b630530`](https://github.com/pulipakaa24/mujoco_warp/commit/b63053080fff862d41c502fbffa3a03f799ae3f2)): G1 task elliptic impratio 10 at 1.42× physics / 1.44× loop vs pyramidal.
 Protocol for the numbers below: `metalsim_step.py ROBOT 4096 matched` through the timing queue (PD to random
 targets, Newton 10 / 20, 1000 timed steps); `g1task` = the task's own model (Isaac's G1 asset, 43 dofs, its PD
 servos, 2.5 ms × 8 substeps per call, `recommended` or `tau10_impact_hardlimits_ellip10`), physics steps/s.
@@ -547,7 +547,7 @@ from either start), so it was not built.
 | variant (flag) | G1 task ellip10, physics steps/s | Go2 | humanoid | SO-101 |
 |---|---|---|---|---|
 | pyramidal (`recommended`, reference) | 3,268,888 | 923,850 | 958,995 | 1,065,380 |
-| baseline `b630530` (full JᵀDJ rebuild + cone term + Cholesky every iteration) | 2,061,253 (1.59×) | 580,782 | 640,936 | 816,143 |
+| baseline [`b630530`](https://github.com/pulipakaa24/mujoco_warp/commit/b63053080fff862d41c502fbffa3a03f799ae3f2) (full JᵀDJ rebuild + cone term + Cholesky every iteration) | 2,061,253 (1.59×) | 580,782 | 640,936 | 816,143 |
 | mode 1: incremental h + cone term added inside the fused Cholesky launch (`MJW_ELLIPTIC_INCREMENTAL=1`) | 1,738,302 (1.88×) | 606,498 | 613,305 | 820,336 |
 | **mode 2: per-entry deltas + cone term → htot, plain register Cholesky (`=2`, default)** | **2,187,925 (1.49×)** | **623,230** | **666,355** | **847,292** |
 | mode 2 + zero-row skip in the cone kernel (`MJW_CONE_SKIP_ZERO=1`, archived: the 3 test loads cost more than the skipped ones) | 2,182,409 (−0.3 %) | 607,832 (−2.5 %) | 660,338 (−0.9 %) | 838,682 (−1.0 %) |
@@ -561,9 +561,9 @@ factor 0.95); elliptic baseline 16.86 (Cholesky 6.01 ×11, cone term 2.39, tiled
 
 In the task's own protocol (`bench_contact_tuning.py`: 4096 worlds, standing start, 3 s, 8 substeps of 2.5 ms,
 physics only, 3 interleaved repeats): `recommended` 78,349 env-steps/s, `tau10_impact_hardlimits_ellip10`
-**64,519 (1.21×)** with mode 2, against 55,379 (1.42×) at `b630530` and 11,029 (7.07×) before the launch fix:
+**64,519 (1.21×)** with mode 2, against 55,379 (1.42×) at [`b630530`](https://github.com/pulipakaa24/mujoco_warp/commit/b63053080fff862d41c502fbffa3a03f799ae3f2) and 11,029 (7.07×) before the launch fix:
 the elliptic premium on the G1 task is now 21 % physics-only in that protocol. **Full-loop A/B (measured,
-`scripts/diagnostics/g1_tp_variants.py 4096`, mode 2 live at fork `9b4e96a`, two repeats interleaved,
+`scripts/diagnostics/g1_tp_variants.py 4096`, mode 2 live at my fork's [`9b4e96a`](https://github.com/pulipakaa24/mujoco_warp/commit/9b4e96af2ddec285e0f58595fbba27c31a64852a), two repeats interleaved,
 `runs/competitors/e2_loop_ab.log`)**, env-steps/s recommended vs `tau10_impact_hardlimits_ellip10`:
 physics only 83,393 / 83,423 vs 64,807 / 64,729 (**1.29×**); full env step 55,791 / 55,760 vs 40,488 / 40,358
 (1.38×); rollout + inference 56,097 / 56,200 vs 42,378 / 42,261 (1.33×); **full PPO loop 51,715 / 51,955 vs
@@ -595,8 +595,8 @@ Reading:
 - Line search (item 3): the elliptic kernel has the same launch count as pyramidal (10 per step); its
   extra cost is the per-launch quad precompute and the cone evaluations on primary rows; skipping the
   secondary rows' contact loads measured within noise (kept as `MJW_LS_SKIP_SECONDARY`, on the
-  `metalsim-elliptic2-ls` branch, not merged). MuJoCo's exact-solution shortcut (quadratic-only fast
-  exit) is the stable-state fast path already in the fork; it cannot apply while any row is in the CONE
+  [`metalsim-elliptic2-ls`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-elliptic2-ls) branch, not merged). MuJoCo's exact-solution shortcut (quadratic-only fast
+  exit) is the stable-state fast path already in my fork; it cannot apply while any row is in the CONE
   state (non-quadratic cost along the ray).
 - Solver conditioning (item 4): §8.2 and §8.5: 9 % more iterations on walking states with a longer tail; cap 10 changes states above the floor under elliptic cones, cap 20 does not (24 % more loop cost).
 
@@ -606,7 +606,7 @@ Reading:
   `mj_step` over 40 steps: Go2 1.8e-7 … 2.3e-6 rad, SO-101 2.4e-8 … 8.3e-6, humanoid 1.6e-7 … 1.9e-6 at
   10 steps (chaotic fall after), G1 Menagerie (sparse, unchanged path) 6.7e-8 … 4.3e-7: the same envelope for
   the rebuild (`=0`), mode 1, mode 2 and mode 2 + zero-row skip (modes 1 and 2 give the same digits).
-- Fork CPU tests (`solver_test`, `forward_test`, `constraint_test`, `--cpu`, fused path on): 242 passed, 10 skipped.
+- My fork's CPU tests (`solver_test`, `forward_test`, `constraint_test`, `--cpu`, fused path on): 242 passed, 10 skipped.
 - Metal, graph replay, 512 worlds × 200 steps vs the unpatched snapshots (`elliptic_check.py`; floor = two
   instances of the same configuration): mode 1: Go2 1.5e-6 / 2.5e-6 / 5.3e-5 rad at steps 25 / 100 / 200 (floor
   2.0e-6 / 2.8e-6 / 5.3e-5), G1 sparse 5.5e-6 / 2.9e-2 / 0.61 with 0 / 4.9 / 16.2 % of worlds apart (floor
@@ -620,9 +620,9 @@ Reading:
   0.62 with 0 / 5.3 / 16.2 % (floor 2.0e-5 / 3.4e-2 / 0.34, 0 / 4.1 / 15.6 %), G1 task 0.8 / 28.1 % (floor 0.8 /
   26.2 %); oracles identical to three digits (Go2 1.89e-7 … 9.21e-5, G1 5.91e-8 … 3.46e-6; the task-model
   oracle now steps MuJoCo C 8 times per call: 9.9e-8 at 4 ms, 1.6e-2 at 16 ms as the robot falls).
-- **Fork test suite on Metal with mode 2 (`e2_pytest_sz`): 1451 passed, 39 skipped, 1 failed** — the
+- **My fork's test suite on Metal with mode 2 (`e2_pytest_sz`): 1451 passed, 39 skipped, 1 failed** — the
   pre-existing MuJoCo-nightly `test_put_data_nefc_zero_dense` (§7.4); `test_hfield_maxconpair` passes since
-  `b630530`.
+  [`b630530`](https://github.com/pulipakaa24/mujoco_warp/commit/b63053080fff862d41c502fbffa3a03f799ae3f2).
 
 ### 8.5 Newton iteration cap under elliptic cones (measured, `scripts/diagnostics/competitors/cap_probe_ellip.py`, the 3.0 agent's `runs/il3/cap_probe.py` protocol)
 

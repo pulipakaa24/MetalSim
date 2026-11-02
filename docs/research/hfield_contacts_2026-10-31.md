@@ -1,20 +1,36 @@
 # Heightfield contacts in MetalSim's MuJoCo Warp fork: three defects, the fix, and its effect
 
 2026-10-31. Scope: make heightfield contacts of primitive geoms (sphere, capsule, box, cylinder, ellipsoid) in
-MetalSim's MuJoCo Warp fork match CPU MuJoCo, check the mesh path (Isaac's G1 feet) against the same standard, and
-settle the margin convention. Found through the `g1_bumps` film (Unitree's G1, 5 mm sphere feet, on Isaac Lab's
-random rough tile): CPU MuJoCo 11 of 16 robots fall, the fork far fewer (`runs/readme_media/handoff/g1-bumps.md`).
-**measured** = run here (MacBook Pro 14-inch M4 Max, Mac16,6; GPU work through `scripts/gpu_run.sh`); **reported** =
-from the cited source; **estimated** = our judgement.
+[my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) match CPU
+[MuJoCo](https://github.com/google-deepmind/mujoco), check the mesh path (Isaac's G1 feet) against the same standard,
+and settle the margin convention. Found through the [`g1_bumps` film](../renders/G1_BUMPS.md)
+([Unitree's G1](https://github.com/unitreerobotics/unitree_rl_gym), 5 mm sphere feet, on
+[Isaac Lab](https://github.com/isaac-sim/IsaacLab)'s random rough tile): CPU MuJoCo 11 of 16 robots fall, my fork far
+fewer (`runs/readme_media/handoff/g1-bumps.md`). **measured** = run here (MacBook Pro 14-inch M4 Max, Mac16,6; GPU work
+through `scripts/gpu_run.sh`); **reported** = from the cited source; **estimated** = our judgement.
 
-Code: fork branch `metalsim-hfield-contacts` (worktree `runs/readme_media/scratch/hfield-contacts/mjw`) on `8eb51fe`
-(the pinned `metalsim` head); full diff `runs/readme_media/handoff/hfield-contacts.patch`. **Landed 2026-10-31:** the
-fork's `metalsim` was fast-forwarded to it (`93e5ce1`), then to the follow-up of section 12 (`787a5b3`), which
-MetalSim pins; the six commits are `patches/mujoco_warp/0018-0023` (on `8eb51fe`), the follow-up's eight `0024-0031`
-(on `93e5ce1`), the whole branch `patches/mujoco_warp/metalsim-787a5b3.diff` (on v3.14.0 `88af9cc`). The scratch paths cited below (`runs/readme_media/scratch/hfield-contacts/`) are local to the
-machine that ran them and are not in the repository. Sources:
-[MJW] MuJoCo Warp, the fork at `8eb51fe` and upstream `gdm/main` `d41a47c0` (2026-10-31);
-[C] MuJoCo C 3.14.0 sources (`runs/readme_media/scratch/hfield-contacts/src_c/`), the version installed here;
+Code: branch [`metalsim-hfield-contacts`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-hfield-contacts) of
+my fork (worktree `runs/readme_media/scratch/hfield-contacts/mjw`) on
+[`8eb51fe`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624) (the pinned
+`metalsim` head); full diff `runs/readme_media/handoff/hfield-contacts.patch`. **Landed 2026-10-31:** my fork's
+`metalsim` was fast-forwarded to it
+([`93e5ce1`](https://github.com/pulipakaa24/mujoco_warp/commit/93e5ce18e76854c430ce669314af00ddceb92147)), then to the
+follow-up of section 12
+([`787a5b3`](https://github.com/pulipakaa24/mujoco_warp/commit/787a5b3a37acc2551ffc8a2c1af1e9781d76723f)), which
+MetalSim pins (the commit README.md's `pip install` line names); the six commits are `patches/mujoco_warp/0018-0023` (on
+[`8eb51fe`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624)), the
+follow-up's eight `0024-0031` (on
+[`93e5ce1`](https://github.com/pulipakaa24/mujoco_warp/commit/93e5ce18e76854c430ce669314af00ddceb92147)), the whole
+branch `patches/mujoco_warp/metalsim-787a5b3.diff` (on upstream MuJoCo Warp v3.14.0
+[`88af9cc`](https://github.com/google-deepmind/mujoco_warp/commit/88af9cc682d42e2e925daa0bae25f53277999f7b)). The
+scratch paths cited below (`runs/readme_media/scratch/hfield-contacts/`) are local to the machine that ran them and are
+not in the repository. Sources:
+[MJW] [MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp): my fork at
+[`8eb51fe`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624) and upstream
+`main` at [`d41a47c0`](https://github.com/google-deepmind/mujoco_warp/commit/d41a47c0837fc71abb44d7d4799bf85ca19ff7ab)
+(2026-10-31);
+[C] [MuJoCo C 3.14.0](https://github.com/google-deepmind/mujoco/tree/3.14.0) sources
+(`runs/readme_media/scratch/hfield-contacts/src_c/`), the version installed here;
 [C-main] https://github.com/google-deepmind/mujoco (main, read 2026-10-31), commit
 [8626d3c](https://github.com/google-deepmind/mujoco/commit/8626d3c35eceb8b36dbc5182852b25ffde7a6465) "Fix margin
 and gap double-counting in heightfield collisions" (2026-10-06).
@@ -25,21 +41,25 @@ MuJoCo C and MuJoCo Warp collide a convex geom with a heightfield the same way: 
 under the geom is extruded down to the heightfield base into a triangular prism, and each prism is a convex body for
 GJK/EPA; one contact per penetrating prism [C `mjc_ConvexHField`, `engine_collision_convex.c:1170-1328`]. MuJoCo Warp
 then keeps at most 4 contacts per pair. Two defects shared with upstream MuJoCo Warp (the second also in MuJoCo C)
-and one in MetalSim's own mesh path made the fork's contacts wrong:
+and one in MetalSim's own mesh path made the contacts of
+[my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) wrong:
 
-1. **Side-wall override** (upstream MuJoCo Warp #928, `f2f79579`, still on `gdm/main`): when GJK's closest feature
-   of a prism is a side wall, `_inflate` (and `_epa_witness` for deep contacts) replaced the result with a vertical
-   contact against the prism's top triangle and `dist = -|x1 - x2|`, a penetration whatever the real separation.
-   A 5 mm sphere 8.6 mm clear of a prism came back 25.6 mm deep with normal (0, 0, 1). The kernel also kept
-   separated prisms as candidates, and its 4-contact selection dropped every candidate within 1 mm of the deepest by
-   position alone, so a sphere in a crease lost its second face.
+1. **Side-wall override** (upstream MuJoCo Warp [#928](https://github.com/google-deepmind/mujoco_warp/pull/928),
+   [`f2f79579`](https://github.com/google-deepmind/mujoco_warp/commit/f2f795796fc433adf8e235f01fae3747585ae5db), still
+   on upstream `main`): when GJK's closest feature of a prism is a side wall, `_inflate` (and `_epa_witness` for deep
+   contacts) replaced the result with a vertical contact against the prism's top triangle and `dist = -|x1 - x2|`, a
+   penetration whatever the real separation. A 5 mm sphere 8.6 mm clear of a prism came back 25.6 mm deep with normal
+   (0, 0, 1). The kernel also kept separated prisms as candidates, and its 4-contact selection dropped every candidate
+   within 1 mm of the deepest by position alone, so a sphere in a crease lost its second face.
 2. **Prism support index** (upstream MuJoCo Warp, and MuJoCo C 3.14 and main): EPA on discrete pairs (box, mesh)
    stops when a new support point repeats a vertex-index pair already in the polytope. The prism's support function
    gave all six vertices the same index (MuJoCo Warp: -2 / -3 by the sign of dir.z; MuJoCo C: never set, -1), so EPA
    stopped early: a box 9.25 mm into a prism came back 2.57 mm (Warp) or 3.44 mm (C) deep along wrong axes.
-3. **Mesh plane path** (MetalSim's `f2716b4`): a mesh of at most 256 vertices was tested vertex by vertex against
-   each triangle's plane inside its column; any contact whose deepest point is a terrain vertex or edge inside the
-   mesh was missed. Isaac's G1 foot on the random rough tile: no contact in 178 of 1000 placements that touch.
+3. **Mesh plane path** (my fork's
+   [`f2716b4`](https://github.com/pulipakaa24/mujoco_warp/commit/f2716b4e7873ed40b8405c0840238610349c7e7e)): a mesh of
+   at most 256 vertices was tested vertex by vertex against each triangle's plane inside its column; any contact whose
+   deepest point is a terrain vertex or edge inside the mesh was missed. Isaac's G1 foot on the random rough tile: no
+   contact in 178 of 1000 placements that touch.
 
 After the fix every heightfield contact on the tile matches the exact geometry: per-triangle closest features for
 spheres and capsules, the separating-axis penetration per prism for boxes and the G1 foot mesh; normals within
@@ -49,24 +69,26 @@ CPU MuJoCo within the run-to-run spread (75.8 % of 240 robots vs 68.3-68.8 %; pi
 Isaac's G1 rough-task env step under random actions (its feet are meshes and now take GJK/EPA), 1.2-1.3x per PPO
 iteration in the 2.3.2 rough configs and, with Isaac Lab 3.0's geom gap, 1.7x after the follow-up of section 12
 (2.05x and dropped contacts before it); nothing for primitives. The heightfield margin now follows MuJoCo C main
-(section 7). Every rough-terrain result of Isaac's G1 on MuJoCo Warp (PARITY §1.5) needed a re-run (section 9). Re-run
-on the repaired kernel (section 13): the 2.3.2 rough preset's three seeds end within the seed spread of the old ones
-(+18.0 ± 2.4 at 1500, level 6.11, against +19.4 ± 3.1, 6.07; Isaac +14.1, 5.90) but climb the curriculum later
-(level 5.48 ± 0.09 at 1000 against 5.83 ± 0.21); `rough_il3` ends at +12.0, level 5.93 (was +8.4, 5.96; Isaac +14.5,
-5.80; one seed, initial reset added); transfer falls barely change. The Isaac-side and timing rows are pending.
+(section 7). Every rough-terrain result of Isaac's G1 on MuJoCo Warp
+([PARITY §1.5](../PARITY.md#15-learning-on-the-g1-task)) needed a re-run (section 9). Re-run on the repaired kernel
+(section 13): the 2.3.2 rough preset's three seeds end within the seed spread of the old ones (+18.0 ± 2.4 at 1500,
+level 6.11, against +19.4 ± 3.1, 6.07; Isaac +14.1, 5.90) but climb the curriculum later (level 5.48 ± 0.09 at 1000
+against 5.83 ± 0.21); `rough_il3` ends at +12.0, level 5.93 (was +8.4, 5.96; Isaac +14.5, 5.80; one seed, initial reset
+added); transfer falls barely change. The Isaac-side and timing rows are pending.
 
-## 2. Baseline, re-measured on the pinned fork (`8eb51fe`)
+## 2. Baseline, re-measured on the pinned fork ([`8eb51fe`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624))
 
-The `metalsim` head already sends primitives to upstream's GJK/EPA prism path (`b630530`,
-`HFIELD_PLANE_CONTACTS_PRIMITIVES = False`) and meshes of at most 256 vertices to the plane path. The g1-bumps
-column "MetalSim fork: 81.9 %, 1/16 falls" had measured a stale checkout (`07a51a6`); the pinned fork is the column
-"upstream MJW". **measured**:
+The `metalsim` head already sends primitives to upstream's GJK/EPA prism path
+(`HFIELD_PLANE_CONTACTS_PRIMITIVES = False`) and meshes of at most 256 vertices to the plane path. The g1-bumps column
+"MetalSim fork: 81.9 %, 1/16 falls" had measured a stale checkout
+([`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc)); the pinned
+fork is the column "upstream MJW". **measured**:
 
 - Contact check (`runs/film/g1_bumps/measure/contact_check.py`, 3000 spheres of 5 mm pressed 0.5-3 mm into the tile,
-  Warp's CPU device): contact count equal to the exact set 88.8 % (126 fewer, 211 more), 6.11 % of contacts more than
-  10 deg from the nearest true normal (p95 21.8 deg), deepest-contact depth error p95 8.0 mm. CPU MuJoCo: 99.6 %
-  (0 fewer, 11 more: in all 11 a duplicate of one feature reached from two prisms, same point within 0.1 mm and
-  normal within 0.05 deg), 0 normals off. As the brief.
+  [Warp](https://github.com/NVIDIA/warp)'s CPU device): contact count equal to the exact set 88.8 % (126 fewer, 211
+  more), 6.11 % of contacts more than 10 deg from the nearest true normal (p95 21.8 deg), deepest-contact depth error
+  p95 8.0 mm. CPU MuJoCo: 99.6 % (0 fewer, 11 more: in all 11 a duplicate of one feature reached from two prisms, same
+  point within 0.1 mm and normal within 0.05 deg), 0 normals off. As the brief.
 - G1 falls on Isaac's tile (seed 0, 16 robots, 8 s): GPU runs of the pinned fork gave 2, 5, 4, 3, 1 and 3 of 16 in
   six runs: MuJoCo Warp on Metal is not run-to-run repeatable here (contact order from atomics, chaotic gait), so
   the g1-bumps hand-off's 6/16 (the stale checkout with every geom on GJK/EPA) is inside that spread, and a single
@@ -78,20 +100,25 @@ Probe `runs/readme_media/scratch/hfield-contacts/probe/gjk_point_prism.py 15` (p
 fork 25.6 mm with normal (0, 0, 1)) runs MuJoCo Warp's `gjk` and `ccd` on the sphere against each of the 18 prisms
 around it. **measured**: GJK's point-to-prism distance is right (prism 9: 3.147 mm, float64 3.147 mm; prism 8: 13.567
 mm vs 13.574 mm), but `ccd` returns -25.6 mm for prism 8, which is 8.6 mm clear of the sphere. The source:
-`collision_gjk._inflate` [MJW `collision_gjk.py:2455-2485` at `8eb51fe`] has a heightfield branch (upstream #928,
-"Improve sphere/capsule <-> hfield collisions", `f2f79579`, 2025-12-17): when the GJK simplex holds both top and bottom
-prism vertices (the closest feature is a side wall) it takes the geom's support point, projects it vertically onto
-the top triangle (or a vertex height) and returns `dist = -|x1 - x2|`, always a penetration. `_epa_witness`
-[`collision_gjk.py:996-1027`] does the same for deep contacts (and calls `support` with a position as the
-direction). MuJoCo C has no heightfield case in its GJK/EPA [C `engine_collision_gjk.c`]: the prism is a plain
-polytope there. Both overrides are still on upstream `gdm/main` `d41a47c0`.
+`collision_gjk._inflate` [MJW `collision_gjk.py:2455-2485` at
+[`8eb51fe`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624)] has a
+heightfield branch (upstream [#928](https://github.com/google-deepmind/mujoco_warp/pull/928), "Improve
+sphere/capsule <-> hfield collisions",
+[`f2f79579`](https://github.com/google-deepmind/mujoco_warp/commit/f2f795796fc433adf8e235f01fae3747585ae5db),
+2025-12-17): when the GJK simplex holds both top and bottom prism vertices (the closest feature is a side wall) it takes
+the geom's support point, projects it vertically onto the top triangle (or a vertex height) and returns
+`dist = -|x1 - x2|`, always a penetration. `_epa_witness` [`collision_gjk.py:996-1027`] does the same for deep contacts
+(and calls `support` with a position as the direction). MuJoCo C has no heightfield case in its GJK/EPA [C
+`engine_collision_gjk.c`]: the prism is a plain polytope there. Both overrides are still on upstream `main` at
+[`d41a47c0`](https://github.com/google-deepmind/mujoco_warp/commit/d41a47c0837fc71abb44d7d4799bf85ca19ff7ab).
 
 Two kernel details turned the phantom contacts into wrong contact sets [MJW `collision_convex.py` `ccd_hfield_kernel`]:
 the pinned fork keeps a prism whenever `ccd` reports `ncontact` (it reports 1 for separated geoms too; upstream main
 has since added `dist >= margin + gap` as a skip), and contacts 1-3 are chosen by spread (furthest from contact 0,
 furthest from that line, ...) but the selection stops as soon as the furthest remaining candidate is within 1 mm of
-contact 0 (`MIN_DIST_TO_NEXT_CONTACT`, upstream #847) by position only. In a crease a 5 mm sphere touches two faces at
-points 0.4 mm apart (p5 of the tile's two-contact sets; `sel_proto.py`), so the second face was lost.
+contact 0 (`MIN_DIST_TO_NEXT_CONTACT`, upstream [#847](https://github.com/google-deepmind/mujoco_warp/pull/847)) by
+position only. In a crease a 5 mm sphere touches two faces at points 0.4 mm apart (p5 of the tile's two-contact sets;
+`sel_proto.py`), so the second face was lost.
 
 ## 4. Defect 2: the prism's support vertex index (MuJoCo Warp and MuJoCo C)
 
@@ -114,17 +141,18 @@ MuJoCo C main still leaves `vertindex` unset in `mjc_prism_support` [C-main, rea
 
 ## 5. Defect 3: the mesh plane path (MetalSim's own)
 
-MetalSim's `f2716b4` (PARITY §1.6) replaced GJK/EPA for meshes of at most 256 vertices with a per-triangle plane test:
-per prism, the deepest mesh vertex below the triangle's plane whose footprint lies in the triangle. It was written
-because GJK/EPA returned inverted normals and 2 m penetrations for the G1 feet. **estimated**: the `_epa_witness`
-override of defect 1 (a support point taken in the direction of a position vector) is the likely source, but not
-confirmed: §1.6's minimal repro (a box mesh pressed 3 cm into a flat heightfield, base 1.9 m;
-`probe/mesh_repro.py`, four yaw angles) on the pinned fork's GJK/EPA path no longer shows a 2 m penetration
-(depths 1.2-3.0 cm; 4 of 16 normals sideways; the fixed fork 8 of 16, all at the box's edge prisms, like MuJoCo C's own
-1.2-1.3 cm side contacts there). The plane test cannot see a terrain vertex or edge that pokes into a mesh face.
-**measured** on Isaac's G1 foot collider (8-vertex
-box mesh, 0.203 x 0.065 x 0.019 m) at 1000 random poses pressed 0.5-3 mm into the tile: no contact at all in 178,
-9.6 % of normals more than 10 deg off, depth error p95 1.1 mm (max 10 mm), against the per-prism SAT.
+Commit [`f2716b4`](https://github.com/pulipakaa24/mujoco_warp/commit/f2716b4e7873ed40b8405c0840238610349c7e7e) of
+[my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) (PARITY §1.6) replaced GJK/EPA for
+meshes of at most 256 vertices with a per-triangle plane test: per prism, the deepest mesh vertex below the triangle's
+plane whose footprint lies in the triangle. It was written because GJK/EPA returned inverted normals and 2 m
+penetrations for the G1 feet. **estimated**: the `_epa_witness` override of defect 1 (a support point taken in the
+direction of a position vector) is the likely source, but not confirmed: §1.6's minimal repro (a box mesh pressed 3 cm
+into a flat heightfield, base 1.9 m; `probe/mesh_repro.py`, four yaw angles) on the pinned fork's GJK/EPA path no longer
+shows a 2 m penetration (depths 1.2-3.0 cm; 4 of 16 normals sideways; the fixed fork 8 of 16, all at the box's edge
+prisms, like MuJoCo C's own 1.2-1.3 cm side contacts there). The plane test cannot see a terrain vertex or edge that
+pokes into a mesh face. **measured** on Isaac's G1 foot collider (8-vertex box mesh, 0.203 x 0.065 x 0.019 m) at 1000
+random poses pressed 0.5-3 mm into the tile: no contact at all in 178, 9.6 % of normals more than 10 deg off, depth
+error p95 1.1 mm (max 10 mm), against the per-prism SAT.
 
 ## 6. The fix (fork commits on `metalsim-hfield-contacts`)
 
@@ -140,8 +168,9 @@ Every change but the penetration test is behind a module flag that restores the 
 | margin and gap: C main's convention (section 7) | same, `_hfield_filter` | `HFIELD_TRUE_DISTANCE` (True) |
 | meshes on GJK/EPA instead of the plane path; Warp's deterministic mode keeps the plane path for meshes (the GJK/EPA path is not repeatable there) | same, `convex_narrowphase` | `HFIELD_PLANE_CONTACTS` (now False) |
 
-The 4-contact cap per heightfield pair (upstream #847) is unchanged. It is the only remaining difference from the
-exact sets on the tile: 13 of 3000 spheres touch 5 or 6 distinct triangle features.
+The 4-contact cap per heightfield pair (upstream [#847](https://github.com/google-deepmind/mujoco_warp/pull/847)) is
+unchanged. It is the only remaining difference from the exact sets on the tile: 13 of 3000 spheres touch 5 or 6 distinct
+triangle features.
 
 ## 7. Margin convention
 
@@ -151,13 +180,15 @@ inflates the geom by half of it, then calls `mjc_penetration` with margin 0 [C `
 (`probe/margin2.py`, sphere / box / capsule / box mesh over a flat heightfield, margin 0.01 on both geoms, so 0.02 for
 the pair): C reports `dist = g - 1.5 (margin + gap)` for a gap `g` and keeps the contact while `g < margin + gap`,
 every shape; the pinned fork matched it for primitives and was 0.5 margin off on the mesh plane path. Every other
-pair in C and in MuJoCo Warp reports `dist = g`. **reported**: MuJoCo C main fixed this on 2026-10-06 (8626d3c, "Fix
-margin and gap double-counting in heightfield collisions"): the prism is inflated like the geom (support offset by
-half the margin), `mjc_penetration` gets the margin, the prism height test expands the geom's bounds by it, and its
-test `MjcConvexTest.HFieldMarginAndGap` (terrain margin 0.02, gap 0.01, sphere 15 mm above) expects `dist` 0.015
-and the contact point halfway. The fork now follows C main (`HFIELD_TRUE_DISTANCE`; the plane path too), so a
-heightfield behaves like a plane under a margin. It matches C 3.14 only at margin = gap = 0, which is every
-heightfield pair in MetalSim (Isaac G1 and Unitree G1 models: all margins and gaps 0). False restores C 3.14's form.
+pair in C and in MuJoCo Warp reports `dist = g`. **reported**: MuJoCo C main fixed this on 2026-10-06
+([8626d3c](https://github.com/google-deepmind/mujoco/commit/8626d3c35eceb8b36dbc5182852b25ffde7a6465), "Fix margin and
+gap double-counting in heightfield collisions"): the prism is inflated like the geom (support offset by half the
+margin), `mjc_penetration` gets the margin, the prism height test expands the geom's bounds by it, and its test
+`MjcConvexTest.HFieldMarginAndGap` (terrain margin 0.02, gap 0.01, sphere 15 mm above) expects `dist` 0.015 and the
+contact point halfway. [My fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) now follows C
+main (`HFIELD_TRUE_DISTANCE`; the plane path too), so a heightfield behaves like a plane under a margin. It matches C
+3.14 only at margin = gap = 0, which is every heightfield pair in MetalSim (Isaac G1 and Unitree G1 models: all margins
+and gaps 0). False restores C 3.14's form.
 
 ## 8. Acceptance
 
@@ -174,7 +205,7 @@ Cells: contact count equal to the reference's distinct contacts (capped at 4, Mu
 with no contact where the reference has one / contacts more than 10 deg from every reference normal / normal error
 p99 (deg) / deepest-depth error p95 (max), mm. **measured**:
 
-| shape (size) | reference | pinned fork `8eb51fe` | fixed fork | MuJoCo C 3.14 |
+| shape (size) | reference | pinned fork [`8eb51fe`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624) | fixed fork | MuJoCo C 3.14 |
 |---|---|---|---|---|
 | sphere r 5 mm (Unitree G1 sole) | exact | 88.8 % / 0 / 6.11 % / 147.8 / 8.00 (70.0) | 99.97 % / 0 / 0 % / 0.02 / 0.00 (0.0) | 99.5 % / 0 / 0 % / 0.00 / 0.00 (0.0) |
 | capsule r 2 cm, half-length 5 cm | exact | 82.6 % / 0 / 0.35 % / 0.05 / 0.00 (38.7) | 100.0 % / 0 / 0 % / 0.01 / 0.00 (0.0) | 74.5 % / 0 / 0 % / 0.00 / 0.00 (0.0) |
@@ -188,7 +219,7 @@ shared edge, a terrain vertex in six prisms) is written twice or more; that, and
 (section 4), is why its count column is lower. On the brief's own harness (`contact_check.py`, raw count equal to the
 exact set, no cap) the fixed fork scores 99.5 % (14 spheres: 13 with 5 or 6 true contacts above the cap, one grazing
 contact of 0.000 mm depth) against C's 99.6 % (11 spheres with duplicates); its one "normal > 10 deg" is the
-harness's own artefact (`np.sign(-0.0)` zeroes the fork's horizontal normal (-1, -0, -0), which equals C's for that
+harness's own artefact (`np.sign(-0.0)` zeroes my fork's horizontal normal (-1, -0, -0), which equals C's for that
 sphere, a prism side wall). The pinned fork's mesh column is the plane path (its default for meshes). Near-horizontal
 normals (|n_z| < 0.3), the side-wall contacts of the prism model, are 1.1 % (box) and 1.4 % (foot) of exact contacts,
 1.2 / 1.6 % for the fixed fork and 2.9 / 2.5 % for C.
@@ -217,7 +248,7 @@ repeated. **measured** (`falls/summary.json`):
 |---|---|---|---|---|
 | CPU MuJoCo 3.14 (Unitree's loop; the film's engine) | 1 | 11 / 10 / 14 / 12 / 8 | 55 | 55 / 80 = 68.8 % |
 | CPU MuJoCo, start joints + N(0, 1e-6 rad) | 3 | 12, 11, 10 / 13, 12, 11 / 13, 11, 11 / 11, 11, 10 / 10, 13, 5 | 59, 58, 47 | 164 / 240 = 68.3 % |
-| MuJoCo Warp, pinned fork `8eb51fe` (Metal) | 3-6 | 2, 5, 4, 3, 1, 3 / 3, 3, 6 / 1, 6, 5 / 3, 1, 4 / 1, 1, 2 | 10, 12, 20 | 54 / 288 = 18.8 % |
+| MuJoCo Warp, pinned fork [`8eb51fe`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624) (Metal) | 3-6 | 2, 5, 4, 3, 1, 3 / 3, 3, 6 / 1, 6, 5 / 3, 1, 4 / 1, 1, 2 | 10, 12, 20 | 54 / 288 = 18.8 % |
 | MuJoCo Warp, fixed fork (Metal) | 3 | 10, 11, 13 / 16, 14, 14 / 13, 12, 14 / 12, 13, 15 / 7, 8, 10 | 58, 58, 66 | 182 / 240 = 75.8 % |
 
 The fixed fork falls as often as CPU MuJoCo within the run-to-run spread (per 80-robot run 60.7 +- 4.6 vs 54.8 +- 5.4,
@@ -226,7 +257,7 @@ deterministic, so its single run per seed has no error bar; a 1e-6 rad perturbat
 by up to 8 falls (seed 4: 5 to 13). On flat ground the two engines already agree (the g1-unitree hand-off: within 0.1
 mm of Unitree's CPU run over 8 s; no heightfield, so unaffected here). The remaining gap (about 6 falls per 80 robots,
 about one standard deviation) is not resolved further here; candidates are float32 vs float64 and MuJoCo C writing
-duplicate contacts at shared edges (each adds stiffness) where the fork writes one.
+duplicate contacts at shared edges (each adds stiffness) where my fork writes one.
 
 ### 8.4 Relative cost
 
@@ -237,7 +268,7 @@ ratios are indicative only, the absolute numbers are not performance figures.**
 
 | fork | env-steps/s (runs) | relative |
 |---|---|---|
-| pinned `8eb51fe` (meshes on the plane path) | 62,257 / 62,346 | 1.00 |
+| pinned [`8eb51fe`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624) (meshes on the plane path) | 62,257 / 62,346 | 1.00 |
 | fixed, with `HFIELD_PLANE_CONTACTS = True` (meshes on the plane path) | 62,279 / 62,407 | 1.00 |
 | fixed, default (meshes on GJK/EPA) | 52,073 / 52,820 / 53,234 / 53,499 | 0.85 |
 
@@ -273,54 +304,59 @@ not real surfaces (section 10).
 ## 9. Effect on PARITY §1.5 (rough-terrain training with Isaac's G1)
 
 Isaac's G1 collides with the terrain through three 8-vertex box meshes (both feet and one more; every other geom
-is excluded), so on the heightfield cells (random rough, slopes; the stair and box cells use exact boxes since
-`0cfb188`, with the heightfield lowered under them) its contacts went through the plane path, which the static check
-shows wrong on random rough (no contact in 17.8 % of touching foot poses, 9.5 % of normals > 10 deg off). The fork now
-sends them through GJK/EPA. **Affected**: every rough-terrain number in PARITY §1.4-1.6 measured on MuJoCo Warp
-(training curves and final returns of the three seeds, terrain levels, the transfer tables in both directions, the
-wall-cell transfer counts, the rough throughput rows, `test_hfield_mesh_contacts_match_mujoco_c`'s figures), the
-Isaac Lab 3.0 like-for-like rough runs (`docs/research/isaaclab3_like_for_like_2026-09-25.md` §6.8) and any film
-or evaluation of Isaac's G1 on the rough task. Not affected: flat-terrain results, Newton-backend results, the
-box-cell contacts, the terrain geometry and height scan. **estimated** size of the effect (before the re-runs of
-section 13): unknown until re-run;
-the foot's contacts on random-rough and slope cells change in roughly one placement in five (missing contacts made
-the feet sink into bumps, which the policy may have learned to exploit or tolerate).
+is excluded), so on the heightfield cells (random rough, slopes; the stair and box cells use exact boxes,
+with the heightfield lowered under them) its contacts went through the plane path, which the static check
+shows wrong on random rough (no contact in 17.8 % of touching foot poses, 9.5 % of normals > 10 deg off).
+[My fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) now sends them through GJK/EPA.
+**Affected**: every rough-terrain number in PARITY §1.4-1.6 measured on MuJoCo Warp (training curves and final returns
+of the three seeds, terrain levels, the transfer tables in both directions, the wall-cell transfer counts, the rough
+throughput rows, `test_hfield_mesh_contacts_match_mujoco_c`'s figures), the Isaac Lab 3.0 like-for-like rough runs
+(`docs/research/isaaclab3_like_for_like_2026-09-25.md` §6.8) and any film or evaluation of Isaac's G1 on the rough task.
+Not affected: flat-terrain results, Newton-backend results, the box-cell contacts, the terrain geometry and height scan.
+**estimated** size of the effect (before the re-runs of section 13): unknown until re-run; the foot's contacts on
+random-rough and slope cells change in roughly one placement in five (missing contacts made the feet sink into bumps,
+which the policy may have learned to exploit or tolerate).
 
 Re-runs needed (after the pin bump), in order of cost:
 1. `tests/test_terrain.py` on the bumped pin (done here on the branch: 21 passed) and the rough rows of §1.4
    (physics only / step / step + inference at 4096 envs; section 8.4 gives the relative cost). Tests: done again
-   in section 13; §1.4 rows: pending (the timing machine).
+   in section 13; §1.4 rows: pending (the timing machine, the 16-inch MacBook Pro (M4 Max)).
 2. Transfer of Isaac's rough checkpoints into MetalSim (`runs/g1_rough_transfer.jsonl` protocol; 7 / 24 falls before)
    and the wall-cell transfer (14 / 96 before): no training needed, shows the size of the change first. Isaac's
    checkpoints are not on this machine; section 13 measures the change on our old checkpoint and on NVIDIA's
    pretrained rough policy instead.
 3. Rough training, three seeds x 1500 iterations on the 2.3.2 preset (+16.4 / +22.6 / +19.1 at 1500 before; Isaac
    +14.1), then our checkpoints transferred to Isaac. Training and the MetalSim-side transfers: done (section 13);
-   in Isaac: pending (the L4).
-4. The Isaac Lab 3.0 like-for-like rough run (`rough_il3`, +8.4 / level 5.96 before vs Isaac Newton +14.5). Done on
-   `787a5b3` (section 13).
+   in Isaac: pending (the NVIDIA L4 GPU).
+4. The Isaac Lab 3.0 like-for-like rough run (`rough_il3`, +8.4 / level 5.96 before vs Isaac Lab 3.0 on
+   [Newton](https://github.com/newton-physics/newton) +14.5). Done on
+   [`787a5b3`](https://github.com/pulipakaa24/mujoco_warp/commit/787a5b3a37acc2551ffc8a2c1af1e9781d76723f) (section 13).
 5. Films that put Isaac's G1 on rough terrain on MuJoCo Warp, and the g1_bumps cell's engine decision (MuJoCo Warp
    now falls like CPU MuJoCo there, so the cell could run on MetalSim's own physics).
 
 ## 10. Upstream
 
 **estimated**, worth filing (none filed from here):
-- MuJoCo Warp: the heightfield side-wall override in `_inflate` / `_epa_witness` (#928) returns penetrations for
-  separated prisms; the prism support's vertex index (-2 / -3) defeats discrete EPA's termination test; the
-  4-contact selection's position-only 1 mm stop drops a sphere's second face in a crease. The fork's commits are a
-  candidate patch (each behind its flag).
+- MuJoCo Warp: the heightfield side-wall override in `_inflate` / `_epa_witness`
+  ([#928](https://github.com/google-deepmind/mujoco_warp/pull/928)) returns penetrations for separated prisms; the prism
+  support's vertex index (-2 / -3) defeats discrete EPA's termination test; the 4-contact selection's position-only 1 mm
+  stop drops a sphere's second face in a crease. The commits on
+  [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) are a candidate patch (each behind
+  its flag).
 - MuJoCo C: `mjc_prism_support` does not set `vertindex`, so box / mesh against a heightfield stop EPA early
   (3.44 mm reported for a 9.25 mm penetration; main still has it). A one-line fix: set `obj->vertindex = ibest`.
 - Both: the prism model gives contacts through internal prism walls when a geom is deeper than its horizontal
-  overlap with an edge prism (section 8.5). Upstream #928 tried to replace them by vertical contacts, unconditionally
-  (defect 1). A correct version would apply only to penetrating prisms and only to walls shared with a neighbour
-  (not the heightfield's outer border), measured against the exact surface; not attempted here, because it departs
-  from MuJoCo C's semantics and the brief asked for parity.
+  overlap with an edge prism (section 8.5). Upstream [#928](https://github.com/google-deepmind/mujoco_warp/pull/928)
+  tried to replace them by vertical contacts, unconditionally (defect 1). A correct version would apply only to
+  penetrating prisms and only to walls shared with a neighbour (not the heightfield's outer border), measured against
+  the exact surface; not attempted here, because it departs from MuJoCo C's semantics and the brief asked for parity.
 
 ## 11. Reproduce
 
-All from the repository root with `.venv/bin/python`; MuJoCo Warp copy chosen by `PYTHONPATH` (the fork worktree
-`runs/readme_media/scratch/hfield-contacts/mjw`, or `mjw_base` = `git archive 8eb51fe`).
+All from the repository root with `.venv/bin/python`; MuJoCo Warp copy chosen by `PYTHONPATH` (the worktree
+`runs/readme_media/scratch/hfield-contacts/mjw` of
+[my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim), or `mjw_base` =
+`git archive 8eb51fe`).
 
 - Static: `cc2.py place|c|exact|exactprism <shape> runs/readme_media/scratch/hfield-contacts/cc/<shape>`,
   `cc_all.sh <tag> <copy>`, `cc2.py compare <shape> <dir>`, `cc_show.py <dir>/compare.json`; spheres also
@@ -333,67 +369,89 @@ All from the repository root with `.venv/bin/python`; MuJoCo Warp copy chosen by
 
 ## 12. Addendum (2026-10-31, evening): EPA horizon overflow and the cost of a geom gap
 
-The rough-terrain re-runs on `93e5ce1` (`runs/readme_media/handoff/rough-reruns.md`, items 2-3) found two problems
-this note's fix had exposed: Isaac Lab 3.0's like-for-like config (`rough_il3`) flagged MuJoCo Warp's `EPA_HORIZON`
-capacity overflow in a few of the 4096 worlds within the first iterations (3 in each 8-iteration smoke run; the
-pair's contact is dropped for that substep), and its PPO iteration took about 2.1x as long as on the plane-path pin
-`8eb51fe`, against the -15 % of section 8.4.
-Both come from the G1's mesh feet now being on per-prism GJK/EPA (section 6) together with `rough_il3`'s geom gap
-(Isaac Lab 3.0's 1 cm per geom; MuJoCo Warp sums a pair's gaps, so `margin + gap` = 0.02 m). Fork branch
-`metalsim-hfield-epa` (worktree `runs/readme_media/scratch/hfield-epa/mjw`, on `93e5ce1`; pushed, and the fork's
-`metalsim` fast-forwarded to it): `439b808`, `f85879c`, `1eb40d5`, then, after an independent review
-(`runs/readme_media/handoff/epa-review.md`), `d7a90fb`, `3d8f48c`, `ba9cfb7`, `489f421`, `787a5b3`, which MetalSim
-pins (`patches/mujoco_warp/0024-0031`); patch `runs/readme_media/handoff/hfield-epa.patch.v2`. Sources: [MJW] as
-above; [C-main] `engine_collision_gjk.c` read 2026-10-31 (`horizon` / `horizonRec`, `epa`, `mjc_ccd`); MuJoCo issue
+The rough-terrain re-runs on
+[`93e5ce1`](https://github.com/pulipakaa24/mujoco_warp/commit/93e5ce18e76854c430ce669314af00ddceb92147)
+(`runs/readme_media/handoff/rough-reruns.md`, items 2-3) found two problems this note's fix had exposed: Isaac Lab 3.0's
+like-for-like config (`rough_il3`) flagged MuJoCo Warp's `EPA_HORIZON` capacity overflow in a few of the 4096 worlds
+within the first iterations (3 in each 8-iteration smoke run; the pair's contact is dropped for that substep), and its
+PPO iteration took about 2.1x as long as on the plane-path pin
+[`8eb51fe`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624), against the
+-15 % of section 8.4. Both come from the G1's mesh feet now being on per-prism GJK/EPA (section 6) together with
+`rough_il3`'s geom gap (Isaac Lab 3.0's 1 cm per geom; MuJoCo Warp sums a pair's gaps, so `margin + gap` = 0.02 m).
+Branch [`metalsim-hfield-epa`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-hfield-epa) of
+[my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) (worktree
+`runs/readme_media/scratch/hfield-epa/mjw`, on
+[`93e5ce1`](https://github.com/pulipakaa24/mujoco_warp/commit/93e5ce18e76854c430ce669314af00ddceb92147); pushed, and my
+fork's `metalsim` fast-forwarded to it):
+[`439b808`](https://github.com/pulipakaa24/mujoco_warp/commit/439b8083ae0ff39f58937a083cfc2d3c56ce022f),
+[`f85879c`](https://github.com/pulipakaa24/mujoco_warp/commit/f85879cd44bd6439d4fa7bace80dd67702184885),
+[`1eb40d5`](https://github.com/pulipakaa24/mujoco_warp/commit/1eb40d55956d073e4fa544ca0f0eb0d456681791), then, after an
+independent review (`runs/readme_media/handoff/epa-review.md`),
+[`d7a90fb`](https://github.com/pulipakaa24/mujoco_warp/commit/d7a90fb635b90f3207e79ef222c3be12997d29bc),
+[`3d8f48c`](https://github.com/pulipakaa24/mujoco_warp/commit/3d8f48ca77fa41c980aa9595dd90071c6eb43e6c),
+[`ba9cfb7`](https://github.com/pulipakaa24/mujoco_warp/commit/ba9cfb7d2079278dfc56f8dd613fe07773360cac),
+[`489f421`](https://github.com/pulipakaa24/mujoco_warp/commit/489f421dd0ee8a243831dd0452d353bb1bbbfd5b),
+[`787a5b3`](https://github.com/pulipakaa24/mujoco_warp/commit/787a5b3a37acc2551ffc8a2c1af1e9781d76723f), which MetalSim
+pins (`patches/mujoco_warp/0024-0031`); patch `runs/readme_media/handoff/hfield-epa.patch.v2`. Sources: [MJW] as above;
+[C-main] `engine_collision_gjk.c` read 2026-10-31 (`horizon` / `horizonRec`, `epa`, `mjc_ccd`); MuJoCo issue
 [google-deepmind/mujoco#3646](https://github.com/google-deepmind/mujoco/issues/3646) (C's horizon buffer, fixed in
-`6d662aed` by a bound check and `24 + max(0, ccd_iterations - 35)` edges); MuJoCo Warp PR
+[`6d662aed`](https://github.com/google-deepmind/mujoco/commit/6d662aedda693a1225a03a26c6b3ddd5e3cc4fbe) by a bound check
+and `24 + max(0, ccd_iterations - 35)` edges); MuJoCo Warp PR
 [google-deepmind/mujoco_warp#1845](https://github.com/google-deepmind/mujoco_warp/pull/1845) (open: the same
 disconnected-horizon failure on aligned mesh plates). Scratch paths are local to the machine that ran them.
 
 **Mechanism (measured).** A substep hook on Metal stored the qpos of the first `EPA_HORIZON` event per world during
-12 `rough_il3` iterations on `93e5ce1` (3 events, iterations 7-10). Replayed on Warp's CPU device, all three
-overflow again, and so do 20 copies of each with the root position jittered by 1e-6 m. In each, a foot mesh against
-one prism ran EPA for 33-39 iterations on the *inflated* shapes, with upper and lower depth bounds converging at
-19.2-19.9 mm, i.e. the uninflated shapes 0.1-0.8 mm apart: EPA crawling over the rounded part of the inflated
-Minkowski difference, where the support point lies (to rounding) on the planes of many small faces. Two things in
-the fork made that fatal:
-1. **Horizon scan** [MJW `_epa`, since the first EPA port `66c2ebce`]: the visible faces are found by testing every
-   face on its own. MuJoCo C recurses through face adjacency from the closest face, so its deleted faces are always
-   connected [C-main `horizonRec`]. With the support point on several faces' planes, rounding can delete faces that
-   are not connected to the closest one; the horizon is then not one loop (two regions touching at a vertex, or a
-   ring), the faces attached to it do not close the polytope, and the edge list (`_add_edge` toggles an edge in and
-   out, so the buffer must hold the intermediate set, not just the final horizon) overflows its fixed 24 entries.
-   Static G1 foot and torso placements on the training terrain: 31-64 non-loop horizons per 40,000 placements (none
-   overflowing at 24; the training states did).
+12 `rough_il3` iterations on
+[`93e5ce1`](https://github.com/pulipakaa24/mujoco_warp/commit/93e5ce18e76854c430ce669314af00ddceb92147) (3 events,
+iterations 7-10). Replayed on Warp's CPU device, all three overflow again, and so do 20 copies of each with the root
+position jittered by 1e-6 m. In each, a foot mesh against one prism ran EPA for 33-39 iterations on the *inflated*
+shapes, with upper and lower depth bounds converging at 19.2-19.9 mm, i.e. the uninflated shapes 0.1-0.8 mm apart: EPA
+crawling over the rounded part of the inflated Minkowski difference, where the support point lies (to rounding) on the
+planes of many small faces. Two things in my fork made that fatal:
+1. **Horizon scan** [MJW `_epa`, since upstream's first EPA port
+   [`66c2ebce`](https://github.com/google-deepmind/mujoco_warp/commit/66c2ebce1cafb174dafb9d3e30d035f27a91537c)]: the
+   visible faces are found by testing every face on its own. MuJoCo C recurses through face adjacency from the closest
+   face, so its deleted faces are always connected [C-main `horizonRec`]. With the support point on several faces'
+   planes, rounding can delete faces that are not connected to the closest one; the horizon is then not one loop (two
+   regions touching at a vertex, or a ring), the faces attached to it do not close the polytope, and the edge list
+   (`_add_edge` toggles an edge in and out, so the buffer must hold the intermediate set, not just the final horizon)
+   overflows its fixed 24 entries. Static G1 foot and torso placements on the training terrain: 31-64 non-loop horizons
+   per 40,000 placements (none overflowing at 24; the training states did).
 2. **Margin handling** [MJW `gjk_phase`]: with a margin or gap, every prism within `margin + gap` of the foot went
    through EPA on the inflated (smooth, hence non-discrete) shapes, iterating to the 1e-6 m tolerance. MuJoCo C's
    `mjc_ccd` first runs GJK on the uninflated shapes and, when they are apart, returns that distance less the margins
    without EPA ("special handling for sphere, capsule, and margin (shrink to underlying geom)"); upstream MuJoCo Warp
-   does the same since 2026-10-23 for every pair except heightfields (`gdm/main` `23efc9a`, `has_non_hfield_margin`),
-   because upstream's heightfield path uses the older margin convention that this fork replaced (section 7).
+   does the same since 2026-10-23 for every pair except heightfields (`main` at
+   [`23efc9a`](https://github.com/google-deepmind/mujoco_warp/commit/23efc9aa41a29db65ab3c7f6bfbb485feedae905),
+   `has_non_hfield_margin`), because upstream's heightfield path uses the older margin convention that my fork replaced
+   (section 7).
 
 A third, rarer drop: when EPA's face buffer (6 + 5 x ccd_iterations) fills, `_attach_face` fails and the contact is
 dropped without any flag; MuJoCo C stops with its closest face instead [C-main `epa`, "out of memory for faces"]
 (1 in 40,000 static foot placements).
 
 **Fix.**
-- `439b808` EPA: the original scan runs first; when its horizon is not one simple loop it is undone (each face it
-  deleted carries a per-iteration mark in `face_norm2`, which nothing reads for deleted faces) and the deleted
-  region grows from the closest face by passes over the face list, adding a visible face only when it shares an
-  edge with the region, MuJoCo C's region. A scan whose horizon is one loop is kept as it is, so results are bitwise
-  unchanged there. The horizon buffer holds every edge of EPA's largest polytope, `3 (5 + ccd_iterations) - 6` (114
-  at 35). If it still fills (`EPA_HORIZON`) or the grown region is still not a disk, EPA returns no contact, as
-  MuJoCo C's `epa` when its horizon runs out of edges (`d7a90fb`; C has no test for a region that is not a disk);
-  neither occurs at the derived size (0 in 351,278 worlds of the static sets and training-state replays, instrumented
-  copy). A full face buffer stops EPA with its closest face, as in C.
-- `f85879c` `collision_gjk.HFIELD_MARGIN_SHRINK` (default True): heightfield prism pairs with a margin or gap take
-  MuJoCo C's route: GJK on the uninflated shapes; EPA (on the inflated shapes, as C) only when they overlap. No effect
-  at margin = gap = 0. Setting it False in the fork's `collision_gjk.py` (read at import) restores the previous form;
-  the shrink is off whenever `HFIELD_PRISM_POLYTOPE` is False (`3d8f48c`).
+- [`439b808`](https://github.com/pulipakaa24/mujoco_warp/commit/439b8083ae0ff39f58937a083cfc2d3c56ce022f) EPA: the
+  original scan runs first; when its horizon is not one simple loop it is undone (each face it deleted carries a
+  per-iteration mark in `face_norm2`, which nothing reads for deleted faces) and the deleted region grows from the
+  closest face by passes over the face list, adding a visible face only when it shares an edge with the region, MuJoCo
+  C's region. A scan whose horizon is one loop is kept as it is, so results are bitwise unchanged there. The horizon
+  buffer holds every edge of EPA's largest polytope, `3 (5 + ccd_iterations) - 6` (114 at 35). If it still fills
+  (`EPA_HORIZON`) or the grown region is still not a disk, EPA returns no contact, as MuJoCo C's `epa` when its horizon
+  runs out of edges
+  ([`d7a90fb`](https://github.com/pulipakaa24/mujoco_warp/commit/d7a90fb635b90f3207e79ef222c3be12997d29bc); C has no
+  test for a region that is not a disk); neither occurs at the derived size (0 in 351,278 worlds of the static sets and
+  training-state replays, instrumented copy). A full face buffer stops EPA with its closest face, as in C.
+- [`f85879c`](https://github.com/pulipakaa24/mujoco_warp/commit/f85879cd44bd6439d4fa7bace80dd67702184885)
+  `collision_gjk.HFIELD_MARGIN_SHRINK` (default True): heightfield prism pairs with a margin or gap take MuJoCo C's
+  route: GJK on the uninflated shapes; EPA (on the inflated shapes, as C) only when they overlap. No effect at margin =
+  gap = 0. Setting it False in my fork's `collision_gjk.py` (read at import) restores the previous form; the shrink is
+  off whenever `HFIELD_PRISM_POLYTOPE` is False
+  ([`3d8f48c`](https://github.com/pulipakaa24/mujoco_warp/commit/3d8f48ca77fa41c980aa9595dd90071c6eb43e6c)).
 
 **Results (measured).**
 
-| check | `93e5ce1` | fix |
+| check | [`93e5ce1`](https://github.com/pulipakaa24/mujoco_warp/commit/93e5ce18e76854c430ce669314af00ddceb92147) | fix |
 |---|---|---|
 | captured `rough_il3` overflow states, CPU replay (3 states x 21) | 63 / 63 overflow | 0 / 63 (also 0 with the EPA fix alone) |
 | `rough_il3` smoke, 4096 envs x 8 it, `EPA_HORIZON` worlds (two runs) | 3, 3 | 0, 0 |
@@ -402,14 +460,16 @@ dropped without any flag; MuJoCo C stops with its closest face instead [C-main `
 | heightfield contact checks of section 8.1 (3000 spheres; 1000 each capsule, box, cylinder, ellipsoid, G1 foot; gap 0) | | bitwise identical |
 | static G1 foot / torso placements on the training terrain, gap 0.01 per geom (5 x 40,000) and the g1_bumps tile (2 x 40,000), EPA fix alone | | bitwise identical in all but 2-7 worlds per set, every one a non-loop horizon; one dropped contact recovered, one face-buffer drop recovered |
 | G1 foot on box stairs (boxes_local-like, 20,000 placements incl. flat, grid-aligned soles) | | bitwise identical |
-| fork suites `collision_driver_test`, `collision_gjk_test`, `collision_primitive_core_test` (with the new tests) | | CPU and Metal: 127 passed, 2 skipped (`787a5b3`; 122 at `1eb40d5`) |
+| fork suites `collision_driver_test`, `collision_gjk_test`, `collision_primitive_core_test` (with the new tests) | | CPU and Metal: 127 passed, 2 skipped ([`787a5b3`](https://github.com/pulipakaa24/mujoco_warp/commit/787a5b3a37acc2551ffc8a2c1af1e9781d76723f); 122 at [`1eb40d5`](https://github.com/pulipakaa24/mujoco_warp/commit/1eb40d55956d073e4fa544ca0f0eb0d456681791)) |
 | MetalSim `tests/test_terrain.py` (Metal) | 21 passed | 21 passed, the heightfield-mesh test's figures unchanged (min normal z 0.912, max penetration 5.2 mm) |
 
-The fix column was measured at `1eb40d5`. `787a5b3` changes only the fallbacks above, the shrink's condition and the
-tests. At the defaults it gives bitwise-identical contacts and overflow flags on the CPU sets above (the section 8.1
-checks, the static placements, box stairs, and 49,278 replayed `rough_il3` training states: 359,278 worlds); the suites
-and `tests/test_terrain.py` were re-run on it; the Metal smoke, capture and transfer rows were not
-(`runs/readme_media/handoff/epa-fixes.md`).
+The fix column was measured at
+[`1eb40d5`](https://github.com/pulipakaa24/mujoco_warp/commit/1eb40d55956d073e4fa544ca0f0eb0d456681791).
+[`787a5b3`](https://github.com/pulipakaa24/mujoco_warp/commit/787a5b3a37acc2551ffc8a2c1af1e9781d76723f) changes only the
+fallbacks above, the shrink's condition and the tests. At the defaults it gives bitwise-identical contacts and overflow
+flags on the CPU sets above (the section 8.1 checks, the static placements, box stairs, and 49,278 replayed `rough_il3`
+training states: 359,278 worlds); the suites and `tests/test_terrain.py` were re-run on it; the Metal smoke, capture and
+transfer rows were not (`runs/readme_media/handoff/epa-fixes.md`).
 
 With the shrink, prisms apart within the gap get GJK's exact distance (EPA on the inflated shapes had it to about
 2e-7 m, with normals of neighbouring prisms 0.3 deg apart, which the duplicate test of section 6 then kept as extra
@@ -427,23 +487,27 @@ per pair are the same with the fix; the `rough_il3` run's dynamics were affected
 have been among the four (not the case in the three captured states).
 
 **Cost (measured on the 14-inch MacBook Pro on AC power, powermode 2: not a timing machine, ratios only).** The
-rough-rerun smoke commands (`runs/rough_rerun_2026-10-31/train_wrap.py`, 4096 envs, 8 iterations, `--initial_reset
-1`), time per PPO iteration over iterations 4-8, forks interleaved in one queue job (the fix timed at `1eb40d5`;
-`787a5b3` was not re-timed):
+rough-rerun smoke commands (`runs/rough_rerun_2026-10-31/train_wrap.py`, 4096 envs, 8 iterations, `--initial_reset 1`),
+time per PPO iteration over iterations 4-8, forks interleaved in one queue job (the fix timed at
+[`1eb40d5`](https://github.com/pulipakaa24/mujoco_warp/commit/1eb40d55956d073e4fa544ca0f0eb0d456681791);
+[`787a5b3`](https://github.com/pulipakaa24/mujoco_warp/commit/787a5b3a37acc2551ffc8a2c1af1e9781d76723f) was not
+re-timed):
 
-| config | `8eb51fe` (plane path) | `93e5ce1` | fix | `93e5ce1` / `8eb51fe` | fix / `8eb51fe` |
+| config | [`8eb51fe`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624) (plane path) | [`93e5ce1`](https://github.com/pulipakaa24/mujoco_warp/commit/93e5ce18e76854c430ce669314af00ddceb92147) | fix | [`93e5ce1`](https://github.com/pulipakaa24/mujoco_warp/commit/93e5ce18e76854c430ce669314af00ddceb92147) / [`8eb51fe`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624) | fix / [`8eb51fe`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624) |
 |---|---|---|---|---|---|
 | `rough_il3` (2 rounds) | 1.870 / 1.874 s | 3.838 / 3.848 s | 3.145 / 3.151 s | 2.05 | 1.68 |
 | 2.3.2 seed-0 config, heightfield everywhere, no gap (2 / 6 / 6 runs, medians) | 1.910 s | 2.483 s | 2.509 s | 1.30 | 1.31 |
 | 2.3.2 seed-1 config, boxes_local + heightfield, no gap (1 / 4 / 4 runs, medians) | 2.129 s | 2.541 s | 2.569 s | 1.19 | 1.21 |
 
 Section 8.4's -15 % is the env step under random actions (on battery); a PPO iteration (rollout with the learning
-policy, plus the update) shows larger ratios: 1.30x / 1.19x the plane path in the 2.3.2 configs on `93e5ce1`, 1.31x /
-1.21x with this fix. The difference between the two protocols was not isolated. Where `rough_il3`'s cost goes
-(training states after iteration 12, 512 worlds, every prism the kernel processes classified by its exact float64
-signed distance, `probe/profile_counts.py`): with the 2 cm pair gap, 266 / 259 of the 512 left / right feet have
-prisms within reach (125 / 115 without the gap, same states); each such pair processes 13.4 prisms (GJK each), of
-which 1.25 penetrate and 5.3-5.5 are apart within the gap. EPA calls per foot pair: 6.5-6.8 on `93e5ce1` (all on the
+policy, plus the update) shows larger ratios: 1.30x / 1.19x the plane path in the 2.3.2 configs on
+[`93e5ce1`](https://github.com/pulipakaa24/mujoco_warp/commit/93e5ce18e76854c430ce669314af00ddceb92147), 1.31x / 1.21x
+with this fix. The difference between the two protocols was not isolated. Where `rough_il3`'s cost goes (training states
+after iteration 12, 512 worlds, every prism the kernel processes classified by its exact float64 signed distance,
+`probe/profile_counts.py`): with the 2 cm pair gap, 266 / 259 of the 512 left / right feet have prisms within reach (125
+/ 115 without the gap, same states); each such pair processes 13.4 prisms (GJK each), of which 1.25 penetrate and
+5.3-5.5 are apart within the gap. EPA calls per foot pair: 6.5-6.8 on
+[`93e5ce1`](https://github.com/pulipakaa24/mujoco_warp/commit/93e5ce18e76854c430ce669314af00ddceb92147) (all on the
 inflated shapes), 1.24-1.26 with the fix (-81 %). What remains of the 1.68x is the gap's semantics (twice the foot
 pairs, each with ~13 GJK calls, producing the inactive gap-zone contacts MuJoCo Warp's `gap` asks for) on per-prism
 GJK/EPA instead of the plane test. Not adopted (measured on CPU): EPA on the uninflated shapes for penetrating prisms
@@ -453,12 +517,14 @@ the exact depth, and it departs from MuJoCo C's algorithm).
 **Consequences.** The 2.3.2-config runs (no gap) never ran EPA on inflated shapes and showed no overflow (smoke and
 the 1500-iteration seed-0 run); the fix changes their contacts only where a scan's horizon was not one loop or EPA's
 face buffer filled, and adds about 1 % to their cost (medians of 4-6 interleaved runs; single runs spread by up to 7 %;
-CPU collision time +1 % on 40,000 foot placements). `rough_il3` on `93e5ce1` dropped inactive contacts and paid 2.05x;
-with the fix its gap-zone contacts are exact and it pays 1.68x the plane path, so its re-run belongs on the fix's
-commit. Still open: the fork's subgrid takes the mesh's tight horizontal bounds while MuJoCo C main grows them by the
-margin (prisms beside a geom within the gap are not candidates; gap-zone contacts only, at MetalSim's margin 0);
-MuJoCo Warp's four-contact selection counts inactive gap-zone contacts against the cap; upstream issues not filed
-(MuJoCo Warp: horizon scan, face-buffer drop, heightfield margin shrink; #1845 covers the first).
+CPU collision time +1 % on 40,000 foot placements). `rough_il3` on
+[`93e5ce1`](https://github.com/pulipakaa24/mujoco_warp/commit/93e5ce18e76854c430ce669314af00ddceb92147) dropped inactive
+contacts and paid 2.05x; with the fix its gap-zone contacts are exact and it pays 1.68x the plane path, so its re-run
+belongs on the fix's commit. Still open: my fork's subgrid takes the mesh's tight horizontal bounds while MuJoCo C main
+grows them by the margin (prisms beside a geom within the gap are not candidates; gap-zone contacts only, at MetalSim's
+margin 0); MuJoCo Warp's four-contact selection counts inactive gap-zone contacts against the cap; upstream issues not
+filed (MuJoCo Warp: horizon scan, face-buffer drop, heightfield margin shrink;
+[#1845](https://github.com/google-deepmind/mujoco_warp/pull/1845) covers the first).
 
 ## 13. Re-runs on the repaired kernel (2026-10-31, night)
 
@@ -473,17 +539,21 @@ commands and how each maps onto today's CLI: `runs/readme_media/handoff/rough-re
 
 | job | MuJoCo Warp loaded (job header) | outcome |
 |---|---|---|
-| tests | `93e5ce1` | `tests/test_terrain.py` 21 passed (heightfield-mesh test: min normal z 0.912, max penetration 5.2 mm vs MuJoCo C 4.6 mm, pelvis within 1 mm, as section 8.2); `tests/test_solver_presets.py tests/test_g1_task_terms.py` 38 passed, 4 skipped |
-| transfers, the same checkpoints on both kernels | `8eb51fe` (git archive, plane path) and `93e5ce1` | all exit 0; overflow flags at exit: the line-search cap `LS_ITERATIONS` only, no capacity flag |
-| 2.3.2 rough preset, seeds 0 / 1 / 2, 1500 iterations each; seed 0's checkpoints through both transfer protocols | `93e5ce1` | all exit 0; 0 blow-ups, 0 dropped rows, no capacity flag, `EPA_HORIZON` 0; solver caps, as in the old seed-0 run: `LS_ITERATIONS` at every log point, `ITERATIONS` at 198-237 of 1500 (old seed 0: 82) |
-| exports of seeds 0-2 for Isaac | `93e5ce1` (seeds 0, 1), `787a5b3` (seed 2) | the shared checkout was synced to the pin at 21:48:28, 15 s after seed 2's training ended and 8 min before its export; the export reads only the checkpoint and MuJoCo C's model (`metalsim/parity/export_policy.py:2-3`), so MuJoCo Warp's version does not enter |
-| `rough_il3` seed 0, 1500 iterations | `787a5b3` (git archive) | exit 0; 67 blow-ups (below), no capacity flag, `EPA_HORIZON` 0 |
+| tests | [`93e5ce1`](https://github.com/pulipakaa24/mujoco_warp/commit/93e5ce18e76854c430ce669314af00ddceb92147) | `tests/test_terrain.py` 21 passed (heightfield-mesh test: min normal z 0.912, max penetration 5.2 mm vs MuJoCo C 4.6 mm, pelvis within 1 mm, as section 8.2); `tests/test_solver_presets.py tests/test_g1_task_terms.py` 38 passed, 4 skipped |
+| transfers, the same checkpoints on both kernels | [`8eb51fe`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624) (git archive, plane path) and [`93e5ce1`](https://github.com/pulipakaa24/mujoco_warp/commit/93e5ce18e76854c430ce669314af00ddceb92147) | all exit 0; overflow flags at exit: the line-search cap `LS_ITERATIONS` only, no capacity flag |
+| 2.3.2 rough preset, seeds 0 / 1 / 2, 1500 iterations each; seed 0's checkpoints through both transfer protocols | [`93e5ce1`](https://github.com/pulipakaa24/mujoco_warp/commit/93e5ce18e76854c430ce669314af00ddceb92147) | all exit 0; 0 blow-ups, 0 dropped rows, no capacity flag, `EPA_HORIZON` 0; solver caps, as in the old seed-0 run: `LS_ITERATIONS` at every log point, `ITERATIONS` at 198-237 of 1500 (old seed 0: 82) |
+| exports of seeds 0-2 for Isaac | [`93e5ce1`](https://github.com/pulipakaa24/mujoco_warp/commit/93e5ce18e76854c430ce669314af00ddceb92147) (seeds 0, 1), [`787a5b3`](https://github.com/pulipakaa24/mujoco_warp/commit/787a5b3a37acc2551ffc8a2c1af1e9781d76723f) (seed 2) | the shared checkout was synced to the pin at 21:48:28, 15 s after seed 2's training ended and 8 min before its export; the export reads only the checkpoint and MuJoCo C's model (`metalsim/parity/export_policy.py:2-3`), so MuJoCo Warp's version does not enter |
+| `rough_il3` seed 0, 1500 iterations | [`787a5b3`](https://github.com/pulipakaa24/mujoco_warp/commit/787a5b3a37acc2551ffc8a2c1af1e9781d76723f) (git archive) | exit 0; 67 blow-ups (below), no capacity flag, `EPA_HORIZON` 0 |
 
-The 2.3.2 seeds and the transfers ran on `93e5ce1`, not on the pin: without a margin or gap EPA never runs on
-inflated shapes, and `787a5b3` changes such contacts only at non-loop horizons and full face buffers (section 12), so
-these results stand for the pin (**estimated** from section 12's static and replay sets; not re-run on `787a5b3`).
+The 2.3.2 seeds and the transfers ran on
+[`93e5ce1`](https://github.com/pulipakaa24/mujoco_warp/commit/93e5ce18e76854c430ce669314af00ddceb92147), not on the pin:
+without a margin or gap EPA never runs on inflated shapes, and
+[`787a5b3`](https://github.com/pulipakaa24/mujoco_warp/commit/787a5b3a37acc2551ffc8a2c1af1e9781d76723f) changes such
+contacts only at non-loop horizons and full face buffers (section 12), so these results stand for the pin (**estimated**
+from section 12's static and replay sets; not re-run on
+[`787a5b3`](https://github.com/pulipakaa24/mujoco_warp/commit/787a5b3a37acc2551ffc8a2c1af1e9781d76723f)).
 
-Deviations from the originals and limits of the comparison (the hand-off has the details):
+Deviations from the originals and limits of the comparison (the rough-reruns hand-off has the details):
 - Every training run starts from the task reset (`--initial_reset 1`). The originals started each env's first episode
   at `qpos0` (PARITY §1.5, start-state defect), which on the repaired kernel overflows `njmax` on the box cells (`NEFC`
   at iteration 1 of a 4096-env sizing run). The first ~12 iterations differ by design, and `rough_il3`'s early
@@ -582,9 +652,12 @@ No fall on pyramid stairs or random rough in any B row. Reading (small samples: 
 - Falls barely move: none in protocol A on either kernel; in B one wall-cell fall per checkpoint on the repaired
   kernel and none on the plane path. The re-trained seed 0 falls 0 / 24 in A (record 0 / 24) and 0 / 96 on the wall
   cells in B (record 4 / 96).
-- Run-to-run spread: the same protocol run twice on `93e5ce1` (the pipeline's smoke and full runs, level 3) differs by
-  up to 0.51 m of travel per env, on the plane path by 0.03 m; the full protocol on `93e5ce1` and on the EPA fix
-  (gap-0 contacts the same but for non-loop horizons) differs by up to 0.33 m per cell mean
+- Run-to-run spread: the same protocol run twice on
+  [`93e5ce1`](https://github.com/pulipakaa24/mujoco_warp/commit/93e5ce18e76854c430ce669314af00ddceb92147) (the
+  pipeline's smoke and full runs, level 3) differs by up to 0.51 m of travel per env, on the plane path by 0.03 m; the
+  full protocol on
+  [`93e5ce1`](https://github.com/pulipakaa24/mujoco_warp/commit/93e5ce18e76854c430ce669314af00ddceb92147) and on the EPA
+  fix (gap-0 contacts the same but for non-loop horizons) differs by up to 0.33 m per cell mean
   (`runs/readme_media/handoff/hfield-epa.md`, job V2). Changes beyond that: on heightfield cells the repaired contacts
   shorten the travel of policies trained elsewhere, our old checkpoint by 1.28 m on pyramid stairs and 0.77 m on random
   rough in A and 0.74 m on random rough in B, NVIDIA's by 1.10 m on pyramid stairs in A and 0.77 m on random rough in

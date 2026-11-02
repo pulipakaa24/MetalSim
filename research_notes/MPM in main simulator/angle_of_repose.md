@@ -7,24 +7,29 @@ column-collapse deposit gave 10-14 deg for friction 0.4-0.9, and my batch script
 
 The solver enforces sqrt(J2) <= mu p (cohesionless, cap at yield_pressure / 2, never reached): `implicit_mpm/
 implicit_mpm_solver_kernels.py:249-260` (mu passed through), `rheology_solver_kernels.py:43-77, 100, 107-109, 626,
-659-681`, the DB16 stress mapping (Warp `fem/space/dof_mapper.py:218-228`: r0 = tr(sigma)/sqrt(6), |r_T|^2 = J2).
-This is the tau_bar <= mu p of Jop et al. 2006, Dunatunga & Kamrin 2015 and Daviet & Bertails-Descoubes 2016; with zero
-dilatancy the plastic flow is deviatoric. A heap flank stops flowing in near-simple shear, where tau/sigma_n = mu: the
-**expected repose angle is atan(mu)** = 21.8 / 34.2 / 42.0 deg for mu = 0.4 / 0.68 / 0.9 (Dunatunga & Kamrin: "the
-material must settle at or below ... arctan(mu_s)"; their MPM deposits all at or below it). Not the plane-strain
-(asin mu) or Klar et al. 2016 compression-meridian mappings (other stress paths; Klar's alpha is not Newton's mu).
-Static Drucker-Prager states can hold slightly steeper slopes (Modaressi & Evesque), so "angle > atan mu" is not
-automatically a bug, but flow-formed heaps should not.
+659-681`, the DB16 stress mapping ([Warp](https://github.com/NVIDIA/warp) `fem/space/dof_mapper.py:218-228`: r0 =
+tr(sigma)/sqrt(6), |r_T|^2 = J2). This is the tau_bar <= mu p of [Jop et al. 2006](https://doi.org/10.1038/nature04801),
+[Dunatunga & Kamrin 2015](https://doi.org/10.1017/jfm.2015.383) and
+[Daviet & Bertails-Descoubes 2016](https://doi.org/10.1145/2897824.2925877); with zero dilatancy the plastic flow is
+deviatoric. A heap flank stops flowing in near-simple shear, where tau/sigma_n = mu: the **expected repose angle is
+atan(mu)** = 21.8 / 34.2 / 42.0 deg for mu = 0.4 / 0.68 / 0.9 (Dunatunga & Kamrin: "the material must settle at or below
+... arctan(mu_s)"; their MPM deposits all at or below it). Not the plane-strain (asin mu) or
+[Klar et al. 2016](https://doi.org/10.1145/2897824.2925906) compression-meridian mappings (other stress paths; Klar's
+alpha is not Newton's mu). Static Drucker-Prager states can hold slightly steeper slopes (Modaressi & Evesque), so
+"angle > atan mu" is not automatically a bug, but flow-formed heaps should not.
 
 ## Why the collapse deposit was not a repose test, and what still looks wrong
 
-A column of aspect ratio 2 collapses inertially and leaves a curved deposit flatter than repose (Lube 2004, Lajeunesse
-2004/2005; Sarlin et al. 2021: quasi-static only for release speeds well below 0.4 sqrt(g H)). But the deposit slope
-moved only 0.15 deg per deg of atan(mu) (10.4 -> 13.9 deg for 21.8 -> 42.0 deg); inertial runout alone does not explain
-that weak a sensitivity. Suspects, all lowering the angle: grid smoothing (quadratic support, ~3 cells) over a flank
-spanning only ~6 cells at voxel 0.02; partly filled surface cells carrying no pressure (the unilateral offset switches
-cohesion off in non-compact cells, `rheology_solver_kernels.py:270-277`), so a one-cell skin can creep at any slope;
-an unconverged solve acting like a lower mu; and the floor friction (0.7) below mu = 0.9 letting the toe slide.
+A column of aspect ratio 2 collapses inertially and leaves a curved deposit flatter than repose
+([Lube 2004](https://doi.org/10.1017/S0022112004009036), Lajeunesse
+[2004](https://doi.org/10.1063/1.1736611)/[2005](https://doi.org/10.1063/1.2087687);
+[Sarlin et al. 2021](https://doi.org/10.1103/PhysRevE.104.064904): quasi-static only for release speeds well below 0.4
+sqrt(g H)). But the deposit slope moved only 0.15 deg per deg of atan(mu) (10.4 -> 13.9 deg for 21.8 -> 42.0 deg);
+inertial runout alone does not explain that weak a sensitivity. Suspects, all lowering the angle: grid smoothing
+(quadratic support, ~3 cells) over a flank spanning only ~6 cells at voxel 0.02; partly filled surface cells carrying no
+pressure (the unilateral offset switches cohesion off in non-compact cells, `rheology_solver_kernels.py:270-277`), so a
+one-cell skin can creep at any slope; an unconverged solve acting like a lower mu; and the floor friction (0.7) below mu
+= 0.9 letting the toe slide.
 
 ## Protocol (lifted cylinder) and acceptance
 

@@ -1,8 +1,9 @@
 # Elliptic-cone premium: independent review (2026-09-26)
 
 Scope: can the G1 task's elliptic-cone premium (impratio 10, Newton cap 20) be cut further **without changing the
-converged result**, and what did the implementation work miss? Research only: no fork code edited, no GPU work.
-Fork read: `upstream/mujoco_warp` branch `metalsim` at `0a9de8e` (`mujoco_warp/_src/solver.py`); MuJoCo C reference:
+converged result**, and what did the implementation work miss? Research only: no code of [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) edited, no GPU work.
+Fork read: `upstream/mujoco_warp` branch `metalsim` at [`0a9de8e`](https://github.com/pulipakaa24/mujoco_warp/commit/0a9de8e5cd098bb9c878dc5f5b98d2b53252aec3) (`mujoco_warp/_src/solver.py`);
+[MuJoCo](https://github.com/google-deepmind/mujoco) C reference:
 the installed `mujoco` 3.14.0 wheel for probes and `scratch/deformable/mujoco_main/src/engine/engine_{solver,forward}.c`
 (a MuJoCo main checkout) for source reading. Labels: **measured** (with scope), **published** (cited), **estimated**
 (with the reasoning).
@@ -12,7 +13,7 @@ on the dumped task states `runs/competitors/g1_states/ellip10.{mjb,npz}` (`g1_st
 policy walking on flat ground, 256 worlds x 9 snapshots, each taken at a control-step boundary with the new action
 applied). Each probe runs that control step's 8 substeps of 2.5 ms, so there are 2,304 control steps and 18,432 Newton
 solves per configuration. The Newton cap is 100 unless stated. Engines: MuJoCo C float64 and MuJoCo Warp float32 on
-Warp's CPU device, imported read-only from the shared checkout. The second state set is
+[Warp](https://github.com/NVIDIA/warp)'s CPU device, imported read-only from the shared checkout. The second state set is
 `g1_states/c_ellip10` (MuJoCo C, 64 worlds standing, falling and lying).
 
 ## 0. Summary
@@ -21,7 +22,7 @@ Warp's CPU device, imported read-only from the shared checkout. The second state
 |---|---|
 | 1. where the 31.9 ms goes | Iterations 11-20 cost ~15 ms, about half. They are 0.19 % of the world-iterations (measured, CPU), so this is dispatches plus the latency of the slowest 1-17 worlds. Extra dispatches in iterations 1-10 (11-12 launches per elliptic iteration vs 5-6 on the fused pyramidal path) cost ~4 ms. Real work and latency in iterations 1-10 cost ~13 ms: +26 % world-iterations, the cone Hessian term, refactorization of every cone world, and 1.6x line-search evaluations. The loop premium is larger than the physics-only one (48.5 ms per control step vs 31.9), inferred to be physics on the rollout's harder states. |
 | 2. why ~2x the cap | **Inherent, and caused by impratio 10, not by the cone.** MuJoCo C float64 on the same walking states: elliptic imp10 mean 3.77 iterations, 0.61 % of solves > 10, max 17 (at ls_iterations >= 50). Pyramidal: 2.92, 0.01 %, max 11. **Elliptic imp1: 3.07, 0.02 %, max 11, i.e. pyramidal-like.** MuJoCo Warp float32 matches C (3.67 / 0.42 % / 17). The tail depends on the start point: a cold start removes 85 % of the > 10 solves on walking states but is 1.7x worse on lying states. It is not a line-search artefact: in the tail iterations 0 % of line searches hit their cap. |
-| 3. prior art | No cheaper exact-cone formulation keeps MuJoCo's converged result. PhysX TGS projects each anchor's 2-D friction impulse onto a disk inside a fixed-iteration PGS/TGS loop: an exact cone, a different (unconverged) solution. MuJoCo C does the same per-iteration cone work (`HessianCone`). Genesis (Sept 2026) made two elliptic changes: a lane-parallel cone-block accumulation (bit-identical, +39-78 %; our `world2` / mode 2 already does this) and a line search that stops at the derivative's rounding noise and steps to kinks instead of midpoints (0-4 % on convex scenes, bit-identical on its Go2 convex run). The second is transferable (§3). |
+| 3. prior art | No cheaper exact-cone formulation keeps MuJoCo's converged result. [PhysX](https://github.com/NVIDIA-Omniverse/PhysX) TGS projects each anchor's 2-D friction impulse onto a disk inside a fixed-iteration PGS/TGS loop: an exact cone, a different (unconverged) solution. MuJoCo C does the same per-iteration cone work (`HessianCone`). Genesis (Sept 2026) made two elliptic changes: a lane-parallel cone-block accumulation (bit-identical, +39-78 %; our `world2` / mode 2 already does this) and a line search that stops at the derivative's rounding noise and steps to kinks instead of midpoints (0-4 % on convex scenes, bit-identical on its Go2 convex run). The second is transferable (§3). |
 | 4. result-neutral settings | Raising `tolerance` is not free: MuJoCo Warp already clamps it to 1e-6 (`io.py:390`), and 1e-7 / 1e-6 give the same iterations. `ls_iterations`: 20 and 15 stay within the 1-ulp floor, 10 does not. `noslip` is unsupported in MuJoCo Warp and 0 in the model. The cap of 20 cannot become a per-world exit on Metal (no conditional graph node). On walking states **6.2 of the 20 launched iterations per substep are empty** (measured distribution, 4096 worlds). 11-12 have 1-47 active worlds and carry the full per-world latency. |
 | 5. verdict | Removable without changing results: **~20-30 % of the 0.68 premium**. Fusing the elliptic per-iteration launches saves ~6.5-9.6 ms per control step. A GPU-side exact early exit through ICB indirect execution ranges saves 0.5-2.4 ms. A noise-floored line-search tolerance saves ~1-3 ms. Together the loop goes from 1.68x to ~1.49-1.56x (estimated). A persistent per-world tail kernel (large port) could reach ~1.42-1.52x. The rest (~1.45x) is inherent to impratio 10 elliptic cones on a latency-bound GPU: more Newton iterations, a long tail, and non-quadratic line searches. MuJoCo C shows all three. |
 
@@ -35,7 +36,7 @@ Two findings neither line of work had:
   `ls_iterations >= 50` (measured, `c_blowup.log`, `c_ls100.log`).
 - **(B) Warp's line search hits its 20-iteration budget in ~10 % of calls, on both cone types.** 18 % of calls at Newton
   iteration 1, 0 % in the tail. Iterations 20-100 of those searches change the state below the 1-ulp floor. This is
-  the fp32 "tolerance below the rounding of its derivative" pathology that Genesis fixed in PR #3382. It costs
+  the fp32 "tolerance below the rounding of its derivative" pathology that Genesis fixed in [PR #3382](https://github.com/Genesis-Embodied-AI/genesis-world/pull/3382). It costs
   throughput in the full early iterations, not tail latency.
 
 ## 1. Where the 31.9 ms per step goes (4096 envs, 8 substeps, physics-only protocol)
@@ -44,7 +45,7 @@ Measured anchors:
 
 - `runs/tp26/ellip.wrapper.log`: pyramidal cap 10 physics 43.8 ms, elliptic imp10 cap 20 physics 75.8 ms per control
   step. Rollout 64.9 vs 113.3 ms per step, loop 57.6 K vs 34.3 K env-steps/s (71.0 vs 119.5 ms per env-step batch).
-- `runs/competitors/e2_loop_cap.log` (fork `9b4e96a`): elliptic physics 64.8 K (cap 10) and 52.2 K (cap 20)
+- `runs/competitors/e2_loop_cap.log` ([my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) at [`9b4e96a`](https://github.com/pulipakaa24/mujoco_warp/commit/9b4e96af2ddec285e0f58595fbba27c31a64852a)): elliptic physics 64.8 K (cap 10) and 52.2 K (cap 20)
   env-steps/s, i.e. 63.2 and 78.5 ms. **Cap 10 to 20 costs 15.3 ms, 0.19 ms per added iteration-substep.** Pyramidal
   cap 10 to 20: 49.1 to 56.7 ms, 0.094 ms per added (empty) iteration.
 - Dispatch cost in a dependent graph-replay chain: 8.1 µs per removed dispatch (the pyramidal fusion: -2.6 ms per
@@ -63,9 +64,9 @@ Reconciled budget (per control step; rounding ±1-2 ms):
 
 | component | ms | status |
 |---|---|---|
-| (a) iterations 11-20 (the cap raise) | ~15 | measured as a block (15.3 at `9b4e96a`). Split: ~7-8 ms dispatch floor (80 iteration-substeps x 11-12 launches x 8-10 µs, estimated) and ~7 ms latency of the slowest active world (inferred as the remainder). The work itself is 0.19 % of the world-iterations, i.e. nil. |
+| (a) iterations 11-20 (the cap raise) | ~15 | measured as a block (15.3 at [`9b4e96a`](https://github.com/pulipakaa24/mujoco_warp/commit/9b4e96af2ddec285e0f58595fbba27c31a64852a)). Split: ~7-8 ms dispatch floor (80 iteration-substeps x 11-12 launches x 8-10 µs, estimated) and ~7 ms latency of the slowest active world (inferred as the remainder). The work itself is 0.19 % of the world-iterations, i.e. nil. |
 | (b) extra dispatches in iterations 1-10 | ~4 | estimated: 6 more launches x 80 x 8.1 µs. Consistent with the gap growing 2.6 ms when the pyramidal fusion landed. |
-| (c) work and latency in iterations 1-10 | ~13 | the remainder (measured gap 14.1 ms at cap 10 on `9b4e96a`, plus the fusion growth, minus (b)). By the eager split of §8.3 (cone term + deltas 2.49, extra Cholesky 1.0, extra line search 0.65, constraint update 0.13 ms per substep, eager), scaled to graph mode: cone Hessian term ~6-7, refactorizing every cone world ~2-3, line search ~2-3 (quad precompute plus 1.6x evaluations, see §2), plus the extra 26 % of world-iterations spread over these. The split inside (c) is inferred, not measured. |
+| (c) work and latency in iterations 1-10 | ~13 | the remainder (measured gap 14.1 ms at cap 10 on [`9b4e96a`](https://github.com/pulipakaa24/mujoco_warp/commit/9b4e96af2ddec285e0f58595fbba27c31a64852a), plus the fusion growth, minus (b)). By the eager split of §8.3 (cone term + deltas 2.49, extra Cholesky 1.0, extra line search 0.65, constraint update 0.13 ms per substep, eager), scaled to graph mode: cone Hessian term ~6-7, refactorizing every cone world ~2-3, line search ~2-3 (quad precompute plus 1.6x evaluations, see §2), plus the extra 26 % of world-iterations spread over these. The split inside (c) is inferred, not measured. |
 | total | ~32 | vs the measured 31.9 |
 
 Answers to the sub-questions. (a) The extra cap iterations are almost entirely latency and dispatch: 6.2 of the 20
@@ -135,8 +136,8 @@ Reading:
   or Newton decrement is below the tolerance, or when alpha = 0. Warm start: best of warm start / smooth. Line search:
   1-D Newton with bracketing on the piecewise cost (published, Computation chapter). `noslip` is a PGS-style
   post-process over the friction rows that removes residual slip and changes the solution (MuJoCo docs, `noslip_iterations`).
-  MuJoCo Warp does not implement it (MJX-Warp: "All except PGS, noslip"). The model has `noslip_iterations = 0`.
-- **Todorov 2014** (ICRA, "Convex and analytically-invertible dynamics with contacts and constraints"). This is the
+  MuJoCo Warp does not implement it ([MJX-Warp](https://mujoco.readthedocs.io/en/stable/mjx.html): "All except PGS, noslip"). The model has `noslip_iterations = 0`.
+- **[Todorov 2014](https://doi.org/10.1109/ICRA.2014.6907751)** (ICRA, "Convex and analytically-invertible dynamics with contacts and constraints"). This is the
   convex primal formulation both engines solve. The elliptic cone cost is C1 but not C2 at the cone boundary, which is
   why Newton needs state-dependent damping. The paper offers no cheaper exact solver, only the choice of CG / Newton /
   PGS on the same problem.
@@ -145,15 +146,15 @@ Reading:
   `while_loop` on the accelerator (early exit on convergence), which Metal graph replay lacks.
 - **MuJoCo Warp on CUDA**: `wp.capture_while(nsolving, ...)` (`solver.py:4884`) re-launches the iteration while any
   world is unconverged. On Metal MetalSim sets `graph_conditional = False`, so all `opt.iterations` launch.
-- **Genesis** (published, GitHub, Sept 2026). PR #3380 (merged 2026-09-20): the elliptic cone block accumulated by
+- **[Genesis](https://github.com/Genesis-Embodied-AI/genesis-world)** (published, GitHub, Sept 2026). [PR #3380](https://github.com/Genesis-Embodied-AI/genesis-world/pull/3380) (merged 2026-09-20): the elliptic cone block accumulated by
   the 32 lanes instead of one thread, "bit-identical", +39 % Go2 / +78 % arm at 2048 envs on an RTX 5090. That is the
-  same fix as our `MJW_JTDAJ_ELLIPTIC_LANES=32` / `world2` (done 2026-09-25). PR #3382 (merged 2026-09-22): the line
+  same fix as our `MJW_JTDAJ_ELLIPTIC_LANES=32` / `world2` (done 2026-09-25). [PR #3382](https://github.com/Genesis-Embodied-AI/genesis-world/pull/3382) (merged 2026-09-22): the line
   search takes the next kink (a friction block switching stick / saturate, a normal row switching on / off) instead of
   the midpoint, and floors the gradient tolerance at the rounding noise of the derivative terms. The old line search
   "spent its whole budget on a tolerance below the rounding of its derivative". Step rate +0-4 % on 2048-env convex
-  scenes, "the go2 convex run is bit-identical to main". PR #3373 (closed): the same idea cut an aloha-clutter grasp
+  scenes, "the go2 convex run is bit-identical to main". [PR #3373](https://github.com/Genesis-Embodied-AI/genesis-world/pull/3373) (closed): the same idea cut an aloha-clutter grasp
   from 12-54 to 11-22 Newton iterations at the stick / slip transitions of its Signorini mode. Genesis's own measured
-  elliptic premium in our competitor run: Go2 2.23x, G1 1.72x (`competitors_2026-09-25.md`, pre-#3380).
+  elliptic premium in our competitor run: Go2 2.23x, G1 1.72x (`competitors_2026-09-25.md`, pre-[#3380](https://github.com/Genesis-Embodied-AI/genesis-world/pull/3380)).
 - **PhysX 5.6.1 TGS** (source `DyTGSContactPrep.cpp` ~1745). Per friction anchor, `totalImpulse = sqrt(f0² + f1²)`
   is clamped to `frictionScale·μ·normalImpulse` and both axes are rescaled: an exact circular cone applied as an O(1)
   projection inside a fixed number of TGS position / velocity iterations (patch friction, two anchors per patch;
@@ -161,8 +162,8 @@ Reading:
   because the solver never converges a Newton system. It is a different solution (unconverged, patch-anchored), so it
   is not a way to get MuJoCo's converged result cheaply.
 - **Other exact-cone solvers.** Cone-projected Gauss-Seidel (PGS with disk projection, MuJoCo's own PGS
-  `projectCone`), APGD / SOCP interior point (Tasora & Anitescu; Acary & Brémond), Drake's SAP (Castro et al. 2022,
-  convex unconstrained, Newton with exact line search), and the ADMM-type solvers of Carpentier et al. (2024, "From
+  `projectCone`), APGD / SOCP interior point (Tasora & Anitescu; Acary & Brémond), [Drake](https://github.com/RobotLocomotion/drake)'s SAP ([Castro et al. 2022](https://arxiv.org/abs/2110.10107),
+  convex unconstrained, Newton with exact line search), and the ADMM-type solvers of Carpentier et al. ([2024](https://arxiv.org/abs/2405.17020), "From
   compliant to rigid contact simulation"). They either solve a different regularized problem (SAP, ADMM: different
   converged forces) or converge to MuJoCo's problem more slowly per unit of work (PGS / APGD: linear convergence;
   interior point: 20-50 factorizations). None beats a 3-4-iteration semismooth Newton on MuJoCo's own problem. No known
@@ -194,7 +195,7 @@ the 1-ulp qvel nudge (p99 2.6e-4, max 6.6e-4, 0 control steps > 1e-3):
   (pyramidal 10.3 %, elliptic imp1 9.9 %): 18-19 % at Newton iteration 1, 7-8 % at iteration 2, 0 % from iteration
   11. So it is neither elliptic-specific nor tail latency. It is throughput in the full early launches. Lowering the
   budget is only safe down to ~15. The better fix is Genesis's: stop once the derivative is below the rounding noise of
-  its own sum. The fork already computes that bound for alpha (`noise_floor`, `solver.py:1131-1135`) but not for
+  its own sum. [My fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) already computes that bound for alpha (`noise_floor`, `solver.py:1131-1135`) but not for
   `gtol`, which is `max(tol·ls_tol·‖s‖·scale, 1e-6)`. Kink candidates (the closed-form alpha where each elliptic
   contact enters or leaves the cone along the ray) would also shorten the searches that do converge. Estimated 1-3 ms
   per control step on the elliptic path (less on pyramidal). The expected state change is float-noise level (ls 20 /
@@ -204,7 +205,7 @@ the 1-ulp qvel nudge (p99 2.6e-4, max 6.6e-4, 0 control steps > 1e-3):
   expectation at 4096 worlds (walking): iterations 1-12 are always non-empty, 13 is non-empty with probability 0.86, 14
   0.36, 15-17 0.2 each, 18-20 ~0. That is **6.2 empty iterations per substep, 50 per control step**. Iterations 11-14
   carry 17, 8, 2 and 0.4 active worlds and pay the full chain latency. On the rollout's flailing states fewer are
-  empty (tail 20-34). An exact early exit on Metal is possible without a conditional graph node. The Warp fork already
+  empty (tail 20-34). An exact early exit on Metal is possible without a conditional graph node. [My fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) already
   replays graphs through an ICB with `executeCommandsInBuffer:withRange:` (`warp/native/metal.mm:1464`). Metal also
   has `executeCommands(in:indirectBuffer:indirectBufferOffset:)`, where the range comes from a GPU buffer (published,
   Apple docs, compute encoder, iOS 13+ / macOS). Encoding each Newton iteration as its own ICB range and letting
@@ -222,7 +223,7 @@ it physics (the PPO update is 144-155 vs 148 ms).
 |---|---|---|---|---|
 | Fuse the elliptic per-iteration launches: efc + qfrc + grad into one kernel (as `_update_constraint_gradient_fused`), cone list + htot folded into the Cholesky launch, 11-12 to ~5-6 | no (bitwise, apart from the SIMD-sum order of `grad_dot`, as in the pyramidal fusion) | 6.5-9.6 ms (5-6 dispatches x 160 iteration-substeps x 8-10 µs) | 1-2 days | the parallel agent's item 1; confirmed as the largest result-neutral lever |
 | Exact early exit via ICB indirect execution ranges | no (bitwise) | 0.5-2.4 ms after fusion (state-dependent) | 2-3 days (Warp backend) | new |
-| Noise-floored line-search `gtol` (plus optional kink candidates, Genesis #3382) | float-noise level (to verify) | 1-3 ms | 1 day | new |
+| Noise-floored line-search `gtol` (plus optional kink candidates, Genesis [#3382](https://github.com/Genesis-Embodied-AI/genesis-world/pull/3382)) | float-noise level (to verify) | 1-3 ms | 1 day | new |
 | Persistent per-world tail kernel (iterations ≥ ~8 in one launch per active world, §11.1 of the throughput note) | no | 3-5 ms beyond the above (removes the tail's dispatches, keeps its per-world latency) | large port, occupancy risk | deferred in §11.1; the elliptic tail makes it worth more than on pyramidal |
 | Cone-space warm start | tolerance level (like cap 12-15) | pays only through a lower cap or an early exit. If it matched the cold-start tail on walking states without the lying-state penalty, cap 15 would become possible: ~4-5 ms, pending a cap-probe re-validation on every state class | – | parallel agent's item 2. Evidence neutral to positive (§2). The random-action states need 20-34 iterations with today's start. |
 | lower `tolerance`, `ls_iterations` < 15, cap < 20, noslip | yes | – | – | rejected |
@@ -235,7 +236,7 @@ fusion job's before/after is the first check.
 **Inherent (~1.45x on the loop):** +26-29 % Newton iterations (C 3.77 vs 2.92, Warp 3.67 vs 2.92), a tail to 17
 iterations on walking states and 20-34 on fallen ones (C shows the same), 1.6x line-search evaluations per iteration
 (C: 4.96 vs 3.10), and the per-iteration cone Hessian and refactorization of cone worlds. MuJoCo C does the same
-per-iteration cone work; its rank-1 form measured slower on Metal (DECISIONS 2026-09-26). The root cause is
+per-iteration cone work; its rank-1 form measured slower on Metal ([DECISIONS](../DECISIONS.md) 2026-09-26). The root cause is
 impratio 10: elliptic at impratio 1 costs about what pyramidal does. That is a fidelity choice (PhysX impact forces
 within 8 %) and stays.
 
@@ -249,7 +250,7 @@ Recommended next measurements (GPU, owner's queue):
 
 ## Sources
 
-- Code: `upstream/mujoco_warp/mujoco_warp/_src/solver.py` (`0a9de8e`; lines cited above), `io.py:387-390`;
+- Code: `upstream/mujoco_warp/mujoco_warp/_src/solver.py` ([`0a9de8e`](https://github.com/pulipakaa24/mujoco_warp/commit/0a9de8e5cd098bb9c878dc5f5b98d2b53252aec3); lines cited above), `io.py:387-390`;
   `upstream/warp-innate/warp/native/metal.mm:1420-1470`; `scratch/deformable/mujoco_main/src/engine/engine_solver.c`
   (`mj_solPrimal`, `HessianIncremental`, `HessianCone`), `engine_forward.c` (`warmstart`, lines 1071-1131);
   `upstream/PhysX-5.6.1/physx/source/lowleveldynamics/src/DyTGSContactPrep.cpp` (~1730-1760).
@@ -265,7 +266,7 @@ Recommended next measurements (GPU, owner's queue):
   https://developer.apple.com/documentation/metal/mtlcomputecommandencoder/executecommands(in:indirectbuffer:indirectbufferoffset:)
 - A. M. Castro et al., "An unconstrained convex formulation of compliant contact", IEEE T-RO 2022 (SAP). J.
   Carpentier et al., "From compliant to rigid contact simulation: a unified and efficient approach", RSS 2024
-  (arXiv 2405.17020).
+  ([arXiv 2405.17020](https://arxiv.org/abs/2405.17020)).
 - Project measurements: `runs/tp26/ellip.wrapper.log`, `runs/competitors/e2_loop_cap.log`,
   `runs/competitors/cap_probe/*.json`, `docs/research/elliptic_cones_2026-09-25.md` §8,
   `docs/research/throughput_2026-09-26.md` §2c / §4b / §11.1; new probes in `runs/competitors/elliptic_review/`.

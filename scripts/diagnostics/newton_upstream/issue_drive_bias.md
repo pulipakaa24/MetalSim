@@ -6,11 +6,12 @@
 
 A revolute pendulum held by an XPBD position drive with `target_ke` 200 N m/rad settles with a gravity sag that
 scales as 1/iterations instead of `tau_gravity / ke`: the effective stiffness is 72, 145, 291, 593 and 1240 N m/rad at
-1, 2, 4, 8 and 16 iterations (relaxation 0.4/0.4 to isolate this from the relaxation issue). On a humanoid (Unitree G1,
-Isaac Lab gains) the effect depends on the link: light, heavily damped links (hands, kd 10 on ~1e-6 kg m^2 links)
-come out far softer than `ke`, heavy ones stiffer; joint angles with the base fixed differ from the exact static
-PD equilibrium by 0.03-0.4 rad at 4-16 iterations. The same PD law applied as a torque through `Control.joint_f`
-(damping integrated backward-Euler) is exact at any iteration count.
+1, 2, 4, 8 and 16 iterations (relaxation 0.4/0.4 to isolate this from
+[the relaxation issue](https://github.com/newton-physics/newton/issues/4314)). On a humanoid (Unitree G1, Isaac Lab
+gains) the effect depends on the link: light, heavily damped links (hands, kd 10 on ~1e-6 kg m^2 links) come out far
+softer than `ke`, heavy ones stiffer; joint angles with the base fixed differ from the exact static PD equilibrium by
+0.03-0.4 rad at 4-16 iterations. The same PD law applied as a torque through `Control.joint_f` (damping integrated
+backward-Euler) is exact at any iteration count.
 
 ## Reproducer
 
@@ -58,4 +59,4 @@ enters only through `gamma` above.)
 
 Disable the drive (`target_ke = target_kd = 0`) and apply `tau = kp (q* - q) - kd qd / (1 + kd dt / I)` through
 `Control.joint_f` each substep (`q, qd` from `newton.eval_ik`, I the joint-space inertia), with equal joint
-relaxation factors (see the relaxation issue).
+relaxation factors (see [the relaxation issue](https://github.com/newton-physics/newton/issues/4314)).

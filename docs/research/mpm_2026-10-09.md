@@ -1,8 +1,8 @@
 # Port Newton's implicit MPM, then accelerate it
 
-*Research report, dated 2026-10-09. Scope: metalsim (Apple-Silicon Metal) against Isaac Lab 3.0-EA / Isaac Sim 6.1 / Newton 1.5.2, with references recorded on an NVIDIA L4 machine.*
+*Research report, dated 2026-10-09. Scope: metalsim (Apple-Silicon Metal) against [Isaac Lab 3.0-EA](https://github.com/isaac-sim/IsaacLab/tree/v3.0.0-EA) / [Isaac Sim](https://github.com/isaac-sim/IsaacSim) 6.1 / [Newton 1.5.2](https://github.com/newton-physics/newton/tree/v1.5.2), with references recorded on an NVIDIA L4 machine.*
 
-For Isaac parity, metalsim's MPM has to be **Newton's `SolverImplicitMPM`**, not an MLS-MPM. That is the only MPM that Isaac Lab 3.0-EA exposes. PhysX removed its experimental MPM and FLIP solvers in 5.4.0, and today it offers only position-based (PBD) particles, which Isaac Lab does not wire into any asset or task. Newton's solver is a different algorithm from the Taichi/Genesis family. It solves one implicit, nonsmooth Drucker-Prager rheology and frictional-contact problem per step, on a trilinear (Q1) velocity grid with piecewise-constant (P0) stress. A Genesis-style explicit MLS-MPM could match it statistically at best, never step for step. The most important finding is that **Newton's solver already runs on the M4 Max through the in-repo Warp Metal fork after a one-line patch**. The patch makes `warp.fem` integrate in float32 instead of float64. With it, the solver matched the CPU to about 1e-8 and was bitwise repeatable across Metal runs. A faithful reference therefore exists on the Mac before any custom kernel is written. On the performance side, measured Metal microbenchmarks show that particle-to-grid transfer (P2G) should use **threadgroup fixed-point int32 tiles**: 0.33–0.48 ms per million particles, 6–8.7× faster than device float atomics, and deterministic. The plan, then, is to record a small set of Newton/Isaac Lab references on the L4, set up the Newton-on-Metal port as the parity oracle, and replace its hot paths with native Metal kernels one at a time. Each replacement must pass a tiered benchmark suite whose tolerances are tied to measured noise floors and to published granular scaling laws.
+For Isaac parity, metalsim's MPM has to be **Newton's `SolverImplicitMPM`**, not an MLS-MPM. That is the only MPM that Isaac Lab 3.0-EA exposes. [PhysX](https://github.com/NVIDIA-Omniverse/PhysX) removed its experimental MPM and FLIP solvers in 5.4.0, and today it offers only position-based (PBD) particles, which Isaac Lab does not wire into any asset or task. Newton's solver is a different algorithm from the [Taichi](https://github.com/taichi-dev/taichi)/[Genesis](https://github.com/Genesis-Embodied-AI/genesis-world) family. It solves one implicit, nonsmooth Drucker-Prager rheology and frictional-contact problem per step, on a trilinear (Q1) velocity grid with piecewise-constant (P0) stress. A Genesis-style explicit MLS-MPM could match it statistically at best, never step for step. The most important finding is that **Newton's solver already runs on the M4 Max through the Metal backend in [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) after a one-line patch**. The patch makes `warp.fem` integrate in float32 instead of float64. With it, the solver matched the CPU to about 1e-8 and was bitwise repeatable across Metal runs. A faithful reference therefore exists on the Mac before any custom kernel is written. On the performance side, measured Metal microbenchmarks show that particle-to-grid transfer (P2G) should use **threadgroup fixed-point int32 tiles**: 0.33–0.48 ms per million particles, 6–8.7× faster than device float atomics, and deterministic. The plan, then, is to record a small set of Newton/Isaac Lab references on the L4, set up the Newton-on-Metal port as the parity oracle, and replace its hot paths with native Metal kernels one at a time. Each replacement must pass a tiered benchmark suite whose tolerances are tied to measured noise floors and to published granular scaling laws.
 
 ## Isaac's only MPM is Newton ImplicitMPM; PhysX offers PBD particles alone
 
@@ -22,7 +22,7 @@ The v3.0.0-EA release (2026-09-16) is "built for Isaac Sim 6.1, Python 3.12, PyT
 - **Asset.** `MPMObject` provides `particle_pos_w` and `particle_vel_w` readback.
 - **Spawners.** `MPMGridCfg`, `MPMPointsCfg` and `MPMParticleMaterialCfg`.
 - **Demos.** Four of them: granular, two-way coupling, snowball smash and teapot fill.
-- **Contrib RL tasks.** Two, which couple MuJoCo-Warp to MPM through Newton's `SolverCoupledProxy`.
+- **Contrib RL tasks.** Two, which couple [MuJoCo-Warp](https://github.com/google-deepmind/mujoco_warp) to MPM through Newton's `SolverCoupledProxy`.
 
 The concepts page states plainly that "MPM support and rigid-MPM coupling are experimental" ([using_mpm.rst](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/docs/source/concepts/using_mpm.rst)).
 
@@ -47,7 +47,7 @@ The yield surface is a Drucker-Prager cone with cohesion (`yield_stress`), a ten
 
 The velocity/strain basis menu (Q1/B2/B3 × P0/P1d/Q1/pic) and the hardening, dilatancy and viscosity options line up with NVIDIA's SIGGRAPH 2026 "Mixed Material Point Methods" paper. That paper reports being "integrated as a first-party module in the Newton physics engine" ([project page](https://research.nvidia.com/labs/prl/mixed_mpm/index.html)). **The 2026 paper, more than the 2016 one, is the effective spec.**
 
-Rigid coupling is impulse-based. The MPM solve includes finite-mass bodies' Delassus operators, and `collect_collider_impulses()` returns the reactions, which the rigid solver applies with a one-frame lag. In Newton's example, MuJoCo runs 4 substeps per 1/100 s frame and MPM runs one step per frame ([example_mpm_twoway_coupling.py](https://github.com/newton-physics/newton/blob/v1.5.2/newton/examples/mpm/example_mpm_twoway_coupling.py)).
+Rigid coupling is impulse-based. The MPM solve includes finite-mass bodies' Delassus operators, and `collect_collider_impulses()` returns the reactions, which the rigid solver applies with a one-frame lag. In Newton's example, [MuJoCo](https://github.com/google-deepmind/mujoco) runs 4 substeps per 1/100 s frame and MPM runs one step per frame ([example_mpm_twoway_coupling.py](https://github.com/newton-physics/newton/blob/v1.5.2/newton/examples/mpm/example_mpm_twoway_coupling.py)).
 
 A version-skew caveat: Newton 1.6.0 (2026-09-10) adds USD import of MPM materials, `extract_particle_surface()` and a water dam-break example. **Isaac Lab 3.0-EA pins 1.5.2, so references must be recorded on 1.5.2** ([Newton CHANGELOG](https://github.com/newton-physics/newton/blob/main/CHANGELOG.md)).
 
@@ -55,14 +55,14 @@ A version-skew caveat: Newton 1.6.0 (2026-09-10) adds USD import of MPM material
 
 | Solver | Time integration and discretization | Materials | Rigid coupling | Runs on Apple Metal today? |
 |---|---|---|---|---|
-| **Newton `SolverImplicitMPM`** (Isaac Lab 3.0-EA's MPM) | Implicit, one nonsmooth solve per step; Q1 velocity, P0 stress, APIC, sparse NanoVDB or dense grid | Drucker-Prager + cap + cohesion + viscosity + dilatancy + hardening; Hencky elasticity optional | Two-way, implicit within the MPM step, lagged to the rigid solver | **Yes, via the Warp Metal fork with a float32-accumulate patch** (measured, small scene) |
-| Genesis MPM | Explicit MLS-MPM, quadratic B-spline, dense grid | Elastic, ElastoPlastic, Snow, Sand (Klár DP), Liquid, Muscle | Two-way, explicit SDF velocity projection; legacy coupler only | Compiles via Quadrants Metal; nondeterministic P2G; open Metal miscompile issues; no MPM measurement |
+| **Newton `SolverImplicitMPM`** (Isaac Lab 3.0-EA's MPM) | Implicit, one nonsmooth solve per step; Q1 velocity, P0 stress, APIC, sparse [NanoVDB](https://github.com/AcademySoftwareFoundation/openvdb/tree/master/nanovdb) or dense grid | Drucker-Prager + cap + cohesion + viscosity + dilatancy + hardening; Hencky elasticity optional | Two-way, implicit within the MPM step, lagged to the rigid solver | **Yes, via [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) (Metal backend) with a float32-accumulate patch** (measured, small scene) |
+| Genesis MPM | Explicit MLS-MPM, quadratic B-spline, dense grid | Elastic, ElastoPlastic, Snow, Sand (Klár DP), Liquid, Muscle | Two-way, explicit SDF velocity projection; legacy coupler only | Compiles via [Quadrants](https://github.com/Genesis-Embodied-AI/quadrants) Metal; nondeterministic P2G; open Metal miscompile issues; no MPM measurement |
 | Taichi mpm88/99/128/3d | Explicit MLS-MPM, quadratic B-spline, slip walls 3 cells deep | Fluid, jelly, snow (fixed-corotated) | None | Taichi has a Metal backend; no published Apple MPM numbers |
-| Warp examples | `example_apic_fluid` (APIC fluid with a pressure solve) only; no `example_mpm` upstream | Fluid | None | The fork supports the needed features; untested |
+| [Warp](https://github.com/NVIDIA/warp) examples | `example_apic_fluid` (APIC fluid with a pressure solve) only; no `example_mpm` upstream | Fluid | None | My fork of Warp supports the needed features; untested |
 
 ### Genesis and Taichi are the explicit MLS-MPM lineage
 
-Genesis's solver uses quadratic B-spline weights on a 3×3×3 stencil. Its P2G term is `−dt·V_p·4·inv_dx²·τ + m_p·C_p`, and it scatters into a dense grid with float atomics. Its default dt is 1e-2 with 1 substep, even though its own warning threshold at grid density 64 is about 3.1e-4 s ([mpm_solver.py](https://raw.githubusercontent.com/Genesis-Embodied-AI/Genesis/main/genesis/engine/solvers/mpm_solver.py), [solvers.py](https://raw.githubusercontent.com/Genesis-Embodied-AI/Genesis/main/genesis/options/solvers.py)). Its Sand model is the Klár 2016 Hencky-strain Drucker-Prager return map ([Klár et al.](https://www.math.ucla.edu/~cffjiang/research/sand/paper.pdf)). Rigid coupling exchanges an explicit `−mΔv/dt` force per grid node. **The newer SAP coupler has no MPM support at all** ([legacy_coupler.py](https://raw.githubusercontent.com/Genesis-Embodied-AI/Genesis/main/genesis/engine/couplers/legacy_coupler.py), [sap_coupler.py](https://raw.githubusercontent.com/Genesis-Embodied-AI/Genesis/main/genesis/engine/couplers/sap_coupler.py)).
+Genesis's solver uses quadratic B-spline weights on a 3×3×3 stencil. Its P2G term is `−dt·V_p·4·inv_dx²·τ + m_p·C_p`, and it scatters into a dense grid with float atomics. Its default dt is 1e-2 with 1 substep, even though its own warning threshold at grid density 64 is about 3.1e-4 s ([mpm_solver.py](https://raw.githubusercontent.com/Genesis-Embodied-AI/Genesis/main/genesis/engine/solvers/mpm_solver.py), [solvers.py](https://raw.githubusercontent.com/Genesis-Embodied-AI/Genesis/main/genesis/options/solvers.py)). Its Sand model is the Klár 2016 Hencky-strain Drucker-Prager return map ([Klár et al.](https://math.ucdavis.edu/~jteran/papers/KGPSJT16.pdf)). Rigid coupling exchanges an explicit `−mΔv/dt` force per grid node. **The newer SAP coupler has no MPM support at all** ([legacy_coupler.py](https://raw.githubusercontent.com/Genesis-Embodied-AI/Genesis/main/genesis/engine/couplers/legacy_coupler.py), [sap_coupler.py](https://raw.githubusercontent.com/Genesis-Embodied-AI/Genesis/main/genesis/engine/couplers/sap_coupler.py)).
 
 On Metal, Genesis compiles through Quadrants, but open issues hit exactly the patterns MPM uses:
 
@@ -82,16 +82,16 @@ Newton instead steps once per 1/60–1/120 s frame. Explicit MPM is many cheap, 
 
 ### Newton on Metal: measured working after a one-line patch
 
-The Metal Warp fork (branch `metalsim`) supports what ImplicitMPM needs:
+The Metal backend in [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) supports what ImplicitMPM needs:
 
 - native float32 and int32 device atomics;
 - forward-only tile ops within 32 KB of threadgroup memory;
 - host-built NanoVDB volumes;
 - BSR matrices with a host-side topology path.
 
-It has **no float64**. It also does not support `wp.config.deterministic` or CUDA conditional graphs ([metal.rst, local](upstream/warp-innate/docs/user_guide/metal.rst)). `fem.integrate` defaults to `accumulate_dtype=wp.float64` ([integrate.py, local](upstream/warp-innate/warp/_src/fem/integrate.py)), and Newton never overrides it. As a result, **unmodified `SolverImplicitMPM.step` fails on `metal:0`** with "Kernel 'integrate_fraction_…' uses builtins that are not supported on Metal yet: float64".
+It has **no float64**. It also does not support `wp.config.deterministic` or CUDA conditional graphs ([metal.rst, innate-inc/warp](https://github.com/innate-inc/warp/blob/main/docs/user_guide/metal.rst)). `fem.integrate` defaults to `accumulate_dtype=wp.float64` ([integrate.py, innate-inc/warp](https://github.com/innate-inc/warp/blob/main/warp/_src/fem/integrate.py)), and Newton never overrides it. As a result, **unmodified `SolverImplicitMPM.step` fails on `metal:0`** with "Kernel 'integrate_fraction_…' uses builtins that are not supported on Metal yet: float64".
 
-The probe scene was 1,000 particles at voxel 0.1 and dt 1/60 on a ground plane, run with Newton `90e23324` on the fork. With `fem.integrate` defaulted to float32, 120 frames ran on Metal for both dense and sparse grids. Results:
+The probe scene was 1,000 particles at voxel 0.1 and dt 1/60 on a ground plane, run with [my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim) at [`90e23324`](https://github.com/pulipakaa24/newton/commit/90e23324521fa86710e483e01d02e80d1dac0060) on my fork of Warp. With `fem.integrate` defaulted to float32, 120 frames ran on Metal for both dense and sparse grids. Results:
 
 - **Dense grid, CPU vs Metal:** final minimum z 0.0026439887 on the CPU against 0.0026439829 on Metal. They differ at float32 round-off.
 - **Repeatability:** two Metal runs of each grid type gave identical `particle_q` MD5 hashes.
@@ -102,7 +102,7 @@ The probe scripts were in this session's scratchpad (`mpm_metal_probe.py` and `m
 Determinism is structurally favourable:
 
 - **P2G.** `warp.fem` P2G is a node-centric gather over a stable radix sort, with no float atomics.
-- **G2P.** It is a single add per particle under `integration_scheme="pic"`. It becomes order-dependent only under GIMP ([integrate.py, local](upstream/warp-innate/warp/_src/fem/integrate.py)).
+- **G2P.** It is a single add per particle under `integration_scheme="pic"`. It becomes order-dependent only under GIMP ([integrate.py, innate-inc/warp](https://github.com/innate-inc/warp/blob/main/warp/_src/fem/integrate.py)).
 
 Two problems remain:
 
@@ -129,7 +129,7 @@ Capture details:
 
 The Isaac Lab path proves "what Isaac users get". Build a `SimulationContext` with `NewtonCfg(solver_cfg=MPMSolverCfg(...))` and an `MPMObjectCfg` spawned with `MPMGridCfg(particle_placement="cell_center", jitter=0)`. Read `obj.data.particle_pos_w` and `particle_vel_w` each step. The repo's existing `record_deformables_il3.py` already reads `ProxyArray`s this way and can be cloned. Its usage string must change, because **3.0-EA removed `--headless` in favour of `--viz none`** ([release notes](https://github.com/isaac-sim/IsaacLab/releases/tag/v3.0.0-EA)).
 
-PhysX PBD needs Kit with GPU dynamics and USD authored through `omni.physx.scripts.particleUtils` ([particleUtils.py](https://github.com/NVIDIA-Omniverse/PhysX/blob/main/omni/extensions/runtime/source/omni.physx/python/scripts/particleUtils.py)). The 6.1 readback route is unverified. It could be a tensor view, USD `points` writeback, or ovphysx buffers, so a smoke test must come first.
+PhysX PBD needs Kit with GPU dynamics and USD authored through `omni.physx.scripts.particleUtils` ([particleUtils.py](https://github.com/NVIDIA-Omniverse/PhysX/blob/107.3-omni-and-physx-5.6.1/omni/extensions/runtime/source/omni.physx/python/scripts/particleUtils.py)). The 6.1 readback route is unverified. It could be a tensor view, USD `points` writeback, or [ovphysx](https://nvidia-omniverse.github.io/PhysX/ovphysx/latest/index.html) buffers, so a smoke test must come first.
 
 No source gives L4-specific MPM problems or any published Newton MPM throughput. **The L4 timings metalsim records will be the first numbers for this solver.**
 
@@ -154,8 +154,8 @@ Granular flow is chaotic, and nobody publishes a formal protocol for benchmarkin
 
 **Column collapse is the best-documented granular benchmark.** Normalized runout (L_f − L_i)/L_i is linear in the aspect ratio a for small a, then follows a^(2/3) in 2D or a^(1/2) axisymmetrically. The published fits are:
 
-- Lube 2005 (2D): 1.2a for a < 2.3, then 1.9a^(2/3).
-- Lajeunesse 2005 (2D): a for a < 3, then a^(2/3).
+- [Lube 2005](https://doi.org/10.1103/PhysRevE.72.041301) (2D): 1.2a for a < 2.3, then 1.9a^(2/3).
+- [Lajeunesse 2005](https://doi.org/10.1063/1.2087687) (2D): a for a < 3, then a^(2/3).
 
 Fits from different labs disagree by about 20% ([arXiv 1602.07881](https://arxiv.org/html/1602.07881v1)). Continuum MPM with a µ(I) model reproduces the "jointed power-law scaling" ([Dunatunga & Kamrin, MIT DSpace](https://dspace.mit.edu/handle/1721.1/107838?show=full)). Rate-independent continuum models tend to over-predict runout at high aspect ratio, so a ≥ 5 should be read with that bias in mind.
 
@@ -169,7 +169,7 @@ Fits from different labs disagree by about 20% ([arXiv 1602.07881](https://arxiv
 
 All are in N/cm³, scaled by a medium factor ζ: 0.194 for loose 0.3 mm glass and 0.371 when close-packed. The paper's own accuracy is about 10% on peak leg force and about 20% for the scaling routine ([Li, Zhang & Goldman, arXiv 1303.7065](https://arxiv.org/html/1303.7065)).
 
-**Dam-break fronts** in Martin & Moyce run at v/√(gH) of 1.48 and 1.69, against the Ritter limit of 2 ([arXiv 1308.0115](https://arxiv.org/pdf/1308.0115)).
+**Dam-break fronts** in [Martin & Moyce](https://doi.org/10.1098/rsta.1952.0006) run at v/√(gH) of 1.48 and 1.69, against the Ritter limit of 2 ([arXiv 1308.0115](https://arxiv.org/pdf/1308.0115)).
 
 **ManiSkill2** supplies crisp success criteria for MPM manipulation. Its Pour task requires the liquid level within 4 mm of the line and fewer than 100 particles spilled. Its throughput was about 80–84 FPS for 16 environments on an RTX Titan, limited by kernel launches ([arXiv 2302.04659](https://arxiv.org/pdf/2302.04659)).
 
@@ -212,7 +212,7 @@ The literature arrives at the same structure. Gao 2018 got **23×** over atomic-
 
 ### Supporting numbers for the rest of the step
 
-- **Sorting.** The repo's stable radix sort runs at about **3.1 Gkeys/s** ([SPLAT.md, local](metalsim/render/SPLAT.md)). A full 32-bit sort of 1M particles therefore costs about as much as P2G itself (estimate: 0.33 ms). Counting sorts on block keys of 16 bits or fewer, done rarely, are the right choice.
+- **Sorting.** The repo's stable radix sort runs at about **3.1 Gkeys/s** ([SPLAT.md](/metalsim/render/SPLAT.md)). A full 32-bit sort of 1M particles therefore costs about as much as P2G itself (estimate: 0.33 ms). Counting sorts on block keys of 16 bits or fewer, done rarely, are the right choice.
 - **Grid clearing.** Clearing a 34 MB dense grid took 0.037 ms (measured). Dense per-environment grids are effectively free to reset.
 - **Saturation.** P2G cost per particle was flat from 2.1M to 16.8M particles. A single dispatch of about 0.25M particles nearly fills the 40-core GPU, so small environments must be batched into one dispatch.
 
@@ -222,7 +222,7 @@ For explicit MLS-MPM, a full step should cost an estimated **0.8–1.2 ms per mi
 
 Newton assembles the strain operator B as a BSR matrix over grid nodes. The P2G and G2P transfers therefore run once per step, and the 24–250 rheology iterations operate on strain and velocity nodes. At the 8–27 particles per voxel used in the shipped examples ([newton/examples/mpm](https://github.com/newton-physics/newton/tree/v1.5.2/newton/examples/mpm)), each iteration touches roughly an order of magnitude fewer entities than a particle pass would. This is an inference from the code structure, not a measurement.
 
-If it holds, the iteration loop is short, dependent and launch-bound. Its cost on Metal is dominated by dispatch count and host round-trips for convergence checks, not by atomics. The fork already reports that **launch fusion paid off on Metal: fusing 5 of 9 per-iteration launches gave +3.9% on a 4096-environment MuJoCo Warp workload** ([throughput note, local](docs/research/throughput_2026-09-26.md)). The performance plan should therefore attack the iteration loop's encoding, and the transfer kernels second.
+If it holds, the iteration loop is short, dependent and launch-bound. Its cost on Metal is dominated by dispatch count and host round-trips for convergence checks, not by atomics. [My fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) already reports that **launch fusion paid off on Metal: fusing 5 of 9 per-iteration launches gave +3.9% on a 4096-environment MuJoCo Warp workload** ([throughput note](/docs/research/throughput_2026-09-26.md)). The performance plan should therefore attack the iteration loop's encoding, and the transfer kernels second.
 
 ## Recommendations
 
@@ -273,7 +273,7 @@ The tolerances below are proposals, derived from the cited accuracy of each anch
 
 | Stage | Work | Gate |
 |---|---|---|
-| S0 | Record R0–R6 on the L4. Upstream a Metal default of `accumulate_dtype=float32` in the Warp fork (or a Newton pass-through). Run all reference scenes with Newton on `metal:0`. | T0 passes; T1/T2 measured, which sizes the float32 penalty before any custom code |
+| S0 | Record R0–R6 on the L4. Upstream a Metal default of `accumulate_dtype=float32` in [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) (or a Newton pass-through). Run all reference scenes with Newton on `metal:0`. | T0 passes; T1/T2 measured, which sizes the float32 penalty before any custom code |
 | S1 | Build the harness for the suite above in `metalsim/parity`. Freeze Newton-on-Metal as the oracle. | Oracle passes T1–T2 against the L4, or the gap is explained by R0's float32 run |
 | S2 | Remove host round-trips: fixed/dense grids (no host NanoVDB rebuild), padded or preallocated BSR topology, convergence checks every k iterations, whole step encoded in one command buffer, Metal-tuned block sizes in place of the `is_cuda` gates. | Bitwise equal to the S1 oracle for any k that is a check-frequency change only; otherwise T1 |
 | S3 | Native Metal kernels, one at a time behind A/B switches: counting sort by block (re-sorted when particles leave a free zone, every 10–30 steps per Fei 2021); P2G via a threadgroup int32 fixed-point tile (Q1 = 8 nodes per particle), with per-channel scale chosen so quantization stays ≤ 0.1× tolerance; G2P gather; colored-GS rheology with one dispatch per color and fused local solves. | Each kernel passes T0, T1 and T2 against the oracle before merging |

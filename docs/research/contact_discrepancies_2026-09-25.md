@@ -1,7 +1,7 @@
 # The two contact discrepancies that survived the tuning sweep: impact peaks and feet air time
 
 2026-09-25. Scope: the two gaps to Isaac's PhysX recordings that no setting of the 11-setting sweep closed
-(PARITY §1.7, `docs/research/mujoco_contact_vs_physx_2026-09-25.md`): (A) contact-force peaks 3–5× Isaac's at equal
+([PARITY §1.7](../PARITY.md#17-fidelity-protocol-against-isaac-sim-51-on-an-l4-recorded-2026-09-24-physx--rtx), `docs/research/mujoco_contact_vs_physx_2026-09-25.md`): (A) contact-force peaks 3–5× Isaac's at equal
 mean force; (B) feet_air_time 0.016–0.022 vs Isaac 0.035 and feet_slide −0.025 vs −0.017. Every number is labelled
 **measured** (run here, with the script and log named) or **estimated**. Diagnostics: `scripts/diagnostics/contact_research/`;
 outputs: `runs/contact_research/`.
@@ -29,7 +29,8 @@ outputs: `runs/contact_research/`.
   ([PhysX 5.6.1 API](https://nvidia-omniverse.github.io/PhysX/physx/5.6.1/_api_build/structPxContactPairPoint.html)).
 * The GPU kernel behind the call sums the per-patch **normal** impulses and multiplies by 1/dt:
   `upstream/PhysX-omni-5.6.1/omni/extensions/runtime/source/omni.physx.tensors/plugins/gpu/CudaKernels.cu:1526–1541`
-  (`impulse += impulseMag * patch.normal; return timeStepInv * impulse;`, tag 107.3-omni-and-physx-5.6.1).
+  (`impulse += impulseMag * patch.normal; return timeStepInv * impulse;`, PhysX tag
+  [107.3-omni-and-physx-5.6.1](https://github.com/NVIDIA-Omniverse/PhysX/tree/107.3-omni-and-physx-5.6.1)).
 * In the TGS solver the accumulated `appliedForce` is reset once per `simulate()` in constraint prep, and
   `writeBackContactBlockTGS` writes the sum over all position and velocity iterations
   (`physx/source/gpusolver/src/CUDA/solverBlockTGS.cuh`, `contactConstraintBlockPrep.cuh`).
@@ -38,7 +39,8 @@ So what `record_g1.py` stored after each `env.step()` (`contacts.data.net_forces
 last 5 ms PhysX step of the 20 ms control step, divided by 5 ms**. The first 15 ms of every control step are never
 reported.
 
-**Ours.** `metalsim.sensors.contact.ContactSensor` runs after every 2.5 ms substep. Each value is MuJoCo's constraint
+**Ours.** `metalsim.sensors.contact.ContactSensor` runs after every 2.5 ms substep. Each value is
+[MuJoCo](https://github.com/google-deepmind/mujoco)'s constraint
 force of that substep, which for a velocity-level solve is the substep's impulse / 2.5 ms.
 `metalsim.parity.record_g1` stores the value of the **last** substep (8 of 8). `compare.py` then takes, per body,
 the max over the 150–250 control steps.
@@ -52,7 +54,7 @@ the max over the 150–250 control steps.
 
 **Per-substep re-recording** (measured):
 * `substep_forces.py` replays the three protocols at 2.5 ms and records every substep: MuJoCo C on the CPU, and
-  MuJoCo Warp through the GPU queue (see the Warp confirmation below).
+  [MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp) through the GPU queue (see the Warp confirmation below).
 * Its last-substep samples reproduce the Warp recordings used in the tables: torso 3745.8 vs 3745.7 N (default),
   3233.6 vs 3254.9 (τ10 impact-only), feet 3073.6 vs 3073.6 (τ5).
 
@@ -171,7 +173,8 @@ Facts:
 * **Maintainers on peaks**: "looking at contact force magnitude in this situation is useless. This is a
   timestep-dependent quantity. You should be looking at the integral of the impulse (force*dt)" (Tassa,
   [#1620](https://github.com/google-deepmind/mujoco/issues/1620); likewise [#1743](https://github.com/google-deepmind/mujoco/issues/1743)).
-* **Newton's ke/kd → MuJoCo mapping** (`upstream/newton/newton/_src/solvers/mujoco/kernels.py:189–203`; newton-1.5.2 `:192–206`):
+* **[Newton](https://github.com/newton-physics/newton)'s ke/kd → MuJoCo mapping**
+  (`upstream/newton/newton/_src/solvers/mujoco/kernels.py:189–203`; newton-1.5.2 `:192–206`):
   * Formula: `timeconst = 2/(kd·d_width)`, `dampratio = kd/2·sqrt(d_r/ke)`.
   * Applied per geom as `convert_solref(ke, kd, 1.0, 1.0)` (`solver_mujoco.py:6602`, the default
     `SOLREF_MODE_MJCF_DEFAULT`, no mass scaling); solimp stays MuJoCo's default.
@@ -181,10 +184,10 @@ Facts:
   * That is close to our τ5 preset with a softer impedance. The earlier reading of ke/kd as the direct form
     (−160000, −1100) was not Newton's mapping, which is why that robot never fell.
 * **Published humanoid configs**:
-  * MuJoCo Playground G1 (`g1_mjx_feetonly.xml`): 2 ms, Euler, no solref/solimp (default), foot pairs condim 3,
+  * [MuJoCo Playground](https://github.com/google-deepmind/mujoco_playground) G1 (`g1_mjx_feetonly.xml`): 2 ms, Euler, no solref/solimp (default), foot pairs condim 3,
     friction 0.6.
-  * mjlab G1 (`g1_constants.py:220–247`): seven r = 1 cm capsules per foot, priority 1, condim 3, friction 0.6, default
-    solref/solimp, 5 ms step.
+  * [mjlab](https://github.com/mujocolab/mjlab) G1 (`g1_constants.py:220–247`): seven r = 1 cm capsules per foot,
+    priority 1, condim 3, friction 0.6, default solref/solimp, 5 ms step.
   * None tunes impact forces.
 
 Measured on MuJoCo C, same protocols (`summary_table.py`; MuJoCo C reproduces the Warp recordings, above). The columns
@@ -212,14 +215,15 @@ feet, at 2.5 ms / on 5 ms averages):
 
 * **Humans, force plates at ~1 kHz:**
   * Stiff landings from 0.59 m: ≈ 3.3 body weights (BW); soft ≈ 2.3 BW (DeVita & Skelly 1992, MSSE 24(1):108,
-    doi:10.1249/00005768-199201000-00018).
+    doi:[10.1249/00005768-199201000-00018](https://doi.org/10.1249/00005768-199201000-00018)).
   * Barefoot drops: heel peak 4.1 / 2.8 BW from 0.6 m and 5.7 / 3.8 BW from 0.9 m, gymnasts / recreational athletes,
     sampled at 960 Hz (Seegmiller & McCaw 2003, [PMC314389](https://pmc.ncbi.nlm.nih.gov/articles/PMC314389/)).
-  * 11 BW from 1.28 m (McNitt-Gray 1993, J Biomech 26:1037).
-  * A meta-analysis of 26 studies finds lower peaks when plates sample below 1 kHz (Niu et al. 2014, doi:10.1155/2014/126860).
+  * 11 BW from 1.28 m (McNitt-Gray 1993, [J Biomech 26:1037](https://doi.org/10.1016/S0021-9290%2805%2980003-X)).
+  * A meta-analysis of 26 studies finds lower peaks when plates sample below 1 kHz (Niu et al. 2014,
+    doi:[10.1155/2014/126860](https://doi.org/10.1155/2014/126860)).
   * Human pulses last 20–50 ms because of soft tissue.
 * **Robots:**
-  * A 65 kg biped walking with stiff feet: 3.85 BW footfall (Honda, US5455497).
+  * A 65 kg biped walking with stiff feet: 3.85 BW footfall (Honda, [US5455497](https://patents.google.com/patent/US5455497A/en)).
   * Humanoid falls without padding reach >100 g at the torso (Kajita et al., Humanoids 2016).
   * A 5 kg rigid impactor dropped from 1 m reads 86.8 kN at 25 kHz on a bare surface
     ([arXiv 2601.02857](https://arxiv.org/html/2601.02857)).
@@ -283,7 +287,7 @@ the toe edge, lift.
 
 ### B(1) Isaac's checkpoints in our simulator (measured, GPU)
 
-Isaac's rsl_rl checkpoints were converted to our joint order (`isaac_ckpt_to_metalsim.py`; the actions match the
+Isaac's [rsl_rl](https://github.com/leggedrobotics/rsl_rl) checkpoints were converted to our joint order (`isaac_ckpt_to_metalsim.py`; the actions match the
 `side_by_side.py` mapping to 1.4e-6). They were played with `air_time_rollout.py`: 1024 envs × 1000 control steps, the task's own
 random commands and resets, mean action unless noted, seed 1 unless noted. The rollout uses the same per-term accounting as
 `g1_reward_terms.py`. feet_slide is given both ways: with the foot frame-origin velocity (the task kernel) and with the foot COM
@@ -337,7 +341,7 @@ Reading:
    run. It is a small systematic bias in our kernel (`metalsim/learn/g1_velocity.py`, `g1_foot_vel_mjwarp` uses `xpos`
    rather than `xipos`); fixing it is for the task owner, since the file is not mine to edit.
 
-### B: Isaac Lab 3.0's own MuJoCo Warp training (measured by NVIDIA's pipeline, L4, `runs/parity3/isaac/train/summary_flat_newton_mjwarp.json`, commit c6d17fd)
+### B: Isaac Lab 3.0's own MuJoCo Warp training (measured by NVIDIA's pipeline on the NVIDIA L4 GPU, `runs/parity3/isaac/train/summary_flat_newton_mjwarp.json`, commit [`977519d`](https://github.com/pulipakaa24/MetalSim/commit/977519d5d5c77cbb3e6f44cf8906e456267f2d34))
 
 | iteration | PhysX air / slide (Isaac Lab 2.3.2) | Newton-MuJoCo Warp air / slide (Isaac Lab 3.0, solref ≈ (5 ms, 1.375)) |
 |---|---|---|

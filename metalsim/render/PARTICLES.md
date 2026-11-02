@@ -1,7 +1,7 @@
 # Particles in the renderer (render grains)
 
-Simulated particles (Newton's implicit MPM sand, any particle buffer) are drawn by metalsim's own renderers as
-**render grains**: each particle carries `grains_per_particle` small irregular grains, every grain an instance of one
+Simulated particles ([Newton][newton]'s implicit MPM sand, any particle buffer) are drawn by metalsim's own renderers
+as **render grains**: each particle carries `grains_per_particle` small irregular grains, every grain an instance of one
 of a few grain meshes. Tier 2 (path tracer) traces them in the same instance acceleration structure as the scene;
 tier 0 (raster) draws the same instances, so batched camera observations see the same material. Research and design
 choices: `research_notes/Metal MPM speed and scalable determinism/particle_rendering.md`.
@@ -58,7 +58,7 @@ that traverses it (`metalsim/render/as_limits.py`). Before 2026-10-13 the grains
 of 25.1 M instances built without the flag, outside the supported range. On macOS 26, with the demo's four ground
 planes, that build never finished: still at 100 % utilisation after 900 s (`runs/stall_bisect/`), the same build with
 one plane took 1 s. The GPU work outlived the killed process, and the Mac rebooted after each such run. The 14-inch
-(macOS 27) built and rendered it, so it rendered by luck.
+MacBook Pro (M4 Max, macOS 27) built and rendered it, so it rendered by luck.
 
 Now:
 - `as_limits.check` refuses any structure past the standard limits unless the caller has an extended-limits path,
@@ -71,13 +71,13 @@ Now:
   Default descriptors read 0).
 - Flat past 2^24 instances is built with extended limits and traced with the `extended_limits` intersector.
 
-Measured on this Mac (macOS 26), 4 ground planes, 6.28 M grains: two-level build 121 ms (rebuild 77 ms) vs flat 117 ms
-(79 ms); build + one 256x144 trace pass 82 ms vs 84 ms. A 480x270, 64 spp, OIDN frame differs from flat in 5.7 % of
-pixels by at most 11/255 (mean relative HDR difference 3.5e-4: path-tracer and denoiser noise from ulp-level
-differences in the nested transforms). This Mac refuses builds past 6.3 M grains in `stall_bisect.sh` without
-`ALLOW_LARGE=1`.
+Measured on the 16-inch MacBook Pro (M4 Max, macOS 26), 4 ground planes, 6.28 M grains: two-level build 121 ms
+(rebuild 77 ms) vs flat 117 ms (79 ms); build + one 256x144 trace pass 82 ms vs 84 ms. A 480x270, 64 spp,
+[OIDN][oidn] frame differs from flat in 5.7 % of pixels by at most 11/255 (mean relative HDR difference 3.5e-4:
+path-tracer and denoiser noise from ulp-level differences in the nested transforms). The 16-inch refuses builds past
+6.3 M grains in `stall_bisect.sh` without `ALLOW_LARGE=1`.
 
-Correctness validation on the 14-inch M4 Max (macOS 27.0.1, origin/main 94b75be, 2026-10-13), the demo scene with 4
+Correctness validation on the 14-inch M4 Max (macOS 27.0.1, 2026-10-13), the demo scene with 4
 ground planes, each step alone with the GPU back to idle (no ownerless utilisation, recoveryCount 0) between steps. The
 times are from that validation run, not benchmark figures (timing measurements are taken on the 16-inch):
 
@@ -91,8 +91,9 @@ No structure used extended limits, and every build and frame completed. The full
 128 spp, OIDN) also rendered to the end. Its frames match the 2026-10-12 flat-layout clip within about 1/255 mean (sky,
 ground-plane and sand means equal; 2-3.5 % of pixels differ by more than 10/255, texture detail after the atlas fix).
 
-**Benchmark on the 16-inch M4 Max** (macOS 26.7.1, the machine where the flat 25 M build stalled; origin/main 44dd48c,
-Warp 95f6f121, MuJoCo Warp f1b35e2; 2026-10-13). The same scene with 4 ground planes, two-level grains. Each step ran
+**Benchmark on the 16-inch M4 Max** (macOS 26.7.1, the machine where the flat 25 M build stalled; origin/main
+[`cb82d30`][], [my fork of Warp][warp-fork] at [`95f6f121`][], [my fork of MuJoCo Warp][mjw-fork] at [`f1b35e2`][];
+2026-10-13). The same scene with 4 ground planes, two-level grains. Each step ran
 alone as an exclusive timing job through `scripts/gpu_run.sh` under a watchdog (60 s / 120 s without output). Before
 and after every step: device, renderer and tiler utilisation 0-2 %, recoveryCount 0, no process stuck exiting.
 
@@ -131,18 +132,19 @@ Measured (M4 Max, 2026-10-12): instance scaling in a 64 x 64 frame, 2 envs: 2,00
 
 ## Demo: ANYmal C on MPM sand
 
-`scripts/particle_demo/`: `sim_anymal.py` records Newton 1.5.2's `example_mpm_anymal` (its model, solvers and
+`scripts/particle_demo/`: `sim_anymal.py` records Newton 1.5.2's [`example_mpm_anymal`][example-anymal] (its model, solvers and
 walking policy; a 1.2 x 4.6 m bed, 10 cm deep, and a 0.4 m/s forward command) and `render_anymal.py` path-traces it
-with the Menagerie ANYmal C meshes and textures mapped onto Newton's bodies by name, a Poly Haven HDRI whose sun is
+with the [MuJoCo Menagerie][menagerie] ANYmal C meshes and textures mapped onto Newton's bodies by name, a
+[Poly Haven][polyhaven] HDRI whose sun is
 split into an analytic sun disk (`hdr.extract_sun`: no fireflies from BSDF-sampled rays hitting a 0.3-degree
-HDRI sun), decoration grains around the bed on a sand-textured ground plane, OIDN, ACES. `watchdog.py` kills a
+HDRI sun), decoration grains around the bed on a sand-textured ground plane, OIDN, [ACES][aces]. `watchdog.py` kills a
 stalled or overrunning job.
 
 Result (2026-10-12, 14-inch M4 Max): 669,372 sand particles (46 ms per simulated frame) plus 261,061 decoration
 particles, 27 grains each = 25.1 M grain instances; 1920 x 1080, 128 spp (32 passes x 4), 5 bounces, OIDN: 10.4 s per
 frame median (12.1 s max), the 240-frame clip in 43 minutes; stills at 256 spp 16-21 s. Credits: Menagerie
-`anybotics_anymal_c` (BSD-3), Poly Haven `goegap` HDRI and `coast_sand_01` texture (CC0), Newton 1.5.2
-`example_mpm_anymal` and its walking policy (Apache-2.0).
+[`anybotics_anymal_c`][anymal-c] (BSD-3), Poly Haven [`goegap`][goegap] HDRI and [`coast_sand_01`][coast-sand] texture
+(CC0), Newton 1.5.2 `example_mpm_anymal` and its walking policy (Apache-2.0).
 
 ## Limits and next steps
 
@@ -152,5 +154,23 @@ frame median (12.1 s max), the 240-frame clip in 43 minutes; stills at 256 spp 1
 - Memory: ~270 B per grain (structure + descriptor); 22 M grains = 6 GB.
 - Tier 1 (hybrid) draws grains with tier-0 shading and no ray-traced shadows on them; the grains are not in tier 1's
   ray-tracing structure.
-- The 2026-10-12 demo clip was rendered before the atlas fix (RENDER_COVERAGE item 11) with `--flip-mesh-v 1`; on
-  the current renderer the default (0) is right.
+- The 2026-10-12 demo clip was rendered before the atlas fix
+  ([`docs/RENDER_COVERAGE.md`](../../docs/RENDER_COVERAGE.md) item 11) with `--flip-mesh-v 1`; on the current renderer
+  the default (0) is right.
+
+<!-- Link targets. -->
+
+[`cb82d30`]: https://github.com/pulipakaa24/MetalSim/commit/cb82d3002c78c67c95e84192133aa92a6f2845da
+[`95f6f121`]: https://github.com/pulipakaa24/warp/commit/95f6f121b7e67025958335c7c15e338ac04a798a
+[`f1b35e2`]: https://github.com/pulipakaa24/mujoco_warp/commit/f1b35e2b3ddc80b197b0c665bf6d71523d175daf
+[warp-fork]: https://github.com/pulipakaa24/warp/tree/metalsim
+[mjw-fork]: https://github.com/pulipakaa24/mujoco_warp/tree/metalsim
+[newton]: https://github.com/newton-physics/newton
+[example-anymal]: https://github.com/newton-physics/newton/blob/v1.5.2/newton/examples/mpm/example_mpm_anymal.py
+[menagerie]: https://github.com/google-deepmind/mujoco_menagerie
+[anymal-c]: https://github.com/google-deepmind/mujoco_menagerie/tree/main/anybotics_anymal_c
+[polyhaven]: https://polyhaven.com
+[goegap]: https://polyhaven.com/a/goegap
+[coast-sand]: https://polyhaven.com/a/coast_sand_01
+[oidn]: https://www.openimagedenoise.org/
+[aces]: https://github.com/ampas/aces-dev

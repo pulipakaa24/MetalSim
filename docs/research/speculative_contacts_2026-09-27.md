@@ -1,14 +1,14 @@
 # Speculative contacts in MuJoCo Warp: the over-travel explained, the rule corrected, the prototype stays archived (2026-09-27)
 
 Question (owner): explore the speculative-contact prototype of `penetration_2026-09-26.md` §5 to a decision. It cuts the
-G1 landing penetration from 13.25 mm to 1.56 mm (PhysX 0.51 mm), but Isaac's PhysX-trained checkpoints walked 10–14 cm
+G1 landing penetration from 13.25 mm to 1.56 mm ([PhysX](https://github.com/NVIDIA-Omniverse/PhysX) 0.51 mm), but Isaac's PhysX-trained checkpoints walked 10–14 cm
 further than in Isaac under it (transfer error 0.117 m vs 0.060 m for the default), and its drop-torso 5 ms force was 4 %
 over PhysX's bound. Fidelity first; the references are PhysX and the real robot.
 
-All numbers are **measured** on this machine (M4 Max; MuJoCo Warp fork f824af1 plus the prototype commits on branch
-`metalsim-spec-proto`; every GPU job went through `scripts/gpu_run.sh` and imported a frozen per-job worktree:
+All numbers are **measured** on this machine (M4 Max; [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) at [`f824af1`](https://github.com/pulipakaa24/mujoco_warp/commit/f824af1c5f482791cca90c1a6ca6fe5adb19ce63) plus the prototype commits on branch
+[`metalsim-spec-proto`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-spec-proto); every GPU job went through `scripts/gpu_run.sh` and imported a frozen per-job worktree:
 `upstream/mujoco_warp-f824af1`, `-spec-d99186b`, `-spec-27f1fcd`, `-spec-e636feb`). Scope: one asset (Isaac's G1 minimal USD, mesh-box
-feet), the PARITY §1.7 protocols, and Isaac's checkpoints 500 / 1000 / 1499.
+feet), the [PARITY](../PARITY.md) §1.7 protocols, and Isaac's checkpoints 500 / 1000 / 1499.
 
 ## Verdict
 
@@ -29,12 +29,13 @@ feet), the PARITY §1.7 protocols, and Isaac's checkpoints 500 / 1000 / 1499.
    - (iii) rows allocated but inert reproduce the base preset to 0.001–0.004 m;
    - (iv) the policy observes no contact quantity;
    - (i) removing the friction coupling makes the robot travel **further**, not less.
-3. **The investigation found two real defects in the prototype, and both are fixed in the fork.** A third, minor one
-   (rows for contacts at exactly dist == margin) was found by the fork suite and fixed in e636feb (§6).
+3. **The investigation found two real defects in the prototype, and both are fixed in [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) (branch
+   [`metalsim-spec-proto`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-spec-proto)).** A third, minor one (rows for contacts at exactly dist == margin) was found by
+   my fork's test suite and fixed in [`e636feb`](https://github.com/pulipakaa24/mujoco_warp/commit/e636feb24440e690e73f0c8dfb18aa67468c0c6d) (§6).
    - (a) *Friction coupling (MuJoCo's soft elliptic cone).* A speculative row pushes and brakes a body that is only sliding
      past inside the gap, although its normal row alone would not act. A box skimming 2 mm above the plane at 1 m/s
-     with no gravity gets 119 N, is lifted 9.6 mm and slowed to 0.90 m/s. MuJoCo C, stock MuJoCo Warp and PhysX give
-     0 N. PhysX bounds friction by the contact's accumulated normal impulse, so a speculative contact that does not push
+     with no gravity gets 119 N, is lifted 9.6 mm and slowed to 0.90 m/s. [MuJoCo](https://github.com/google-deepmind/mujoco) C, stock
+     [MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp) and PhysX give 0 N. PhysX bounds friction by the contact's accumulated normal impulse, so a speculative contact that does not push
      has no friction (`DyTGSContactPrep.cpp:1643–1654`, `solverBlockTGS.cuh:337–338, 421–423`).
      Fix: `MJW_SPEC_FRICTION=live`. A speculative contact keeps its friction rows only when its normal row predicts a
      crossing within the step (pos + h v_n < 0); otherwise the friction rows are inert (J = 0).
@@ -61,7 +62,7 @@ feet), the PARITY §1.7 protocols, and Isaac's checkpoints 500 / 1000 / 1499.
      force 7071 N within the bound. But the hold-torso 20 ms force is 1.78× (40 ms: 1.13×), short phases are 15.5 %, and
      the transfer error is 0.087 m.
 5. **Recommendation: keep `recommended` as the default. The speculative rule stays archived** on
-   `metalsim-spec-proto` (head e636feb), now with the corrections and a C reference. **No training run was queued.** The owner's
+   [`metalsim-spec-proto`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-spec-proto), now with the corrections and a C reference. **No training run was queued.** The owner's
    condition was "over-travel explained **and fixed**, force bound holds". The over-travel is explained, but it cannot
    be fixed inside the contact rule: its cause is the cadence. The corrected rule also loses the slide match.
    What remains (§5):
@@ -81,13 +82,13 @@ feet), the PARITY §1.7 protocols, and Isaac's checkpoints 500 / 1000 / 1499.
 
   Per control step it also logs actions, root, joint positions (Isaac order), foot COM speed and height, and the task
   ContactSensor's forces and flags. Tables: `probe_table.py`, `gait_vs_isaac.py`.
-- **Fork switches** (prototype only, active with `MJW_SPECULATIVE_GAP=1`, elliptic cones):
-  - `MJW_SPEC_FRICTION=cone|none|live` (d99186b): a gate kernel after `_efc_contact_update` zeroes J, vel and aref of the
+- **Switches in [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-spec-proto)** (prototype only, active with `MJW_SPECULATIVE_GAP=1`, elliptic cones):
+  - `MJW_SPEC_FRICTION=cone|none|live` ([`d99186b`](https://github.com/pulipakaa24/mujoco_warp/commit/d99186b33c04d5eaf8548900a0f877e24d99a25b)): a gate kernel after `_efc_contact_update` zeroes J, vel and aref of the
     selected rows, so they sit in the cone's top zone or add nothing;
   - `MJW_SPEC_NULL=1`: every row of a speculative contact is inert (the control for hypothesis (iii));
-  - `MJW_SPEC_FRICIMP=d0` (27f1fcd).
+  - `MJW_SPEC_FRICIMP=d0` ([`27f1fcd`](https://github.com/pulipakaa24/mujoco_warp/commit/27f1fcd903e450fe70f435cc95a251408eda713c)).
 
-  The defaults (`cone`, `pos`) reproduce bc83fb0.
+  The defaults (`cone`, `pos`) reproduce [`bc83fb0`](https://github.com/pulipakaa24/mujoco_warp/commit/bc83fb0fecf345090a02cbb13fba400e9f1ad97e).
 - **MuJoCo C reference of the rule** (`c_oracle.py`, float64). It runs MuJoCo C's own pipeline on a model copy whose
   gap geoms carry margin = gap, so that C creates the rows. After `mj_fwdVelocity` every contact row is
   re-parameterised from the true distance: MuJoCo's imp / K / B / R for pos ≤ 0; the speculative a_ref and d0 for
@@ -272,10 +273,10 @@ one row. "Final" is live + d0 in MuJoCo Warp. The C reference of the rule gives 
   bounces a sliding box.
 
 **(b) Inert at gap 0.** CPU device, G1, 2 worlds, drop plus random PD targets, 400 substeps (`cpu_traj.py`,
-`runs/speculative/cpu/inactive.log`). Bitwise equal to the fork head f824af1 in qpos, qvel, nefc and Σ efc_force:
-- `MJW_SPECULATIVE_GAP=1` with a gap-free preset (recommended), on d99186b;
-- the same with `MJW_SPEC_FRICTION=live`, on d99186b and on 27f1fcd (`+ MJW_SPEC_FRICIMP=d0`);
-- the gap preset with `MJW_SPECULATIVE_GAP=0`, on d99186b and 27f1fcd.
+`runs/speculative/cpu/inactive.log`). Bitwise equal to the head of [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim), [`f824af1`](https://github.com/pulipakaa24/mujoco_warp/commit/f824af1c5f482791cca90c1a6ca6fe5adb19ce63), in qpos, qvel, nefc and Σ efc_force:
+- `MJW_SPECULATIVE_GAP=1` with a gap-free preset (recommended), on [`d99186b`](https://github.com/pulipakaa24/mujoco_warp/commit/d99186b33c04d5eaf8548900a0f877e24d99a25b);
+- the same with `MJW_SPEC_FRICTION=live`, on [`d99186b`](https://github.com/pulipakaa24/mujoco_warp/commit/d99186b33c04d5eaf8548900a0f877e24d99a25b) and on [`27f1fcd`](https://github.com/pulipakaa24/mujoco_warp/commit/27f1fcd903e450fe70f435cc95a251408eda713c) (`+ MJW_SPEC_FRICIMP=d0`);
+- the gap preset with `MJW_SPECULATIVE_GAP=0`, on [`d99186b`](https://github.com/pulipakaa24/mujoco_warp/commit/d99186b33c04d5eaf8548900a0f877e24d99a25b) and [`27f1fcd`](https://github.com/pulipakaa24/mujoco_warp/commit/27f1fcd903e450fe70f435cc95a251408eda713c).
 
 The rows of a contact with dist ≤ margin are untouched by construction: `write_contact` detects only dist < margin + gap,
 and every change is gated on pos > 0.
@@ -307,8 +308,9 @@ same protocol as (b):
 - The over-travel is explained. It is not fixable in the contact rule, because the cause is the +4–6 % cadence that
   every contact model shows against PhysX. The corrected rule also gives up the slide match (−0.0111 vs −0.0127) and
   brings back 16 % short contact phases.
-- The corrected rule, the switches, the C reference and all tools are archived on the fork branch `metalsim-spec-proto`
-  (e636feb; d99186b = gate and NULL switches, 27f1fcd = the friction impedance, e636feb = the dist == margin fix) and in `scripts/diagnostics/speculative/`.
+- The corrected rule, the switches, the C reference and all tools are archived on the branch [`metalsim-spec-proto`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-spec-proto) of
+  [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) ([`d99186b`](https://github.com/pulipakaa24/mujoco_warp/commit/d99186b33c04d5eaf8548900a0f877e24d99a25b) = gate and NULL switches, [`27f1fcd`](https://github.com/pulipakaa24/mujoco_warp/commit/27f1fcd903e450fe70f435cc95a251408eda713c) = the friction impedance, [`e636feb`](https://github.com/pulipakaa24/mujoco_warp/commit/e636feb24440e690e73f0c8dfb18aa67468c0c6d) = the
+  dist == margin fix) and in `scripts/diagnostics/speculative/`.
 - Before the rule can be reconsidered:
   1. Explain the cadence gap (it exists under the default too): actuator / PD implementation, armature, joint friction,
      action latency. Once the cadence matches, the x-travel test becomes a valid check of the stride, which the rule
@@ -320,19 +322,20 @@ same protocol as (b):
 
 ## 6. Fork suite (task 3c)
 
-Frozen worktree `upstream/mujoco_warp-spec-27f1fcd`, Warp `upstream/warp-innate` c200d46b, Metal, `pytest
+Frozen worktree `upstream/mujoco_warp-spec-27f1fcd` ([my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-spec-proto)), [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) at
+[`c200d46b`](https://github.com/pulipakaa24/warp/commit/c200d46b31503c51406651ad7528ef7171a1f29f) (`upstream/warp-innate`), Metal, `pytest
 mujoco_warp/_src` (`runs/speculative/suite.wrapper.log`):
 
-| configuration | 27f1fcd (`suite.wrapper.log`) | e636feb (`suite2.wrapper.log`) |
+| configuration | [`27f1fcd`](https://github.com/pulipakaa24/mujoco_warp/commit/27f1fcd903e450fe70f435cc95a251408eda713c) (`suite.wrapper.log`) | [`e636feb`](https://github.com/pulipakaa24/mujoco_warp/commit/e636feb24440e690e73f0c8dfb18aa67468c0c6d) (`suite2.wrapper.log`) |
 |---|---|---|
 | no switch | 1451 passed, 1 failed (pre-existing), 39 skipped | **1451 / 1 / 39** |
 | `MJW_SPECULATIVE_GAP=1` | 1445 / 7 / 39 | **1449 / 3 / 39** |
 | `+ MJW_SPEC_FRICTION=live MJW_SPEC_FRICIMP=d0` | 1445 / 7 / 39 | **1449 / 3 / 39** |
 
-- On 27f1fcd, four of the six extra failures (`constraint_test::test_jdotv{2..5}`) exposed a third prototype bug. A
+- On [`27f1fcd`](https://github.com/pulipakaa24/mujoco_warp/commit/27f1fcd903e450fe70f435cc95a251408eda713c), four of the six extra failures (`constraint_test::test_jdotv{2..5}`) exposed a third prototype bug. A
   contact at exactly dist == margin got rows: MuJoCo excludes it (C `exclude = 1`), and such contacts arrive through
-  `put_data`, e.g. keyframes resting at dist 0. Fixed in e636feb (`active = active or pos > 0`).
-- e636feb reproduces 27f1fcd bitwise on the G1 (CPU, final rule over 800 substeps, and gap 0), so every protocol number
+  `put_data`, e.g. keyframes resting at dist 0. Fixed in [`e636feb`](https://github.com/pulipakaa24/mujoco_warp/commit/e636feb24440e690e73f0c8dfb18aa67468c0c6d) (`active = active or pos > 0`).
+- [`e636feb`](https://github.com/pulipakaa24/mujoco_warp/commit/e636feb24440e690e73f0c8dfb18aa67468c0c6d) reproduces [`27f1fcd`](https://github.com/pulipakaa24/mujoco_warp/commit/27f1fcd903e450fe70f435cc95a251408eda713c) bitwise on the G1 (CPU, final rule over 800 substeps, and gap 0), so every protocol number
   above holds for it.
 - The two remaining failures under the switch, `constraint_test::test_efc_address_inactive_contacts` and
   `collision_driver_test::test_ccd_margin_dist` (nefc 4 != 0), assert that contacts inside the gap have **no** rows.

@@ -2,15 +2,18 @@
 
 2026-09-25. Scope: close MetalSim's remaining contact-fidelity gaps to Isaac Lab / PhysX on the G1 velocity task
 (MuJoCo Warp is the parity engine). Gaps as measured before this note: impact peaks 3–5× Isaac's at equal mean
-contact force (PARITY §1.7), feet_slide −0.059 vs Isaac −0.017 and feet_air_time 0.018 vs 0.035 on the rsl_rl
-flat-config policy (learner agent, it 399), joint limits soft (MuJoCo default solref), and the plane-convex
-contact-set decision (fork commit 284dcd1; MuJoCo C's contact set moved checkpoint transfer from within 5 % of Isaac
-to 9–12 % short). Everything in the "expected effect" column is **estimated**; measurements follow in the
-metric table referenced at the end.
+contact force ([PARITY §1.7](../PARITY.md#17-fidelity-protocol-against-isaac-sim-51-on-an-l4-recorded-2026-09-24-physx--rtx)),
+feet_slide −0.059 vs Isaac −0.017 and feet_air_time 0.018 vs 0.035 on the
+[rsl_rl](https://github.com/leggedrobotics/rsl_rl) flat-config policy (MetalSim's own training run, iteration 399),
+joint limits soft (MuJoCo default solref), and the plane-convex contact-set decision
+([my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) at
+[`284dcd1`](https://github.com/pulipakaa24/mujoco_warp/commit/284dcd12ff37d56ea0201ade4e7f941d772a0f28); MuJoCo C's
+contact set moved checkpoint transfer from within 5 % of Isaac to 9–12 % short). Everything in the "expected effect"
+column is **estimated**; measurements follow in the metric table referenced at the end.
 
 Sources: [MX] https://mujoco.readthedocs.io/en/latest/XMLreference.html, [MM] https://mujoco.readthedocs.io/en/latest/modeling.html,
 [MC] https://mujoco.readthedocs.io/en/latest/computation/index.html, [MJW] https://github.com/google-deepmind/mujoco_warp (README),
-[PG] https://github.com/google-deepmind/mujoco_playground and arXiv 2502.08844, [MJL] https://github.com/mujocolab/mjlab,
+[PG] https://github.com/google-deepmind/mujoco_playground and [arXiv 2502.08844](https://arxiv.org/abs/2502.08844), [MJL] https://github.com/mujocolab/mjlab,
 [IL] https://github.com/isaac-sim/IsaacLab (isaaclab_assets/robots/unitree.py, isaaclab/sim/simulation_cfg.py,
 velocity_env_cfg.py; develop: core/velocity/velocity_env_cfg.py and docs/source/concepts/solver-tuning/tune_mjwarp.rst),
 [PX] https://nvidia-omniverse.github.io/PhysX/physx/5.4.1/docs/AdvancedCollisionDetection.html and .../RigidBodyDynamics.html.
@@ -29,7 +32,7 @@ velocity_env_cfg.py; develop: core/velocity/velocity_env_cfg.py and docs/source/
 * **impratio** (1): frictional-to-normal impedance ratio, for elliptic cones; "not recommended to use high impratio values
   with pyramidal cones" [MX].
 * **noslip_iterations**: post-processing PGS on friction; **not supported by MuJoCo Warp** [MJW] (put_model raises
-  NotImplementedError in our fork too).
+  NotImplementedError in [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) too).
 * **margin / gap**: a pair's values are the sums of the two geoms' (C engine_collision_driver.c:166/175, MuJoCo Warp
   collision_core.contact_margin_gap); contacts with dist < margin are active and the impedance acts on dist − margin;
   margin < dist ≤ margin+gap are inactive [MC]. Measured here: margin 1 cm makes the G1 stand 1 cm higher (pelvis
@@ -47,7 +50,8 @@ velocity_env_cfg.py; develop: core/velocity/velocity_env_cfg.py and docs/source/
 * **Isaac Lab's own MuJoCo Warp config** (develop) [IL]: 2 substeps of 5 ms (2.5 ms), pyramidal, impratio 1,
   `NewtonShapeCfg(margin=0.0, ke=160000.0, kd=1100.0)`; ke/kd reach MuJoCo through Newton's solref mapping, which we
   could not verify (our direct-form reading keeps the G1 standing after the drop: not the mapping).
-* **Humanoid-Gym sim2sim** (arXiv 2404.05695): MuJoCo 1 ms, PGS 50 iterations, condim 4, solref (0.001, 2), friction 0.9.
+* **Humanoid-Gym sim2sim** ([arXiv 2404.05695](https://arxiv.org/abs/2404.05695)): MuJoCo 1 ms, PGS 50 iterations,
+  condim 4, solref (0.001, 2), friction 0.9.
 
 Reading: the published MuJoCo humanoid configs all use default, soft contacts (τ 20 ms) and pyramidal cones and
 randomize friction; none aims at PhysX parity of contact forces.
@@ -70,12 +74,13 @@ randomize friction; none aims at PhysX parity of contact forces.
 
 * Erez, Tassa, Todorov, ICRA 2015 (https://roboti.us/lab/papers/ErezICRA15.pdf): MuJoCo fastest and most accurate on
   robotics-relevant constrained systems; pre-PhysX 5/TGS.
-* PolySim (arXiv 2510.01708), G1 motion tracking: IsaacSim-only policy in MuJoCo 3.6 % success (MPJPE 80.6 mm); training
-  across three simulators 56.4 % (65.6 mm).
-* Quadruped loco-manipulation sim-to-sim (arXiv 2512.18938): MuJoCo shows foot "sliding artifacts" (pose RMSE 0.113/0.123)
-  vs Isaac Gym yaw oscillation (0.144/0.231); impratio 100 removes the error but is called "unrealistically high".
-* No published engine comparison of contact-force peaks or penetration with numbers was found (Collins et al. 2021,
-  Kaup et al. 2024 are qualitative).
+* PolySim ([arXiv 2510.01708](https://arxiv.org/abs/2510.01708)), G1 motion tracking: IsaacSim-only policy in MuJoCo
+  3.6 % success (MPJPE 80.6 mm); training across three simulators 56.4 % (65.6 mm).
+* Quadruped loco-manipulation sim-to-sim ([arXiv 2512.18938](https://arxiv.org/abs/2512.18938)): MuJoCo shows foot
+  "sliding artifacts" (pose RMSE 0.113/0.123) vs Isaac Gym yaw oscillation (0.144/0.231); impratio 100 removes the error
+  but is called "unrealistically high".
+* No published engine comparison of contact-force peaks or penetration with numbers was found ([Collins et al. 2021](https://doi.org/10.1109/ACCESS.2021.3068769),
+  [Kaup et al. 2024](https://arxiv.org/abs/2407.08590) are qualitative).
 
 ## 5. Candidate settings and expected effect (estimated)
 

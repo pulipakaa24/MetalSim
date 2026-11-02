@@ -6,9 +6,9 @@ env-steps/s at 4096 envs (`runs/tp26/ellip.wrapper.log`). This note is the work 
 premium be cut without changing the converged result", reprioritised mid-way by the independent review
 (`elliptic_cost_review_2026-09-26.md`). Every number is **measured** (this machine, M4 Max 40-core GPU, 64 GB; GPU
 runs through `scripts/gpu_run.sh ... timing` on an idle device, importing frozen per-job worktrees) unless marked
-**estimated**. Raw logs: `runs/ellip_ws/`. Fork branch `metalsim-ellip-ws` (MuJoCo Warp `pulipakaa24/mujoco_warp`,
-on 0a9de8e; Warp `warp-innate` on 9abceff9). Scripts added: `scripts/diagnostics/competitors/g1_newton_iters.py`
-(MuJoCo C and Warp-CPU Newton statistics on dumped states), `scripts/diagnostics/ellip_fused_cpu_check.py` (fused vs
+**estimated**. Raw logs: `runs/ellip_ws/`. Branch [`metalsim-ellip-ws`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-ellip-ws) of [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) (on
+[`0a9de8e`](https://github.com/pulipakaa24/mujoco_warp/commit/0a9de8e5cd098bb9c878dc5f5b98d2b53252aec3)) and [`metalsim-ellip-ws`](https://github.com/pulipakaa24/warp/tree/metalsim-ellip-ws) of [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) (`warp-innate`, on [`9abceff9`](https://github.com/pulipakaa24/warp/commit/9abceff953313e090084ed5950427a5dccf91258)). Scripts added: `scripts/diagnostics/competitors/g1_newton_iters.py`
+([MuJoCo](https://github.com/google-deepmind/mujoco) C and Warp-CPU Newton statistics on dumped states), `scripts/diagnostics/ellip_fused_cpu_check.py` (fused vs
 unfused, bitwise, CPU), `scripts/diagnostics/ls_noise_floor_check.py` (line-search floor, CPU),
 `scripts/diagnostics/competitors/cap_probe_variant.py` (cap probe for a solver variant); `g1_solve_iteration_cost.py`
 gained `"state":"rollout"` and the warm-start-buffer restore.
@@ -18,8 +18,8 @@ gained `"state":"rollout"` and the warm-start-buffer restore.
 | item | result | changes the converged result? | status |
 |---|---|---|---|
 | 1. Fused per-iteration launch on the elliptic path (`_update_constraint_gradient_fused` with the CONE rule, the cone list on lane 0, the flipped-row deltas + cone term into `htot` by the same lanes; 128 lanes per world) | launches per Newton iteration **11 → 5**; G1 task ellip10 cap 20 at 4096: physics only 76.0 → 57.0 ms, env step 112.4 → 100.5, rollout + inference 113.6 → 102.3 ms per step, **loop 34.3 K → 37.7 K env-steps/s** (one run each, §3.4; the two-repeat A/B is §6) | no: bitwise the unfused launches on the CPU device over 8 substeps (qacc, qfrc_constraint, efc_force, efc_state, solver_niter, qpos, qvel); on Metal inside the unfused configuration's two-instance floor with identical medians | **landed**, default on Metal (`MJW_METAL_FUSE_UPDATE=0`, `MJW_METAL_FUSE_HTOT=0`, `MJW_METAL_FUSE_LANES`) |
-| 2. Exact per-world early exit of the Newton loop in graph replay (Warp fork: ICB indirect execution ranges; MuJoCo Warp: `_solve_done` zeroes the remaining iterations' range lengths) | elliptic cap 20 physics only 55.4 → 47.7 ms, env step 106 → 103; pyramidal cap 10 physics 43.8 → 39.7 ms; empty iterations 0.06–0.15 → ~0 ms | no: skipped iterations had no active world (bitwise by construction; medians identical to the floor's on Metal) | **landed**, default on (`MJW_METAL_ICB_EARLY_EXIT=0`) |
-| 3. Line-search derivative noise floor (Genesis PR #3382's rule) | CPU: line-search iterations per call 5.97 → 2.72, the launch's longest search 14.1 → 11.2 (median 20 → 10), Newton iterations unchanged; Metal: env step −2.2 %, loop 37.5 K → 38.1 K | at the floor on walking states (CPU 1-ulp floor and the 4096-env cap probe), **1.3× the floor's p99 on lying robots** (cap probe, independent of the cap) | **archived as an option** (`MJW_LS_NOISE_FLOOR=8`), §5 |
+| 2. Exact per-world early exit of the Newton loop in graph replay ([my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim): ICB indirect execution ranges; MuJoCo Warp: `_solve_done` zeroes the remaining iterations' range lengths) | elliptic cap 20 physics only 55.4 → 47.7 ms, env step 106 → 103; pyramidal cap 10 physics 43.8 → 39.7 ms; empty iterations 0.06–0.15 → ~0 ms | no: skipped iterations had no active world (bitwise by construction; medians identical to the floor's on Metal) | **landed**, default on (`MJW_METAL_ICB_EARLY_EXIT=0`) |
+| 3. Line-search derivative noise floor ([Genesis PR #3382](https://github.com/Genesis-Embodied-AI/genesis-world/pull/3382)'s rule) | CPU: line-search iterations per call 5.97 → 2.72, the launch's longest search 14.1 → 11.2 (median 20 → 10), Newton iterations unchanged; Metal: env step −2.2 %, loop 37.5 K → 38.1 K | at the floor on walking states (CPU 1-ulp floor and the 4096-env cap probe), **1.3× the floor's p99 on lying robots** (cap probe, independent of the cap) | **archived as an option** (`MJW_LS_NOISE_FLOOR=8`), §5 |
 | 4. Warm start in cone space | characterised (§2): MuJoCo C's better-of-two start is taken in 0.7 % of solves; the extrapolated start 2·qacc_prev − qacc_prevprev cuts Newton iterations 3.69 → 2.73 (elliptic) and 2.93 → 1.98 (pyramidal) on walking states, env step −4 %, but 5.8× more worlds reach the cap on random-action states and its state differences sit systematically 1.5–2× above the floor's median | tolerance level | **archived** behind `MJW_WARMSTART_EXTRAP=1` (deprioritised by the review; the cap probe is §2.4) |
 
 ## 1. What the elliptic iteration launches (before / after)
@@ -32,7 +32,7 @@ CPU device (`ellip_fused_cpu_check.py`, 64 worlds, cap 20, 8 substeps):
 | elliptic, before (`mul_m`, line search, zero counters, `_update_constraint_efc`, qfrc, zero grad_dot, grad, cone list, htot per entry, Cholesky, `_solve_done`) | **11** | 255 |
 | elliptic, fused rows + cone list (`MJW_METAL_FUSE_HTOT=0`) | 6 | 195 |
 | **elliptic, fused rows + cone list + htot (default)** | **5** | 183 |
-| pyramidal (fused since dd42c23; its kernel signature grew here, arithmetic unchanged) | 5 (from 9 unfused) | 160 at cap 10 |
+| pyramidal (already fused before this work; its kernel signature grew here, arithmetic unchanged) | 5 (from 9 unfused) | 160 at cap 10 |
 
 Bitwise identity on the CPU device (Warp's CPU atomics run in order, so the comparison is exact): over 8 substeps of 64
 G1-task worlds from the walking snapshot t = 60, max |Δ| of qacc, qfrc_constraint, efc_force, qpos, qvel = 0, state
@@ -49,8 +49,8 @@ Newton cap 100. `scripts/diagnostics/competitors/g1_newton_iters.py`, `runs/elli
 
 ### 2.1 MuJoCo C's warm start vs the fork's
 
-MuJoCo C (`engine_forward.c` `warmstart()`, lines 1072–1131 of the 2026-09-25 head 3991e54; the same function exists
-in 3.14.0) starts the solve from the **better of `qacc_warmstart` and `qacc_smooth` by cost**; upstream MuJoCo Warp
+MuJoCo C (`engine_forward.c` `warmstart()`, lines 1072–1131 of upstream MuJoCo's 2026-09-25 head [`3991e54`](https://github.com/google-deepmind/mujoco/commit/3991e5459d28be5846377a1144bdb919ecebd3a5); the same function exists
+in 3.14.0) starts the solve from the **better of `qacc_warmstart` and `qacc_smooth` by cost**; upstream [MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp)
 (`solver._solve_init_dof`) starts from `qacc_warmstart` unconditionally. C also exits with zero iterations when the
 duality-gap certificate already holds (`engine_solver.c:2857–2875`). Measured in C on the dumped states (256 worlds ×
 9 snapshots × 8 substeps = 18,432 solves per cone):
@@ -75,11 +75,11 @@ Iterations grow with the cone rows at the start: 0 rows 2.4, 6 rows 3.8, 15 rows
 
 | start of the solve | elliptic: mean / p90 / p99 / max, ≥ 10 | later substeps (2–8) mean | pyramidal: mean / p99 / max |
 |---|---|---|---|
-| `qacc_warmstart` (the fork, MuJoCo Warp upstream) | 3.69 / 6 / 10 / 13, 1.1 % | 3.68 | 2.93 / 7 / 10 |
+| `qacc_warmstart` ([my fork](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim), MuJoCo Warp upstream) | 3.69 / 6 / 10 / 13, 1.1 % | 3.68 | 2.93 / 7 / 10 |
 | `qacc_smooth` (warm start disabled) | 3.83 / 6 / 8 / 13, 0.23 % | 3.83 | – |
 | **2 qacc_prev − qacc_prevprev** (linear extrapolation from the second substep on) | **2.73 / 5 / 9 / 12, 0.53 %** | **2.58** | **1.98 / 6 / 9** (later substeps 1.82) |
 
-The extrapolation cuts the elliptic iteration count by 26 % (30 % on substeps 2–8) and pyramidal's by 32 %; the
+The extrapolation cuts the elliptic iteration count by 26 % (30 % on substeps 2–8) and pyramidal's by 32 %; my
 fork's implementation (`MJW_WARMSTART_EXTRAP=1`, §2.3) reproduces the script's manual extrapolation to the digit
 (2.7258 / 1.9773). The smooth start shortens the tail but costs iterations on average (MuJoCo C's better-of-two rule
 would take it in 0.7 % of solves).
@@ -145,25 +145,25 @@ unfused |Δqpos| max / median at steps 1, 2, 5, 10, 20, 50: 1.13e-6 / 0, 2.30e-5
 3.40e-2 / 8.9e-8, 6.52e-2 / 2.4e-7, 0.92 / 1.2e-7 (the falling random-action G1 is chaotic from step 5, so the maxima
 are the floor's and the medians are the measure). Fused + htot: 1.42e-6 / 0, 5.11e-5 / 0, 2.34e-2 / 3.0e-8, 3.40e-2 /
 8.9e-8, 6.52e-2 / 2.1e-7, 1.41 / 1.2e-7 (its own floor 3.49e-6, 1.62e-3, 2.34e-2, 2.66e-2, 6.52e-2, 1.41). Worlds at
-the iteration cap and at the line-search cap over the run: 9–12 / 476–483 in every configuration. Fork suite on Metal
-from the frozen worktree 5d0d165 (`runs/ellip_ws/suite.wrapper.log`): **1451 passed, 1 failed (the pre-existing
-`test_put_data_nefc_zero_dense`), 39 skipped** = baseline; the same count on the final fork head fbf7da8 (fused
+the iteration cap and at the line-search cap over the run: 9–12 / 476–483 in every configuration. The test suite of
+[my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) on Metal from the frozen worktree [`5d0d165`](https://github.com/pulipakaa24/mujoco_warp/commit/5d0d1656637247834ebb10e30aff2e8fa91cc066) (`runs/ellip_ws/suite.wrapper.log`): **1451 passed, 1 failed (the pre-existing
+`test_put_data_nefc_zero_dense`), 39 skipped** = baseline; the same count on the final head [`fbf7da8`](https://github.com/pulipakaa24/mujoco_warp/commit/fbf7da8c79a37f3a43c7cca9e466d1691cab93dd) (fused
 launch at 128 lanes, ICB early exit, line-search knob) with default knobs and with `MJW_LS_NOISE_FLOOR=8`
-(`runs/ellip_ws/suite3.wrapper.log`; the intermediate 433c305 had two test-only failures, the direct `_solve_done`
-launches in `solver_test.py` with the old argument list, fixed in fbf7da8). CPU (`--cpu`): `solver_test` + `forward_test`
+(`runs/ellip_ws/suite3.wrapper.log`; the intermediate [`433c305`](https://github.com/pulipakaa24/mujoco_warp/commit/433c30524971267054f5fe02522278fb34d08c3e) had two test-only failures, the direct `_solve_done`
+launches in `solver_test.py` with the old argument list, fixed in [`fbf7da8`](https://github.com/pulipakaa24/mujoco_warp/commit/fbf7da8c79a37f3a43c7cca9e466d1691cab93dd)). CPU (`--cpu`): `solver_test` + `forward_test`
 + `types_test` + `io_test` 313 passed, 12 skipped, the same pre-existing failure; `solver_test` + `forward_test` with the
 fused kernels forced on the CPU device (`MJW_METAL_FUSE_UPDATE_CPU=1 MJW_FUSE_H_CHOLESKY_CPU=1`) and with
-`MJW_WARMSTART_EXTRAP=1`: 150 passed, 8 skipped each. Fork heads: MuJoCo Warp `metalsim-ellip-ws` 063ff98 (code
-fbf7da8), Warp `metalsim-ellip-ws` c200d46b (code 6bceb39d), both pushed.
+`MJW_WARMSTART_EXTRAP=1`: 150 passed, 8 skipped each. Branch heads: MuJoCo Warp [`metalsim-ellip-ws`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-ellip-ws) (code
+[`fbf7da8`](https://github.com/pulipakaa24/mujoco_warp/commit/fbf7da8c79a37f3a43c7cca9e466d1691cab93dd)), Warp [`metalsim-ellip-ws`](https://github.com/pulipakaa24/warp/tree/metalsim-ellip-ws) (code [`6bceb39d`](https://github.com/pulipakaa24/warp/commit/6bceb39d5b114e42b0060b62a776fa3bd71af730)), both pushed.
 
 ### 3.3 Throughput (4096 envs, G1 task, elliptic ellip10 cap 20, `g1_tp_variants.py --quick`, two interleaved repeats)
 
 | variant (frozen worktree) | launches / iteration | physics only ms (standing state) | full env step ms (random actions) |
 |---|---|---|---|
-| U unfused (5d0d165, `MJW_METAL_FUSE_UPDATE=0`) | 11 | 76.0 / 76.0 (53.9 K env-steps/s) | 113.1 / 113.1 (36.2 K) |
+| U unfused ([`5d0d165`](https://github.com/pulipakaa24/mujoco_warp/commit/5d0d1656637247834ebb10e30aff2e8fa91cc066), `MJW_METAL_FUSE_UPDATE=0`) | 11 | 76.0 / 76.0 (53.9 K env-steps/s) | 113.1 / 113.1 (36.2 K) |
 | F fused, per-entry htot launch kept | 6 | 71.2 / 70.8 (57.5–57.8 K) | 109.4 / 108.8 (37.4–37.6 K) |
 | H32 fused + htot, 32 lanes | 5 | 55.6 / 55.4 (73.6–73.9 K) | 106.2 / 106.1 (38.6 K) |
-| H64 (ca431fc, `MJW_METAL_FUSE_LANES=64`) | 5 | 55.6 / 55.6 | 101.3 / 101.2 (40.4 K) |
+| H64 ([`ca431fc`](https://github.com/pulipakaa24/mujoco_warp/commit/ca431fc1f1f50fd70c8cdbd85170e6c2082faaa7), `MJW_METAL_FUSE_LANES=64`) | 5 | 55.6 / 55.6 | 101.3 / 101.2 (40.4 K) |
 | **H128 (default)** | 5 | 57.0 / 56.9 (71.8–72.0 K) | **101.0 / 100.8 (40.6 K)** |
 
 Why the htot fusion is worth 15 ms of the standing-state physics step: the per-entry launch is a (nworld × 946)-thread
@@ -174,9 +174,9 @@ is slower than the 946-thread grid (marginal cost of iteration 1: 1.80 vs 1.63 m
 (7.4 entries per lane) recover most of the full-activity cost (marginal per substep, random-action state: U 12.97, F
 12.63, H32 13.64, H64 12.80, H128 12.19 ms; `iter*.log`).
 
-### 3.4 The rollout regime (`runs/ellip_ws/prof.wrapper.log`, one run per variant, frozen ca431fc)
+### 3.4 The rollout regime (`runs/ellip_ws/prof.wrapper.log`, one run per variant, frozen [ca431fc](https://github.com/pulipakaa24/mujoco_warp/commit/ca431fc1f1f50fd70c8cdbd85170e6c2082faaa7))
 
-The first full A/B with H32 (`ab.wrapper.log`, a00c21f) moved the loop from 34.2–34.4 K to only 34.1–34.5 K
+The first full A/B with H32 (`ab.wrapper.log`, [`a00c21f`](https://github.com/pulipakaa24/mujoco_warp/commit/a00c21ff7b1c63c5d73ed3d888acc37843aeb1aa)) moved the loop from 34.2–34.4 K to only 34.1–34.5 K
 env-steps/s although the env step had gained 6 %: the rollout's states are not the random-action states. Measured on
 the state after one PPO rollout of the untrained policy (nefc mean 3.0, 0.55 contacts per world: light contact, most
 worlds converge in 2–5 iterations): solve per substep U 10.35, F 9.70, H32 9.55, **H128 8.72 ms**; marginal cost of
@@ -188,7 +188,7 @@ iterations 16–20 U 0.27–0.19, F 0.27–0.15, H32 0.08–0.05, H128 0.19–0.
 | F fused, per-entry htot | 70.9 | 108.9 | 109.7 | 143 | 35,420 |
 | **H128** | 57.0 | 100.5 | **102.3** | 150 | **37,742** |
 
-## 4. Item 2: exact early exit of the Newton loop in graph replay (Warp fork `metalsim-ellip-ws` 6bceb39d, MuJoCo Warp 21be81b)
+## 4. Item 2: exact early exit of the Newton loop in graph replay (Warp fork `metalsim-ellip-ws` [6bceb39d](https://github.com/pulipakaa24/warp/commit/6bceb39d5b114e42b0060b62a776fa3bd71af730), MuJoCo Warp [21be81b](https://github.com/pulipakaa24/mujoco_warp/commit/21be81b1da2ff09e02c8fab403ce4bf0b29f2db6))
 
 Mechanism. Warp's Metal graph replay encodes the recorded dispatches 1:1 into an indirect command buffer and executes
 them with `executeCommandsInBuffer:withRange:` (`metal.mm` `graph_build_icb` / `graph_launch`). Metal's
@@ -198,13 +198,13 @@ them with `executeCommandsInBuffer:withRange:` (`metal.mm` `graph_build_icb` / `
 them become a segment replayed through an indirect range whose 16 bytes (uint32 location, length, full length, pad)
 live in a Warp array; the backend fills location and lengths at the range's end (unified memory) and resolves the
 `MTLBuffer` at begin (the array is freed at the end of `solve()` and retained by the graph, as any capture-time
-allocation). MuJoCo Warp (`_solve`, `MJW_METAL_ICB_EARLY_EXIT`, on when the Warp fork has the API and a Metal capture
+allocation). MuJoCo Warp (`_solve`, `MJW_METAL_ICB_EARLY_EXIT`, on when [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) has the API and a Metal capture
 is open, off under `graph_conditional`): every Newton iteration is one segment; `_solve_init_efc` restores every
 length from its full length each substep; in `_solve_done` the world whose atomic brings `nsolving` to zero writes 0
 into the lengths of iterations i+1 … cap−1. The skipped iterations had no active world, so the result is bitwise
-the fixed-count loop by construction; without the fork's Warp (or with `WP_METAL_ICB=0`) everything launches as before.
+the fixed-count loop by construction; without my fork of Warp (or with `WP_METAL_ICB=0`) everything launches as before.
 
-Metal (`runs/ellip_ws/icb2.wrapper.log`, frozen 12cc1e2 + Warp 6bceb39d, htot fusion at 32 lanes, two interleaved
+Metal (`runs/ellip_ws/icb2.wrapper.log`, frozen [`12cc1e2`](https://github.com/pulipakaa24/mujoco_warp/commit/12cc1e28529bb3912d3365ac4ff7bf77bdd6ba3f) + Warp [`6bceb39d`](https://github.com/pulipakaa24/warp/commit/6bceb39d5b114e42b0060b62a776fa3bd71af730), htot fusion at 32 lanes, two interleaved
 repeats): state difference on vs off at 512 envs: medians identical to the floors' at every step (0, 0, 2.9e-8, 8.9e-8,
 2.2e-7, 4.0e-7, 2.7e-7, 1.3e-7), worlds at the caps identical (9–11 / 479–481). Physics only **55.4 → 47.7 / 47.6 ms**
 (the standing state: most of the 20 iterations are empty), env step 106.0 / 105.6 → **102.7 / 102.9 ms** (−3.0 %).
@@ -213,14 +213,14 @@ Marginal cost of iterations 18–20 in graph mode (random-action state, all worl
 because only its last three iterations are empty. Pyramidal cap 10 gains its empty iterations too: physics only 43.8
 → 39.7 ms in the final A/B (§6). Landed, default on.
 
-## 5. Item 3: line-search derivative noise floor (MuJoCo Warp 12cc1e2, `MJW_LS_NOISE_FLOOR`)
+## 5. Item 3: line-search derivative noise floor (MuJoCo Warp [12cc1e2](https://github.com/pulipakaa24/mujoco_warp/commit/12cc1e28529bb3912d3365ac4ff7bf77bdd6ba3f), `MJW_LS_NOISE_FLOOR`)
 
 The convergence test of `_linesearch_iterative_kernel` is |P′(α)| < gtol with gtol = max(tol·ls_tol·‖s‖·scale, 1e-6).
 The derivative is a float32 sum over the rows whose rounding noise is ~eps × its gross magnitude Σ|q1_i| + |α| Σ 2q2_i;
 when gtol is below it the search cannot terminate on the derivative and bisects to its budget (the review's finding
-(B): 10 % of calls, 18 % at Newton iteration 1). Genesis PR #3382 (merged 2026-09-22) floors the tolerance at that
+(B): 10 % of calls, 18 % at Newton iteration 1). [Genesis PR #3382](https://github.com/Genesis-Embodied-AI/genesis-world/pull/3382) (merged 2026-09-22) floors the tolerance at that
 noise and steps to kinks instead of midpoints; only the floor is ported here: `gtol_at(α) = max(gtol, K·eps·(q1_abs +
-|α|·p0[2]))` with `q1_abs` the Cauchy–Schwarz bound the fork already forms for the alpha floor
+|α|·p0[2]))` with `q1_abs` the Cauchy–Schwarz bound [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) already forms for the alpha floor
 (`sqrt(2 Σcost_i Σ2q2_i) + |gauss q1|`), K = `MJW_LS_NOISE_FLOOR` in units of float32 eps. `MJW_LS_STATS=1` records
 each world's line-search iteration count (`ctx.ls_iters`).
 
@@ -243,7 +243,7 @@ CPU (`ls_noise_floor_check.py`, walking states, 256 worlds × 9 snapshots × 8 s
 Reading: the floor does not change the Newton iteration count, halves the line-search iterations per call and cuts the
 launch's longest search (the kernel's latency) from 14.1 to 11.2 (median 20 → 10); the state after 8 substeps is at
 the 1-ulp floor (p99 4.6e-4 vs 3.7e-4, the same 11–12 chaotic worlds; the task's own setting has a 0.43 rad/s
-outlier the floored search does not). Metal (`runs/ellip_ws/ls.wrapper.log`, frozen 12cc1e2, early exit on, 32 lanes): state difference vs the floor-off
+outlier the floored search does not). Metal (`runs/ellip_ws/ls.wrapper.log`, frozen [`12cc1e2`](https://github.com/pulipakaa24/mujoco_warp/commit/12cc1e28529bb3912d3365ac4ff7bf77bdd6ba3f), early exit on, 32 lanes): state difference vs the floor-off
 reference at 512 envs, medians at steps 5 / 10 / 20 / 30: 3.7e-8 / 1.0e-7 / 2.1e-7 / 4.0e-7 (8 eps) and 3.5e-8 /
 9.7e-8 / 2.1e-7 / 3.6e-7 (32 eps) against the floors' 2.6–3.0e-8 / 8.9e-8 / 2.1–2.2e-7 / 3.6–4.0e-7: 1.0–1.4× the
 floor's median (a termination change is float noise in every world, unlike the fusion's exact identity); worlds at the
@@ -264,8 +264,8 @@ Decision: **archived as an option, off by default** (`MJW_LS_NOISE_FLOOR=8` for 
 
 ## 6. Final A/B (job_ellip.sh protocol: `g1_tp_variants.py 4096`, two interleaved repeats P E P E, frozen worktrees)
 
-`runs/ellip_ws/final.wrapper.log` (12:03–12:06), frozen MuJoCo Warp 433c305 (fused elliptic iteration at 128 lanes,
-ICB early exit; line-search floor by env var) + Warp 6bceb39d, MetalSim b7080fb, env-steps/s at 4096 envs (ms):
+`runs/ellip_ws/final.wrapper.log` (12:03–12:06), frozen [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) at [`433c305`](https://github.com/pulipakaa24/mujoco_warp/commit/433c30524971267054f5fe02522278fb34d08c3e) (fused elliptic iteration at
+128 lanes, ICB early exit; line-search floor by env var) + [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) at [`6bceb39d`](https://github.com/pulipakaa24/warp/commit/6bceb39d5b114e42b0060b62a776fa3bd71af730), MetalSim [`baad4f2`](https://github.com/pulipakaa24/MetalSim/commit/baad4f27fb477426fa70eff4655e3238aa1d1082), env-steps/s at 4096 envs (ms):
 
 | preset, cap | physics only | full env step | rollout + inference | PPO update | **full PPO loop** | loop vs pyramidal |
 |---|---|---|---|---|---|---|
@@ -288,14 +288,14 @@ of rollout + inference per step against pyramidal's 65 ms) is the review's "inhe
   and 20–34 on fallen robots (§8.5 of the cones note): the cap of 20 is needed, and the iterations 11–20 now cost only
   when a world is still active (the early exit removes the empty ones; the active-tail iterations cost their launches
   plus the slowest world's line search + factor + solve, 0.2–0.3 ms each in graph mode).
-- The line search: 1.6× the evaluations per Newton iteration (C: 4.93 vs 3.10) and, in the fork, launches whose slowest
+- The line search: 1.6× the evaluations per Newton iteration (C: 4.93 vs 3.10) and, in [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim), launches whose slowest
   world ran to the budget in half the launches; the noise floor brings the launch's longest search from 14.1 to 11.2
   iterations, not to pyramidal's ~10 (its own launch max is 13.4 → 10.1 with the floor). Kink candidates (the second
-  half of Genesis #3382) were not ported.
+  half of [Genesis #3382](https://github.com/Genesis-Embodied-AI/genesis-world/pull/3382)) were not ported.
 - Per-iteration work: the cone term (rebuilt every iteration as in MuJoCo C's `HessianCone`, now inside the fused
   launch at ~0.1 ms more than the per-entry grid at full activity even at 128 lanes), the refactorization of every
   world with a cone row (the stable-state fast path cannot apply to CONE rows), and the elliptic line-search kernel's
-  quad precompute. The rank-1 alternative (`MJW_ELLIPTIC_CONE_UPDATE`) measured slower on Metal (DECISIONS 2026-09-26).
+  quad precompute. The rank-1 alternative (`MJW_ELLIPTIC_CONE_UPDATE`) measured slower on Metal ([DECISIONS](../DECISIONS.md) 2026-09-26).
 - Not physics: the rollout + inference step is 102–104 ms against an env step of 95–98 ms, and pyramidal's rollout is
   65.3 ms for a 65.3 ms env step; the 5–7 ms gap under elliptic (also present before this work, 113.6 vs 112.4) is
   unexplained here.
@@ -308,10 +308,10 @@ tolerance-level state change, more worlds at the cap; `MJW_WARMSTART_EXTRAP=1`);
 
 - MuJoCo C: `scratch/deformable/mujoco_main/src/engine/engine_forward.c` (`warmstart()` 1072–1131, `mj_fwdConstraint`
   1234–1296, `qacc_warmstart` written in `mj_advance` 1488), `engine_solver.c` (`mj_solPrimal` 2786–2935: the zero-
-  iteration certificate 2857–2875, the main loop 2880–2935; `PrimalSearch` 1970–2145), head 3991e54 (2026-09-25).
-- Warp fork `upstream/warp-innate` `warp/native/metal.mm` (`Graph`, `graph_build_icb`, `graph_launch`, 92–130 /
-  1400–1470 at 9abceff9), Apple `MTLComputeCommandEncoder executeCommandsInBuffer:indirectBuffer:indirectBufferOffset:`.
-- Genesis PR #3382 (genesis-world, merged 2026-09-22): line-search gradient tolerance floored at the rounding noise of
+  iteration certificate 2857–2875, the main loop 2880–2935; `PrimalSearch` 1970–2145), upstream head [`3991e54`](https://github.com/google-deepmind/mujoco/commit/3991e5459d28be5846377a1144bdb919ecebd3a5) (2026-09-25).
+- [My fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) `upstream/warp-innate` `warp/native/metal.mm` (`Graph`, `graph_build_icb`, `graph_launch`, 92–130 /
+  1400–1470 at [`9abceff9`](https://github.com/pulipakaa24/warp/commit/9abceff953313e090084ed5950427a5dccf91258)), Apple `MTLComputeCommandEncoder executeCommandsInBuffer:indirectBuffer:indirectBufferOffset:`.
+- [Genesis PR #3382](https://github.com/Genesis-Embodied-AI/genesis-world/pull/3382) (genesis-world, merged 2026-09-22): line-search gradient tolerance floored at the rounding noise of
   the derivative terms, kink candidates instead of midpoints; "bit-identical" on its convex run.
 - `docs/research/elliptic_cost_review_2026-09-26.md` (the independent review), `elliptic_cones_2026-09-25.md` §8,
   `throughput_2026-09-26.md` §2c / §4b / §11.1.

@@ -1,6 +1,6 @@
 # CUDA approximate float32 division / sqrt / rcp / rsqrt, and bit-exact emulation on Apple GPUs
 
-Research note, 2026-10-11. Goal: reproduce, bit for bit on Apple GPUs (Metal), what NVRTC `--use_fast_math` code (as emitted by Warp) computes on an NVIDIA L4 (sm_89, Ada).
+Research note, 2026-10-11. Goal: reproduce, bit for bit on Apple GPUs (Metal), what NVRTC `--use_fast_math` code (as emitted by [Warp](https://github.com/NVIDIA/warp)) computes on an NVIDIA L4 (sm_89, Ada).
 
 **Evidence used.** NVIDIA, Apple, LLVM, Mesa and Warp documentation and source, quoted directly; forum posts and papers; and fresh compiles on Compiler Explorer (godbolt.org API, compilers `nvcc133` = NVCC 13.3.0 and `nvcc118` = NVCC 11.8). The compiles produced PTX and `nvdisasm` SASS; no GPU was used. Anything marked **[inferred]** or **[unverified]** has not been checked on hardware.
 
@@ -149,8 +149,8 @@ This is the "scales operands" range fix that the ISA describes. For |b| ≤ 2^12
   - Because these are **non-ftz** PTX, they become *pre-scale + MUFU + FMUL* on sm_89 even inside a fast-math module (see §3).
 - NVRTC options (`warp/native/warp.cu`): `if (fast_math) opts.push_back("--use_fast_math");` then `opts.push_back(fuse_fp ? "--fmad=true" : "--fmad=false")`. — [warp/native/warp.cu](https://github.com/NVIDIA/warp/blob/main/warp/native/warp.cu)
 - Module option defaults: `"fast_math": False`, `"fuse_fp": True`. Docs: "**fast_math**: Enable fast math for CUDA compilation, defaults to `False`." CHANGELOG (old): "fast math is now *disabled* by default". — [warp/_src/context.py](https://github.com/NVIDIA/warp/blob/main/warp/_src/context.py), [Warp CHANGELOG](https://github.com/NVIDIA/warp/blob/main/CHANGELOG.md)
-- Checked in the local Warp fork (1.18.0.dev) and against upstream `main`. Versions 1.10–1.16 are assumed to have the same `div`/`sqrt`/NVRTC behaviour, since the `--use_fast_math` push and the `a/b` / `::sqrtf` bodies are long-standing. **[inferred for each exact version]**
-- Project relevance: Newton's implicit MPM rheology kernels use `kernel_options={"fast_math": True}` (`newton/_src/solvers/implicit_mpm/rheology_solver_kernels.py`, four kernels). The raycast and warp_raytrace kernels default `fast_math=True`. So every `/`, `wp.sqrt`, `1/x` and `1/wp.sqrt` in those kernels runs `MUFU.RCP`/`SQRT`/`RSQ` on the L4. — local fork of [newton-physics/newton](https://github.com/newton-physics/newton)
+- Checked in [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) (1.18.0.dev) and against upstream `main`. Versions 1.10–1.16 are assumed to have the same `div`/`sqrt`/NVRTC behaviour, since the `--use_fast_math` push and the `a/b` / `::sqrtf` bodies are long-standing. **[inferred for each exact version]**
+- Project relevance: Newton's implicit MPM rheology kernels use `kernel_options={"fast_math": True}` (`newton/_src/solvers/implicit_mpm/rheology_solver_kernels.py`, four kernels). The raycast and warp_raytrace kernels default `fast_math=True`. So every `/`, `wp.sqrt`, `1/x` and `1/wp.sqrt` in those kernels runs `MUFU.RCP`/`SQRT`/`RSQ` on the L4. — [my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim-1.5.2) of [newton-physics/newton](https://github.com/newton-physics/newton)
 
 ---
 
@@ -278,7 +278,8 @@ can store one form under another's hash.
   13.6** ps. A first version (bit-serial squarer, three table loads, 64-bit sums) cost 11.9 / 16.3 ps. Exact MUFU
   results cost about 3x a correctly rounded operation on Apple GPUs (Apple's hardware has a near-correctly-rounded
   reciprocal, so IEEE results are cheap; NVIDIA's non-IEEE rounding is not).
-- Newton MPM (Warp branch `metalsim-cuda-fast-math`, MetalSim MPM.md section 8, 1b): `"cuda"` is 1.17-2.22x the
+- Newton MPM (branch `metalsim-cuda-fast-math` of [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim), MetalSim
+  [MPM.md](../../metalsim/physics/mpm/MPM.md) section 8, 1b): `"cuda"` is 1.17-2.22x the
   ms/frame of `"off"` (correctly rounded), `"relaxed"` 0.64-0.94x. Parity against the L4's 16-run floor ensemble:
   `"cuda"` is closest to the L4 on the column (0.144 um vs 0.165 um at 3 s, the L4's iteration counts) and the plate
   (0.95x the largest floor, final force inside the L4's range), but not better overall than `"off"` (anymal 1.01 vs

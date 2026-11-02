@@ -1,36 +1,51 @@
 # Newton VBD and Newton's coupled rigid/deformable solvers on Metal (the Isaac Lab 3.0 deformable path)
 
-2026-09-25. Isaac Lab 3.0 EA (Isaac Sim 6.1) runs deformables on the Newton backend with Newton's VBD solver,
-coupled to MuJoCo Warp rigid bodies through Newton's experimental coupled-solver framework. This note records
-(1) what kept VBD from running on the Metal Warp fork and the fix, (2) VBD and the coupled solvers on Metal
-against the CPU device, with throughput, and (3) from source, how Isaac Lab 3.0 couples rigid and deformable
-bodies under Newton. Companion: `physx_deformables_port_2026-09-25.md` (PhysX-backend formulations).
-**Measured** = run here (M4 Max; Metal through `scripts/gpu_run.sh` at kind `low`, `gpu_lock.py status` at the top of
-every log); **source** = read in the cited file.
+2026-09-25. [Isaac Lab](https://github.com/isaac-sim/IsaacLab) 3.0 EA
+([Isaac Sim](https://github.com/isaac-sim/IsaacSim) 6.1) runs deformables on the
+[Newton](https://github.com/newton-physics/newton) backend with Newton's VBD solver, coupled to
+[MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp) rigid bodies through Newton's experimental coupled-solver
+framework. This note records (1) what kept VBD from running on Metal through
+[my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) and the fix, (2) VBD and the coupled solvers on
+Metal against the CPU device, with throughput, and (3) from source, how Isaac Lab 3.0 couples rigid and deformable
+bodies under Newton. Companion: [`physx_deformables_port_2026-09-25.md`](physx_deformables_port_2026-09-25.md)
+(PhysX-backend formulations). **Measured** = run here (M4 Max; Metal through `scripts/gpu_run.sh` at kind `low`,
+`gpu_lock.py status` at the top of every log); **source** = read in the cited file.
 
-Sources: [N152] `upstream/newton-1.5.2` = newton-physics/newton tag `v1.5.2` (cf5378db, 2026-09-09), the version
-Isaac Lab 3.0 EA pins; [NF] `upstream/newton` = MetalSim fork branch `metalsim` (90e23324, 1.7.0.dev); [W]
-`upstream/warp-innate` = Warp fork branch `metalsim`; [IL3] isaac-sim/IsaacLab tag `v3.0.0-EA` and `develop`
-(24fd3182), read from a sparse clone. Logs and data: `runs/newton_vbd/`. Scripts:
-`scripts/diagnostics/newton_vbd/` (`vbd_probe.py`, `coupled_probe.py`, `run_newton_tests.py`,
-`profile_launches.py`), environment `scripts/setup_newton152.sh` (`.venv-newton152`).
+Sources: [N152] `upstream/newton-1.5.2` = newton-physics/newton tag
+[`v1.5.2`](https://github.com/newton-physics/newton/tree/v1.5.2)
+([`cf5378db`](https://github.com/newton-physics/newton/commit/cf5378db6002b5c19b86344737cdd40cb8e08f0c), 2026-09-09),
+the version Isaac Lab 3.0 EA pins; [NF] `upstream/newton` = branch `metalsim` of
+[my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim)
+([`90e23324`](https://github.com/pulipakaa24/newton/commit/90e23324521fa86710e483e01d02e80d1dac0060), 1.7.0.dev); [W]
+`upstream/warp-innate` = branch `metalsim` of [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim);
+[IL3] isaac-sim/IsaacLab tag [`v3.0.0-EA`](https://github.com/isaac-sim/IsaacLab/tree/v3.0.0-EA) and `develop`
+([`24fd3182`](https://github.com/isaac-sim/IsaacLab/commit/24fd31827ee878c6fe68850aa06a7a60f490e209)), read from a
+sparse clone. Logs and data: `runs/newton_vbd/`. Scripts: `scripts/diagnostics/newton_vbd/` (`vbd_probe.py`,
+`coupled_probe.py`, `run_newton_tests.py`, `profile_launches.py`), environment `scripts/setup_newton152.sh`
+(`.venv-newton152`).
 
 ## 1. Summary
 
-* **Newton VBD runs on Metal.** Newton 1.5.2's SolverVBD (cloth and tetrahedral soft bodies) compiles and runs on
-  the Metal Warp fork unchanged. Newton main / the 1.7.0.dev fork failed to build one module,
+* **Newton VBD runs on Metal.** Newton 1.5.2's SolverVBD (cloth and tetrahedral soft bodies) compiles and runs on Metal
+  through [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) unchanged. Newton main /
+  [my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim) (1.7.0.dev) failed to build one module,
   `rigid_vbd_kernels`, with a link error: `Undefined symbol(s) for architecture 'air64': 'nextafterf'`. The Metal
-  standard library has no `nextafterf`, and clang lowers `__builtin_nextafterf` to a call to it. Newton's
-  interval arithmetic for rigid–soft Divide-and-Truncate (`newton/_src/solvers/vbd/interval_arithmetic.py`,
-  Newton e42568d9, after 1.5.2) calls it from the non-CUDA branch of a native snippet, and Metal takes that
-  branch. **Fixed in the Warp fork** (9050cb54; `patches/warp/0007-Metal-nextafterf-*`, and merged into the fork's `metalsim` as f194006 by c041d10): `metal_crt.h` now has a bit-exact IEEE
-  `nextafterf`, computed on bit patterns because Apple GPUs flush float32 subnormals in comparisons, and maps
-  `__builtin_nextafterf` onto it. The new test `test_metal.test_nextafterf` matches `numpy.nextafter` bit for bit
-  on Metal and on the CPU. `warp.tests.test_metal` passes 16/16. No Newton change was needed.
-* The earlier ledger row "VBD fails to compile on Metal" (GAPS, Newton XPBD ledger) is closed for both Newton
-  versions. The error was invisible in Warp's exception because the fork's Metal compile-log filter drops lines
+  standard library has no `nextafterf`, and clang lowers `__builtin_nextafterf` to a call to it. Newton's interval
+  arithmetic for rigid–soft Divide-and-Truncate (`newton/_src/solvers/vbd/interval_arithmetic.py`, upstream Newton
+  [`e42568d9`](https://github.com/newton-physics/newton/commit/e42568d9895f12b5bb004f3fedb600053e233f8c), after 1.5.2)
+  calls it from the non-CUDA branch of a native snippet, and Metal takes that branch. **Fixed in my fork of Warp**
+  ([`9050cb54`](https://github.com/pulipakaa24/warp/commit/9050cb5452de26ca6c80871bee15c389c06f9b10);
+  `patches/warp/0007-Metal-nextafterf-*`, and merged into its `metalsim` branch as
+  [`f194006`](https://github.com/pulipakaa24/warp/commit/f194006a4cf197fda93633252af81bc3f57f5561)): `metal_crt.h` now
+  has a bit-exact IEEE `nextafterf`, computed on bit patterns because Apple GPUs flush float32 subnormals in
+  comparisons, and maps `__builtin_nextafterf` onto it. The new test `test_metal.test_nextafterf` matches
+  `numpy.nextafter` bit for bit on Metal and on the CPU. `warp.tests.test_metal` passes 16/16. No Newton change was
+  needed.
+* The earlier ledger row "VBD fails to compile on Metal" ([GAPS](../GAPS.md), Newton XPBD ledger) is closed for both
+  Newton versions. The error was invisible in Warp's exception because my fork's Metal compile-log filter drops lines
   after a warning and keeps only 4,096 bytes. Recompiling the cached `.metal` source through a 30-line Objective-C
-  harness (`scripts/diagnostics/newton_vbd/mtlc.m`: `MTLDevice newLibraryWithSource`, the fork's compile options) printed the full log (`runs/newton_vbd/mtlc_fork_rigid.log`).
+  harness (`scripts/diagnostics/newton_vbd/mtlc.m`: `MTLDevice newLibraryWithSource`, my fork's compile options) printed
+  the full log (`runs/newton_vbd/mtlc_fork_rigid.log`).
 * **Metal matches the CPU device** to float32 sensitivity. Soft cube, 200 steps: at most 1.3e-4 m. Cloth draped
   over a box edge: at most 0.18 m, against 0.16 m when the CPU is compared with itself from a start perturbed by
   1e-7 m. Median vertex error at step 199: 1.2e-2 m (Metal) vs 1.4e-2 m (perturbed CPU).
@@ -46,14 +61,15 @@ Isaac Lab 3.0 EA pins; [NF] `upstream/newton` = MetalSim fork branch `metalsim` 
   cloth) and 8e-5 m (ADMM). Graph capture needs one eager frame first. SolverVBD sizes its contact buffers on the
   first step, and allocating inside a capture needs a CUDA memory pool, which Metal lacks. Newton's own error
   message prescribes the eager frame.
-* **Version constraint.** Newton 1.5.2's `SolverMuJoCo` requires mujoco-warp ~=3.11. Against MetalSim's
-  MuJoCo Warp fork (3.14) it fails to build `convert_mjw_contacts_to_newton_kernel`: `contact_force_fn` overload
-  mismatch. The Newton fork (1.7.0.dev, which declares ~=3.12) fails the same way. The coupled reference
-  therefore runs in `.venv-newton152` with stock mujoco-warp 3.11.0, i.e. without MetalSim's MuJoCo Warp fixes.
+* **Version constraint.** Newton 1.5.2's `SolverMuJoCo` requires mujoco-warp ~=3.11. Against
+  [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) (3.14) it fails to build
+  `convert_mjw_contacts_to_newton_kernel`: `contact_force_fn` overload mismatch. My fork of Newton (1.7.0.dev, which
+  declares ~=3.12) fails the same way. The coupled reference therefore runs in `.venv-newton152` with stock mujoco-warp
+  3.11.0, i.e. without MetalSim's MuJoCo Warp fixes.
 * **Throughput** (graph replay, env-steps/s at 1024 / 4096 worlds): VBD cloth (441 particles) 3.6K / 3.7K; VBD
   soft cube (125 nodes) 0.69K / 0.57K. The cube's `solve_elasticity` kernel is compute-bound from ~256 worlds.
   For scale, the PhysX-style PBD cloth prototype gets 57.7K / 41.3K on the same cloth, and MetalSim `XPBDSim`
-  320K / 285K (companion doc §6). Isaac Lab publishes no deformable throughput.
+  320K / 285K ([companion doc](physx_deformables_port_2026-09-25.md) §6). Isaac Lab publishes no deformable throughput.
 
 ## 2. Versions and environments
 
@@ -61,8 +77,8 @@ Isaac Lab 3.0 EA pins; [NF] `upstream/newton` = MetalSim fork branch `metalsim` 
 |---|---|---|---|---|
 | Isaac Lab 3.0 EA | 1.5.2 (`pyproject.toml:407`, uv override; line 93 is the loose `newton[sim]>=1.2.0`) | ~=3.11 (Newton's `[sim]` extra) | 1.16 | [IL3] |
 | Isaac Lab `develop` | 1.6.0 (`pyproject.toml:91`) | | | [IL3] |
-| `.venv-newton152` (this work) | 1.5.2, editable `upstream/newton-1.5.2` | 3.11.0 / 3.11.0 (stock) | fork 1.18.0.dev (`upstream/warp-innate` 9050cb54) | `scripts/setup_newton152.sh` |
-| `.venv-newtonfork` | 1.7.0.dev fork (or 1.5.2 via `PYTHONPATH`) | 3.14.0 / MetalSim fork 3.14.0 | same | `scripts/setup_newton.sh` |
+| `.venv-newton152` (this work) | 1.5.2, editable `upstream/newton-1.5.2` | 3.11.0 / 3.11.0 (stock) | fork 1.18.0.dev (`upstream/warp-innate` [`9050cb54`](https://github.com/pulipakaa24/warp/commit/9050cb5452de26ca6c80871bee15c389c06f9b10)) | `scripts/setup_newton152.sh` |
+| `.venv-newtonfork` | [my fork](https://github.com/pulipakaa24/newton/tree/metalsim) 1.7.0.dev (or 1.5.2 via `PYTHONPATH`) | 3.14.0 / [my fork](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) 3.14.0 | same | `scripts/setup_newton.sh` |
 
 On particle-only scenes the Newton 1.5.2 and 1.7.0.dev VBD produce **bitwise-identical** CPU trajectories (cloth
 and cube, 200 steps). The 1.7.0.dev differences are in the rigid (AVBD) path and in new options
@@ -166,19 +182,21 @@ to 1000 during graph capture, but allocation during capture is not enabled on th
 
 | date | decision | options considered (with numbers) | chosen and why | how to re-enable the others |
 |---|---|---|---|---|
-| 2026-09-25 | Where to fix VBD's `nextafterf` on Metal | (a) Warp fork: `nextafterf` + `__builtin_nextafterf` in `metal_crt.h`; (b) Newton fork: a `__METAL_VERSION__` branch in `interval_arithmetic.py`; (c) disable interval arithmetic | (a): fixes every native snippet that uses the C name, keeps Newton upstream code unmodified, bit-exact vs numpy (test) | (b)/(c) not implemented; (a) is one header block (revert 9050cb54) |
+| 2026-09-25 | Where to fix VBD's `nextafterf` on Metal | (a) my fork of Warp: `nextafterf` + `__builtin_nextafterf` in `metal_crt.h`; (b) my fork of Newton: a `__METAL_VERSION__` branch in `interval_arithmetic.py`; (c) disable interval arithmetic | (a): fixes every native snippet that uses the C name, keeps Newton upstream code unmodified, bit-exact vs numpy (test) | (b)/(c) not implemented; (a) is one header block (revert [`9050cb54`](https://github.com/pulipakaa24/warp/commit/9050cb5452de26ca6c80871bee15c389c06f9b10)) |
 | 2026-09-25 | `nextafterf` implementation | float compares (first version: +-1-ULP subnormal neighbours wrong on Metal because comparisons flush subnormals) vs integer ordering on the bit pattern | bit pattern (bit-exact on Metal and CPU) | – |
 | 2026-09-25 | Newton version for the Isaac Lab 3.0 reference | 1.5.2 (EA pin) vs 1.7.0.dev fork (identical VBD particle trajectories; fork's SolverMuJoCo also incompatible with our MuJoCo Warp) | 1.5.2 in `.venv-newton152` | `PYTHONPATH=upstream/newton` or `.venv-newtonfork` |
-| 2026-09-25 | MuJoCo Warp under Newton's SolverMuJoCo | stock 3.11.0 (runs, coupled examples pass on Metal) vs MetalSim fork 3.14 (build error in `convert_mjw_contacts_to_newton_kernel`) | stock 3.11.0 for the Newton reference | port SolverMuJoCo to 3.14 or backport fork fixes (open) |
+| 2026-09-25 | MuJoCo Warp under Newton's SolverMuJoCo | stock 3.11.0 (runs, coupled examples pass on Metal) vs my fork of MuJoCo Warp 3.14 (build error in `convert_mjw_contacts_to_newton_kernel`) | stock 3.11.0 for the Newton reference | port SolverMuJoCo to 3.14 or backport fork fixes (open) |
 | 2026-09-25 | Capture of coupled VBD scenes on Metal | allocation during capture (needs a memory pool; Metal has none) vs one eager frame before capture (Newton's own recommendation) | eager frame | `coupled_probe.py --no-warmup-before-capture` |
 
 ## 6. Open items
 
-* The ledger row "VBD solver fails to compile on Metal" (GAPS.md, Newton XPBD ledger) can be closed: fork
-  9050cb54, this note. `docs/*.md` is not edited here.
-* Improve the fork's Metal compile-error report. Keep link-stage lines ("Undefined symbol"), which lack `: error:`,
-  and do not truncate at 4 KB. This needs a native rebuild of `libwarp`.
+* The ledger row "VBD solver fails to compile on Metal" (GAPS.md, Newton XPBD ledger) can be closed:
+  [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) at
+  [`9050cb54`](https://github.com/pulipakaa24/warp/commit/9050cb5452de26ca6c80871bee15c389c06f9b10), this note.
+  `docs/*.md` is not edited here.
+* Improve the Metal compile-error report of my fork of Warp. Keep link-stage lines ("Undefined symbol"), which lack
+  `: error:`, and do not truncate at 4 KB. This needs a native rebuild of `libwarp`.
 * VBD soft-body throughput: `solve_elasticity` is compute-bound at 1024+ worlds (0.57–0.69K env-steps/s at 10×10
   substeps/iterations). Profile inside the kernel (tet Hessians per vertex) before tuning.
 * PhysX protocol comparison of VBD cloth/cube (the other agent's recordings), with Isaac Lab 3.0's own Newton
-  parameters once an Isaac Lab 3.0 reference is recorded on the L4.
+  parameters once an Isaac Lab 3.0 reference is recorded on the NVIDIA L4 GPU.

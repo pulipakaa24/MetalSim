@@ -1,6 +1,7 @@
 # Camera-RL update on Metal: why conv backward is slow on PyTorch MPS, and what to do (2026-09-24)
 
-Scope: the Isaac Lab / skrl camera-cartpole PPO update (metalsim/learn/ppo.py, train_cartpole_rgb.py):
+Scope: the [Isaac Lab](https://github.com/isaac-sim/IsaacLab) / [skrl](https://github.com/Toni-SM/skrl)
+camera-cartpole PPO update (metalsim/learn/ppo.py, train_cartpole_rgb.py):
 NatureCNN (conv 3→32 k8 s4, 32→64 k4 s2, 64→64 k3 s1, ReLU; flatten 64·9·9 = 5184 → Linear 512 ELU;
 linear actor/critic heads), 4 epochs × 32 minibatches of 2048 over 65,536 images of 3×100×100, Adam,
 grad clip 1.0. Machine: M4 Max (40-core GPU), macOS 26, torch 2.14.0, mlx 0.32.2.
@@ -54,20 +55,21 @@ there is no native Metal conv2d training kernel. File:
   `grad_output` is gathered through MPSGraph's strided path. Issue #193349
   (https://github.com/pytorch/pytorch/issues/193349: bf16 conv backward 0.77 ms contiguous vs 22.87 ms
   channels-last) was fixed by PR #193623 (https://github.com/pytorch/pytorch/pull/193623, landed as commit
-  b6ddff2e038e on 2026-08-14, NHWC data-grad and HWIO weight-grad paths), which is on `main` only, not in 2.14.0.
+  [`b6ddff2e038e`](https://github.com/pytorch/pytorch/commit/b6ddff2e038ee87a16c397c8f72a46c2b26a910b) on 2026-08-14, NHWC data-grad and HWIO weight-grad paths), which is on `main` only, not in 2.14.0.
   Its only published gain over contiguous is 0.84 → 0.63 ms on one bf16 shape (≈ 1.3×).
 - torch.compile: issue #192551 (https://github.com/pytorch/pytorch/issues/192551) — compiled CNN
   training on MPS 4.5× slower than eager because Inductor's layout optimisation forces channels-last
   into this NCHW-only backward; with `TORCHINDUCTOR_LAYOUT_OPTIMIZATION=0` compiled was 0.72–0.87× of
-  eager step time. PR #193191 (skip layout opt for MPS training) was closed unmerged. Inductor's MPS
+  eager step time. [PR #193191](https://github.com/pytorch/pytorch/pull/193191) (skip layout opt for MPS training) was closed unmerged. Inductor's MPS
   backend does not generate conv/matmul kernels (it calls the same aten ops), so it can only fuse the
   pointwise ops around them (see docs/research/pytorch_mps_interop_2026-09-22.md §4).
 - Release notes: 2.12 (https://github.com/pytorch/pytorch/releases/tag/v2.12.0) and 2.13
   (https://github.com/pytorch/pytorch/releases/tag/v2.13.0) have no conv2d-performance items for MPS
-  (2.13 adds the Conv3d NDHWC fast path #184612); 2.14
-  (https://github.com/pytorch/pytorch/releases/tag/v2.14.0) has #188359 and #192303 (correctness:
+  (2.13 adds the Conv3d NDHWC fast path [#184612](https://github.com/pytorch/pytorch/pull/184612)); 2.14
+  (https://github.com/pytorch/pytorch/releases/tag/v2.14.0) has #188359 and
+  [#192303](https://github.com/pytorch/pytorch/pull/192303) (correctness:
   large kernels, non-contiguous weights) and #188802 (3-D only). Nothing for conv2d backward.
-- Open, not in 2.14: PR #189019 `torch.mps.MetalGraph` capture/replay (dispatch overhead only).
+- Open, not in 2.14: [PR #189019](https://github.com/pytorch/pytorch/pull/189019) `torch.mps.MetalGraph` capture/replay (dispatch overhead only).
 - Optimizer: fused Adam exists for MPS (`"mps"` in `_get_fused_kernels_supported_devices`,
   https://raw.githubusercontent.com/pytorch/pytorch/v2.14.0/torch/utils/_foreach_utils.py L13).
 
@@ -92,8 +94,10 @@ replacing the op with a different formulation (unfold+matmul, space-to-depth, a 
   0.71 ms; M5, MLX 0.32.2 vs torch 2.13: 0.80 vs 0.55 ms (MLX slower). Forward+backward conv,
   ml-explore/mlx#1313 (https://github.com/ml-explore/mlx/issues/1313, 2024, "PyTorch (MPS) is faster
   than MLX in backward of convolution layer"): PyTorch 3–6× faster on M1 Pro/Max, MLX faster on M3 Max
-  (numbers are in an image in the issue; closed 2024-10-31 after mlx PR #1541). No published MLX-vs-MPS number for these shapes or versions.
-  Interop: zero-copy DLPack on Metal both directions (MLX PR #3531, see the 2026-09-22 interop file),
+  (numbers are in an image in the issue; closed 2024-10-31 after mlx
+  [PR #1541](https://github.com/ml-explore/mlx/pull/1541)). No published MLX-vs-MPS number for these shapes or versions.
+  Interop: zero-copy DLPack on Metal both directions ([MLX PR #3531](https://github.com/ml-explore/mlx/pull/3531), see
+  [the 2026-09-22 interop file](pytorch_mps_interop_2026-09-22.md)),
   no synchronisation carried — `torch.mps.synchronize()` / `mx.eval` + `mx.synchronize()` at the seam.
 - **MPSCNNConvolutionGradient / MPSGraph direct**: exists, not deprecated
   (https://developer.apple.com/documentation/metalperformanceshaders/mpscnnconvolutiongradient); no
@@ -189,7 +193,7 @@ MPSGraph 35.9 ms, space-to-depth (stride-1 convs) 35.6 ms, unfold+matmul 68.0 ms
 
 ## 5. Recommendation
 
-Criterion from the brief: implement only if ≥ 1.5× on the update while PPO stays in PyTorch.
+Criterion set for this work: implement only if ≥ 1.5× on the update while PPO stays in PyTorch.
 
 1. **MLX encoder behind a torch.autograd.Function** — the only measured alternative at ≥ 1.5×, but that
    1.50× is for the *whole* update in MLX. Keeping the heads, loss, and Adam in torch (fused Adam 4.7
@@ -207,8 +211,8 @@ Criterion from the brief: implement only if ≥ 1.5× on the update while PPO st
    Combined with (2): **estimated ≈ 3.9–4.2 s (1.6–1.7×, ~12K env-steps/s)**. Highest effort, and the
    only path estimated to clear 1.5× in fp32 with PPO in torch.
 
-Estimated best achievable within this design: update ≈ 4 s, i.e. ≈ 12K env-steps/s including training
-(vs 8.1K measured now, 32K Isaac/4090). Beyond that the floor is ≈ 1.7–2.0 s from the arithmetic in §0.
+Estimated best achievable within this design: update ≈ 4 s, i.e. ≈ 12K env-steps/s including training (vs 8.1K
+measured now, 32K for Isaac Lab on an RTX 4090). Beyond that the floor is ≈ 1.7–2.0 s from the arithmetic in §0.
 
 ## 6. Step 3: what was implemented, and the result [measured]
 

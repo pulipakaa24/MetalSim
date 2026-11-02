@@ -1,6 +1,6 @@
 # FMA contraction in the CUDA pipeline (NVRTC/NVVM to PTX to ptxas to SASS) for Warp 1.16 kernels on sm_89
 
-Scope: float32 multiply/add contraction when Warp 1.16 JIT-compiles with NVRTC `--fmad=true` (the default, `fuse_fp=True`) and ptxas assembles for sm_89 (L4). Sources were checked on 2026-10-10. LLVM quotes come from llvm-project `main` as of that date, with LLVM 17.0.6 used where the behaviour differs. NVVM (the front end inside NVRTC) is NVIDIA's closed-source fork of LLVM. Upstream LLVM is evidence about its likely logic, not proof of it.
+Scope: float32 multiply/add contraction when [Warp](https://github.com/NVIDIA/warp) 1.16 JIT-compiles with NVRTC `--fmad=true` (the default, `fuse_fp=True`) and ptxas assembles for sm_89 (the NVIDIA L4 GPU). Sources were checked on 2026-10-10. LLVM quotes come from llvm-project `main` as of that date, with LLVM 17.0.6 used where the behaviour differs. NVVM (the front end inside NVRTC) is NVIDIA's closed-source fork of LLVM. Upstream LLVM is evidence about its likely logic, not proof of it.
 
 ## 1. What the PTX ISA says about mul/add/sub without a rounding modifier
 

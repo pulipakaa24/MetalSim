@@ -1,64 +1,85 @@
 # G1 throughput "regression" 2026-09-25: fork commit or machine? (measured on the 16-inch M4 Max)
 
-Scope: the report from a session on another M4 Max (14-inch, 64 GB) that MetalSim `fbaab25` with the forks at their
-`metalsim` heads measures the G1 flat task (4096 envs, 2.5 ms, decimation 8) at physics-only 84.1 K, full env step
-55.2 K and full PPO loop 50.2 K env-steps/s against the README's 81.0 K / 67.6 K / 56.6 K, with `g1_step_profile.py`
-putting the difference in `solver.solve` (5.50 ms per substep there against 4.23 ms in `runs/mjw_tp/final_checks.log`).
-Candidates named: the flex merge `8fbf965` in the MuJoCo Warp fork (the headline was taken at `ccfaffb` / `1791414`), or
-the machine. This note settles it with interleaved back-to-back runs on the machine the headline was measured on.
-Every number below is measured on this machine through the timing queue (`scripts/gpu_run.sh ... timing`), on AC
-power, with the wrapper's per-process GPU log idle (0 %, no process at or above 1 %) at the start and end of every
-job; logs in `runs/mjw_tp/ab/` and `runs/mjw_tp/*.wrapper.log`, job scripts `runs/mjw_tp/job_ab1.sh`, `job_ab2.sh`,
-`job_cc.sh`, `job_cc2.sh`, `job_gen.sh`, `job_gen2.sh`.
+Scope: the report from a session on another M4 Max (14-inch, 64 GB) that MetalSim
+[`e3cb2aa`](https://github.com/pulipakaa24/MetalSim/commit/e3cb2aa0afe135478146820781013056c455131e) with
+[my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) and
+[my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) at their `metalsim` heads measures
+the G1 flat task (4096 envs, 2.5 ms, decimation 8) at physics-only 84.1 K, full env step 55.2 K and full PPO loop 50.2 K
+env-steps/s against the README's 81.0 K / 67.6 K / 56.6 K, with `g1_step_profile.py` putting the difference in
+`solver.solve` (5.50 ms per substep there against 4.23 ms in `runs/mjw_tp/final_checks.log`). Candidates named: the flex
+merge [`8fbf965`](https://github.com/pulipakaa24/mujoco_warp/commit/8fbf965acb630aa32573dda802404d519c843a99) in my fork
+of MuJoCo Warp (the headline was taken at
+[`ccfaffb`](https://github.com/pulipakaa24/mujoco_warp/commit/ccfaffb38d9e4ff765214d24c2eebbbdb4358b1d) /
+[`1791414`](https://github.com/pulipakaa24/mujoco_warp/commit/17914144d132dec4c0aa3bccfe743816faec72c9)), or the
+machine. This note settles it with interleaved back-to-back runs on the machine the headline was measured on. Every
+number below is measured on this machine through the timing queue (`scripts/gpu_run.sh ... timing`), on AC power, with
+the wrapper's per-process GPU log idle (0 %, no process at or above 1 %) at the start and end of every job; logs in
+`runs/mjw_tp/ab/` and `runs/mjw_tp/*.wrapper.log`, job scripts `runs/mjw_tp/job_ab1.sh`, `job_ab2.sh`, `job_cc.sh`,
+`job_cc2.sh`, `job_gen.sh`, `job_gen2.sh`.
 
 ## 1. What is actually installed here (a finding in itself)
 
-The shared checkout `upstream/mujoco_warp` (the editable install the queue's jobs import) is at **`1791414`**, the
-local `metalsim` branch, 11 commits behind `fork/metalsim` (`07a51a6`): the flex merge and its follow-ups were
-pushed from the `upstream/mujoco_warp-merge` worktree and the shared checkout's branch was never fast-forwarded. So
-"the fork head" on this machine has been the headline's own commit all along, and the other machine (a fresh clone
-at `07a51a6`) was the first to run the merge. The A/B below therefore compares the installed `1791414` against a
-worktree at `07a51a6` (`upstream/mujoco_warp-07a51a6`, imported through `PYTHONPATH`, import path verified in every
-run). Warp: the shared checkout `upstream/warp-innate` is at `9050cb54`, 3 commits behind `fork/metalsim`
-(`f194006a`; those commits touch only `segmented_sort_pairs` in `warp/_src/utils.py`, a flex-only path). The
-other machine's Warp commit `4127c48` is not an object in this repository's fork remote, so it could not be
-measured here; the Warp delta since the headline (`b9557cb` → `9050cb54`) is one commit adding `nextafterf` to the
-Metal kernel CRT (no kernel used by the G1 changes).
+The shared checkout `upstream/mujoco_warp` (the editable install the queue's jobs import) is at
+**[`1791414`](https://github.com/pulipakaa24/mujoco_warp/commit/17914144d132dec4c0aa3bccfe743816faec72c9)**, the local
+`metalsim` branch, 11 commits behind the `metalsim` branch of
+[my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim)
+([`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc)): the flex
+merge and its follow-ups were pushed from the `upstream/mujoco_warp-merge` worktree and the shared checkout's branch was
+never fast-forwarded. So "the fork head" on this machine has been the headline's own commit all along, and the other
+machine (a fresh clone at
+[`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc)) was the first
+to run the merge. The A/B below therefore compares the installed
+[`1791414`](https://github.com/pulipakaa24/mujoco_warp/commit/17914144d132dec4c0aa3bccfe743816faec72c9) against a
+worktree at [`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc)
+(`upstream/mujoco_warp-07a51a6`, imported through `PYTHONPATH`, import path verified in every run). Warp: the shared
+checkout `upstream/warp-innate` is at
+[`9050cb54`](https://github.com/pulipakaa24/warp/commit/9050cb5452de26ca6c80871bee15c389c06f9b10), 3 commits behind the
+`metalsim` branch of [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim)
+([`f194006a`](https://github.com/pulipakaa24/warp/commit/f194006a4cf197fda93633252af81bc3f57f5561); those commits touch
+only `segmented_sort_pairs` in `warp/_src/utils.py`, a flex-only path). The other machine's Warp commit
+[`4127c48`](https://github.com/pulipakaa24/warp/commit/4127c4818334080de6f3d23aef522e582ff6a2a7) is not an object in
+this repository's fork remote, so it could not be measured here; the Warp delta since the headline
+([`b9557cb`](https://github.com/pulipakaa24/warp/commit/b9557cb987a51b51aae947f5345b61aeb6e28b32) →
+[`9050cb54`](https://github.com/pulipakaa24/warp/commit/9050cb5452de26ca6c80871bee15c389c06f9b10)) is one commit adding
+`nextafterf` to the Metal kernel CRT (no kernel used by the G1 changes).
 
-Code delta `1791414..07a51a6` outside the flex files: `constraint.py` adds `_equality_flex_reserve` (launched only
-under `m.nflex > 0`), `io.py` adds a CPU-side `_flex_elemorder` at `put_model`, `types.py` one Model field. The G1
-has no flex, so no launch, default or block size changes for it; the measurement confirms it.
+Code delta [`1791414..07a51a6`](https://github.com/pulipakaa24/mujoco_warp/compare/1791414...07a51a6) outside the flex
+files: `constraint.py` adds `_equality_flex_reserve` (launched only under `m.nflex > 0`), `io.py` adds a CPU-side
+`_flex_elemorder` at `put_model`, `types.py` one Model field. The G1 has no flex, so no launch, default or block size
+changes for it; the measurement confirms it.
 
-## 2. A/B: MuJoCo Warp fork `1791414` (A) vs `07a51a6` (B), interleaved A B A B
+## 2. A/B: MuJoCo Warp fork [`1791414`](https://github.com/pulipakaa24/mujoco_warp/commit/17914144d132dec4c0aa3bccfe743816faec72c9) (A) vs [`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc) (B), interleaved A B A B
 
-MetalSim `626f54c`, Warp `9050cb54`, same process settings, `scripts/diagnostics/g1_tp_variants.py 4096`
-(`runs/mjw_tp/ab1.wrapper.log`, 19:39–19:41) and `g1_step_profile.py 4096 0.0025 --reps 20`
-(`runs/mjw_tp/ab2.wrapper.log`, 19:41). `pmset -g batt`: AC power, 100 %; `pmset -g therm`: no thermal or
-performance warning level recorded, before every run.
+MetalSim [`1595839`](https://github.com/pulipakaa24/MetalSim/commit/1595839cab992c8d2dd79ecdbec1569b1f2cc60b), [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) at
+[`9050cb54`](https://github.com/pulipakaa24/warp/commit/9050cb5452de26ca6c80871bee15c389c06f9b10), same process
+settings, `scripts/diagnostics/g1_tp_variants.py 4096` (`runs/mjw_tp/ab1.wrapper.log`, 19:39–19:41) and
+`g1_step_profile.py 4096 0.0025 --reps 20` (`runs/mjw_tp/ab2.wrapper.log`, 19:41). `pmset -g batt`: AC power, 100 %;
+`pmset -g therm`: no thermal or performance warning level recorded, before every run.
 
 | run | physics only | full env step | rollout + inference | PPO update | full PPO loop | nefc max / mean | nacon per world | overflow |
 |---|---|---|---|---|---|---|---|---|
-| A1 `1791414` | 81,077 (50.5 ms) | 54,272 (75.5 ms) | 54,225 | 152 ms | 50,022 | 43 / 14.4 | 2.77 | ITERATIONS 26, LS 3887 |
-| B1 `07a51a6` | 81,014 (50.6 ms) | 54,035 (75.8 ms) | 54,023 | 149 ms | 49,937 | 44 / 14.4 | 2.75 | ITERATIONS 16, LS 3863 |
-| A2 `1791414` | 81,287 (50.4 ms) | 54,077 (75.7 ms) | 53,836 | 147 ms | 49,823 | 43 / 14.2 | 2.70 | ITERATIONS 12, LS 3877 |
-| B2 `07a51a6` | 81,041 (50.5 ms) | 54,169 (75.6 ms) | 53,990 | 144 ms | 50,022 | 44 / 14.5 | 2.75 | ITERATIONS 22, LS 3890 |
+| A1 [`1791414`](https://github.com/pulipakaa24/mujoco_warp/commit/17914144d132dec4c0aa3bccfe743816faec72c9) | 81,077 (50.5 ms) | 54,272 (75.5 ms) | 54,225 | 152 ms | 50,022 | 43 / 14.4 | 2.77 | ITERATIONS 26, LS 3887 |
+| B1 [`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc) | 81,014 (50.6 ms) | 54,035 (75.8 ms) | 54,023 | 149 ms | 49,937 | 44 / 14.4 | 2.75 | ITERATIONS 16, LS 3863 |
+| A2 [`1791414`](https://github.com/pulipakaa24/mujoco_warp/commit/17914144d132dec4c0aa3bccfe743816faec72c9) | 81,287 (50.4 ms) | 54,077 (75.7 ms) | 53,836 | 147 ms | 49,823 | 43 / 14.2 | 2.70 | ITERATIONS 12, LS 3877 |
+| B2 [`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc) | 81,041 (50.5 ms) | 54,169 (75.6 ms) | 53,990 | 144 ms | 50,022 | 44 / 14.5 | 2.75 | ITERATIONS 22, LS 3890 |
 | spread A vs B | 0.3 % | 0.4 % | 0.7 % | 5 % (update, MPS) | 0.4 % | | | |
 
 Step profile (20 replays, ms per control step; `solver.solve` per substep):
 
 | run | physics segment | whole step graph | solver.solve / substep | mjw.step / substep | dispatches (step / substep) |
 |---|---|---|---|---|---|
-| A1 `1791414` | 70.07 | 72.98 (56,127 env-steps/s) | 5.69 | 9.41 | 1653 / 202 |
-| B1 `07a51a6` | 69.76 | 73.02 (56,094) | 5.74 | 9.40 | 1653 / 202 |
-| A2 `1791414` | 69.78 | 72.89 (56,194) | 5.72 | 9.41 | 1653 / 202 |
-| B2 `07a51a6` | 69.83 | 73.13 (56,007) | 5.72 | 9.32 | 1653 / 202 |
-| headline (`runs/mjw_tp/final_checks.log`, 10:01 the same day, fork `1791414`) | 54.24 | 58.52 (69,999) | 4.23 | 8.13 | 1653 / 202 |
-| other machine (`runs/competitors/metalsim_g1_step_profile.log`, `07a51a6`) | 68.16 | 71.29 (57,457) | 5.50 | 9.13 | 1653 / 202 |
+| A1 [`1791414`](https://github.com/pulipakaa24/mujoco_warp/commit/17914144d132dec4c0aa3bccfe743816faec72c9) | 70.07 | 72.98 (56,127 env-steps/s) | 5.69 | 9.41 | 1653 / 202 |
+| B1 [`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc) | 69.76 | 73.02 (56,094) | 5.74 | 9.40 | 1653 / 202 |
+| A2 [`1791414`](https://github.com/pulipakaa24/mujoco_warp/commit/17914144d132dec4c0aa3bccfe743816faec72c9) | 69.78 | 72.89 (56,194) | 5.72 | 9.41 | 1653 / 202 |
+| B2 [`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc) | 69.83 | 73.13 (56,007) | 5.72 | 9.32 | 1653 / 202 |
+| headline (`runs/mjw_tp/final_checks.log`, 10:01 the same day, fork [`1791414`](https://github.com/pulipakaa24/mujoco_warp/commit/17914144d132dec4c0aa3bccfe743816faec72c9)) | 54.24 | 58.52 (69,999) | 4.23 | 8.13 | 1653 / 202 |
+| other machine (`runs/competitors/metalsim_g1_step_profile.log`, [`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc)) | 68.16 | 71.29 (57,457) | 5.50 | 9.13 | 1653 / 202 |
 
-**Verdict on the fork: not a code regression in `1791414..07a51a6`.** A and B agree within the run-to-run spread on
-every column, with the same kernels and dispatch counts. The other machine's `solver.solve` (5.50 ms) is if anything
-faster than this machine's today (5.7 ms), so the "14-inch, possibly power-limited" explanation is also wrong: the
-two machines agree once the same code runs on both.
+**Verdict on [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim): not a code regression
+in [`1791414..07a51a6`](https://github.com/pulipakaa24/mujoco_warp/compare/1791414...07a51a6).** A and B agree within
+the run-to-run spread on every column, with the same kernels and dispatch counts. The other machine's `solver.solve`
+(5.50 ms) is if anything faster than this machine's today (5.7 ms), so the "14-inch, possibly power-limited" explanation
+is also wrong: the two machines agree once the same code runs on both.
 
 **But the headline is not reproducible today at the headline's own fork commit**: physics-only matches (81.0–81.3 K
 vs 80.5–81.0 K) while the full env step is 54.1–54.3 K against 67.6 K, the loop 49.8–50.0 K against 55.8–56.3 K, and
@@ -67,26 +88,30 @@ the step and the profile are measured under random actions (contact-rich). The c
 and solver-side, with the same launches: more worlds are unconverged at each of the 10 Newton iterations (the
 per-thread `ctx.done` exit does less), and `ITERATIONS` overflow (worlds hitting the Newton cap) now appears in
 12–26 of 4096 worlds where the headline runs had none. That is the signature of a harder constraint problem, not of
-slower kernels: the MetalSim task, not the fork, changed between the headline session (MetalSim `d867143` +
-`df0fda1`) and now (`626f54c`).
+slower kernels: the MetalSim task, not my fork of MuJoCo Warp, changed between the headline session (MetalSim
+[`4ff65d5`](https://github.com/pulipakaa24/MetalSim/commit/4ff65d5f674c62da81e148d537249b7edf493dcc) + [`addb27e`](https://github.com/pulipakaa24/MetalSim/commit/addb27ec6e8df2c861162e438e0d1530ff878331)) and now ([`1595839`](https://github.com/pulipakaa24/MetalSim/commit/1595839cab992c8d2dd79ecdbec1569b1f2cc60b)).
 
-## 3. Mechanism: the task's contact preset (MetalSim `e3ba79f`)
+## 3. Mechanism: the task's contact preset (MetalSim [`b147342`](https://github.com/pulipakaa24/MetalSim/commit/b14734296ec0c692ac889ef661f672e2ee273e94))
 
-Candidates in `git diff df0fda1..626f54c -- metalsim/`: `e3ba79f` "G1 task: contact_cfg (default `recommended` =
+Candidates in MetalSim's `metalsim/` changes from [`addb27e`](https://github.com/pulipakaa24/MetalSim/commit/addb27ec6e8df2c861162e438e0d1530ff878331) to [`1595839`](https://github.com/pulipakaa24/MetalSim/commit/1595839cab992c8d2dd79ecdbec1569b1f2cc60b):
+[`b147342`](https://github.com/pulipakaa24/MetalSim/commit/b14734296ec0c692ac889ef661f672e2ee273e94) "G1 task: contact_cfg (default `recommended` =
 `tau10_impact_hardlimits`, the 2026-09-25 PhysX-parity decision)" makes every `G1VelocityTask` apply contact
 solref 10 ms / solimp 0.9→0.999 over 5 mm and hard joint limits (solref 5 ms, solimp 0.99→0.999 over 1 mm) instead
-of MuJoCo's 20 ms / 0.9–0.95 defaults; `ba0762a` / `13a57a4` (Isaac Lab 3.0 presets, only with `solver_cfg`),
-`aa88f11` (reward term on the foot COM), `109984b` (factorization defaults, the same layout for the G1), and render-only
-commits. The decision row for the preset (DECISIONS.md, 2026-09-25 "contact / limit preset, final") lists its cost
-as "1.02×", measured as 117.5 ms per step at 4096 envs, i.e. before the throughput work (when the 43×43 dense
-Cholesky was two thirds of physics and the solver's state-dependent work a small share). After the fast paths the
-fixed cost is gone and the state-dependent part is what is left.
+of [MuJoCo](https://github.com/google-deepmind/mujoco)'s 20 ms / 0.9–0.95 defaults; [`8a9c295`](https://github.com/pulipakaa24/MetalSim/commit/8a9c2951c4cc225e4b981845a5d07ef5461e9f03) /
+[`6073004`](https://github.com/pulipakaa24/MetalSim/commit/6073004f850b2b62d93881ee2a44db8a6e46d55b)
+([Isaac Lab](https://github.com/isaac-sim/IsaacLab) 3.0 presets, only with `solver_cfg`),
+[`12b4e33`](https://github.com/pulipakaa24/MetalSim/commit/12b4e33b2561a5292e73bb09487555bba0933a06) (reward term on the foot COM),
+[`9b14689`](https://github.com/pulipakaa24/MetalSim/commit/9b146890f30d7083b736ae219433f7fa5b199749) (factorization defaults, the same layout for the G1), and render-only commits. The decision row for
+the preset ([DECISIONS.md](../DECISIONS.md), 2026-09-25 "contact / limit preset, final") lists its cost as "1.02×",
+measured as 117.5 ms per step at 4096 envs, i.e. before the throughput work (when the 43×43 dense Cholesky was two
+thirds of physics and the solver's state-dependent work a small share). After the fast paths the fixed cost is gone and
+the state-dependent part is what is left.
 
 A/B at MetalSim HEAD, installed forks, interleaved R D R D (`runs/mjw_tp/cc.wrapper.log`): `contact_cfg="recommended"`
-(R, the task default since `e3ba79f`) against `contact_cfg=null` (D, the model's own solref/solimp: the headline
+(R, the task default since [`b147342`](https://github.com/pulipakaa24/MetalSim/commit/b14734296ec0c692ac889ef661f672e2ee273e94)) against `contact_cfg=null` (D, the model's own solref/solimp: the headline
 setting). Results in §3.1 (filled from the run).
 
-### 3.1 Results (`runs/mjw_tp/cc.wrapper.log`, 19:56–19:58, MetalSim `98a41c1`, forks `9050cb54` / `1791414`, AC power, idle GPU)
+### 3.1 Results (`runs/mjw_tp/cc.wrapper.log`, 19:56–19:58, MetalSim [`1209b4e`](https://github.com/pulipakaa24/MetalSim/commit/1209b4e40e87d38372f4ba74974c0199a234c619), forks [`9050cb54`](https://github.com/pulipakaa24/warp/commit/9050cb5452de26ca6c80871bee15c389c06f9b10) / [`1791414`](https://github.com/pulipakaa24/mujoco_warp/commit/17914144d132dec4c0aa3bccfe743816faec72c9), AC power, idle GPU)
 
 | run | physics only | full env step | rollout + inference | PPO update | full PPO loop | nefc mean | nacon / world | overflow |
 |---|---|---|---|---|---|---|---|---|
@@ -115,10 +140,11 @@ the fixed cost, so the harder problem the preset poses (hard limits with solref 
 impedance 0.99–0.999 over 1 mm; contacts stiff on impact) now shows directly: worlds stay unconverged for more of
 the 10 Newton iterations (the per-thread `ctx.done` exit does less work per launch), and 12–28 of 4096 worlds hit
 the Newton cap (`ITERATIONS` overflow) every measured step where the headline setting had none. The cap is a cost cap
-(PARITY §1.4 note), but a world leaving the solver at the cap is a world whose constraint forces are less converged:
-the preset's owner should know that its solve is not only slower but also not fully converged in ~0.5 % of worlds at
-10 iterations (a fidelity observation, not acted on here: the preset is a PhysX-parity decision and fidelity
-decides). Which part of the preset carries the cost (hard limits vs the 10 ms impact contacts) is in §3.2.
+([PARITY §1.4](../PARITY.md#14-throughput-on-the-g1-task-isaacs-protocol-4096-envs) note), but a world leaving the
+solver at the cap is a world whose constraint forces are less converged: the preset's owner should know that its solve
+is not only slower but also not fully converged in ~0.5 % of worlds at 10 iterations (a fidelity observation, not acted
+on here: the preset is a [PhysX](https://github.com/NVIDIA-Omniverse/PhysX)-parity decision and fidelity decides). Which
+part of the preset carries the cost (hard limits vs the 10 ms impact contacts) is in §3.2.
 
 ### 3.2 Decomposition (`runs/mjw_tp/cc2.wrapper.log`, 20:13–20:15, `g1_tp_variants.py --quick`, interleaved)
 
@@ -144,24 +170,27 @@ throughput decision.
 ## 4. Generality: where the G1 fast paths apply (task D)
 
 The three Metal fast paths and their conditions (`scripts/diagnostics/g1_tp_generality.py` prints them per scene from
-the built model): **register Cholesky** (Warp fork: one SIMD group, no workspaces) for Newton Hessians with
-nv ≤ `metal_register_cholesky_max` (48); MuJoCo Warp launches the single-tile Cholesky off CUDA for nv ≤ 64
-(`MJW_METAL_DENSE_CHOL_MAX`), so 49–64 dofs take the cooperative tile path (the G1's pre-step-1 state, physics
-1.4× slower) and above 64 the blocked path (−18 % measured on the G1 when forced); **M layout**: the dense tile for
-trees up to `m_dense_max` (32) dofs, the one-thread-per-world sparse L'DL above; **fused incremental Hessian +
-Cholesky**: Newton solver, non-elliptic cone (MuJoCo Warp's incremental Hessian is pyramidal-only:
-`_use_incremental`), dense constraint Jacobian (`jacobian=auto` goes sparse above 32 dofs), nv ≤ 64.
+the built model): **register Cholesky** ([my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim): one SIMD
+group, no workspaces) for Newton Hessians with nv ≤ `metal_register_cholesky_max` (48); MuJoCo Warp launches the
+single-tile Cholesky off CUDA for nv ≤ 64 (`MJW_METAL_DENSE_CHOL_MAX`), so 49–64 dofs take the cooperative tile path
+(the G1's pre-step-1 state, physics 1.4× slower) and above 64 the blocked path (−18 % measured on the G1 when forced);
+**M layout**: the dense tile for trees up to `m_dense_max` (32) dofs, the one-thread-per-world sparse L'DL above;
+**fused incremental Hessian + Cholesky**: Newton solver, non-elliptic cone (MuJoCo Warp's incremental Hessian is
+pyramidal-only: `_use_incremental`), dense constraint Jacobian (`jacobian=auto` goes sparse above 32 dofs), nv ≤ 64.
 
-Measured 2026-09-25 19:41–19:48 on this machine (`runs/mjw_tp/gen.wrapper.log`, installed fork `1791414`, 4096
-worlds; Go2 by the competitor protocol `scripts/diagnostics/competitors/metalsim_step.py go2 4096 matched`,
-4 ms, PD, 10 / 20 iterations, random targets; SO-101 lift and Panda by `fast_factorization_scenes.throughput`,
-their own `BatchSimOptions`, fixed random ctrl, 3 builds × 3 × 50 steps, median; kernel shares from the eager
-`WP_METAL_PROFILE=1` sum of per-dispatch times, an attribution not a timing):
+Measured 2026-09-25 19:41–19:48 on this machine (`runs/mjw_tp/gen.wrapper.log`,
+[my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) installed at
+[`1791414`](https://github.com/pulipakaa24/mujoco_warp/commit/17914144d132dec4c0aa3bccfe743816faec72c9), 4096 worlds;
+Go2 by the competitor protocol `scripts/diagnostics/competitors/metalsim_step.py go2 4096 matched`, 4 ms, PD, 10 / 20
+iterations, random targets; [SO-101](https://github.com/TheRobotStudio/SO-ARM100/tree/main/Simulation/SO101) lift and
+Panda by `fast_factorization_scenes.throughput`, their own `BatchSimOptions`, fixed random ctrl, 3 builds × 3 × 50
+steps, median; kernel shares from the eager `WP_METAL_PROFILE=1` sum of per-dispatch times, an attribution not a
+timing):
 
 | model (scene default cone) | nv / substeps | register Cholesky | M | fused Hessian | pyramidal | elliptic | elliptic / pyramidal |
 |---|---|---|---|---|---|---|---|
 | G1 task (pyramidal, forced dense) | 43 / 8 | yes | sparse L'DL | yes | 81 K env-steps/s physics, 54 K step (§2) | not run (the elliptic agent's worktree) | – |
-| Go2, menagerie scene (elliptic) | 18 / 1 | yes | dense tile | pyramidal only | 932,628 physics steps/s | 239,935 | 3.9× |
+| Go2, [menagerie](https://github.com/google-deepmind/mujoco_menagerie) scene (elliptic) | 18 / 1 | yes | dense tile | pyramidal only | 932,628 physics steps/s | 239,935 | 3.9× |
 | SO-101 lift scene (elliptic) | 12 / 4 | yes | dense tile | pyramidal only | 292,171 env-steps/s (1.17 M physics steps/s) | 122,534 (490 K) | 2.4× |
 | Panda, menagerie scene (pyramidal; 100 / 50 iterations) | 9 / 10 | yes | dense tile | pyramidal only | 28,403 env-steps/s (284 K physics steps/s) | 9,923 (99 K) | 2.9× |
 
@@ -185,9 +214,9 @@ launch per iteration, exactly the cost class the G1 work removed elsewhere. Esti
 paths to elliptic cones: if the JTCJ term cost what the pyramidal JTDAJ assembly costs on the same scene (SO-101:
 34.5 → ~2 ms per env step), SO-101 elliptic would go from 52 to ~20 ms of GPU time per step, i.e. from 123 K to an
 estimated 250–280 K env-steps/s (2.0–2.3×), and Panda elliptic from 9.9 K to an estimated 25 K; Go2 elliptic
-(240 K, JTCJ 19.0 of 24.0 ms) to an estimated 700–850 K physics steps/s. That is the elliptic-cone work already under way in the fork
-worktree `upstream/mujoco_warp-ellip` (`docs/HANDOFF_elliptic_cone_perf.md`), so it is reported here, not done.
-Whether a task uses elliptic cones is a fidelity choice (slip), not a throughput knob: the SO-101 lift scene's
+(240 K, JTCJ 19.0 of 24.0 ms) to an estimated 700–850 K physics steps/s. That is the elliptic-cone work already under
+way in my fork's worktree `upstream/mujoco_warp-ellip` (`docs/HANDOFF_elliptic_cone_perf.md`), so it is reported here,
+not done. Whether a task uses elliptic cones is a fidelity choice (slip), not a throughput knob: the SO-101 lift scene's
 2.4× should not be taken by switching its cone.
 
 ## 5. Ledger updates, contamination check, what is left open
@@ -205,14 +234,17 @@ Whether a task uses elliptic cones is a fidelity choice (slip), not a throughput
 - Tools: `scripts/diagnostics/g1_tp_variants.py` and `g1_step_profile.py` take `contact_cfg` / `solver_cfg` in
   `MJW_TP_VARIANT` (null = the headline setting); `scripts/diagnostics/g1_tp_generality.py` prints the fast-path flags
   of any scene and measures it. Worktree `upstream/mujoco_warp-07a51a6` (read-only, for `PYTHONPATH` A/Bs).
-- For the main session: the shared checkout `upstream/mujoco_warp` is 11 commits behind `fork/metalsim`; the A/B
-  says fast-forwarding it to `07a51a6` costs the G1 nothing. Not done here (shared checkout, rule 5). Warp
-  `upstream/warp-innate` is 3 commits behind for the same reason (flex-only). No fork fix branch was needed
-  (`metalsim-tp-regress` not created: there is nothing to fix in the fork).
+- For the main session: the shared checkout `upstream/mujoco_warp` is 11 commits behind the `metalsim` branch of
+  [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim); the A/B says fast-forwarding it to
+  [`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc) costs the G1
+  nothing. Not done here (shared checkout, rule 5). Warp `upstream/warp-innate` is 3 commits behind for the same reason
+  (flex-only). No fork fix branch was needed (`metalsim-tp-regress` not created: there is nothing to fix in my fork).
 - Open: (1) the Newton cap hits under the preset (12–28 worlds of 4096 per step): whether those worlds' forces are
   acceptably converged is a fidelity question for the preset's owner (a cheap probe: `iterations` 20 vs 10 under
   the preset on the state-difference protocol, `g1_tp_check.py`); (2) rough terrain was not re-measured under the
   preset (the README's rough 41.9 K is the default-contact number); (3) the elliptic-cone Hessian grid
   (§4) is the one place a fast path is missing for models in the repository, owned by the elliptic-cone session;
-  (4) the other machine's Warp `4127c48` is not in this repository's remote, so that commit remains unmeasured here
-  (its measured numbers match this machine's, so nothing suggests it matters).
+  (4) the other machine's Warp
+  [`4127c48`](https://github.com/pulipakaa24/warp/commit/4127c4818334080de6f3d23aef522e582ff6a2a7) is not in this
+  repository's remote, so that commit remains unmeasured here (its measured numbers match this machine's, so nothing
+  suggests it matters).

@@ -17,29 +17,35 @@ came out of this is in `docs/HANDOFF_elliptic_cone_perf.md`.
 
 - **Nothing matches MetalSim as a whole on a Mac.** No other project combines all of these on an Apple
   GPU:
-  - Isaac Lab tasks run from Isaac's own assets and configuration;
-  - parity measured against Isaac Sim and Isaac Lab;
+  - [Isaac Lab](https://github.com/isaac-sim/IsaacLab) tasks run from Isaac's own assets and configuration;
+  - parity measured against [Isaac Sim](https://github.com/isaac-sim/IsaacSim) and Isaac Lab;
   - rendering, lidar and radar on Metal's ray-tracing hardware;
-  - Replicator-layout data;
+  - [Replicator](https://docs.omniverse.nvidia.com/extensions/latest/ext_replicator.html)-layout data;
   - camera RL.
-- **On raw physics speed on a Mac, Genesis is the only serious rival.** Measured here with matched
-  cones, it is on par on the Go2 and slower on the G1. Where Genesis leads (elliptic cones, 1.3–1.9×),
-  the cause is a Metal launch-size problem in MuJoCo Warp that can be fixed (see the handoff).
+- **On raw physics speed on a Mac, [Genesis](https://github.com/Genesis-Embodied-AI/genesis-world) is the only
+  serious rival.** Measured here with matched cones, it is on par on the Go2 and slower on the G1. Where
+  Genesis leads (elliptic cones, 1.3–1.9×), the cause is a Metal launch-size problem in
+  [MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp) that can be fixed (see the
+  [handoff](../HANDOFF_elliptic_cone_perf.md)).
 - **NVIDIA hardware beats MetalSim on throughput**, whether local (RTX 4090/5090, DGX Spark) or rented
   (Brev L40S, about $1/hr). So does real Isaac on fidelity, by definition. None of it runs on the Mac.
-- **The threat to watch** is official Isaac Lab on a Mac GPU through warp-metal plus Isaac Lab 3.0's
-  kit-less Newton/MuJoCo Warp path (GA targeted for about the end of October 2026). That would take
-  away task parity as a differentiator. The renderer, sensors and Replicator output would remain.
+- **The threat to watch** is official Isaac Lab on a Mac GPU through
+  [warp-metal](https://github.com/innate-inc/warp-metal) plus Isaac Lab 3.0's kit-less
+  [Newton](https://github.com/newton-physics/newton)/MuJoCo Warp path (GA targeted for about the end of
+  October 2026). That would take away task parity as a differentiator. The renderer, sensors and Replicator
+  output would remain.
 
 ## 2. Measured here
 
 **Head-to-head, physics only** (`metalsim_step.py`, `genesis_step.py`):
-- same Menagerie MJCF (Go2, G1) in both engines;
+- same [Menagerie](https://github.com/google-deepmind/mujoco_menagerie) MJCF (Go2, G1) in both engines;
 - joint PD to random targets around `home`, resampled every 20 steps;
 - 4 ms step, 4096 envs, Newton solver at 10 / 20 iterations;
 - synchronized, 1000 steps after 100 warm-up steps.
 
-Genesis is v1.4.2 (`a4b45ff`) on `gs.metal` with torch on MPS.
+Genesis is v1.4.2
+([`a4b45ff`](https://github.com/Genesis-Embodied-AI/genesis-world/commit/a4b45ff15242c349bbc8fb988d25545666134b19))
+on `gs.metal` with torch on MPS.
 
 | model, friction cone | MetalSim steps/s | Genesis steps/s | ratio (MetalSim / Genesis) |
 |---|---|---|---|
@@ -65,31 +71,37 @@ Log: `runs/competitors/cone.log`.
 
 - **Go2:** the load is equal.
 - **G1:** MetalSim solves about 2× the contacts. That is likely MuJoCo C's plane-to-convex contact set
-  (4 per pair, MuJoCo Warp fork `284dcd1`) against Genesis's smaller set. So the pyramidal G1 lead
+  (4 per pair, [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) at
+  [`284dcd1`](https://github.com/pulipakaa24/mujoco_warp/commit/284dcd12ff37d56ea0201ade4e7f941d772a0f28)) against
+  Genesis's smaller set. So the pyramidal G1 lead
   (1.23×) comes with twice the contacts.
 
 The physics agrees across engines: the final mean base height is Go2 0.189 vs 0.188, and G1 0.084 vs
 0.092. The G1 falls under these random targets in both engines.
 
 **End-to-end RL:**
-- **Genesis's own `examples/locomotion/go2_train.py`** at 4096 envs on Metal/MPS, rsl-rl 5.5.1:
-  170–171K env-steps/s for the full PPO loop (collection 0.30 s + learning 0.27 s per iteration),
-  steady over 30 iterations, reward rising. Log: `runs/competitors/genesis_go2_4096.log`.
+- **Genesis's own `examples/locomotion/go2_train.py`** at 4096 envs on Metal/MPS,
+  [rsl-rl](https://github.com/leggedrobotics/rsl_rl) 5.5.1: 170–171K env-steps/s for the full PPO loop
+  (collection 0.30 s + learning 0.27 s per iteration), steady over 30 iterations, reward rising. Log:
+  `runs/competitors/genesis_go2_4096.log`.
   - This is the first public evidence that Genesis locomotion trains end to end on a Mac GPU. I found
     no published M-series figure.
   - It is not comparable to the G1 task: 12 actuators, 2 substeps of 10 ms, no self-collision,
     pyramidal cones and a short reward set, against the G1's 43 DoF, 8 substeps of 2.5 ms and Isaac's
     full task.
-- **MetalSim G1 flat** at `main` `fbaab25` on this machine (`g1_tp_variants.py 4096`), with the README
-  figures in parentheses:
+- **MetalSim G1 flat** at `main`
+  [`e3cb2aa`](https://github.com/pulipakaa24/MetalSim/commit/e3cb2aa0afe135478146820781013056c455131e) on this
+  machine (`g1_tp_variants.py 4096`), with the [README](../../README.md) figures in parentheses:
   - physics only 84.1K (81.0K);
   - full env step 55.2K (67.6K);
   - full PPO loop 50.2K (56.6K).
   - The difference is in `solver.solve`: 5.50 ms per substep against 4.23 ms. It is open; see the
-    handoff doc.
+    [handoff doc](../HANDOFF_elliptic_cone_perf.md).
 
-**MuJoCo-MLX-Cpp** (`20niship/MuJoCo-MLX-Cpp` `3ae0e4a`):
-- Built against MuJoCo 3.5.0 and MLX 0.32.2 (it pins 0.31.2).
+**MuJoCo-MLX-Cpp** ([`20niship/MuJoCo-MLX-Cpp`](https://github.com/20niship/MuJoCo-MLX-Cpp)
+[`3ae0e4a`](https://github.com/20niship/MuJoCo-MLX-Cpp/commit/3ae0e4a6a9a9de800d03b75526e17402d862afb4)):
+- Built against [MuJoCo](https://github.com/google-deepmind/mujoco) 3.5.0 and [MLX](https://github.com/ml-explore/mlx)
+  0.32.2 (it pins 0.31.2).
 - Its own `bench_baseline`, one process per benchmark, a 120 s cap, 3 repeats.
 - MetalSim ran under the same protocol (`metalsim_mlxprotocol.py`): model file as is, Euler, zero
   control, reset included, solver budget from the XML (100 / 50).
@@ -103,9 +115,9 @@ The physics agrees across engines: the final mean base height is Go2 0.189 vs 0.
 
 Logs: `runs/competitors/mlx_only.log`, `metalsim_mlxprotocol.log`.
 
-- Its README's 331K steps/s (8192 envs) and 73K training SPS are **published**, on Gymnasium
-  Humanoid-v5, and were not reproduced here. Its training benchmarks need `arghyasur1991/MuJoCo-MLX`,
-  which returned 404 during the survey.
+- Its README's 331K steps/s (8192 envs) and 73K training SPS are **published**, on
+  [Gymnasium](https://github.com/Farama-Foundation/Gymnasium) Humanoid-v5, and were not reproduced here. Its
+  training benchmarks need `arghyasur1991/MuJoCo-MLX`, which returned 404 during the survey.
 - It hung on 1 in 3 of the larger runs.
 - Its Go2 lead is the elliptic-cone issue again: nothing in its source uses the `ELLIPTIC` enum it
   defines, so it solves the Go2 with pyramidal cones.
@@ -113,29 +125,34 @@ Logs: `runs/competitors/mlx_only.log`, `metalsim_mlxprotocol.log`.
 ## 3. Other simulators that run on the Apple GPU
 
 **innate-inc/warp-metal (David Dobas)**
-- What it is: a Metal backend for NVIDIA Warp, adding a `metal:0` device next to stock `warp-lang`.
-  Needs macOS 15+.
+- What it is: a Metal backend for NVIDIA [Warp](https://github.com/NVIDIA/warp), adding a `metal:0` device
+  next to stock `warp-lang`. Needs macOS 15+.
   - [repo](https://github.com/innate-inc/warp-metal)
   - [release 1.18.0.dev20260917](https://github.com/DavidDobas/warp-metal/releases/tag/v1.18.0.dev20260917)
 - Coverage: graph capture, tiles, backward passes, mesh/BVH/volume.
-- Gaps: no float64, 32-bit atomics only, no fixedarray. MuJoCo Warp and mjlab need patch branches.
+- Gaps: no float64, 32-bit atomics only, no fixedarray. MuJoCo Warp and [mjlab](https://github.com/mujocolab/mjlab) need
+  patch branches.
 - **Published:** mjlab G1 velocity, 1024 envs, about 1.0 s per training iteration on an M5 Pro, against
   0.3 s on an RTX 5090. **Estimated:** about 25K env-steps/s, assuming 24 steps per env per
   iteration.
-- It is MetalSim's own base (the Warp fork is on innate-inc/warp `ce15f6b`), not a rival stack. It has
-  no rendering, sensors or Isaac parity.
+- It is MetalSim's own base ([my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) is on
+  [innate-inc/warp](https://github.com/innate-inc/warp)
+  [`ce15f6b`](https://github.com/innate-inc/warp/commit/ce15f6bb2545e2d6c4a4c1fac8e40bb800db7265)), not a
+  rival stack. It has no rendering, sensors or Isaac parity.
 
 **Genesis World** (Genesis AI: $105M seed in July 2025; Genesis World 1.0, Nyx and Quadrants in May 2026)
-- Physics on Metal: Quadrants (Genesis's Taichi fork) compiles the rigid, MPM, SPH, PBD and FEM
+- Physics on Metal: [Quadrants](https://github.com/Genesis-Embodied-AI/quadrants) (Genesis's
+  [Taichi](https://github.com/taichi-dev/taichi) fork) compiles the rigid, MPM, SPH, PBD and FEM
   solvers for Metal. Limits:
   - no float64 on Metal;
   - some compiler optimisations forced off on macOS (NaNs);
   - a Metal-only BVH workaround in the raycaster (`genesis/engine/bvh.py`).
 - CUDA only:
-  - the Madrona batch renderer, which is its fast camera-RL path;
+  - the [Madrona](https://github.com/shacklettbp/madrona) batch renderer, which is its fast camera-RL path;
   - Nyx, its photoreal renderer (x86-64 Linux/Windows with an NVIDIA GPU);
-  - the IPC solver (uipc).
-- On a Mac, rendering is OpenGL rasterization or the LuisaRender path tracer (Metal 3+, denoiser off).
+  - the IPC solver ([uipc](https://github.com/spiriMirror/libuipc)).
+- On a Mac, rendering is OpenGL rasterization or the [LuisaRender](https://github.com/LuisaGroup/LuisaRender)
+  path tracer (Metal 3+, denoiser off).
 - Correctness: open Quadrants Metal miscompiles
   [#925](https://github.com/Genesis-Embodied-AI/quadrants/issues/925) (atomics in branches, filed
   2026-09-24) and [#835](https://github.com/Genesis-Embodied-AI/quadrants/issues/835) (a local vector
@@ -195,7 +212,7 @@ no rendering, a 2-week-old repo at the time of the survey.
 The Isaac Lab paper ([arXiv 2511.04831](https://arxiv.org/html/2511.04831v1)) shows G1 rough on an RTX
 5090 at about 50–80K FPS with training. That is **estimated**, read off a figure. Tiled cameras reach
 100K+ FPS at 64×64 with 1024 envs on an RTX PRO 6000, far above MetalSim's 12.7K camera cartpole.
-MetalSim's own L4 measurements are in PARITY §1.4 and §1.8.
+MetalSim's own measurements on the NVIDIA L4 GPU are in [PARITY](../PARITY.md) §1.4 and §1.8.
 
 **DGX Spark (GB10, $4,699).**
 - **Published:** about 65K sim steps/s on `Isaac-Velocity-Rough-H1-v0` at 512 envs
@@ -209,7 +226,8 @@ MetalSim's own L4 measurements are in PARITY §1.4 and §1.8.
 - Newton 1.0 went GA at GTC in March 2026, under the Linux Foundation (NVIDIA, DeepMind, Disney).
   **Published** (NVIDIA): MuJoCo Warp up to 252× MJX for locomotion and 475× for manipulation on an
   RTX PRO 6000 ([Dataconomy](https://dataconomy.com/2026/03/17/nvidia-launches-newton-1-0-physics-engine-for-industrial-robot-training/)).
-- Isaac Lab 3.0 is multi-backend and kit-less; see `isaaclab3_reference_2026-09-25.md`.
+- Isaac Lab 3.0 is multi-backend and kit-less; see
+  [`isaaclab3_reference_2026-09-25.md`](isaaclab3_reference_2026-09-25.md).
 
 **MuJoCo Playground / MJX** ([arXiv 2502.08844](https://arxiv.org/html/2502.08844v1)):
 - **Published** on an A100: G1 joystick about 106K steps/s, Go1 about 417K, pixel cartpole with Madrona

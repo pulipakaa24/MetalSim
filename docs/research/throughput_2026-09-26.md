@@ -5,15 +5,20 @@ within the measured run-to-run floor, rewards / observations / renders bit-ident
 that changes a result is reported as an option, not landed. Every number is labelled measured / estimated with its
 scope. GPU numbers go through the timing queue (`scripts/gpu_run.sh ... timing`, idle GPU logged at both ends);
 logs in `runs/tp26/`. Fork work in the worktrees `upstream/mujoco_warp-tp` and `upstream/warp-innate-tp` (branches
-`metalsim-tp`), imported through `PYTHONPATH` inside the jobs (the import path is printed in every log); the shared
-checkouts are untouched. Starting point: MetalSim `05cc873`, MuJoCo Warp fork `fe6fe71`, Warp fork `4127c48`;
-G1 flat task, 4096 envs, 2.5 ms x 8 substeps, `contact_cfg="recommended"` (the task default): full env step
-54.1-54.3 K env-steps/s, `solver.solve` 5.7 ms per substep (`docs/research/throughput_regression_2026-09-25.md`).
+`metalsim-tp` of [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-tp) and
+[my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim-tp)), imported through `PYTHONPATH` inside the jobs
+(the import path is printed in every log); the shared checkouts are untouched. Starting point: MetalSim
+[`7e90a62`](https://github.com/pulipakaa24/MetalSim/commit/7e90a62785b5137ea5ea889646ac3bf891c014d2), my fork of MuJoCo
+Warp at [`fe6fe71`](https://github.com/pulipakaa24/mujoco_warp/commit/fe6fe711edf70de2449e30fa62d54c430f6a6e7e), my fork
+of Warp at [`4127c48`](https://github.com/pulipakaa24/warp/commit/4127c4818334080de6f3d23aef522e582ff6a2a7); G1 flat
+task, 4096 envs, 2.5 ms x 8 substeps, `contact_cfg="recommended"` (the task default): full env step 54.1-54.3 K
+env-steps/s, `solver.solve` 5.7 ms per substep (`docs/research/throughput_regression_2026-09-25.md`).
 
 ## 1. Where the preset's 19.5 % goes: Newton iterations and re-factorizations (measured, CPU device)
 
-`scripts/diagnostics/g1_solver_iters.py` hooks `_solver_iteration` on Warp's CPU device (the iteration path is the
-Metal one up to float noise) and counts, per Newton iteration over 64 worlds x 64 substeps of random actions from
+`scripts/diagnostics/g1_solver_iters.py` hooks `_solver_iteration` on [Warp](https://github.com/NVIDIA/warp)'s CPU
+device (the iteration path is the Metal one up to float noise) and counts, per Newton iteration over 64 worlds x 64
+substeps of random actions from
 the init pose (`runs/tp26/solver_iters_cpu.log`):
 
 | preset | solver_niter mean / p90 / max | at the cap | re-factorizations per world-substep (iterations 1-10, initial excluded) | flips per re-factorizing world | worlds with a state change but no quadratic flip |
@@ -23,15 +28,17 @@ the init pose (`runs/tp26/solver_iters_cpu.log`):
 | `recommended` (= tau10_impact_hardlimits) | 2.95 / 5 / 10 | 10 of 4096 (0.2 %) | **1.93** | 2.25 | 0 |
 | `isaaclab3_every_substep_cap20` (cap 20, tol 1e-6) | 2.10 / 4 / 8 | 0 | 1.10 | 2.58 | 0 |
 
-Reading: MuJoCo Warp re-factorizes the full 43 x 43 Hessian (`_update_gradient_h_incremental_cholesky`: delta
-update of H, then the register Cholesky and the solve) for every world with any constraint-state change in an
+Reading: [MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp) re-factorizes the full 43 x 43 Hessian
+(`_update_gradient_h_incremental_cholesky`: delta update of H, then the register Cholesky and the solve) for every world
+with any constraint-state change in an
 iteration; the preset raises those from 1.41 to 1.93 per world-substep and the mean iteration count from 2.4 to
 2.95, on top of the initial factorization every substep. There is never a state change without a quadratic flip,
 so reusing a stored factor ("solve only") has no case to serve. (Scope: 64 worlds from the init pose; the 4096-env
 random-action state on the GPU has more contacts, nefc mean 14.3 vs 9.8 here.)
 
-Precedent: MuJoCo C 3.14 `engine_solver.c` `HessianIncremental` maintains the factor with rank-1 Cholesky
-updates / downdates (`mju_cholUpdate`) per changed constraint and refactorizes only when an update loses rank.
+Precedent: [MuJoCo](https://github.com/google-deepmind/mujoco) C 3.14 `engine_solver.c` `HessianIncremental` maintains
+the factor with rank-1 Cholesky updates / downdates (`mju_cholUpdate`) per changed constraint and refactorizes only when
+an update loses rank.
 Numerics of the same scheme in float32 on the real H sequence (`scripts/diagnostics/g1_chol_update_numerics.py`,
 16 worlds x 48 substeps, recommended preset, `runs/tp26/chol_numerics_budget.log`): search-direction error against
 float64, relative, over all iteration solves: refactorization (what MuJoCo Warp does) median 8.4e-8, p99 1.1e-5,
@@ -43,12 +50,13 @@ is irrelevant), so the rank-1 path is **not a free-fidelity change at the source
 
 ## 2. Cholesky-side kernels: the register solve landed (+5.2 %), the L'DL lanes rejected
 
-### 2a. Register triangular solve for the Newton Hessian (Warp fork `metalsim-tp` 27e63fd + a5b65da)
+### 2a. Register triangular solve for the Newton Hessian (Warp fork [`metalsim-tp`](https://github.com/pulipakaa24/warp/tree/metalsim-tp) [`27e63fd`](https://github.com/pulipakaa24/warp/commit/27e63fd1476596b08f11dfa89a822490adabf6e5) + [`a5b65da`](https://github.com/pulipakaa24/warp/commit/a5b65da1e673caebdbec4772fc27ea4675e0f14f))
 
 `tile_cholesky_solve` with a vector right-hand side ran Warp's cooperative scalar path on Metal: two threadgroup
 barriers per row per sweep (172 barriers for the G1's 43 dofs) with the factor and the vector in threadgroup
-memory. The fork's register Cholesky already keeps the factor's columns in the 32 lanes' registers; the new
-`metal_register_cholesky_solve` (`warp/native/tile_solve.h`) uses the same layout: forward substitution reduces each
+memory. The register Cholesky of [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) already keeps the
+factor's columns in the 32 lanes' registers; the new `metal_register_cholesky_solve` (`warp/native/tile_solve.h`) uses
+the same layout: forward substitution reduces each
 row's dot product with `simd_sum`, back substitution broadcasts `x_i` with `simd_shuffle`, no barriers inside the
 sweeps. It applies to every `tile_cholesky_solve` of size <= `metal_register_cholesky_max` (48) in a block of <= 32
 lanes: the initial and every per-iteration Newton solve of the G1 (pyramidal and elliptic paths alike).
@@ -60,12 +68,13 @@ register vs float64 4.0e-7 at n = 48 (cooperative 4.6e-7). Knob: `warp.config.me
 0.516 -> 0.335 ms per 4096 (n = 32: 0.160 -> 0.106, n = 48: 0.799 -> 0.521), factor + solve 1.146 -> 1.039;
 G1 full env step 73.4-73.5 -> **69.8-69.9 ms (55,752-55,795 -> 58,587-58,718 env-steps/s, +5.2 %)**, physics
 only 83.3 -> 85.5 K. A compact two-column register layout tried alongside (`metal_compact_register_cholesky`,
-bitwise the same factor) measured 5-8 % slower on factor + solve and is archived off (DECISIONS).
+bitwise the same factor) measured 5-8 % slower on factor + solve and is archived off ([DECISIONS](../DECISIONS.md)).
 
-### 2b. Lane-parallel sparse L'DL factorization and solve of M (MuJoCo Warp fork `metalsim-tp` 7245794 / 778cf9e): rejected
+### 2b. Lane-parallel sparse L'DL factorization and solve of M (MuJoCo Warp fork [`metalsim-tp`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-tp) [`7245794`](https://github.com/pulipakaa24/mujoco_warp/commit/7245794f9e7d81864b1f4203e0b138222b7e7275) / [`778cf9e`](https://github.com/pulipakaa24/mujoco_warp/commit/778cf9efe462796a8c4935aa107b5bc9f7fe9dcf)): rejected
 
-The fork's one-world-per-thread `_factor_i_sparse_serial` / `_solve_LD_sparse_serial` (2026-09-25, chosen because
-MuJoCo Warp's level-per-launch form costs a full drain per level) run 2242 dependent FMAs per world for the G1's
+The one-world-per-thread `_factor_i_sparse_serial` / `_solve_LD_sparse_serial` of
+[my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) (2026-09-25, chosen because MuJoCo
+Warp's level-per-launch form costs a full drain per level) run 2242 dependent FMAs per world for the G1's
 factorization, twice per substep (M, and M - dt D for the implicit integrator), plus two solves: ~1.25 ms of the
 8.1 ms substep in the eager per-kernel profile (`runs/mjw_tp/profile8.log`, physics segment: 0.51 and 0.23 ms per
 launch, each including ~0.06 ms of eager dispatch overhead). The level schedule (`io.py`) keys a level by the
@@ -79,18 +88,23 @@ over a level's updates in parallel (distinct targets). Schedule tables are built
 (`qLD_updates_byrow`, `qLD_lane_pairs`, `qLD_lane_rows` and offsets; a row's pairs never straddle a 32-lane block
 because the diagonal lane reads the raw L[k, i] before storing the scaled one and relies on lockstep).
 Correctness (`scripts/diagnostics/ldl_lanes_check.py`, Metal, 64 worlds of random poses): factor and solve
-**bitwise equal** to the serial kernels on the G1 task (nv 43, 434 nonzeros, 14 levels), the menagerie Go2 (18,
+**bitwise equal** to the serial kernels on the G1 task (nv 43, 434 nonzeros, 14 levels), the
+[menagerie](https://github.com/google-deepmind/mujoco_menagerie) Go2 (18,
 all-sparse layout) and the DeepMind humanoid (27); solve residual against the dense M 3.3e-6 / 8.2e-7 / 5.3e-6.
 **Measured slower and archived** (`runs/tp26/regsolve*.wrapper.log`): the first form (factor in a threadgroup
 tile) 0.80 vs 0.45 ms per 4096 factorizations and 0.31 vs 0.22 per solve, G1 step 83.6 vs 75.2 ms: Warp's shared-tile
-element accesses synchronize per access; rewritten on device memory with one barrier per level (fork 778cf9e, still
-bitwise) 0.57 / 0.27 ms, step 72.7 vs 69.9 ms with the register solve. The per-level barriers and the six root
+element accesses synchronize per access; rewritten on device memory with one barrier per level (my fork,
+[`778cf9e`](https://github.com/pulipakaa24/mujoco_warp/commit/778cf9efe462796a8c4935aa107b5bc9f7fe9dcf), still bitwise)
+0.57 / 0.27 ms, step 72.7 vs 69.9 ms with the register solve. The per-level barriers and the six root
 levels with one to six busy lanes cost more than the 7x shorter dependency chain saves. Kept behind
-`MJW_METAL_LDL_LANES=1` (default off, fork 2026-09-26); the serial one-world-per-thread kernels stay.
+`MJW_METAL_LDL_LANES=1` (default off, my fork, 2026-09-26); the serial one-world-per-thread kernels stay.
 
 A third form, one lane per single-child chain of the dof tree per level (the G1: 12 chains in 4 levels, dependent
 chain 105 updates instead of 391; the solve keeps the serial summation order bitwise, the factor's cross-chain
-updates are atomic as upstream's CUDA `_qLD_acc`; fork cdc4fd4 / e068734, `MJW_METAL_LDL_CHAINS=1`), correct to
+updates are atomic as upstream's CUDA `_qLD_acc`; my fork at
+[`cdc4fd4`](https://github.com/pulipakaa24/mujoco_warp/commit/cdc4fd45b874d78de6ffdb26d4925c18a1926643) /
+[`e068734`](https://github.com/pulipakaa24/mujoco_warp/commit/e0687342bbbf65777edcc2d1c22fad690c59c478),
+`MJW_METAL_LDL_CHAINS=1`), correct to
 6e-7 relative (`runs/tp26/chains2.wrapper.log`), is also slower: factor 0.65 ms, solve 0.37, G1 step 72.9 vs
 67.2 ms. Three parallel forms lose to the serial kernel: the per-world work is memory-latency bound (391
 dependent updates at ~1 us each), and the SIMD-group forms add barriers while most lanes idle. Left as the
@@ -145,7 +159,7 @@ bound holds over 60 random-action steps at 64 envs; a deliberately small capacit
 |---|---|---|
 | task capacities njmax 256 / nconmax 32 (the flat task's values: its flat branch takes the heightfield capacities) | 81,534 / 81,520 | 54,385 / 54,340 (75.3 ms) |
 | bound njmax 144 / nconmax 24 | 83,400 / 83,339 | **55,741 / 55,646 (73.5 ms), +2.5 %** |
-| Isaac Lab 3.0 preset (`isaaclab3_every_substep_cap20`), task capacities | 71,803 | 56,301 (72.8 ms) |
+| [Isaac Lab](https://github.com/isaac-sim/IsaacLab) 3.0 preset (`isaaclab3_every_substep_cap20`), task capacities | 71,803 | 56,301 (72.8 ms) |
 | Isaac Lab 3.0 preset, bound | 74,480 | **58,287 (70.3 ms), +3.6 %** |
 
 The G1 flat task now uses the bound by default (`g1_velocity.py`; heightfield / box terrains keep their explicit
@@ -169,7 +183,7 @@ than pretend. Recommendation for the task owner: keep the guard, and size `nconm
 | rough (boxes_local, 4096, `--quick`, interleaved R N R N) | physics only | full env step | Newton cap hit |
 |---|---|---|---|
 | `recommended` (task default) | 63,922 / 63,969 | **45,268 / 45,217 (90.5 ms)** | 23-25 worlds |
-| `contact_cfg=None` (the README's rough setting) | 64,355 / 64,370 | 53,843 / 53,988 (76.0 ms) | none |
+| `contact_cfg=None` (the [README](../../README.md)'s rough setting) | 64,355 / 64,370 | 53,843 / 53,988 (76.0 ms) | none |
 
 The preset costs 19 % of the rough step as on flat, all of it in the solve (physics-only, standing robots, is
 equal). The rough step profile's "outside physics 24.9 ms" is the state artifact already documented on 2026-09-25
@@ -214,7 +228,7 @@ at 48. Rejected: thread-memory arrays cost far more than the unrolled code; the 
 its n = 43 cost is unexplained by these two hypotheses (register pressure limiting resident SIMD groups remains the
 candidate; a 64-lane / two-SIMD-group form with one threadgroup exchange per column is the untested option).
 
-### 2c. Fused per-iteration update launch (MuJoCo Warp fork `metalsim-tp`, in measurement)
+### 2c. Fused per-iteration update launch (MuJoCo Warp fork [`metalsim-tp`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-tp), in measurement)
 
 `_update_constraint_gradient_fused`: the five launches between the line search and the Hessian update (zero the
 change counters, `_update_constraint_efc`, `qfrc_constraint = J^T force`, `_update_gradient_zero_grad_dot`,
@@ -224,8 +238,10 @@ a SIMD-group sum of per-lane partials instead of atomic adds in arbitrary order 
 9 -> 5 launches per iteration. Knob `MJW_METAL_FUSE_UPDATE=0`. **Measured** (`runs/tp26/fuse.wrapper.log`, interleaved F U F U,
 4096, recommended, bound capacities, register solve on in both): full env step 69.9-70.1 -> **67.4 ms
 (58,439-58,589 -> 60,762-60,803 env-steps/s, +3.9 %)**, physics only 85.5-85.9 -> 90.2-90.3 K; the solve per substep
-6.24 -> 5.92 ms (iterations 6-10 now 0.15-0.23 ms each, from 0.18-0.26). Landed (fork dd42c23). State-difference
-protocol: `runs/tp26/check*.wrapper.log`.
+6.24 -> 5.92 ms (iterations 6-10 now 0.15-0.23 ms each, from 0.18-0.26). Landed in
+[my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) as
+[`dd42c23`](https://github.com/pulipakaa24/mujoco_warp/commit/dd42c23b14287ebdc05fdb6a2c762e9aa3422bc5).
+State-difference protocol: `runs/tp26/check*.wrapper.log`.
 
 ## 7. The learning loop outside physics (measured, `runs/tp26/loop.wrapper.log`, `loop2.wrapper.log`, 4096 envs)
 
@@ -277,11 +293,13 @@ of 512, LS 476-481 in both). The fused launches alone (`runs/tp26/check2.wrapper
 
 ## 8. Elliptic cones: the cone term as rank-1 updates of the stored factor (coordinator item; in measurement)
 
-With the elliptic incremental path (fork head 9b4e96a, mode 2) the remaining elliptic premium on the G1 task is a
-per-entry cone term plus a full register Cholesky of htot = h + cone every iteration for worlds with CONE rows.
+With the elliptic incremental path ([my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim)
+at [`9b4e96a`](https://github.com/pulipakaa24/mujoco_warp/commit/9b4e96af2ddec285e0f58595fbba27c31a64852a), mode 2) the
+remaining elliptic premium on the G1 task is a per-entry cone term plus a full register Cholesky of htot = h + cone
+every iteration for worlds with CONE rows.
 MuJoCo C (`engine_solver.c` `HessianConeUpdate`) copies L into Lcone and applies dim rank-1 updates per cone contact
 with v = L_con' Z (L_con the Cholesky of the contact's local curvature). Implemented on `metalsim-tp` (MuJoCo Warp
-2d37... `MJW_ELLIPTIC_CONE_UPDATE=1`, Warp `tile_cholesky_update_inplace` with a register form: lanes own rows, L[k,k]
+`MJW_ELLIPTIC_CONE_UPDATE=1`, Warp `tile_cholesky_update_inplace` with a register form: lanes own rows, L[k,k]
 and x[k] broadcast by SIMD shuffle, no barriers): `_cone_vectors` builds the vectors per world (worlds above
 `MJW_CONE_UPDATE_KMAX` = 6 cone rows keep the per-entry path), the factor of h is stored in `ctx.hfactor` and reused
 across iterations without a quadratic flip. Cone statistics on the G1 task with `tau10_impact_hardlimits_ellip10`
@@ -323,8 +341,13 @@ task (ellip10), Go2, humanoid, SO-101: `runs/tp26/cone.wrapper.log`.
 
 All at 4096 envs, 2.5 ms x 8, `contact_cfg="recommended"`, `g1_tp_variants.py` (full: physics only, full env step,
 rollout + inference, PPO update, full PPO loop), timing queue, idle GPU logged. "Before" is the day's start
-(`runs/mjw_tp/cc.wrapper.log` R1 / R2, 2026-09-25 evening, the same code as this morning: MetalSim 98a41c1,
-forks fe6fe71 / 4127c48, task capacities njmax 256 / nconmax 32, policy mapping A). "After" is the worktrees
+(`runs/mjw_tp/cc.wrapper.log` R1 / R2, 2026-09-25 evening, the same code as this morning: MetalSim
+[`1209b4e`](https://github.com/pulipakaa24/MetalSim/commit/1209b4e40e87d38372f4ba74974c0199a234c619),
+[my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) at
+[`fe6fe71`](https://github.com/pulipakaa24/mujoco_warp/commit/fe6fe711edf70de2449e30fa62d54c430f6a6e7e),
+[my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) at
+[`4127c48`](https://github.com/pulipakaa24/warp/commit/4127c4818334080de6f3d23aef522e582ff6a2a7), task capacities njmax
+256 / nconmax 32, policy mapping A). "After" is the worktrees
 `metalsim-tp` (register solve, fused per-iteration launches; L'DL lanes / chains, compact layout, rolled form
 and the cone update off) with the capacity bound and the policy mapping D (F1 / F2, 06:40).
 
@@ -336,7 +359,9 @@ and the cone update off) with the capacity bound and the policy mapping D (F1 / 
 
 Attribution from the interleaved A/Bs (env step): capacity bound +2.5 % (75.3 -> 73.5 ms), register solve +5.2 %
 (73.5 -> 69.9), fused launches +3.9 % (69.9 -> 67.4); rollout: policy mapping D +2.0 % (74.2 -> 72.8 ms per step
-before the fork changes). The same job's B runs, the installed forks (now 9b4e96a) with njmax 512 / nconmax 128
+before the fork changes). The same job's B runs, the installed forks (now
+[`9b4e96a`](https://github.com/pulipakaa24/mujoco_warp/commit/9b4e96af2ddec285e0f58595fbba27c31a64852a)) with njmax 512
+/ nconmax 128
 forced, measure 84.0-84.6 ms per step (48,441-48,767; loop 48,060-48,147): the capacity-sized launches cost 12 %
 between 256 / 32 and 512 / 128, which is why the bound (144 / 24) and the overflow guard matter beyond the 2.5 %.
 
@@ -379,11 +404,13 @@ mapping bitwise. Learning untouched (no reward, observation, reset or update cha
 
 ### 11.1 Persistent per-world iteration loop (estimate, not built yet)
 
-Upstream MuJoCo Warp (and Newton through it) exits early on CUDA with `wp.capture_while` (a conditional graph node
-re-launching `_solver_iteration` while `nsolving > 0`); Warp's Metal backend has no conditional node and MetalSim
+Upstream MuJoCo Warp (and [Newton](https://github.com/newton-physics/newton) through it) exits early on CUDA with
+`wp.capture_while` (a conditional graph node re-launching `_solver_iteration` while `nsolving > 0`); Warp's Metal
+backend has no conditional node and MetalSim
 sets `graph_conditional = False`, so all 10 iterations are launched and converged worlds exit per thread. A
 per-world persistent loop is expressible on Metal: one 32-lane kernel per world running `while not done:` over
-the fused iteration body (shared tiles inside data-dependent loops are freed per scope by the fork's arena, and
+the fused iteration body (shared tiles inside data-dependent loops are freed per scope by the arena of
+[my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim), and
 MuJoCo Warp already loops tile ops in the JTDAJ kernel). What it can and cannot save, from the measured marginal
 costs (4b): an iteration with no active world costs 0.07-0.10 ms (its 5 launches after the fusion), one with a few
 active worlds 0.15-0.23 ms, so the launch share of the tail (iterations 5-10 under the preset) is ~0.07 ms x 6 =
@@ -400,8 +427,11 @@ porting anything; it needs the Warp backend to expose the ICB commands to a kern
 
 ### 11.2 The 43-dof register Cholesky: 64-lane form (built, in measurement) and the block split (already measured)
 
-64-lane form (Warp fork `metalsim-tp` 2834cf31, `WP_METAL_CHOL64`; MuJoCo Warp `MJW_METAL_CHOL_LANES=64`): two
-SIMD groups per world, one column per lane (43 registers instead of 86), the owner's unscaled column and pivot
+64-lane form (branch [`metalsim-tp`](https://github.com/pulipakaa24/warp/tree/metalsim-tp) of
+[my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) at
+[`2834cf31`](https://github.com/pulipakaa24/warp/commit/2834cf31b4ae8f4689d1185b2e3ef4a41ec0029f), `WP_METAL_CHOL64`;
+MuJoCo Warp `MJW_METAL_CHOL_LANES=64`): two SIMD groups per world, one column per lane (43 registers instead of 86), the
+owner's unscaled column and pivot
 exchanged through the tile's own column storage with one threadgroup barrier per column, every lane forming the
 same `column[i] * (1/d)` products the 32-lane form broadcasts (bitwise expected), the register solve run by group
 0 with group 1 idling at the barriers. **Measured** (`runs/tp26/chol64.wrapper.log`): bitwise equal to the 32-lane
@@ -422,7 +452,10 @@ on 2026-09-25 (core 19 + arms 24, tile ops): 1.35 vs 1.11 ms per 4096 solves, re
 The estimate that motivated it: the serial kernel's 0.45 ms is 391 dependent updates at ~1 us each (device
 memory round trips per element on one thread with ~3 SIMD groups resident per core); the same dependency chain
 with the factor in registers costs a shuffle-latency per update (~10 ns) if every register index is a compile-time
-constant. Design (MuJoCo Warp fork `metalsim-tp` f4276b0, `MJW_METAL_LDL_UNROLLED`, default on when it measures):
+constant. Design (branch [`metalsim-tp`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-tp) of
+[my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) at
+[`f4276b0`](https://github.com/pulipakaa24/mujoco_warp/commit/f4276b02359875187e28a1ede7e46828019d1974),
+`MJW_METAL_LDL_UNROLLED`, default on when it measures):
 lane j of a 32-lane world holds position j of every row of the factor (43 registers), the model's update list is
 emitted as straight-line native code (a `wp.func_native` snippet generated per model layout: 4,087 lines for the
 factor, 1,785 for the solve), each update two `simd_shuffle`s (L[k,i], L[k,k]), one divide, one predicated FMA,
@@ -436,8 +469,9 @@ estimate: the 782 dependent shuffles are ~30 cycles each, not 10). The unrolled 
 is a 782-step dependent shuffle chain with nothing else to overlap: 0.79 vs 0.21 ms, archived
 (`MJW_METAL_LDL_UNROLLED_SOLVE=1`). G1 step A/B (interleaved U S U S, worktrees): physics only 90,618-90,708 ->
 **93,922-93,985 env-steps/s (+3.6 %)**, full env step 60,996-61,248 -> 61,432-62,657 (+1.5 % mean; one pair inside
-the +-1 % step noise). Landed as the Metal default for models with <= 32 entries per row and <= 64 dofs (fork
-05ad3f0; the schedule is built in `put_model`, so no device read happens inside a graph capture).
+the +-1 % step noise). Landed as the Metal default for models with <= 32 entries per row and <= 64 dofs (my fork,
+[`05ad3f0`](https://github.com/pulipakaa24/mujoco_warp/commit/05ad3f0bafed756f02efc6f2fd572afb9867376d); the schedule is
+built in `put_model`, so no device read happens inside a graph capture).
 
 ### 11.4 Rough loop with everything landed (measured, `runs/tp26/rough2.wrapper.log`, 08:33)
 
@@ -452,8 +486,11 @@ its capacities are not model-boundable. The flat loop in the same job: 56,079 (s
 
 ### 11.5 Camera-RL path (measured, `runs/tp26/camera.wrapper.log`, 08:37-08:40)
 
-Isaac-Cartpole-RGB (1024 envs, tier 0, Isaac's skrl configuration), 458,752 env-steps of training per run
-(34-39 s), landed forks vs the day's starting forks (07a51a6 / f194006a through `PYTHONPATH`), interleaved: after
+Isaac-Cartpole-RGB (1024 envs, tier 0, Isaac's [skrl](https://github.com/Toni-SM/skrl) configuration), 458,752 env-steps
+of training per run (34-39 s), landed forks vs the day's starting forks
+([`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc) /
+[`f194006a`](https://github.com/pulipakaa24/warp/commit/f194006a4cf197fda93633252af81bc3f57f5561) through `PYTHONPATH`),
+interleaved: after
 13,369 / 12,931 env-steps/s including training, before 12,655 / 11,802. The 4-7 % difference is inside the spread
 of two runs of the same configuration at this length (13,369 vs 12,931; 12,655 vs 11,802) and the physics is
 0.6-0.8 % of this step (the update is 66-70 %, the policy's torch CNN inference 29-34 %; the Warp MLP mapping does not
@@ -464,8 +501,12 @@ float-noise state differences documented in 5b.
 ### 11.6 The `test_g1_fast_factorization` failure of 08:41 (not a code regression)
 
 `runs/il3/fullsuite2.log` failed `test_defaults_and_previous_values_reachable` with "`_factor_i_sparse_serial`:
-Warp kernels cannot return values". The test passes at the fork head (worktree, 3 passed, 09:0x). The run had
-imported `mujoco_warp` from the shared checkout at a1daf88 at 08:41; the checkout was fast-forwarded to edae7b7
+Warp kernels cannot return values". The test passes at the head of
+[my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) (worktree, 3 passed, 09:0x). The run
+had imported `mujoco_warp` from the shared checkout at
+[`a1daf88`](https://github.com/pulipakaa24/mujoco_warp/commit/a1daf88e13b50ae85243fca53f6d51e87766eefc) at 08:41; the
+checkout was fast-forwarded to
+[`edae7b7`](https://github.com/pulipakaa24/mujoco_warp/commit/edae7b761a81b67a882375e2cf6c2424a1a237b7)
 at 08:43:13 (reflog) while the run was still compiling kernels (its log shows fresh compiles after that). Warp
 reads a kernel's source from its file at build time, so the 250-line-longer `smooth.py` gave the serial kernel a
 shifted source that ended in the next function's `return kernel`. The archived serial path is intact; the
@@ -484,9 +525,10 @@ stays landed.
 
 ### 11.8 Residency test and the split-loop step (measured, `runs/tp26/resid3.wrapper.log`, 09:43)
 
-`scripts/diagnostics/metal_cholesky_residency.py`: the fork's register Cholesky step and register solve templates
-called from a native snippet on H read from device memory, in a plain launch with 32 lanes per world and 1 / 2 / 4 /
-8 worlds per threadgroup, all bitwise equal to the tile path. n = 43: tile path 1.065 ms per 4096 factor + solve;
+`scripts/diagnostics/metal_cholesky_residency.py`: the register Cholesky step and register solve templates of
+[my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) called from a native snippet on H read from device
+memory, in a plain launch with 32 lanes per world and 1 / 2 / 4 / 8 worlds per threadgroup, all bitwise equal to the
+tile path. n = 43: tile path 1.065 ms per 4096 factor + solve;
 the snippet with the **generic** step 4.16 / 4.12 / 4.12 / 4.12 ms (1 / 2 / 4 / 8 worlds per threadgroup: residency
 changes nothing, hypothesis rejected); the snippet with the **split-loop** step (scalar column pivots `ljc0` /
 `ljc1` instead of a per-lane array, the second column's update guarded by the compile-time row index; the same
@@ -502,16 +544,22 @@ was: the cost is the register form's shuffle chain itself, on one SIMD group, an
 today beats it. The G1 step with everything landed (unrolled L'DL factor included) in this job: 65.4-65.8 ms,
 62,272-62,644 env-steps/s.
 
-### 11.9 Test suites (fork heads mujoco_warp 0a9de8e / f33005f, warp 9df9acee)
+### 11.9 Test suites (fork heads mujoco_warp [`0a9de8e`](https://github.com/pulipakaa24/mujoco_warp/commit/0a9de8e5cd098bb9c878dc5f5b98d2b53252aec3) / [`f33005f`](https://github.com/pulipakaa24/mujoco_warp/commit/f33005fef3dd61c907f629c6e68571df22ce7195), warp [`9df9acee`](https://github.com/pulipakaa24/warp/commit/9df9acee341ddd4aad9e16d43b86a96ae86c645f))
 
 `runs/tp26/tests4.wrapper.log` (09:42): mujoco_warp `_src` suite **1451 passed, 1 failed, 39 skipped** = the
 baseline (the failure, `io_test::test_put_data_nefc_zero_dense`, is the pre-existing one: MuJoCo 3.14 returns nefc
 1 for that model; it fails identically in `runs/mjw_tp/full_tests2.log`). The 09:27 run (8 failed / 1444) had the
-unrolled schedule as a dataclass field, which broke `io_jax_test` (5) and `types_test` (1): fixed in 0a9de8e (a
+unrolled schedule as a dataclass field, which broke `io_jax_test` (5) and `types_test` (1): fixed in
+[`0a9de8e`](https://github.com/pulipakaa24/mujoco_warp/commit/0a9de8e5cd098bb9c878dc5f5b98d2b53252aec3) (a
 plain attribute; the JAX-converted model then takes the serial kernel). Warp `test_metal`: 15 passed, 1 failed
-(`test_print_strings_are_per_kernel`), which fails identically on the pre-session fork f194006a (a stdout-capture
+(`test_print_strings_are_per_kernel`), which fails identically on
+[my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) before the session, at
+[`f194006a`](https://github.com/pulipakaa24/warp/commit/f194006a4cf197fda93633252af81bc3f57f5561) (a stdout-capture
 test, not a kernel change). MetalSim: 51 passed (physics / capacity / policy / rollout / fast factorization / G1
-task terms). On frozen worktrees (per-job checkouts at 0a9de8e / 9df9acee that nothing edits while the jobs run,
+task terms). On frozen worktrees (per-job checkouts at
+[`0a9de8e`](https://github.com/pulipakaa24/mujoco_warp/commit/0a9de8e5cd098bb9c878dc5f5b98d2b53252aec3) /
+[`9df9acee`](https://github.com/pulipakaa24/warp/commit/9df9acee341ddd4aad9e16d43b86a96ae86c645f) that nothing edits
+while the jobs run,
 `runs/tp26/suite2.wrapper.log`, 09:43-09:48): **MetalSim whole suite 246 passed, 0 failed** (including
 `test_g1_fast_factorization.py` and `test_g1_parity.py`, whose earlier single failures were the file-changed-during-
 compile race of 11.6, reproduced once more by my own worktree edit during the 09:39 run); **mujoco_warp 1451 passed,
@@ -521,7 +569,8 @@ remaining jobs: measurement and test jobs import frozen per-job worktrees, never
 ## 12. Camera-RL round (Isaac-Cartpole-RGB, 1024 envs, tier 0): plan and what the code already does
 
 Assignment: the camera path at 12.9-13.4 K env-steps/s including training (RTX 4090 published 32 K); physics is
-< 1 % of the step. Known split (research note `metal_cnn_update_2026-09-24.md` section 7.5): per iteration of
+< 1 % of the step. Known split (research note [`metal_cnn_update_2026-09-24.md`](metal_cnn_update_2026-09-24.md) section
+7.5): per iteration of
 65,536 env-steps, update ~3.2 s (64 %), rollout ~1.8 s (35 %: policy inference + rendering), env 0.7 %; the update's
 estimated hardware floor 1.7-2.0 s. Read before profiling:
 

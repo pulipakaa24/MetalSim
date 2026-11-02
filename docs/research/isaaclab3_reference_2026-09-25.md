@@ -1,18 +1,21 @@
 # Isaac Lab 3.0 Early Access as the parity reference (research, 2026-09-25)
 
-Question: what has to change to make Isaac Lab 3.0.0-EA the reference for MetalSim, on both of its
-physics backends (Isaac Sim PhysX and Newton / MuJoCo Warp), so that MetalSim (MuJoCo Warp on Metal)
+Question: what has to change to make [Isaac Lab](https://github.com/isaac-sim/IsaacLab) 3.0.0-EA the reference for
+MetalSim, on both of its physics backends ([Isaac Sim](https://github.com/isaac-sim/IsaacSim)
+[PhysX](https://github.com/NVIDIA-Omniverse/PhysX) and [Newton](https://github.com/newton-physics/newton) /
+[MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp)), so that MetalSim (MuJoCo Warp on Metal)
 is compared like for like against Isaac's own MuJoCo Warp on NVIDIA hardware and against PhysX?
 
-Sources are cited inline. "Source" means the v3.0.0-EA tag of `isaac-sim/IsaacLab`
-(commit `ae37b028ea415c91ea2bc32609efcd759ed2b974`, 2026-09-16, `VERSION` = 3.0.0), read directly;
-paths are relative to the repository root.
+Sources are cited inline. "Source" means the [v3.0.0-EA tag](https://github.com/isaac-sim/IsaacLab/tree/v3.0.0-EA) of
+`isaac-sim/IsaacLab` (commit
+[`ae37b028ea415c91ea2bc32609efcd759ed2b974`](https://github.com/isaac-sim/IsaacLab/commit/ae37b028ea415c91ea2bc32609efcd759ed2b974),
+2026-09-16, `VERSION` = 3.0.0), read directly; paths are relative to the repository root.
 
 ## 1. Release facts (v3.0.0-EA)
 
 - Release page: https://github.com/isaac-sim/IsaacLab/releases/tag/v3.0.0-EA (published
   2026-09-16T22:34Z, tag `v3.0.0-EA` on branch `release/3.0.0`). Built for **Isaac Sim 6.1**,
-  Python 3.12, PyTorch 2.11, Warp 1.16, Newton 1.5.2. General Availability targeted for the end of
+  Python 3.12, PyTorch 2.11, [Warp](https://github.com/NVIDIA/warp) 1.16, Newton 1.5.2. General Availability targeted for the end of
   October 2026; `release/3.0.0` takes only fixes until then.
 - Pins in `pyproject.toml` `[tool.isaaclab.versions]` and `[tool.uv].override-dependencies`:
   `isaacsim[all,extscache]==6.1.0.0`, `torch==2.11.0`, `torchvision==0.26.0`, `warp==1.16.0`,
@@ -59,7 +62,7 @@ Requirements: Python 3.12, Ubuntu 22.04+ (badge: 24.04), GLIBC ≥ 2.35 for the 
 production branch, **580.95.05 or later** on Linux x86_64 (same page). The Isaac Sim requirements page
 (https://docs.isaacsim.omniverse.nvidia.com/latest/installation/requirements.html, "latest" at the time
 of reading) lists Linux driver **595.58.03**, 50 GB SSD minimum, RTX-core GPUs only (A100/H100 not
-supported). Our L4 machine runs 580.178.04: above Isaac Lab's floor, below Isaac Sim's listed driver; we
+supported). Our NVIDIA L4 GPU machine runs 580.178.04: above Isaac Lab's floor, below Isaac Sim's listed driver; we
 install without touching the driver (the 5.1 environment must stay intact) and record whether anything
 fails. Non-interactive EULA: `OMNI_KIT_ACCEPT_EULA=yes`. First Kit launch can take > 10 min
 (extension download).
@@ -109,13 +112,13 @@ against our copies in `assets/isaac/`):
   asset root (`isaaclab/utils/assets.py`, `_ISAAC_SIM_ASSET_RELEASE = "6.1"`), to be hashed against
   our 5.1 copy.
 - Contact sensor prim regex `{ENV_REGEX_NS}/Robot/.*` → `/Robot/[^/]*` (direct children only).
-- PPO: rsl_rl 5.4.1 config shape (`actor`/`critic` `RslRlMLPModelCfg`, `obs_groups`), same
-  hyper-parameters. Flat: 1500 iterations on every backend. Rough: `max_iterations =
-  preset(default=3000, newton_mjwarp=5000)`, with NVIDIA's comment: "Newton needs ~1.7x the PPO
-  iterations to match PhysX on G1 ... The gap is sample-efficiency, not a ceiling — no physics or
-  reward tuning closes it" (`config/g1/agents/rsl_rl_ppo_cfg.py`).
+- PPO: [rsl_rl](https://github.com/leggedrobotics/rsl_rl) 5.4.1 config shape (`actor`/`critic`
+  `RslRlMLPModelCfg`, `obs_groups`), same hyper-parameters. Flat: 1500 iterations on every backend.
+  Rough: `max_iterations = preset(default=3000, newton_mjwarp=5000)`, with NVIDIA's comment: "Newton
+  needs ~1.7x the PPO iterations to match PhysX on G1 ... The gap is sample-efficiency, not a ceiling —
+  no physics or reward tuning closes it" (`config/g1/agents/rsl_rl_ppo_cfg.py`).
 - Physics step: `sim.dt = 0.005`, decimation 4 (unchanged). On Newton, `num_substeps = 2`, so
-  **MuJoCo Warp integrates at 2.5 ms**, which is the step MetalSim already trains at (PARITY §1.5).
+  **MuJoCo Warp integrates at 2.5 ms**, which is the step MetalSim already trains at ([PARITY](../PARITY.md) §1.5).
 
 ## 5. Newton / MuJoCo Warp solver settings as exposed and as the G1 tasks set them
 

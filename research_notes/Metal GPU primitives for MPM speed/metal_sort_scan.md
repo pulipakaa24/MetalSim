@@ -1,8 +1,8 @@
 # GPU parallel primitives on Apple Silicon / Metal: stable radix sort, prefix scan, run-length encode
 
-Scope: what to port into a Warp fork's Metal backend to replace the host versions of `warp.utils.radix_sort_pairs`, `runlength_encode` and `array_scan` (~130 ms per step today for 0.5-2M-element sorts, plus a GPU drain per call). The target is an M4 Max with 40 cores, 32-wide SIMD groups and 32 KB threadgroup memory.
+Scope: what to port into [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim)'s Metal backend to replace the host versions of `warp.utils.radix_sort_pairs`, `runlength_encode` and `array_scan` (~130 ms per step today for 0.5-2M-element sorts, plus a GPU drain per call). The target is an M4 Max with 40 cores, 32-wide SIMD groups and 32 KB threadgroup memory.
 
-Reference point in Warp itself, read from the local Warp source checkout at `scratch/deformable/patchtest/fresh/w/warp/native/`:
+Reference point in [Warp](https://github.com/NVIDIA/warp) itself, read from the local Warp source checkout at `scratch/deformable/patchtest/fresh/w/warp/native/`:
 - The CUDA path calls `cub::DeviceRadixSort::SortPairs` with `cub::DoubleBuffer` and `begin_bit`/`end_bit`, which is why Warp's API requires keys and values buffers of size 2n (`sort.cu`).
 - `scan.cu` calls `cub::DeviceScan::InclusiveSum`/`ExclusiveSum`.
 - `runlength_encode.cu` calls `cub::DeviceRunLengthEncode::Encode`.
@@ -52,7 +52,7 @@ Use a multi-pass reduce-then-scan LSD radix sort (DeviceRadixSort / FidelityFX /
   - This supports 32- and 64-bit payloads using only relaxed 32-bit atomics.
   - Tuning used: workgroup 256, 16 elements per thread (tile 4096), about 1 KB of shared memory.
   - Source: [Decoupled-Fallback-Paper](https://github.com/b0nes164/Decoupled-Fallback-Paper)
-- **GPUPrefixSums repo.** It reports that Decoupled Fallback "shows promising results on Apple M GPU's" (9/2024), says its included code is out of date, and says active development moved to Vello. — [b0nes164/GPUPrefixSums](https://github.com/b0nes164/GPUPrefixSums)
+- **GPUPrefixSums repo.** It reports that Decoupled Fallback "shows promising results on Apple M GPU's" (9/2024), says its included code is out of date, and says active development moved to [Vello](https://github.com/linebender/vello). — [b0nes164/GPUPrefixSums](https://github.com/b0nes164/GPUPrefixSums)
 
 ### Inferences
 - **For the first port, take a reduce-then-scan LSD sort.**
@@ -115,7 +115,7 @@ None of the open, permissively licensed options is a drop-in Metal stable radix 
   - The linebender wiki reports about 3G elements/s for a Metal port with real subgroup ballots, on 16M elements. A stronger barrier cost about 2%. 4-bit digits; 8-bit "not yet yielded sustained gains" in WebGPU.
   - Sources: [compute-shader-101 PR #31](https://github.com/googlefonts/compute-shader-101/pull/31); [linebender wiki](https://linebender.org/wiki/gpu/sorting/)
 - **wgpu_sort (BSD-2).** WGSL re-implementation of Fuchsia's Vulkan radix sort, 32-bit key-value only. It guesses subgroup size by trial. No Apple numbers given; 1M pairs in 0.317 ms on an RTX A5000. — [KeKsBoTer/wgpu_sort](https://github.com/KeKsBoTer/wgpu_sort)
-- **FidelityFX Parallel Sort (MIT).** 4-bit digits (ranking via two 2-bit LSD passes); needs subgroup size of at least 16. — [linebender wiki](https://linebender.org/wiki/gpu/sorting/); license from the GitHub API for GPUOpen-Effects/FidelityFX-ParallelSort
+- **FidelityFX Parallel Sort (MIT).** 4-bit digits (ranking via two 2-bit LSD passes); needs subgroup size of at least 16. — [linebender wiki](https://linebender.org/wiki/gpu/sorting/); license from the GitHub API for [GPUOpen-Effects/FidelityFX-ParallelSort](https://github.com/GPUOpen-Effects/FidelityFX-ParallelSort)
 - **Kieber-Emmons.** "Memory Bandwidth Optimized Parallel Radix Sort in Metal for Apple M1 and Beyond" (Medium) builds radix sort on his Metal scan/reduce primitives. The page returned 403, so I could not get its numbers or code. — [medium.com/p/4f4590cfd5d3](https://medium.com/p/4f4590cfd5d3)
 - **Gaussian-splatting Metal projects** (msplat and others) mostly use per-tile bitonic sorts, not a global radix sort. — [msplat on PyPI](https://pypi.org/project/msplat/)
 
@@ -129,7 +129,7 @@ None of the open, permissively licensed options is a drop-in Metal stable radix 
 - **Bit-identical results.** A stable LSD radix sort over the same bit range gives exactly one possible output permutation. That should match Warp's host radix sort bit for bit, provided float and signed keys use the same order-preserving bit transform (sign-flip for ints, flip-all-if-negative for floats) and NaN and -0.0 handling matches the host. Verify -0.0 against +0.0 explicitly.
 
 ### Gaps
-- I found no published keys/s numbers for MLX argsort, PyTorch-MPS `torch.sort` (which uses MPSGraph), or Taichi/Genesis Metal sorts on M-series chips.
+- I found no published keys/s numbers for MLX argsort, PyTorch-MPS `torch.sort` (which uses MPSGraph), or [Taichi](https://github.com/taichi-dev/taichi)/[Genesis](https://github.com/Genesis-Embodied-AI/genesis-world) Metal sorts on M-series chips.
 - I could not check whether wgpu_sort or Fuchsia's sort runs correctly on Metal; Fuchsia's sort design was not verified here.
 - I found no independent M4 Max measurements of any Metal radix sort; all numbers are self-reported.
 

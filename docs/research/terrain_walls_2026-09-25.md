@@ -2,9 +2,9 @@
 
 2026-09-25. Scope: make the collision surface of Isaac-Velocity-Rough-G1-v0's terrain faithful to Isaac's on the
 vertical-wall sub-terrains (pyramid stairs, inverted pyramid stairs, random-grid boxes), where our 0.1 m heightfield
-turned walls into 0.1 m ramps (PARITY §1.2 terrain row, §1.5 "Rough terrain, like for like", GAPS "Vertical-wall
-terrain"). **measured** = run here (M4 Max; GPU work through `scripts/gpu_run.sh`); **reported** = from the cited
-source; **estimated** = our judgement.
+turned walls into 0.1 m ramps ([PARITY](../PARITY.md) §1.2 terrain row, §1.5 "Rough terrain, like for like",
+[GAPS](../GAPS.md) "Vertical-wall terrain"). **measured** = run here (M4 Max; GPU work through `scripts/gpu_run.sh`);
+**reported** = from the cited source; **estimated** = our judgement.
 
 Sources: [IL-mesh] https://github.com/isaac-sim/IsaacLab/blob/v2.3.2/source/isaaclab/isaaclab/terrains/trimesh/mesh_terrains.py
 (L100-146, L219-244 stairs; L305-366 random grid), [IL-gen] .../terrains/terrain_generator.py (L165-167, L382),
@@ -12,15 +12,23 @@ Sources: [IL-mesh] https://github.com/isaac-sim/IsaacLab/blob/v2.3.2/source/isaa
 [IL-hf] .../terrains/height_field/utils.py (L60-66, L130-150), [IL-rough] .../terrains/config/rough.py (L12-41);
 local copies in `assets/isaac/terrains/`. [MJ-hf] https://mujoco.readthedocs.io/en/latest/XMLreference.html#asset-hfield,
 [MJ-coll] https://mujoco.readthedocs.io/en/latest/computation/index.html#collision, [MJW] `upstream/mujoco_warp`
-(v3.14.0 + MetalSim patches; upstream main 7a060f6 for the table), [MJW-326] https://github.com/google-deepmind/mujoco_warp/issues/326,
-[MJW-1083] .../issues/1083, [mjlab] https://github.com/mujocolab/mjlab (main c2e1e06), [MP] https://github.com/google-deepmind/mujoco_playground
-(4057c14), [LG] https://github.com/leggedrobotics/legged_gym (8fa29ac).
+([my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim): v3.14.0 + MetalSim patches;
+upstream main
+[`7a060f6`](https://github.com/google-deepmind/mujoco_warp/commit/7a060f6054018b7c6c2c8944ce4a542573337521) for the
+table), [MJW-326] https://github.com/google-deepmind/mujoco_warp/issues/326, [MJW-1083] .../issues/1083, [mjlab]
+https://github.com/mujocolab/mjlab (main
+[`c2e1e06`](https://github.com/mujocolab/mjlab/commit/c2e1e06400e309b6897a536693fe5d2aa772c5b2)), [MP]
+https://github.com/google-deepmind/mujoco_playground
+([`4057c14`](https://github.com/google-deepmind/mujoco_playground/commit/4057c147714b6ac09b395377f1a1724bbeacc4d3)),
+[LG] https://github.com/leggedrobotics/legged_gym
+([`8fa29ac`](https://github.com/leggedrobotics/legged_gym/commit/8fa29acc6fd1910c3d9659eef6310bdd301cde0a)).
 
 ## 1. Research plan (what had to be known before building anything)
 
 1. What exactly Isaac collides with on these cells (geometry and collider type), so "faithful" has a definition.
 2. What MuJoCo can represent exactly (hfield, box, mesh, SDF), and what each costs in MuJoCo Warp (narrowphase
-   path, broadphase scaling with static geoms, contact capacity, the fork's hfield plane-contact patch).
+   path, broadphase scaling with static geoms, contact capacity, the hfield plane-contact patch in
+   [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim)).
 3. What the MuJoCo-based locomotion stacks (mjlab, MuJoCo Playground) do for stairs, and what legged_gym did
    (Isaac Lab's terrain code descends from it).
 4. Then measure every option on the same four axes: off-grid height error against Isaac's own mesh, G1 rough env-step
@@ -58,12 +66,12 @@ local copies in `assets/isaac/terrains/`. [MJ-hf] https://mujoco.readthedocs.io/
   `collision_sdf.py` with octree volumes), with their own cost and accuracy limits; not pursued because the boxes are
   already an exact decomposition.
 * **MuJoCo Warp narrowphase** [MJW `collision_driver.py` table, `collision_convex.py`]: HFIELD-MESH goes through
-  `ccd_hfield_kernel` (one thread per pair walking the prism sub-grid serially). In the MetalSim fork
-  (`HFIELD_PLANE_CONTACTS`, PARITY §1.6) each prism gives a contact against its top-triangle plane: a steep ramp
-  triangle gives a contact normal tilted by the ramp angle, and a foot that crosses the ramp strip is pushed up onto
-  the upper tread. BOX-MESH and MESH-MESH are CONVEX with MULTICCD (up to 4 contacts per pair), the same algorithm
-  family as MuJoCo C. HFIELD pairs get one contact per prism in the fork (upstream: at most 1 per pair under MULTICCD,
-  [MJW] `io.py` L637-668 warning).
+  `ccd_hfield_kernel` (one thread per pair walking the prism sub-grid serially). In
+  [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) (`HFIELD_PLANE_CONTACTS`, PARITY
+  §1.6) each prism gives a contact against its top-triangle plane: a steep ramp triangle gives a contact normal tilted
+  by the ramp angle, and a foot that crosses the ramp strip is pushed up onto the upper tread. BOX-MESH and MESH-MESH
+  are CONVEX with MULTICCD (up to 4 contacts per pair), the same algorithm family as MuJoCo C. HFIELD pairs get one
+  contact per prism in my fork (upstream: at most 1 per pair under MULTICCD, [MJW] `io.py` L637-668 warning).
 * **Broadphase cost** [MJW `io.py` L533-620]: all geom pairs are pre-filtered on the host (contype/conaffinity,
   same weld body, parent-child); static world geoms never pair with each other, so the terrain adds
   (robot colliders x terrain geoms) pairs. NXN is used below 250 k filtered pairs and launches
@@ -116,9 +124,11 @@ local copies in `assets/isaac/terrains/`. [MJ-hf] https://mujoco.readthedocs.io/
 
 Throughput: `scripts/diagnostics/terrain_walls_bench.py`, Isaac's benchmark protocol (G1 rough, `rough_isaac`
 rewards, 2.5 ms x 8 substeps, random actions, one captured graph per env step), synchronized rate over 110 steps,
-best of 3, 4096 envs unless stated, all in one GPU slot on the MuJoCo Warp fork at a8e6485 exported clean
-(`runs/terrain_walls/bench_pinned.jsonl`, `bench_pinned.log`, `bench_fine.log`; another agent was editing the fork's
-working tree during this work). Off-grid error: `scripts/diagnostics/terrain_wall_fidelity.py`, 40,000 uniform points
+best of 3, 4096 envs unless stated, all in one GPU slot on
+[my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) at
+[`a8e6485`](https://github.com/pulipakaa24/mujoco_warp/commit/a8e64857ea81c5277f55ec7a995adc1e99191e09) exported clean
+(`runs/terrain_walls/bench_pinned.jsonl`, `bench_pinned.log`, `bench_fine.log`; another agent was editing the working
+tree of my fork during this work). Off-grid error: `scripts/diagnostics/terrain_wall_fidelity.py`, 40,000 uniform points
 per sub-terrain type (all 10 rows), our collision top vs Isaac's `wp.mesh_query_ray` on Isaac's own terrain mesh
 (Isaac's generator run here), mean / p99 / max in mm; the analytic surface equals MuJoCo's `mj_ray` on the compiled
 model to 1e-13 m (`runs/terrain_walls/fidelity.json`, `fidelity_boxes_fine.json`). Step edge:
@@ -193,9 +203,10 @@ Our own policies (trained on the ramped heightfield) stay at 1-4 % falls on the 
 Default for the G1 rough task on MuJoCo Warp: **(a') boxes_local with the exact height scan** (fidelity: exact
 walls, exact scan, the largest transfer improvement; 27.8 K env-steps/s, 6 % below the heightfield's 29.5 K). Kept
 behind flags: `terrain_collision="hfield"` (the previous surface), `"boxes"`, `"meshes"`, `"hfield_fine"` (with
-`fine_res`), `"boxes_fine"`; `scan_surface="grid"`. Newton keeps the heightfield (no per-world box window). Not
-pursued: SDF / octree non-convex meshes (the boxes are already Isaac's exact decomposition), mjlab's height merging
-(changes Isaac's heights), a per-world hfield (MuJoCo Warp does not batch `hfield_data`).
+`fine_res`), `"boxes_fine"`; `scan_surface="grid"`. [Newton](https://github.com/newton-physics/newton) keeps the
+heightfield (no per-world box window). Not pursued: SDF / octree non-convex meshes (the boxes are already Isaac's exact
+decomposition), mjlab's height merging (changes Isaac's heights), a per-world hfield (MuJoCo Warp does not batch
+`hfield_data`).
 
 Caveats: renderers that draw the task model see only the lowered heightfield on box cells in boxes_local (the boxes
 live in `hfield["boxes"]` and per-world slots); `hfield_fine` at 4096 envs needs njmax 256 (the task asks for 512

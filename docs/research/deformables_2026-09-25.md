@@ -1,23 +1,27 @@
 # Deformables on Metal: MuJoCo flex through MuJoCo Warp, Isaac Lab's deformable coverage, alternatives
 
-2026-09-25. Scope: cloth, cables and soft volumes on the Apple GPU through MuJoCo Warp's flex path, as a step
-toward Isaac Lab's `DeformableObject`. Everything marked **measured** was run here (M4 Max; CPU runs on the Warp CPU
-device, Metal runs through `scripts/gpu_run.sh` at kind `low`); **reported** = from the cited source; **estimated** =
-our judgement.
+2026-09-25. Scope: cloth, cables and soft volumes on the Apple GPU through
+[MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp)'s flex path, as a step toward
+[Isaac Lab](https://github.com/isaac-sim/IsaacLab)'s `DeformableObject`. Everything marked **measured** was run here (M4
+Max; CPU runs on the [Warp](https://github.com/NVIDIA/warp) CPU device, Metal runs through `scripts/gpu_run.sh` at kind
+`low`); **reported** = from the cited source; **estimated** = our judgement.
 
 Sources: [MX] https://mujoco.readthedocs.io/en/latest/XMLreference.html (flexcomp, flex, deformable),
 [MM] https://mujoco.readthedocs.io/en/latest/modeling.html (Deformable objects), [MC314]
 https://github.com/google-deepmind/mujoco/blob/3.14.0/src/engine/engine_collision_driver.c and
 engine_collision_primitive.c, [MCmain] the same files on `main` (2026-09-23 commits "Integrate flex collisions into
-threaded mj_narrowphase", "Enable threading across mj_collideTree"), [MJW] upstream/mujoco_warp (v3.14.0 + MetalSim
-patches), [ILA] https://isaac-sim.github.io/IsaacLab/main/source/api/lab/isaaclab.assets.html (DeformableObject,
+threaded mj_narrowphase", "Enable threading across mj_collideTree"), [MJW] upstream/mujoco_warp
+([my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim): v3.14.0 + MetalSim patches), [ILA]
+https://isaac-sim.github.io/IsaacLab/main/source/api/lab/isaaclab.assets.html (DeformableObject,
 DeformableObjectCfg, DeformableObjectData), [ILT] https://isaac-sim.github.io/IsaacLab/main/source/tutorials/01_assets/run_deformable_object.html,
 [ILM] https://isaac-sim.github.io/IsaacLab/main/_modules/isaaclab/sim/spawners/materials/physics_materials_cfg.html,
 [ILS] https://isaac-sim.github.io/IsaacLab/main/source/api/lab/isaaclab.sim.schemas.html, [IL2004]
 https://github.com/isaac-sim/IsaacLab/issues/2004 (cloth/fluid proposal), [IL5285]
 https://github.com/isaac-sim/IsaacLab/issues/5285 (Newton deformable proposal), [IL3] Isaac Lab v3.0.0-beta / Beta 2
-release notes (https://github.com/isaac-sim/IsaacLab/releases/tag/v3.0.0-beta, discussion #6249), [ILP] Isaac Lab
-paper arXiv 2511.04831 (HTML v1), [OP] https://docs.omniverse.nvidia.com/kit/docs/omni_physics/107.3/dev_guide/deformables_beta/deformable_beta.html.
+release notes (https://github.com/isaac-sim/IsaacLab/releases/tag/v3.0.0-beta, discussion
+[#6249](https://github.com/isaac-sim/IsaacLab/discussions/6249)), [ILP] Isaac Lab paper
+[arXiv 2511.04831](https://arxiv.org/abs/2511.04831) (HTML v1), [OP]
+https://docs.omniverse.nvidia.com/kit/docs/omni_physics/107.3/dev_guide/deformables_beta/deformable_beta.html.
 
 ## 1. MuJoCo's flex model
 
@@ -59,9 +63,15 @@ Unsupported (raises): `dof="quadratic"`, flex–SDF, flex–heightfield, flex in
 sleeping, body/actuator/sensor plugins (so no `cable` composite); warning: bending damping on interpolated shells
 [MJW io.py].
 
-Differences from MuJoCo C found and fixed here (MuJoCo Warp fork branch `metalsim-flex`,
-github.com/pulipakaa24/mujoco_warp, commits b2e9ea5, a277152, bbe19bb, 6234396, fa2ff1d; every change behind a module flag, upstream behaviour
-one flag away):
+Differences from MuJoCo C found and fixed here (branch
+[`metalsim-flex`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-flex) of
+[my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim), commits
+[`b2e9ea5`](https://github.com/pulipakaa24/mujoco_warp/commit/b2e9ea5c7498f5ecc2c3c290f757d09e2f61e1d2),
+[`a277152`](https://github.com/pulipakaa24/mujoco_warp/commit/a2771520f5d9de6a0cdd862c599ee7ff97043415),
+[`bbe19bb`](https://github.com/pulipakaa24/mujoco_warp/commit/bbe19bb100f03315c07a4764ed830e0317df15da),
+[`6234396`](https://github.com/pulipakaa24/mujoco_warp/commit/6234396186ca506e27c22513550711ca5689fb5d),
+[`fa2ff1d`](https://github.com/pulipakaa24/mujoco_warp/commit/fa2ff1d388dff58da969acb5dbb374add4ac9ba7); every change
+behind a module flag, upstream behaviour one flag away):
 
 | # | MuJoCo Warp v3.14 | MuJoCo C | fix (flag) | measured effect (one step from MuJoCo C's own states) |
 |---|---|---|---|---|
@@ -110,8 +120,9 @@ compile error, a missing atomic nor precision: the 16 `efc_pos` values equal MuJ
 but rows 4–7 and 8–11 come out swapped. `_equality_flex` takes each edge's row from an atomic counter, so the row
 order is the device's thread order (on CUDA it happens to be edge order; Metal dispatches the 3D launch's threads in
 another order), and the test compares rows in order. The rope (4 rows) and the trilinear volume (strain rows) pass.
-Fix (fork commit 9c6e09f): a reserve kernel takes one block of rows per world and every edge writes at its
-(equality, edge) offset, which is MuJoCo C's order on every device (and makes the Newton solver's block order
+Fix (in [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim)): a reserve kernel takes one
+block of rows per world and every edge writes at its (equality, edge) offset, which is MuJoCo C's order on every device
+(and makes the Newton solver's block order
 deterministic). Everything else in the flex suite passed on Metal (233 of 237 in that run; the other two failures
 were the mesh-normal change of fix 11 on Metal, §6).
 
@@ -123,14 +134,16 @@ were the mesh-normal change of fix 11 on Metal, §6).
   `sim_element_deform_gradient_w`, `sim_element_stress_w`, `root_pos_w`, `root_vel_w`; writers
   `write_nodal_state_to_sim`, `write_nodal_pos_to_sim`, `write_nodal_velocity_to_sim`,
   `write_nodal_kinematic_target_to_sim`, `transform_nodal_pos` [ILA].
-* PhysX backend: FEM **volume** soft bodies only, "only supported in GPU simulation", two tetrahedral meshes
-  (simulation mesh deformed by the solver, collision mesh matching its surface), partial kinematic control of nodes
-  [ILT]. `DeformableBodyMaterialCfg`: `density` (None = solver decides), `dynamic_friction` 0.25, `youngs_modulus`
-  5e7 Pa, `poissons_ratio` 0.45 (0…0.5; Isaac Sim limits it to 0.4999), `elasticity_damping` 0.005,
-  `damping_scale` 1.0 [ILM]. Newer schemas (Omni Physics deformable beta) add `OmniPhysicsSurfaceDeformableSimAPI`
-  / `VolumeDeformableSimAPI`; surface deformables collide through their simulation mesh only [ILS, OP].
+* [PhysX](https://github.com/NVIDIA-Omniverse/PhysX) backend: FEM **volume** soft bodies only, "only supported in GPU
+  simulation", two tetrahedral meshes (simulation mesh deformed by the solver, collision mesh matching its surface),
+  partial kinematic control of nodes [ILT]. `DeformableBodyMaterialCfg`: `density` (None = solver decides),
+  `dynamic_friction` 0.25, `youngs_modulus` 5e7 Pa, `poissons_ratio` 0.45 (0…0.5;
+  [Isaac Sim](https://github.com/isaac-sim/IsaacSim) limits it to 0.4999), `elasticity_damping` 0.005, `damping_scale`
+  1.0 [ILM]. Newer schemas (Omni Physics deformable beta) add `OmniPhysicsSurfaceDeformableSimAPI` /
+  `VolumeDeformableSimAPI`; surface deformables collide through their simulation mesh only [ILS, OP].
 * Cloth: "cloth and fluid simulation isn't officially supported through the Isaac Lab API yet" [IL2004]. Isaac
-  Lab 3.0 adds, on the Newton backend, VBD (Vertex Block Descent) for cloth and soft bodies, a Newton
+  Lab 3.0 adds, on the [Newton](https://github.com/newton-physics/newton) backend, VBD
+  ([Vertex Block Descent](https://arxiv.org/abs/2403.06321)) for cloth and soft bodies, a Newton
   `DeformableObject` (particle `q`/`qd`, kinematic constraints, nodal forces) and a `CoupledSolver` alternating a rigid
   solver (Featherstone or MuJoCo) with VBD per substep, one- or two-way, normal + Coulomb friction [IL5285, IL3].
 * Published throughput for deformables: none. The Isaac Lab paper's performance section covers rigid and
@@ -142,7 +155,7 @@ were the mesh-normal change of fix 11 on Metal, §6).
 | option | status here | fidelity to MuJoCo C | cost |
 |---|---|---|---|
 | MuJoCo Warp flex (this work) | runs, fixed to MuJoCo C's contact model | per-step equal (table above) | measured §6 |
-| Newton VBD | fails to compile on Metal (GAPS ledger), Newton path archived | different model (VBD) | not measured |
+| Newton VBD | fails to compile on Metal ([GAPS](../GAPS.md) ledger), Newton path archived | different model (VBD) | not measured |
 | Newton XPBD particles / Warp's old `warp.sim` cloth | `warp.sim` removed from Warp (only `warp/examples/benchmarks/benchmark_cloth_*`, a spring cloth); Newton XPBD runs on Metal for rigid bodies | different model | not pursued (archived engine) |
 | MetalSim-native XPBD cloth/cable (`metalsim.physics.deformable.XPBDSim`) | runs: same flex topology, graph-coloured distance + cross-edge bending constraints, geom contacts with friction (plane/sphere/capsule/box; meshes as OBBs), two-way coupling via `xfrc_applied`, one captured graph | **not MuJoCo C's model** (measured, box scene, same start as §2): max vertex error 5.4 cm already at step 50 (it removes the initial 2 mm constraint violation at once where MuJoCo's soft edge constraints relax over solref's 20 ms), 5.5–15 cm at rest for 10–40 substeps, cloth mean height +0.9 to +2.0 cm; rejected on fidelity | measured §6 |
 
@@ -150,9 +163,10 @@ were the mesh-normal change of fix 11 on Metal, §6).
 
 1. Done: research; isolated environment (`.venv-flex`, worktree `upstream/mujoco_warp-flex` on `metalsim-flex`);
    flex contact fidelity fixes 1–11 (≈ 1 day) [done].
-2. Metal: run MuJoCo Warp's flex tests on `metal:0`, read the three failures, fix in the Metal codegen / Warp fork
-   (branch `metalsim-flex` of upstream/warp-innate) or MuJoCo Warp (0.5–2 days depending on cause) [done: row
-   order + capture + mesh normal; 237/237 on Metal].
+2. Metal: run MuJoCo Warp's flex tests on `metal:0`, read the three failures, fix in the Metal codegen /
+   [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim-flex) (branch `metalsim-flex` of
+   upstream/warp-innate) or MuJoCo Warp (0.5–2 days depending on cause) [done: row order + capture + mesh normal;
+   237/237 on Metal].
 3. Demo + tests on Metal: `metalsim/physics/deformable.py`, `tests/test_deformable.py` — MuJoCo C parity (free fall,
    contact trajectory, in-contact one-step), energy over 2 s, graph replay = eager; throughput at 64–4096 envs
    (0.5 day) [done, 10/10 on Metal].
@@ -166,19 +180,26 @@ were the mesh-normal change of fix 11 on Metal, §6).
 ## 6. Metal results and throughput (measured, `runs/deformable/metal_run*.log`, `metal_final.log`)
 
 Environment: `.venv-flex` (git-ignored) with the MuJoCo Warp worktree `upstream/mujoco_warp-flex` (branch
-`metalsim-flex`, fork commits b2e9ea5…dfa5d30) and the Warp worktree `upstream/warp-innate-flex` (branch
-`metalsim-flex`, 9dcb140), both pushed to the `fork` remotes. All GPU work ran through `scripts/gpu_run.sh` at kind `low`.
+[`metalsim-flex`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-flex) of
+[my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim), commits
+[`b2e9ea5`](https://github.com/pulipakaa24/mujoco_warp/commit/b2e9ea5c7498f5ecc2c3c290f757d09e2f61e1d2) to
+[`dfa5d30`](https://github.com/pulipakaa24/mujoco_warp/commit/dfa5d30725cd2f96d02cbbb68b7a9a6f22fc3ac8)) and the Warp
+worktree `upstream/warp-innate-flex` (branch [`metalsim-flex`](https://github.com/pulipakaa24/warp/tree/metalsim-flex)
+of [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim),
+[`9dcb140`](https://github.com/pulipakaa24/warp/commit/9dcb1406a49101ff6645f9a8b38221f09e0fc0d6)), both pushed to my
+forks. All GPU work ran through `scripts/gpu_run.sh` at kind `low`.
 
 Correctness on `metal:0`:
 
 * MuJoCo Warp flex tests: 237 passed, 0 failed (before: `test_constraint_parity2/3` failed, §2). Full MuJoCo Warp
   suite: 1450 passed, 2 failed, 39 skipped — the two are not flex: `io_test::test_put_data_nefc_zero_dense`
   (known upstream) and `collision_driver_test::test_hfield_maxconpair`, which fails identically on the CPU and on the
-  unmodified `metalsim` branch (the fork's heightfield patch).
+  unmodified `metalsim` branch ([my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim)'s
+  heightfield patch).
 * Two Metal-only problems met on the way: (1) graph capture of a flex step failed because Warp's Metal
-  `segmented_sort_pairs` validated its segments with a synchronous `.numpy()` (Warp fork 9dcb140); (2) on Metal the
+  `segmented_sort_pairs` validated its segments with a synchronous `.numpy()` (fixed in my fork of Warp); (2) on Metal the
   GJK direction of a touching tetrahedron apex (distance 1e-6 m) was 0.127 rad off the face normal (CPU 1.7e-3):
-  the EPA/GJK normal is now used only for witness separations above 0.1 mm (dfa5d30).
+  the EPA/GJK normal is now used only for witness separations above 0.1 mm.
 * `tests/test_deformable.py`: 10/10 on Metal — free fall equals MuJoCo C (< 1e-5 m, 60 steps, 4 worlds), contact
   trajectory equals MuJoCo C to 1 mm over 100 steps (landing on the box), one-step in-contact parity (contact sets
   equal apart from < 10 µm flex-flex contacts; velocity error median < 1e-4 m/s, max < 0.05), energy never above
@@ -204,9 +225,10 @@ Throughput (physics step only, graph replay, 10 steps per synchronization, `pyth
 Cost of the faithful path at 1024 worlds (graph replay, box scene): full step 26.7 ms; contacts off 9.7 ms;
 constraints off 9.4 ms; CG 5 iterations 20.7 ms. Eager stage timings: flex collision ~9 ms (element–geom detection
 ~4 ms, contact filter ~4 ms, flex-flex SAP + CCD ~4 ms, excluding the per-call workspace allocation that the graph
-does once), contact solve the rest. The device-side sort/scan (fork 361f11f) was worth 2–3.6× (host sorts: a
-segmented sort of 4096×173 SAP keys took 172 ms on the CPU per step). For scale: the rigid G1 alone runs at 68.6K
-physics steps/s at 4096 envs (STATUS); Isaac Lab publishes no deformable throughput.
+does once), contact solve the rest. The device-side sort/scan (my fork,
+[`361f11f`](https://github.com/pulipakaa24/mujoco_warp/commit/361f11f03ed2efe0845d0090b477045d7e9af7c8)) was worth
+2–3.6× (host sorts: a segmented sort of 4096×173 SAP keys took 172 ms on the CPU per step). For scale: the rigid G1
+alone runs at 68.6K physics steps/s at 4096 envs ([STATUS](../STATUS.md)); Isaac Lab publishes no deformable throughput.
 
 ## 7. Decisions
 
@@ -238,9 +260,15 @@ physics steps/s at 4096 envs (STATUS); Isaac Lab publishes no deformable through
 
 ## 9. PhysX's deformable formulations from the source, and which MetalSim backend shares them
 
-Primary sources (all read, not summarised from docs): PhysX SDK 5.6.1 (tag `107.3-physx-5.6.1`, the PhysX in Isaac Sim
-5.1 / omni.physx 107.3) and PhysX main (5.11, `da950a3`), github.com/NVIDIA-Omniverse/PhysX (BSD-3, GPU code included);
-Isaac Lab v2.3.2 and v3.0.0-EA (`ae37b02`); Newton `90e2332` (upstream/newton).
+Primary sources (all read, not summarised from docs): PhysX SDK 5.6.1 (tag
+[`107.3-physx-5.6.1`](https://github.com/NVIDIA-Omniverse/PhysX/tree/107.3-physx-5.6.1), the PhysX in Isaac Sim 5.1 /
+omni.physx 107.3) and PhysX main (5.11,
+[`da950a3`](https://github.com/NVIDIA-Omniverse/PhysX/commit/da950a3537927784951853c66618036f332ca0ce)),
+[github.com/NVIDIA-Omniverse/PhysX](https://github.com/NVIDIA-Omniverse/PhysX) (BSD-3, GPU code included); Isaac Lab
+v2.3.2 and v3.0.0-EA
+([`ae37b02`](https://github.com/isaac-sim/IsaacLab/commit/ae37b028ea415c91ea2bc32609efcd759ed2b974)); Newton
+[`90e2332`](https://github.com/pulipakaa24/newton/commit/90e23324521fa86710e483e01d02e80d1dac0060) on
+[my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim) (upstream/newton).
 
 **Particle cloth (PBD).** `PxParticleClothBuffer` / `PxParticleSpring` (5.6.1 `include/PxParticleBuffer.h`), solved by
 `ps_solveSpringsLaunch` (`source/gpusimulationcontroller/src/CUDA/particlesystem.cu` ~L4137–4300): every cloth
@@ -307,8 +335,8 @@ XPBD (for PhysX PBD cloth) or flex (for FEM/VBD) is the closer default per objec
 ## 10. PhysX (Isaac Sim 5.1) deformable protocol: residuals, fits, throughput (measured)
 
 Reference recording (`runs/deformable/isaac51/`, recorded before the plan moved to Isaac Lab 3.0; Isaac Sim 5.1 /
-Isaac Lab 2.3.2, L4, `metalsim/parity/isaac_side/record_deformables.py`, parameters in `meta.json`): (a) 1 m cloth,
-21×21 PhysX particle cloth, ParticleClothDemo parameters (stretch 1e4, shear 100, bend 200, spring damping 0.2,
+Isaac Lab 2.3.2, NVIDIA L4 GPU, `metalsim/parity/isaac_side/record_deformables.py`, parameters in `meta.json`): (a) 1 m
+cloth, 21×21 PhysX particle cloth, ParticleClothDemo parameters (stretch 1e4, shear 100, bend 200, spring damping 0.2,
 0.02 kg/particle = 8.82 kg, rest offset 0.025 m, 16 iterations, friction 0.6, self-collision on, no drag/lift),
 released at z = 0.5 m over a 0.4 m box; (b) 0.5 × 0.02 × 0.02 m FEM rod (E 1e5, ν 0.4, density 1000, elasticity
 damping 0.005, 44 nodes, 4 pinned) released from horizontal; (c) 0.2 m FEM cube (same material, 8 kg, 1331 nodes)
@@ -395,7 +423,10 @@ largely numerical (XPBD with 16 iterations on stiff tetrahedra). Matching it nee
 (PhysX swing peaks from its trace: `rope_metrics` on `runs/deformable/isaac51`; all rows in
 `runs/deformable/physx_fit51/rope_cube_implicit.json`.)
 
-**Implicit flex damping** (MuJoCo Warp fork `metalsim-flex` c013067, `mujoco_warp/_src/flex_damping.py`, opt-in
+**Implicit flex damping** (branch [`metalsim-flex`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-flex) of
+[my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) at
+[`c013067`](https://github.com/pulipakaa24/mujoco_warp/commit/c013067735aff729364375dd819ba0de088a2f34),
+`mujoco_warp/_src/flex_damping.py`, opt-in
 `flex_damping.ENABLE`): MuJoCo's flex elasticity damping is stiffness-proportional (the strain includes
 (d² − d_prev²)·damping/dt) and explicit, stable only for damping·dt·ω²max < 2. The explicit term is dropped and,
 after `forward()`, the flex vertex velocities solve (M + dt D) v′ = M(qvel + dt qacc) per world with
@@ -486,8 +517,9 @@ from compression plus numerical dissipation, ours from the elasticity damping (0
 Recorded 2026-09-25 on the L4 machine (Isaac Sim 6.1, Isaac Lab v3.0.0-EA) with
 `metalsim/parity/isaac_side/record_deformables_il3.py` on both backends, one Kit process at a time.
 Data: `runs/parity3/isaac/deformable/deformable_il3/{isaacsim_physx,newton_vbd}` (meta.json, cooked
-prims; record.npz local, 190/160 MB). Isaac Lab's automatic tetrahedralization needs `pytetwild`, which is not in the
-3.0 environment and, once installed, aborted Kit ("double free or corruption"); it was removed again and the rods and
+prims; record.npz local, 190/160 MB). Isaac Lab's automatic tetrahedralization needs
+[`pytetwild`](https://github.com/pyvista/pytetwild), which is not in the 3.0 environment and, once installed, aborted
+Kit ("double free or corruption"); it was removed again and the rods and
 cubes use pre-tetrahedralized structured meshes (`make_tetmeshes.py`: hexahedral grid, 6 tetrahedra per cell; rod
 0.5 × 0.02 m with n = 1, 2, 4, 8 cells across and 10n along, cube 0.2 m with n = 2, 4, 8 per edge), Isaac Lab's
 documented alternative. Isaac Lab 3.0 defaults were used: PhysX volume E 1e6, ν 0.45, density 1000, elasticity
@@ -535,12 +567,13 @@ XPBD fitted (+0.5/s) 0.425 / 0.272 / 0.775 / 1.14 s, 3.3 cm (`runs/deformable/ph
 
 **Newton VBD on Metal (same solver).** `scripts/diagnostics/deformable/il3_newton_metal.py` rebuilds the recorded Newton
 scene as Isaac Lab's Newton backend does (contrib builder hooks: add_cloth_mesh / add_soft_mesh with the registry
-values, NewtonShapeCfg defaults, soft-contact settings, pins as inverse mass 0) in `.venv-newton152` (Newton 1.5.2,
-the Warp fork). On the CPU device, 0.3 s of the full scene (cloth, four rods, three cubes) matches the Isaac Newton
-recording to < 1 mm at every sampled point (cloth z-min 0.070 / mean 0.295 both; rod n4 0.507 / 0.761 both). The full
-5 s replay on metal:0 and its throughput (cloth, rod n1, cube n4 at 256 / 1024 / 4096 worlds) are queued at kind low
-(`newton_vbd_replay`); the port note measured VBD cloth (441 particles) 3.6K / 3.7K and cube (125 nodes) 0.69K / 0.57K
-env-steps/s at 1024 / 4096 worlds.
+values, NewtonShapeCfg defaults, soft-contact settings, pins as inverse mass 0) in `.venv-newton152` (upstream Newton
+1.5.2, [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim)). On the CPU device, 0.3 s of the full scene
+(cloth, four rods, three cubes) matches the Isaac Newton recording to < 1 mm at every sampled point (cloth z-min 0.070 /
+mean 0.295 both; rod n4 0.507 / 0.761 both). The full 5 s replay on metal:0 and its throughput (cloth, rod n1, cube n4
+at 256 / 1024 / 4096 worlds) are queued at kind low (`newton_vbd_replay`); the
+[port note](newton_vbd_metal_2026-09-25.md) measured VBD cloth (441 particles) 3.6K / 3.7K and cube (125 nodes) 0.69K /
+0.57K env-steps/s at 1024 / 4096 worlds.
 
 **Recommendation per object type (fidelity first; PhysX 3.0 is the reference for the PhysX backend, the same Newton
 VBD solver on Metal for the Newton backend):**
@@ -560,10 +593,12 @@ VBD solver on Metal for the Newton backend):**
 **Why the flex membrane fell through (resolved).** Not a MuJoCo Warp contact bug: MuJoCo C 3.14 does the same. It keeps
 at most mjMAXCONPAIR = 50 contacts per (body, flex) pair; a 1 m, 33 × 33 cloth over a 0.4 m box needs ~290 at impact
 and ~80 at rest (MuJoCo C rebuilt with the cap at 4000: rests on the box at 0.422 m; with 50: sinks through the box and
-off it). The fork now exposes the cap (`collision_flex.FLEX_MAXCONPAIR`, default 50 for C parity; 400: rests at
-0.420 m, 64a1ea5, test `FlexMaxConPairTest`); UPSTREAM.md item 7 proposes it as an issue for MuJoCo and MuJoCo Warp.
-CPU-only runs now set `WP_DISABLE_METAL=1` (new in the flex Warp worktree, bf4c789, local) so no Metal device exists
-in the process.
+off it). [My fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-flex) (branch
+`metalsim-flex`) now exposes the cap (`collision_flex.FLEX_MAXCONPAIR`, default 50 for C parity; 400: rests at 0.420 m,
+[`64a1ea5`](https://github.com/pulipakaa24/mujoco_warp/commit/64a1ea55cb9a807213ce1e6fb63394ae4fe016ca), test
+`FlexMaxConPairTest`); [UPSTREAM.md](../../scripts/diagnostics/deformable/UPSTREAM.md) item 7 proposes it as an issue
+for MuJoCo and MuJoCo Warp. CPU-only runs now set `WP_DISABLE_METAL=1` (new in the flex Warp worktree) so no Metal
+device exists in the process.
 
 | decision | options (numbers) | chosen, why | how to switch |
 |---|---|---|---|

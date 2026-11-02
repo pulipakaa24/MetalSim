@@ -9,24 +9,24 @@ Column collapse is the best-documented quantitative granular benchmark. The norm
 
 ### Cited Findings
 - **Scaling laws (secondary table, quoted from an SPH column-collapse paper):** normalized runout (r_inf - r0)/r0 vs a = H0/r0 — [SPH granular column collapse study, arXiv 1602.07881](https://arxiv.org/html/1602.07881v1)
-  - Lube et al. 2004, 3D axisymmetric: 1.24a for a < 1.7; 1.6a^(1/2) for a >= 1.7.
+  - [Lube et al. 2004](https://doi.org/10.1017/S0022112004009036), 3D axisymmetric: 1.24a for a < 1.7; 1.6a^(1/2) for a >= 1.7.
   - Lajeunesse et al. 2005, axisymmetric (semicircular tube): a for a < 3; a^(1/2) for a >= 3.
-  - Lube et al. 2005, 2D between vertical walls: 1.2a for a < 2.3; 1.9a^(2/3) for a >= 2.3.
+  - [Lube et al. 2005](https://doi.org/10.1103/PhysRevE.72.041301), 2D between vertical walls: 1.2a for a < 2.3; 1.9a^(2/3) for a >= 2.3.
   - Lajeunesse et al. 2005, 2D channel: a for a < 3; a^(2/3) for a >= 3.
-  - Staron & Hinch 2005, 2D DEM (numerical): 2.5a for a < 2; 3.25a^0.7 for a >= 2.
-- The Lajeunesse paper is "Granular slumping on a horizontal surface", Lajeunesse, Monnier & Homsy, Phys. Fluids 17, 103302 (2005), DOI 10.1063/1.2085378. It used glass beads in a rectangular channel (2D) and a semicircular tube (axisymmetric) — [author PDF, IPGP](https://www.ipgp.fr/~lajeunes/download/2005-pof-slumping.pdf) (could not parse the text; coefficients above come from the secondary table)
+  - [Staron & Hinch 2005](https://doi.org/10.1017/S0022112005006415), 2D DEM (numerical): 2.5a for a < 2; 3.25a^0.7 for a >= 2.
+- The Lajeunesse paper is "Granular slumping on a horizontal surface", Lajeunesse, Monnier & Homsy, Phys. Fluids 17, 103302 (2005), DOI [10.1063/1.2087687](https://doi.org/10.1063/1.2087687). It used glass beads in a rectangular channel (2D) and a semicircular tube (axisymmetric) — [author PDF, IPGP](https://www.ipgp.fr/~lajeunes/download/2005-pof-slumping.pdf) (could not parse the text; coefficients above come from the secondary table)
 - **SPH reproduction and its error:** 2D SPH gave 1.3a (a < 2) and 1.55a^(4/5) (a >= 2), overestimating runout at high a compared with Lube 2005. 3D SPH gave 0.85a (a < 1.7) and 1.05a^(3/5), underestimating it. No percent errors were reported, only qualitative "good agreement". Setup: phi = 30 deg (20/40 deg also tested), r0 = 9.7 cm, rho = 2.6 g/cm^3, smoothing ratio h/dr = 2 (2D) and 1.5625 (3D), h/L from 1/16 to 1/64, CFL prefactor 0.125 — [arXiv 1602.07881](https://arxiv.org/html/1602.07881v1)
 - **Dunatunga & Kamrin 2015 (JFM 779:483-513):** an MPM code with a mu(I) elasto-viscoplastic model. It was validated against Beverloo scaling in silo flow, against "jointed power-law scaling of the run-out distance" in column collapse, and against inclined-chute behaviour. Heaps flatten as a increases, and the repose angle comes out below the static-friction value — [MIT DSpace](https://dspace.mit.edu/handle/1721.1/107838?show=full); [arXiv 1411.5447](https://arxiv.org/pdf/1411.5447)
 - A Mohr-Coulomb MPM study found MPM runout matches DEM for h/r < 2 but overpredicts it for h/r > 2. This is a common, known failure mode of rate-independent continuum models at high aspect ratio — summarized in search results pointing to [par.nsf.gov 10087501](https://par.nsf.gov/servlets/purl/10087501) (not fetched directly)
-- Mast et al. (Acta Geotechnica, "Simulating granular column collapse using the Material Point Method") is listed in the Dunatunga & Kamrin references; its results were not retrieved — [arXiv 1411.5447](https://arxiv.org/pdf/1411.5447)
+- Mast et al. (Acta Geotechnica, ["Simulating granular column collapse using the Material Point Method"](https://doi.org/10.1007/s11440-014-0309-0)) is listed in the Dunatunga & Kamrin references; its results were not retrieved — [arXiv 1411.5447](https://arxiv.org/pdf/1411.5447)
 
 ### Inferences
 - Recommended scene for the two-simulator comparison: a quasi-2D slab (thin periodic or frictionless side walls) in which a varies over {0.5, 1, 2, 3, 5, 8} at fixed L_i (e.g., 0.1 m). Measure (L_f - L_i)/L_i, H_f/L_i, deposit profile h(x), time to arrest, and the KE(t) curve. Fit prefactor and exponent per simulator, then compare each fit with the other simulator and with Lube 2005 / Lajeunesse 2005.
-- Because experimental prefactors themselves differ by about 20% (1.0 vs 1.2), agreement within about 10% between Newton and Metal, plus matching exponents, is a defensible pass. Matching experiment within 20% is "good" by the standard of published continuum papers (inference).
+- Because experimental prefactors themselves differ by about 20% (1.0 vs 1.2), agreement within about 10% between [Newton](https://github.com/newton-physics/newton) and Metal, plus matching exponents, is a defensible pass. Matching experiment within 20% is "good" by the standard of published continuum papers (inference).
 - Both Isaac/Newton and the Metal code need the same friction angle (Drucker-Prager), the same base friction and the same particles per cell. The runout is sensitive to base friction and to the high-a regime.
 
 ### Gaps
-- Balmforth & Kerswell 2005 (JFM, "Granular collapse in two dimensions") coefficients and their channel-width dependence were not retrieved.
+- Balmforth & Kerswell 2005 (JFM, ["Granular collapse in two dimensions"](https://doi.org/10.1017/S0022112005005537)) coefficients and their channel-width dependence were not retrieved.
 - Final-height laws were not retrieved from a fetched source. From memory (unverified), Lube 2005 gives H_f/L_i ~ a for a < ~1.15 and ~a^(2/5) beyond, and Lajeunesse gives H_f/H_i ~ a^-0.6 to a^-0.7.
 - No percent errors were found for Mast 2014, Dunatunga & Kamrin 2015, Klár 2016 or Daviet & Bertails-Descoubes 2016 runout reproductions.
 
@@ -38,7 +38,7 @@ Beverloo discharge (W ∝ (D - kd)^(5/2), C ≈ 0.58, k ≈ 1.5) and the Li-Zhan
 ### Cited Findings
 - **Beverloo law:** W = C rho_b sqrt(g) (D0 - k d)^(5/2). Flow is independent of fill height. C ≈ 0.58 for almost all materials, with a reported band of 0.55-0.65 and up to 0.64 for glass spheres. k ≈ 1.5 for spheres (range 1.3-2.9, larger for angular grains). k ≈ 1.4 is a design default. The law is valid for d > 0.5 mm and orifices large enough to avoid jamming. For non-circular orifices, use the hydraulic diameter 4A/P — [Thermopedia](https://thermopedia.com/content/821/); [Purdue ME308 example](https://engineering.purdue.edu/~wassgren/teaching/ME30800/Examples/dim_anal_18.pdf); [arXiv 1611.05277](https://arxiv.org/pdf/1611.05277); [arXiv 2005.07042](https://arxiv.org/pdf/2005.07042); [powderprocess.net](https://www.powderprocess.net/Powder_Flow/DRAFT_Hopper_Discharge_Flowrate.html)
 - Dunatunga & Kamrin's MPM recovers Beverloo scaling in silo flow — [MIT DSpace](https://dspace.mit.edu/handle/1721.1/107838?show=full)
-- **Klár et al. 2016 (SIGGRAPH), "Drucker-Prager Elastoplasticity for Sand Animation":** Hencky-strain hyperelasticity plus Drucker-Prager with a non-associative return mapping that works with explicit and implicit integration. They note that grain-level friction is hard to tune to match piling, and that Drucker-Prager lets one use the engineering literature to set parameters. Their dissertation has sections on "effect of friction angle on piling" and "comparison to real-world footage"; numbers were not retrieved — [paper, UCLA](https://www.math.ucla.edu/~cffjiang/research/sand/paper.pdf); [UC Davis copy](https://math.ucdavis.edu/~jteran/papers/KGPSJT16.pdf); [eScholarship dissertation](https://www.escholarship.org/content/qt5th3x8fb/qt5th3x8fb.pdf?t=o86y1e)
+- **Klár et al. 2016 (SIGGRAPH), "Drucker-Prager Elastoplasticity for Sand Animation":** Hencky-strain hyperelasticity plus Drucker-Prager with a non-associative return mapping that works with explicit and implicit integration. They note that grain-level friction is hard to tune to match piling, and that Drucker-Prager lets one use the engineering literature to set parameters. Their dissertation has sections on "effect of friction angle on piling" and "comparison to real-world footage"; numbers were not retrieved — [paper (DOI)](https://doi.org/10.1145/2897824.2925906); [UC Davis copy](https://math.ucdavis.edu/~jteran/papers/KGPSJT16.pdf); [eScholarship dissertation](https://www.escholarship.org/content/qt5th3x8fb/qt5th3x8fb.pdf?t=o86y1e)
 - **RFT (Li, Zhang & Goldman, Science 339:1408, 2013):** the force on an element is a stress per unit depth alpha_{z,x}(beta, gamma) × depth × area, where beta is the attack angle and gamma the intrusion angle. The generic fit is a Fourier series: alpha_z = Σ A_mn cos(2π(mβ/π + nγ/2π)) + B_mn sin(...), and alpha_x = Σ C_mn cos(...) + D_mn sin(...). Generic coefficients (N/cm^3, ζ = 1): A00 = 0.206, A10 = 0.169, B11 = 0.212, B01 = 0.358, B-11 = 0.055, C11 = -0.124, C01 = 0.253, C-11 = 0.007, D10 = 0.088 — [arXiv 1303.7065 (HTML)](https://arxiv.org/html/1303.7065)
 - **RFT scaling factor ζ (with α ≈ ζ·α_generic):** poppy seeds loose 0.248, poppy seeds close-packed 0.488, 0.3 mm glass spheres loose 0.194 and close-packed 0.371, 3 mm glass spheres close-packed 0.214. For a new medium, measure α_z(0, π/2) with a horizontal plate pushed down and set ζ ≈ 0.8·α_z(0, π/2) — [arXiv 1303.7065](https://arxiv.org/html/1303.7065)
 - **RFT measurement setup:** plate 3.81 × 2.54 cm (≈ 9.68 cm^2), 0.64 cm thick; depths 2.54, 5.08 and 7.62 cm; speed about 1 cm/s — [arXiv 1303.7065](https://arxiv.org/html/1303.7065)
@@ -76,10 +76,10 @@ Martin & Moyce (1952) is the canonical dam-break dataset. Scales differ between 
 ## Elastic tests and PIC/APIC energy behaviour
 
 ### Takeaway
-No fetched source supplied numerical tolerances. MLS-MPM (Hu et al. 2018) is the formulation most GPU codes (Taichi, PlasticineLab, ManiSkill2/Warp, Genesis) build on. It is equivalent to APIC for transfers and about 2× faster through its stress-divergence discretization.
+No fetched source supplied numerical tolerances. MLS-MPM (Hu et al. 2018) is the formulation most GPU codes ([Taichi](https://github.com/taichi-dev/taichi), [PlasticineLab](https://github.com/hzaskywalker/PlasticineLab), ManiSkill2/[Warp](https://github.com/NVIDIA/warp), [Genesis](https://github.com/Genesis-Embodied-AI/genesis-world)) build on. It is equivalent to APIC for transfers and about 2× faster through its stress-divergence discretization.
 
 ### Cited Findings
-- MLS-MPM: "all MPM simulations run two times faster than before" via a new stress-divergence discretization. It is consistent with APIC/PolyPIC under a Galerkin-style weak form — [Hu et al. 2018 project page](https://yuanming.taichi.graphics/publication/2018-mlsmpm/); [paper PDF](https://www.math.ucla.edu/~cffjiang/research/mlsmpm/hu2018mlsmpm.pdf)
+- MLS-MPM: "all MPM simulations run two times faster than before" via a new stress-divergence discretization. It is consistent with APIC/PolyPIC under a Galerkin-style weak form — [Hu et al. 2018 project page](https://yuanming.taichi.graphics/publication/2018-mlsmpm/); [paper (DOI)](https://doi.org/10.1145/3197517.3201293)
 - AsyncTaichi fuses G2P with the next P2G for extra speed in an MLS-MPM falling-cube benchmark — [arXiv 2012.08141](https://arxiv.org/pdf/2012.08141)
 
 ### Inferences
@@ -91,12 +91,12 @@ No fetched source supplied numerical tolerances. MLS-MPM (Hu et al. 2018) is the
   These need no experimental data and give exact numbers to compare both simulators against.
 
 ### Gaps
-- No retrieved numbers for APIC vs PIC energy dissipation (Jiang et al. 2015, APIC paper) or cantilever errors for MPM.
+- No retrieved numbers for APIC vs PIC energy dissipation ([Jiang et al. 2015](https://doi.org/10.1145/2766996), APIC paper) or cantilever errors for MPM.
 
 ## Robotics benchmarks with soft-body / granular tasks
 
 ### Takeaway
-ManiSkill2's six MPM tasks have crisp, reproducible success criteria and published physical parameters, which makes them the best ready-made robotics comparison. Isaac Lab now ships a Newton-MPM Franka-Pour task. RFT-style foot penetration (above) is the best locomotion-relevant quantitative test.
+ManiSkill2's six MPM tasks have crisp, reproducible success criteria and published physical parameters, which makes them the best ready-made robotics comparison. [Isaac Lab](https://github.com/isaac-sim/IsaacLab) now ships a Newton-MPM Franka-Pour task. RFT-style foot penetration (above) is the best locomotion-relevant quantitative test.
 
 ### Cited Findings
 - **ManiSkill2 soft-body simulator:** MLS-MPM implemented in NVIDIA Warp, with two-way rigid coupling via SDF penalty forces and several soft substeps per rigid step. Parameter ranges: grid spacing 0.005-0.015 m, particle volume 6.2e-8 to 1.2e-7 m^3, density 300-3000, E = 1e4-3e5 Pa, ν = 0.3, yield stress 2e3-1e4 — [ManiSkill2, arXiv 2302.04659](https://ar5iv.labs.arxiv.org/html/2302.04659)
@@ -119,7 +119,7 @@ ManiSkill2's six MPM tasks have crisp, reproducible success criteria and publish
 - ManiSkill2-style scalar metrics (fill fraction, spilled particle count, Chamfer/IoU) are reproducible across simulators if the controller is replayed open-loop from logged actions. Closed-loop policies amplify small differences.
 
 ### Gaps
-- No quantitative numbers retrieved for PlasticineLab, SoftGym, DexDeform, Bekker wheel sinkage, or published sim-to-real granular locomotion (e.g., Choi et al. 2023 "Learning quadrupedal locomotion on deformable terrain", Science Robotics; not fetched).
+- No quantitative numbers retrieved for PlasticineLab, [SoftGym](https://github.com/Xingyu-Lin/softgym), [DexDeform](https://github.com/sizhe-li/DexDeform), Bekker wheel sinkage, or published sim-to-real granular locomotion (e.g., Choi et al. 2023 ["Learning quadrupedal locomotion on deformable terrain"](https://doi.org/10.1126/scirobotics.ade2256), Science Robotics; not fetched).
 
 ## Throughput metrics and published numbers
 
@@ -131,7 +131,7 @@ Published GPU MPM numbers are scene-specific and rarely reported in particles·s
 - **Fei, Huang & Gao 2021** ("Principles towards Real-Time Simulation of MPM on Modern GPUs"): 1.7-8.6× speedup on one GPU and 2.5-14.8× on four GPUs compared with the prior state of the art. Snow with 1.33M particles at 68.5 FPS and a fountain with 143K particles at 55.9 FPS, both on 4× Tesla V100 — [arXiv 2111.00699](https://arxiv.org/pdf/2111.00699)
 - **JAX-MPM:** 1000 steps for over 2.7M particles on a 400×400×100 grid in about 22 s on an A100 (fp32) — [arXiv 2507.04192](https://arxiv.org/pdf/2507.04192)
 - **CRESSim-MPM** benchmarks on an RTX 4090 across particle counts, but explicitly does not aim to beat existing codes on speed — [arXiv 2502.18437](https://arxiv.org/pdf/2502.18437)
-- **HOT** (Wang et al. 2020): implicit MPM up to 10× faster than optimized implicit baselines — [HOT paper](https://www.math.ucla.edu/~cffjiang/research/hot/wang2020hot.pdf)
+- **HOT** (Wang et al. 2020): implicit MPM up to 10× faster than optimized implicit baselines — [HOT paper](https://arxiv.org/abs/1911.07913)
 
 ### Inferences
 - Derived JAX-MPM throughput: 2.7e6 × 1000 / 22 s ≈ 1.2e8 particle-steps/s on an A100 (estimate).

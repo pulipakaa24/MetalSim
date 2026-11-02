@@ -7,7 +7,7 @@ stated on each number. One seed, one asset per protocol.
 
 | # | script (committed) | environment | artifacts |
 |---|---|---|---|
-| 1 | `metalsim/parity/isaac_side/record_penetration.py` | Isaac Sim 5.1 + Isaac Lab 2.3.2 (`~/env_isaaclab`), GPU and CPU PhysX | `runs/parity3/isaac/penetration_il2/`, `penetration_il2_cpu/` |
+| 1 | `metalsim/parity/isaac_side/record_penetration.py` | [Isaac Sim](https://github.com/isaac-sim/IsaacSim) 5.1 + [Isaac Lab](https://github.com/isaac-sim/IsaacLab) 2.3.2 (`~/env_isaaclab`), GPU and CPU [PhysX](https://github.com/NVIDIA-Omniverse/PhysX) | `runs/parity3/isaac/penetration_il2/`, `penetration_il2_cpu/` |
 | 1b | `metalsim/parity/isaac_side/isaaclab3/record_penetration.py` | Isaac Sim 6.1 + Isaac Lab 3.0.0-EA (`~/env_isaaclab3`), `physics=isaacsim_physx` | `runs/parity3/isaac/penetration_il3/` |
 | 2 | `metalsim/parity/isaac_side/record_dome_azimuth.py` | Kit 107.3.3 (Isaac Sim 5.1) and Kit 110.3.0 (Isaac Sim 6.1), RTX path tracing | `runs/parity3/isaac/dome_il2/`, `dome_il3/` (`dome_il3_try1/`: first 6.1 attempt, see §2) |
 | 3 | `metalsim/parity/isaac_side/record_fourbar.py` | Isaac Sim 5.1 + Isaac Lab 2.3.2, PhysX GPU and CPU | `runs/parity3/isaac/fourbar_il2/<run>/` (+ `summary.jsonl`) |
@@ -66,8 +66,8 @@ The robot then falls over. The torso touches down at 1.40 s, and the pelvis rest
 **Summary.** PhysX's peak foot penetration on landing from the 1 m drop is **0.51 mm on Isaac Sim 5.1 GPU PhysX**
 (0.49 mm on CPU PhysX, 2.08 mm on Isaac Sim 6.1 PhysX). It occurs one step after first contact and decays below
 0.1 mm within 55 ms. At rest it is 0.005–0.013 mm, that is resting separation ≈ restOffset 0. MetalSim's
-1.55–1.64 cm peak (GAPS, our side, not re-measured here) is therefore **~30× PhysX 5.1's** (~8× 6.1's). The
-reference is a sub-millimetre, near-rigid contact, not a soft one. Scope: one drop, one asset (Isaac's G1 minimal
+1.55–1.64 cm peak ([GAPS](../GAPS.md), our side, not re-measured here) is therefore **~30× PhysX 5.1's** (~8× 6.1's).
+The reference is a sub-millimetre, near-rigid contact, not a soft one. Scope: one drop, one asset (Isaac's G1 minimal
 USD, box foot colliders), 5 ms step, Isaac's G1 solver settings (8/4 iterations, TGS). The 5.1 → 6.1 difference
 (0.5 → 2.1 mm) is measured but not explained. The contact offset differs: the first report comes at 13 mm vs
 18 mm.
@@ -105,17 +105,18 @@ USD, box foot colliders), 5 ms step, Isaac's G1 solver settings (8/4 iterations,
 - **Azimuth zero: off by −90° from our adopted convention.** Kit's mapping, measured, is
   **u = 0.5 − (atan2(x, −y) + π/2 − yaw)/2π**, equivalently **u = −(atan2(y, x) − yaw)/2π (mod 1)**, with
   v = acos(z)/π. So u = 0 (the left edge of the file) faces **+x**, u = 0.25 faces −y, the image centre u = 0.5
-  faces **−x**, and u = 0.75 faces +y. Our adopted convention puts the centre at −y (rendering_vs_rtx §6.1). It is
-  Kit's mapping rotated by +90° about z, so MetalSim reproduces Kit with `set_environment(yaw=-π/2)` (−90°), or
+  faces **−x**, and u = 0.75 faces +y. Our adopted convention puts the centre at −y
+  ([rendering_vs_rtx](rendering_vs_rtx_2026-09-25.md) §6.1). It is Kit's mapping rotated by +90° about z, so MetalSim
+  reproduces Kit with `set_environment(yaw=-π/2)` (−90°), or
   with the constant folded into the formula.
 - **`rotateZ` on the dome prim** rotates the map by +yaw about +z, in the sense of our formula's `yaw` term
   (measured +90.0° ± 0.3°).
-- **`rotateX +90°`** is applied as an ordinary rigid rotation. BLUE moved from (−0.252, 0.182, 0.950) to
-  (−0.252, −0.950, 0.182) = R_x(90°)·d exactly. So Kit honours authored dome rotations, and the texture is
-  *already* z-up. Authoring USD's `OrientToStageUpAxis` +90° x-rotation for a z-up stage (as the OpenUSD +Y-pole
-  convention expects) tips the map over in Kit. This agrees with NVIDIA's `usd-exchange-samples` note that
-  "Kit/RTX treats the DomeLight environment as Z-up". Importers should not add the rotation for Kit-authored
-  stages.
+- **`rotateX +90°`** is applied as an ordinary rigid rotation. BLUE moved from (−0.252, 0.182, 0.950) to (−0.252,
+  −0.950, 0.182) = R_x(90°)·d exactly. So Kit honours authored dome rotations, and the texture is *already* z-up.
+  Authoring USD's `OrientToStageUpAxis` +90° x-rotation for a z-up stage (as the [OpenUSD](https://openusd.org/) +Y-pole
+  convention expects) tips the map over in Kit. This agrees with NVIDIA's
+  [`usd-exchange-samples`](https://github.com/NVIDIA-Omniverse/usd-exchange-samples) note that "Kit/RTX treats the
+  DomeLight environment as Z-up". Importers should not add the rotation for Kit-authored stages.
 - **Lighting check (top-down PT frame `none_top.png`).** The magenta shadow (GREEN blocked) lies toward +x+y. The
   cyan shadow (RED blocked) lies toward −x+y. The short yellow shadow (BLUE blocked, high elevation) lies toward
   +x−y. Each is opposite the marker direction measured from the background, so the illumination uses the same
@@ -133,9 +134,10 @@ Isaac Lab's `UsdFileCfg`:
 - `world –FixedJoint– ground` is the articulation root link (fixed base).
 - `ground –revolute crank– crank –revolute coupler– coupler` and `ground –revolute rocker– rocker` form the
   articulation tree.
-- The loop is `coupler –revolute loop0– rocker` at C, with `physics:excludeFromArticulation = true` (UsdPhysics).
-  PhysX 5 closes loops "by adding rigid-body Joints between articulation links" (Articulations docs), and this
-  joint is solved as a maximal-coordinate constraint.
+- The loop is `coupler –revolute loop0– rocker` at C, with `physics:excludeFromArticulation = true` (UsdPhysics). PhysX
+  5 closes loops "by adding rigid-body Joints between articulation links"
+  ([Articulations docs](https://nvidia-omniverse.github.io/PhysX/physx/5.6.1/docs/Articulations.html)), and this joint
+  is solved as a maximal-coordinate constraint.
 - Joint frames are world-aligned at the start pose. Link damping, sleep and stabilization thresholds are 0, and the
   joints have no friction.
 - `ImplicitActuatorCfg` has stiffness = damping = 0, so the joints are passive.
@@ -171,8 +173,9 @@ was measured but not investigated further. It is not a reference trajectory.
 
 **Summary.** PhysX closes the four-bar loop tightly: **0.15 mm max / 0.04 mm mean at 2.5 ms, 0.75 / 0.15 mm at
 5 ms** (GPU; CPU PhysX 4× tighter). That is 3–8× tighter than MuJoCo's soft `connect` (0.36–1.16 mm at 2.5 ms)
-and close to Kamino at α 0.5 (0.044 mm). But PhysX **gains energy** on the undamped free swing (+9 % in 5 s at
-2.5 ms, +20 % at 5 ms, where MuJoCo loses 1–5 %), and it follows the exact trajectory less closely than MuJoCo
+and close to [Kamino at α 0.5](closed_loops_2026-09-25.md) (0.044 mm). But PhysX **gains energy** on the undamped free
+swing (+9 % in 5 s at 2.5 ms, +20 % at 5 ms, where MuJoCo loses 1–5 %), and it follows the exact trajectory less closely
+than MuJoCo
 (0.135 rad by 1 s vs 0.02–0.08 rad). Iterations (8 → 32) and TGS/PGS change nothing measurable. So the loop
 reference from Isaac is "hard closure, energy-injecting at robot time steps". Matching PhysX here means matching
 closure; the trajectory itself is a poorer reference than the exact DAE. Scope: one passive swing, one mechanism,
@@ -182,7 +185,8 @@ Isaac Sim 5.1 PhysX only (not run on 6.1).
 
 - Penetration: the local MetalSim comparison of the same per-step profile (peak/settle definition as above) is the
   next step. The 5.1 → 6.1 peak difference (0.5 → 2.1 mm) is unexplained.
-- Dome: apply `yaw = −90°` (or fold it into the formula) in MetalSim's USD DomeLight import, and do not add a
-  +90° x-rotation for Kit stages. PARITY §1.7's caveat and the GAPS row can then be closed (owner: rendering).
+- Dome: apply `yaw = −90°` (or fold it into the formula) in MetalSim's USD DomeLight import, and do not add a +90°
+  x-rotation for Kit stages. [PARITY](../PARITY.md) §1.7's caveat and the GAPS row can then be closed (owner:
+  rendering).
 - Four-bar: the PhysX energy gain versus the loop-joint formulation, and the four-bar on Isaac Sim 6.1 PhysX, were
   not recorded.

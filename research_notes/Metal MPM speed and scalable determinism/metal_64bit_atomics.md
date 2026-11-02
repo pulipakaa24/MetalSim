@@ -1,9 +1,11 @@
 # 64-bit compare-and-swap / exchange without 64-bit CAS: Metal-safe protocols for Newton's remaining sites
 
 Researched 2026-10-11. "Measured" means a probe run on this machine: Apple M4 Max (Apple9 family, 40-core GPU), macOS
-Darwin 25.6, GPUCompiler 32023, the integrated-2 Warp tree (`warp-i2`, the code that refuses 64-bit CAS on Metal,
-same refusal as fork `metalsim` 152808b7), through `scripts/gpu_run.sh` (kind `check`). Probe sources and logs are in
-the session scratchpad, not in the repo. Everything else is cited or read from the code (file and branch named).
+Darwin 25.6, GPUCompiler 32023, the integrated-2 Warp tree (`warp-i2`, see [MPM.md](../../metalsim/physics/mpm/MPM.md) section 8c; the
+code that refuses 64-bit CAS on Metal, same refusal as [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) at
+[`152808b7`](https://github.com/pulipakaa24/warp/commit/152808b7e33ce08fcc17c898c5ce11d567d60795)), through
+`scripts/gpu_run.sh` (kind `check`). Probe sources and logs are in the session scratchpad, not in the repo.
+Everything else is cited or read from the code (file and branch named).
 
 ## Summary
 
@@ -79,14 +81,18 @@ Consequences:
     ...").
   - The check reads the builtin calls of the Python source. So a `wp.atomic_cas(uint64)` that sits in a branch Metal
     never takes still makes the kernel refuse to launch. The CUDA/CPU form must be hidden in a `wp.func_native` body
-    under `#if !defined(__METAL_VERSION__)`, as `_hashtable_cas_key` does (Newton 24fb5367).
+    under `#if !defined(__METAL_VERSION__)`, as `_hashtable_cas_key` does
+    ([my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim-hashtable-metal) at
+    [`24fb5367`](https://github.com/pulipakaa24/newton/commit/24fb53679efbb45de4bc08a1631759789ee9db2e)).
 
 ## Q2. Lock-free techniques without 64-bit CAS, and the pitfalls
 
 1. **Pack and max/min (one-shot publish).** Order the payload so that the integer order of the packed word is the
    order you want the winner chosen in:
    - (score, tie-breaker, id) for contact reduction, already used by Newton's reducer;
-   - (float_flip(dist), key_low32) for contact matching, Newton 24fb5367;
+   - (float_flip(dist), key_low32) for contact matching,
+     [my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim-hashtable-metal) at
+     [`24fb5367`](https://github.com/pulipakaa24/newton/commit/24fb53679efbb45de4bc08a1631759789ee9db2e);
    - depth|id in visibility buffers ([Vulcanite](https://github.com/bdwhst/Vulcanite)).
 
    A 64-bit max/min with no return value is enough when nobody needs to know at once whether they won. Re-reading
@@ -96,7 +102,8 @@ Consequences:
      below (for max) every valid word.
    - One 64-bit min (or max) then writes the whole word.
    - Readers see empty, claimed (in flight) or settled. The claimant publishes in the same branch, with no loop and
-     no dependence on any other thread between claim and publish. This is the Newton HashTable fix (086148e1).
+     no dependence on any other thread between claim and publish. This is the HashTable fix in my fork of Newton
+     ([`086148e1`](https://github.com/pulipakaa24/newton/commit/086148e15f8da29a59dc91e29107008e2030d907)).
 3. **Monotone slots.** If every write to a word in a phase is a max (or every write a min), then:
    - a displaced value never comes back;
    - a stale pre-read (Warp's returned "old") can only under-estimate the slot, which is safe for "did I lose?"
@@ -123,14 +130,16 @@ Pitfalls:
 
   A spin lock (`while CAS(lock,0,1)==1`) whose holder sits in a threadgroup that is not scheduled, or in a masked-off
   path of the waiter's own SIMD-group, never returns. On a Mac that means a GPU hang and possibly a WindowServer
-  watchdog panic (MPM.md 8c records one).
+  watchdog panic ([MPM.md](../../metalsim/physics/mpm/MPM.md) 8c records one).
 - **SIMT reconvergence.** "A deadlock-free program on a multiple-instruction multiple-data (MIMD) architecture may
   deadlock on a SIMT machine" because divergent paths are serialised and reconverge at compiler-chosen points
   ([ElTantawy & Aamodt, MICRO 2016](https://people.ece.ubc.ca/aamodt/papers/eltantawy.micro2016.pdf)). NVIDIA
   addressed this in hardware with Volta's independent thread scheduling
   ([Volta Tuning Guide](https://docs.nvidia.com/cuda/archive/11.6.2/pdf/Volta_Tuning_Guide.pdf)). Apple documents
   nothing of the kind; Warp's own Metal guide warns "Spinlocks built from wp.atomic_cas() can hang: Apple GPUs do not
-  guarantee forward progress between SIMD lanes" (docs/user_guide/metal.rst).
+  guarantee forward progress between SIMD lanes"
+  ([`docs/user_guide/metal.rst`](https://github.com/pulipakaa24/warp/blob/metalsim/docs/user_guide/metal.rst) in
+  [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim)).
 
   The claim/publish wait is weaker than a lock, since the claimant needs only its own next instruction. But it still
   assumes the compiler does not sink the claimant's publish past the loop exit. That is a legal transformation for a
@@ -152,7 +161,7 @@ Pitfalls:
 
 ## Q3. Inventory of 64-bit CAS / exch per line (code read; `git grep` on the fork branches)
 
-| site | 1.7 line (`metalsim`, `metalsim-hashtable-metal`; upstream 45458023) | 1.5.2 line (`metalsim-1.5.2`) |
+| site | 1.7 line ([`metalsim`](https://github.com/pulipakaa24/newton/tree/metalsim), [`metalsim-hashtable-metal`](https://github.com/pulipakaa24/newton/tree/metalsim-hashtable-metal); upstream [`45458023`](https://github.com/newton-physics/newton/commit/45458023f24629c1feffb1f336594808f537db14)) | 1.5.2 line ([`metalsim-1.5.2`](https://github.com/pulipakaa24/newton/tree/metalsim-1.5.2)) |
 |---|---|---|
 | `contact_reduction_global.reduction_rollback_slot` / `reduction_finalize_slot` (uint64 CAS) | present (predictive and two-spatial-depth reducers) | absent (only `reduction_update_slot`, atomic_max) |
 | `contact_reduction_global.reduction_try_update_slot` (uses the *returned* uint64 max) | present: atomic on Metal, but the return is a stale pre-read | absent |
@@ -162,7 +171,8 @@ Pitfalls:
 | 32-bit only (no change needed): Kamino `rcm_batch` level CAS (int32), `fk` max_residual CAS loop (float32), contact-overflow flags (int32), VBD `particle_contact_head` exch (int32), XPBD `manifold_head` exch (int32) | | |
 | **Not 64-bit, but a true spin lock:** `geometry/raycast.py` `_spinlock_acquire` (`while atomic_cas(lock,0,0,1)==1`) | present | present |
 
-Measured failure inventory on Metal (Warp `warp-i2`, Newton `metalsim-hashtable-metal` tree, Newton's tests with the
+Measured failure inventory on Metal (Warp `warp-i2`, the `metalsim-hashtable-metal` tree of
+[my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim-hashtable-metal), Newton's tests with the
 device list forced to "all"; `tests_metal.log`):
 - **test_contact_reduction_global**: 3 failed, 25 passed. The three are `test_centered_two_spatial_depths_*`
   (`prefers_inner_then_outer`, `voxel_only_claim`, `full_buffer_does_not_publish_voxel_key`). The refused kernels are
@@ -176,12 +186,14 @@ device list forced to "all"; `tests_metal.log`):
 - **kamino/test_kamino_solvers_metrics**: 15 failed, 6 passed on the default device metal:0. The first failure
   inspected refuses `_compute_cts_joints_residual: atomic_exch(int64)`; the other 14 were not inspected one by one.
 - **test_hashtable**: all pass.
-- With stock 45458023 (what `.venv` has installed today), every HashTable user also fails on Metal: 15 of 28 in
-  test_contact_reduction_global.
+- With stock upstream Newton [`45458023`](https://github.com/newton-physics/newton/commit/45458023f24629c1feffb1f336594808f537db14) (what `.venv`
+  has installed today), every HashTable user also fails on Metal: 15 of 28 in test_contact_reduction_global.
 
 ## Q4. Per-site designs
 
-Common scaffolding for Newton, copied from the HashTable fix (086148e1 / 24fb5367):
+Common scaffolding for Newton, copied from the HashTable fix in [my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim-hashtable-metal)
+([`086148e1`](https://github.com/pulipakaa24/newton/commit/086148e15f8da29a59dc91e29107008e2030d907) /
+[`24fb5367`](https://github.com/pulipakaa24/newton/commit/24fb53679efbb45de4bc08a1631759789ee9db2e)):
 - a `_use_metal_protocol()` `func_native` that returns `true` under `__METAL_VERSION__`;
 - `_load_u64(arr, idx)`: two relaxed 32-bit atomic loads on Metal, a plain load elsewhere;
 - the CUDA/CPU 64-bit CAS kept inside a `func_native` `#else` branch, so the Python codegen never sees a
@@ -347,8 +359,8 @@ Not covered by the probes:
 
 ## Open questions
 
-- Implement 4a-4c in the fork branches and run Newton's contact reduction, XPBD and Kamino metrics tests on Metal and
-  CPU under a watchdog.
+- Implement 4a-4c in the branches of [my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim) and run Newton's contact
+  reduction, XPBD and Kamino metrics tests on Metal and CPU under a watchdog.
 - The raycast spin lock is a real lock (32-bit, so not refused). It is unsafe on Metal for the reasons in Q2 and
   should become a claim-free formulation, e.g. a packed `atomic_min` of (distance, index) if it guards a closest-hit
   update. Not examined here.
@@ -357,31 +369,36 @@ Not covered by the probes:
 
 ## Implementation (2026-10-12)
 
-The designs of Q4 are in the Newton fork (pulipakaa24/newton), CPU and CUDA code unchanged (the 64-bit CAS / exchange
-moved into `func_native` helpers with a Metal `#if` branch):
+The designs of Q4 are in [my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim), CPU and CUDA code
+unchanged (the 64-bit CAS / exchange moved into `func_native` helpers with a Metal `#if` branch):
 
-| site | 1.7 line (`metalsim`, `metalsim-hashtable-metal`) | 1.5.2 line (`metalsim-1.5.2`) |
+| site | 1.7 line ([`metalsim`](https://github.com/pulipakaa24/newton/tree/metalsim), [`metalsim-hashtable-metal`](https://github.com/pulipakaa24/newton/tree/metalsim-hashtable-metal)) | 1.5.2 line ([`metalsim-1.5.2`](https://github.com/pulipakaa24/newton/tree/metalsim-1.5.2)) |
 |---|---|---|
-| contact_reduction_global finalize / rollback (4a) | `852a9653` / `ffae2416` | absent |
-| XPBD restitution manifold table (4b) | `210e7768` / `391650b6` | absent |
-| Kamino metric argmax keys (4c) | `f6c8f60d` / `4923e0f3` | `3813cbba` (the 5 inline sites through one helper) |
+| contact_reduction_global finalize / rollback (4a) | [`852a9653`](https://github.com/pulipakaa24/newton/commit/852a9653c6ea79f78821db1eaa166b75dd0c4513) / [`ffae2416`](https://github.com/pulipakaa24/newton/commit/ffae24161d5fb721710a6f07ab0ee54186338009) | absent |
+| XPBD restitution manifold table (4b) | [`210e7768`](https://github.com/pulipakaa24/newton/commit/210e7768017d94911a4d6d3e37fe92506e3c6fbb) / [`391650b6`](https://github.com/pulipakaa24/newton/commit/391650b61c844bf3100847006101c1ce619d2981) | absent |
+| Kamino metric argmax keys (4c) | [`f6c8f60d`](https://github.com/pulipakaa24/newton/commit/f6c8f60de2e85738d15bba502d22a32d3cc50aa8) / [`4923e0f3`](https://github.com/pulipakaa24/newton/commit/4923e0f328b50f16cba064b7f47739c8e76c18eb) | [`3813cbba`](https://github.com/pulipakaa24/newton/commit/3813cbba50851af4757f16e30835902efe56ecb2) (the 5 inline sites through one helper) |
 
 Departures from the designs above:
 - 4b: a contact that runs out of passes (bound: table size + 65,536 passes) is left out of restitution, as on CUDA
   when the table is full, and counted in `SolverXPBD.restitution_insert_failures`; the HashTable's claim loop got the
-  same bound (returns -1, counted by the reducers in `ht_insert_failures`): `7dd71ed9` / `a4be3604` (1.7),
-  `e0c7c82e` (1.5.2).
+  same bound (returns -1, counted by the reducers in `ht_insert_failures`):
+  [`7dd71ed9`](https://github.com/pulipakaa24/newton/commit/7dd71ed9f3ccf1b5c55a457b2f0f65da0e678851) /
+  [`a4be3604`](https://github.com/pulipakaa24/newton/commit/a4be3604bc218bb366d12164fa3e1025f333bdae) (1.7),
+  [`e0c7c82e`](https://github.com/pulipakaa24/newton/commit/e0c7c82efc62d92e769020d1dea38ddf491b61cd) (1.5.2).
 - 4c zeroes the packed maxima before each metric launch and finalizes right after it, so one packed row and one key
   scratch serve every metric; the finalize stores the key only when the launch's maximum is the world's maximum after
   the launch (the exchange's own condition), so evaluations without a reset in between keep the exchange's semantics.
   On the 1.5.2 line (no NaN handling there) NaN values do not take part, as their `value >= previous_max` never held.
 
-Tests (Warp fork `152808b7` built, devices cpu + metal:0, Newton's test files under pytest with the device mode "all";
+Tests ([my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) at
+[`152808b7`](https://github.com/pulipakaa24/warp/commit/152808b7e33ce08fcc17c898c5ce11d567d60795) built, devices
+cpu + metal:0, Newton's test files under pytest with the device mode "all";
 logs `runs/rigid17/out/`): on `metalsim-hashtable-metal` (what `.venv` installs) 98 failures -> 13 over
 test_contact_reduction_global, test_contact_reduction, test_hashtable, test_contact_matching, test_collision_pipeline,
 test_narrow_phase, test_sdf_contact, test_heightfield, test_mesh_backface, test_rigid_contact, test_solver_xpbd and
 kamino/test_kamino_solvers_metrics; no test went from pass to fail; the 13 left are SolverMuJoCo tests that fail to
-build `convert_mjw_contacts_to_newton_kernel` against the MuJoCo Warp fork 3.14 (`contact_force_fn` signature,
+build `convert_mjw_contacts_to_newton_kernel` against
+[my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) 3.14 (`contact_force_fn` signature,
 environment). `metalsim` gives identical outcomes. 1.5.2 Kamino metrics: CPU 9/9; Metal 8/9 (before: 5 errors, the
 refused exchange); the Metal failure is test_06's dense-vs-sparse `f_ncp` comparison, 2.1e-6 relative against rtol
 1e-6 in a kernel these changes do not touch. The raycast spin lock (Q3) is unchanged and remains a hang risk on Metal.

@@ -6,8 +6,8 @@ compose with the Kit azimuth convention (`tier2.KIT_DOME_AZIMUTH`, `usd_vs_kit_l
 
 ## Sources
 
-1. **OpenUSD `UsdLuxDomeLight_1`** (openusd.org/release/api/class_usd_lux_dome_light__1.html; user guide
-   openusd.org/dev/user_guides/schemas/usdLux/DomeLight_1.html). `uniform token poleAxis = "scene"`, values
+1. **OpenUSD `UsdLuxDomeLight_1`** ([API reference](https://openusd.org/release/api/class_usd_lux_dome_light__1.html);
+   [user guide](https://openusd.org/dev/user_guides/schemas/usdLux/DomeLight_1.html)). `uniform token poleAxis = "scene"`, values
    `scene` | `Y` | `Z`: "the starting alignment of the dome light's top pole"; `scene` = the stage's up axis. With a
    Y pole the map follows OpenEXR's latlong (pole +y, longitude 0 toward +z); with a Z pole, latitude ±π/2 is ±z and
    longitude 0 faces −y. The alignment "is intended to be applied by a renderer to only the dome itself" and is
@@ -15,10 +15,10 @@ compose with the Kit azimuth convention (`tier2.KIT_DOME_AZIMUTH`, `usd_vs_kit_l
    prim's world transform: `world = R_prim · P_pole · local`. The order is not spelled out, but "not inherited by
    children" only makes sense for a local-frame rotation.
 2. **OpenUSD `UsdLuxDomeLight`** (legacy). No `poleAxis`: by the spec the pole is always +Y (OpenEXR).
-   `OrientToStageUpAxis()` adds a +90° `rotateX` op on z-up stages so a +Y-pole dome stands upright. NVIDIA's USD
-   Exchange SDK (`usdex.core` Light Prims docs) still authors the legacy schema because DomeLight_1 "is not widely
+   `OrientToStageUpAxis()` adds a +90° `rotateX` op on z-up stages so a +Y-pole dome stands upright. NVIDIA's
+   [USD Exchange SDK](https://github.com/NVIDIA-Omniverse/usd-exchange) (`usdex.core` Light Prims docs) still authors the legacy schema because DomeLight_1 "is not widely
    supported yet".
-3. **Kit/RTX, measured** (Isaac Sim 5.1 / Kit 107.3.3 and 6.1 / Kit 110.3.0, legacy `UsdLux.DomeLight` on a z-up stage,
+3. **Kit/RTX, measured** ([Isaac Sim](https://github.com/isaac-sim/IsaacSim) 5.1 / Kit 107.3.3 and 6.1 / Kit 110.3.0, legacy `UsdLux.DomeLight` on a z-up stage,
    `docs/research/isaac_side_session_2026-09-26.md` §2, recipe `metalsim/parity/isaac_side/record_dome_azimuth.py`):
    - the un-rotated dome has pole **+z** (Kit ignores the spec's +Y pole for the legacy schema), with the image centre
      toward −x, i.e. the DomeLight_1 Z-pole frame turned by −90° about +z (`KIT_DOME_AZIMUTH`);
@@ -28,7 +28,7 @@ compose with the Kit azimuth convention (`tier2.KIT_DOME_AZIMUTH`, `usd_vs_kit_l
      where `d_spec` is the DomeLight_1 Z-pole direction of (u, v) and `R_prim` the prim's full world rotation.
      The tilt is not reduced to a yaw, and adding `OrientToStageUpAxis`'s +90° x-rotation on a z-up stage tips the
      map over in Kit.
-4. **Omniverse "Lighting" docs** (docs.omniverse.nvidia.com/materials-and-rendering/latest/lighting.html, UsdLux 25.05
+4. **Omniverse "Lighting" docs** ([docs.omniverse.nvidia.com/materials-and-rendering/latest/lighting.html](https://docs.omniverse.nvidia.com/materials-and-rendering/latest/lighting.html), UsdLux 25.05
    section): "Previously, RTX oriented the dome light such that a default camera would be looking at the 'bottom' of
    the image. Now the default orientation is such that a default camera will be looking at the horizon". The
    section also says Kit previously applied an extra correcting transform to dome lights, and that transform has
@@ -80,7 +80,7 @@ Z pole, `hdr.env_direction(u, v)`), and:
   A first version used only a runtime flag branch. Its upright renders differed from main by 1–2 ulp in 17–21 % of
   HDR values (same paths: rgb, depth, normal and seg were identical). Fast-math codegen had changed around the
   branch (`runs/dome_tilt/suite_v1_runtime_branch.log`). With the compile-time variant,
-  `scripts/diagnostics/dome_untilted_bytes.py` finds all 54 output arrays byte-identical to origin/main c3a25d9d.
+  `scripts/diagnostics/dome_untilted_bytes.py` finds all 54 output arrays byte-identical to main at [`e20bb546`](https://github.com/pulipakaa24/MetalSim/commit/e20bb5464031d8516b37e1159dcb0f1704ebb93a).
   The arrays cover the sky colour, `set_environment` at three yaws, `set_environment_pose`, a sky-only camera, and a USD
   `rotateZ 30` dome through the importer.
 - Lookup (`test_env_map_tilted_dome_lookup`): a map that stores its own dome-frame direction is seen by a sky-only

@@ -1,19 +1,19 @@
 # Pull request for google-deepmind/mujoco_warp: ready, NOT opened (blocked on the owner's Google CLA)
 
-Status 2026-09-26. Head: github.com/pulipakaa24/mujoco_warp branch `elliptic-jtcj-offcuda`, commit `6d8e29a`
-(one commit on upstream `main` `cc97eea`, which is still upstream's head; no rebase needed). Author and committer
-`Aditya Pulipaka <adipu@utexas.edu>`, no co-author trailer (upstream AGENTS.md: AI co-authors fail the CLA check).
+Status 2026-09-26. Head: [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim), branch [`elliptic-jtcj-offcuda`](https://github.com/pulipakaa24/mujoco_warp/tree/elliptic-jtcj-offcuda), commit
+[`6d8e29a`](https://github.com/pulipakaa24/mujoco_warp/commit/6d8e29a210ed0d1812118c3cd22b5e3450b6d2d3) (one commit on upstream `main` [`cc97eea`](https://github.com/google-deepmind/mujoco_warp/commit/cc97eea203bb6d18f5795cd5922a65da1e1051ce), which is still upstream's head; no rebase needed). Author and committer
+`Aditya Pulipaka <adipu@utexas.edu>`, no co-author trailer (upstream [AGENTS.md](https://github.com/google-deepmind/mujoco_warp/blob/main/AGENTS.md): AI co-authors fail the CLA check).
 Commit message unwrapped per upstream AGENTS.md. Issue filed: https://github.com/google-deepmind/mujoco_warp/issues/1704.
 Worktree: `upstream/mujoco_warp-pr`.
 
 Checks run 2026-09-26 (CPU only; scratch venv from upstream's `uv.lock`: warp-lang 1.15.0, mujoco 3.13.1):
 - `pytest mujoco_warp/_src -q --cpu -n 8`: 1514 passed, 39 skipped, 1 failed
-  (`io_test::test_put_data_nefc_zero_dense`, fails identically on `main` `cc97eea`).
+  (`io_test::test_put_data_nefc_zero_dense`, fails identically on `main` [`cc97eea`](https://github.com/google-deepmind/mujoco_warp/commit/cc97eea203bb6d18f5795cd5922a65da1e1051ce)).
 - CPU timing (`scripts/diagnostics/competitors/elliptic_cpu_time.py 32 100`, Go2, 3 runs each, mujoco 3.14.0):
-  `main` 10.2 / 10.3 / 10.4 ms/step, branch 5.7 / 5.8 / 5.8. (The 12.8 -> 5.8 of 2026-09-25 was on the v3.14.0 fork.)
+  `main` 10.2 / 10.3 / 10.4 ms/step, branch 5.7 / 5.8 / 5.8. (The 12.8 -> 5.8 of 2026-09-25 was on my fork, v3.14.0 base.)
 - Oracle (`elliptic_cpu_check.py`, 2 worlds, 40 steps vs mj_step): Go2 max |dq| 1.8e-7 .. 2.4e-6 (main 1.8e-7 .. 2.3e-6),
   G1 sparse 6.7e-8 .. 3.2e-7 on both.
-- Metal numbers are from the v3.14.0-based MetalSim fork (2026-09-25), not re-run (no GPU work in this session).
+- Metal numbers are from my fork (v3.14.0 base, 2026-09-25), not re-run (no GPU work in this session).
 
 To open once the CLA shows as signed (the owner runs this; it is the only step left):
 

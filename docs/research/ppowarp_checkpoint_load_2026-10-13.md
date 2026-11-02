@@ -2,15 +2,18 @@
 
 ## Finding
 
-While the latched overflow guard was being checked (PR #7), `scripts/diagnostics/overflow_training_check.py
+While the latched overflow guard was being checked
+([PR #7](https://github.com/pulipakaa24/MetalSim/commit/8b46aca8ef769a2acbe7a0a9971721c8e53269a7)), `scripts/diagnostics/overflow_training_check.py
 g1_rough_policy*` replayed G1 rough checkpoints on today's task. Every episode ended in a fall after about 40 control
 steps, on every terrain level. The open question was whether the task had changed since the checkpoints were trained
 (cone, observations, gains, ...) or whether physics or task code had regressed.
 
 It was neither. The replay never ran the checkpoint:
 
-- `WarpMLPPolicy` (since `7d2ee8bd`, 2026-09-22) re-homes every parameter of the torch net onto a Warp buffer
-  (`p.data = tb.mps_tensor(warp_array)`), so torch and the Warp rollout share the memory.
+- `WarpMLPPolicy` (since
+  [`7d2ee8bd`](https://github.com/pulipakaa24/MetalSim/commit/7d2ee8bdaddcb8503685d568f7a1de98119cef1b), 2026-09-22)
+  re-homes every parameter of the torch net onto a Warp buffer (`p.data = tb.mps_tensor(warp_array)`), so torch and the
+  Warp rollout share the memory.
 - Torch writes to that memory go through PyTorch's MPS queue. `PPOWarp.update()` orders the optimizer's writes before
   the next Warp rollout with a shared event (`tb.signal_event` + `sim.wait`). A `net.load_state_dict(...)` had no such
   ordering. The copy was not visible to Warp before the rollout, and it was still not visible after a 20-rollout replay
@@ -40,11 +43,13 @@ it uses the `xy` scan order, the exact scan and box collision, while that run us
 
 ## Training on today's main reproduces the documented curve
 
-G1 rough, today's main `ad97888e`, trained on the 14-inch (macOS 27, correctness run; throughput not comparable) with
-the documented run's exact settings (`runs/ellip_default/run.sh`: 4096 envs, physics dt 0.0025, `--reward_cfg
-rough_isaac`, seed 0; the run header is identical to the reference's), 1000 iterations. Log
-`runs/g1regress/ckpt14/rough_main_s0.log`. Reference: `runs/ellip_default/g1_rough_ellip_default_s0.log` (2026-09-26,
-PARITY §1.5). Columns are return / episode length / mean terrain level.
+G1 rough, today's main
+[`8b46aca8`](https://github.com/pulipakaa24/MetalSim/commit/8b46aca8ef769a2acbe7a0a9971721c8e53269a7), trained on the
+14-inch MacBook Pro (M4 Max; macOS 27, correctness run; throughput not comparable) with the documented run's exact
+settings (`runs/ellip_default/run.sh`: 4096 envs, physics dt 0.0025, `--reward_cfg rough_isaac`, seed 0; the run header
+is identical to the reference's), 1000 iterations. Log `runs/g1regress/ckpt14/rough_main_s0.log`. Reference:
+`runs/ellip_default/g1_rough_ellip_default_s0.log` (2026-09-26, [PARITY §1.5](../PARITY.md#15-learning-on-the-g1-task)).
+Columns are return / episode length / mean terrain level.
 
 | iteration | reference (2026-09-26) | today's main |
 |---|---|---|
@@ -57,8 +62,8 @@ PARITY §1.5). Columns are return / episode length / mean terrain level.
 | 700 | +7.01 / 966 / 5.03 | +6.63 / 983 / 5.29 |
 | 1000 | +8.23 / 973 / 5.65 | +7.55 / 985 / 5.86 |
 
-The resulting policy walks when replayed (16-inch, `runs/g1regress/replay_main_rough_it1000.log`): 1,016 of 1,024
-episodes run to the time-out, 9 falls over 1,200 control steps. Spread over levels 0–9 at 4096 envs
+The resulting policy walks when replayed (16-inch MacBook Pro, M4 Max, `runs/g1regress/replay_main_rough_it1000.log`):
+1,016 of 1,024 episodes run to the time-out, 9 falls over 1,200 control steps. Spread over levels 0–9 at 4096 envs
 (`main_rough_it1000_all_levels.log`): 3,983 of 4,096 first episodes run to the time-out.
 
 G1 flat, same protocol (`run.sh` flat settings: dt 0.0025, `--reward_cfg flat`, seed 0, identical run header),
@@ -86,13 +91,13 @@ torch module.
 
 | path | loads into a Warp-bound net? | documented results produced through it | verdict |
 |---|---|---|---|
-| `scripts/diagnostics/overflow_training_check.py g1_rough_policy*` (`f4afcff1`, 2026-10-13 02:54) | yes | the two trained-policy rows of `research_notes/capacity_overflow_guard/g1_bound_and_lost_flags.md` (`runs/fixfail/train/g1_rough_policy*`, `runs/fixfail/train14/`) | **invalid**: they ran the untrained weights. Corrected in the note, re-run with the fix (four runs, last two rows). The conclusion is unchanged: no capacity flag, and no default changed |
-| `metalsim/learn/tron1_wf.py train(resume=...)` / `--resume` (since `293d38a5`, 2026-09-24) | yes | none: `runs/tron1_wf/{easy1,v1,v2}/train.log` each have one start header, so none was resumed, and `docs/TRON1.md` documents no resume | would have run the first rollout of a resumed run on the initial weights (the first update then queues behind the copy). Fixed by the hook |
-| `scripts/diagnostics/ppo_update_profile.py` (`9a3ef746`, 2026-09-26) | yes, to restore the net between timed repeats | PPO update timings | not affected: the timed work is the torch update, which reads the parameters on the same MPS queue as the copy, and `torch.mps.synchronize()` follows each load inside the timed loop. No Warp rollout reads the restored weights |
+| `scripts/diagnostics/overflow_training_check.py g1_rough_policy*` ([`526505da`](https://github.com/pulipakaa24/MetalSim/commit/526505dab2455016b4bcbacc11d652a986c7ce3b), 2026-10-13 02:54) | yes | the two trained-policy rows of `research_notes/capacity_overflow_guard/g1_bound_and_lost_flags.md` (`runs/fixfail/train/g1_rough_policy*`, `runs/fixfail/train14/`) | **invalid**: they ran the untrained weights. Corrected in the note, re-run with the fix (four runs, last two rows). The conclusion is unchanged: no capacity flag, and no default changed |
+| `metalsim/learn/tron1_wf.py train(resume=...)` / `--resume` (since [`840ac1df`](https://github.com/pulipakaa24/MetalSim/commit/840ac1dfd0b80cb3c83210b77181e0f5eb3e257d), 2026-09-24) | yes | none: `runs/tron1_wf/{easy1,v1,v2}/train.log` each have one start header, so none was resumed, and `docs/TRON1.md` documents no resume | would have run the first rollout of a resumed run on the initial weights (the first update then queues behind the copy). Fixed by the hook |
+| `scripts/diagnostics/ppo_update_profile.py` ([`e1512a23`](https://github.com/pulipakaa24/MetalSim/commit/e1512a23196bd7f4f205803074e0c86423c499ea), 2026-09-26) | yes, to restore the net between timed repeats | PPO update timings | not affected: the timed work is the torch update, which reads the parameters on the same MPS queue as the copy, and `torch.mps.synchronize()` follows each load inside the timed loop. No Warp rollout reads the restored weights |
 | `scripts/diagnostics/g1_policy_replay.py` (new here) | yes | this note | written after the fix; it prints whether the Warp weights match the checkpoint |
 | G1 evaluators: `g1_reward_terms.py`, `g1_rough_transfer.py` (`runs/g1_rough_transfer*.jsonl`, PARITY §1.5 transfer numbers), `il3_transfer.py`, `newton_transfer.py`, `newton_stance_gap.py`, `g1_swing.py`, `g1_pushoff.py`, `contact_research/air_time_rollout.py`, `competitors/{g1_falls,g1_state_dump,cap_probe_*}.py`, `speculative/overtravel_probe.py`, `runs/il3/{blowup_probe,policy_stats}.py`, `metalsim/parity/side_by_side.py` (stage videos), `docs/gallery/scripts/14_g1_policy_video.py` | no: each builds its own `ActorCriticMLP` / `nn.Sequential` and evaluates it in torch, with no `WarpMLPPolicy` | PARITY §1.5 transfer, reward-term and swing / push-off results; stage videos; gallery video | not affected |
 | Isaac-side plays of our checkpoints (`runs/parity/isaac/rough/play_rough/L*/metalsim_ours_it*`, `metalsim/parity/isaac_side/play_policy.py`) | no: torch `nn.Sequential` on CUDA inside Isaac | PARITY §1.5 transfer into Isaac | not affected |
-| Franka-Pour (`metalsim/learn/franka_pour_ppo.py`, `franka_pour_eval.py`, PR #6) | no: `PourPPO` keeps its actor and critic as ordinary torch modules on the env device and acts in torch. `franka_pour*.py` contain no `WarpMLPPolicy`, `PPOWarp`, `warp_policy` or `.data =` (grep, exit 1). Eval: `PPO.Actor(...).load_state_dict(ckpt["actor_state_dict"])` then torch inference; resume: `PourPPO.load_state_dict` into torch modules + optimizer | Franka-Pour eval and resume numbers (PARITY §1b) | not affected |
+| Franka-Pour (`metalsim/learn/franka_pour_ppo.py`, `franka_pour_eval.py`, [PR #6](https://github.com/pulipakaa24/MetalSim/commit/c7a62c37416134ded7abc8d6e64434de9040cb15)) | no: `PourPPO` keeps its actor and critic as ordinary torch modules on the env device and acts in torch. `franka_pour*.py` contain no `WarpMLPPolicy`, `PPOWarp`, `warp_policy` or `.data =` (grep, exit 1). Eval: `PPO.Actor(...).load_state_dict(ckpt["actor_state_dict"])` then torch inference; resume: `PourPPO.load_state_dict` into torch modules + optimizer | Franka-Pour eval and resume numbers ([PARITY §1b](../PARITY.md#1b-isaaccontrib-franka-pour-isaac-lab-30-ea-granular-mpm-manipulation-2026-10-12)) | not affected |
 
 Searched: every `load_state_dict` / `torch.load` in `metalsim/`, `scripts/`, `tests/`, `runs/` and `docs/gallery/`,
 and every user of `WarpMLPPolicy` / `PPOWarp(` (`git grep`).

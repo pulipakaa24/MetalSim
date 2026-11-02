@@ -19,7 +19,7 @@ MJCF](https://github.com/TheRobotStudio/SO-ARM100/blob/608122e9ac330a753735f2e18
 
 ## MJCF derivation steps
 
-1. Copied `so101_new_calib.xml` (commit SHA aec17bbc256d1a7342d53aaa4950595d4c30b40d).
+1. Copied `so101_new_calib.xml` (commit SHA [aec17bbc256d1a7342d53aaa4950595d4c30b40d](https://github.com/TheRobotStudio/SO-ARM100/commit/aec17bbc256d1a7342d53aaa4950595d4c30b40d)).
 2. Rounded floats and reformatted the XML for readability.
 3. Switched to implicitfast.
 4. Use default `forcerange` for actuators rather than 3.35 N/m.

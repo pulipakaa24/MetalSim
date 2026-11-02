@@ -1,15 +1,18 @@
 # MuJoCo Warp flex fixes proposed upstream (not filed yet)
 
-**Pre-filing step (required):** the MuJoCo Warp project's CLA check rejects commits co-authored by AI assistants
-(`AGENTS.md` in the repository). Before filing, rewrite the `metalsim-flex` commits of the fork (and the flex commits
+**Pre-filing step (required):** the [MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp) project's CLA check
+rejects commits co-authored by AI assistants (`AGENTS.md` in the repository). Before filing, rewrite the `metalsim-flex`
+commits of [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-flex) (and the flex commits
 in the merge / `patches/mujoco_warp/0008-0016`) without the `Co-Authored-By: Claude ...` trailer, on a fresh branch cut
-for the upstream PRs. MetalSim's own commits keep the trailer. Not rewritten yet (the fork branches are pinned by
-the patch series and the merged heads).
+for the upstream PRs. MetalSim's own commits keep the trailer. Not rewritten yet (the fork branches are pinned by the
+patch series and the merged heads).
 
-Target: google-deepmind/mujoco_warp (base v3.14.0, `88af9cc`). Fixes live on github.com/pulipakaa24/mujoco_warp branch
-`metalsim-flex` (commits listed per item); each is behind a module flag in `mujoco_warp/_src/collision_flex.py` so the
-upstream behaviour is one assignment away. Reference: MuJoCo C 3.14.0 (pip) and MuJoCo C `main` (2026-09-23, built
-locally) where they differ.
+Target: google-deepmind/mujoco_warp (base v3.14.0,
+[`88af9cc`](https://github.com/google-deepmind/mujoco_warp/commit/88af9cc682d42e2e925daa0bae25f53277999f7b)). Fixes live
+on branch [`metalsim-flex`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-flex) of my fork (commits listed
+per item); each is behind a module flag in `mujoco_warp/_src/collision_flex.py` so the upstream behaviour is one
+assignment away. Reference: [MuJoCo](https://github.com/google-deepmind/mujoco) C 3.14.0 (pip) and MuJoCo C `main`
+(2026-09-23, built locally) where they differ.
 
 Reproducers: `upstream_repro.py` (plain MuJoCo Warp API, no MetalSim; run it with the unmodified and the fixed
 MuJoCo Warp) and `row_order_repro.py`. Each case steps MuJoCo C (float64) into contact, hands that exact state to
@@ -19,13 +22,13 @@ Warp CPU device (`runs/deformable/upstream_repro_cpu.jsonl`); float32 against fl
 
 | # | issue | reproducer case | before: ncon W/C, sets equal, one-step max Δqvel | after | fix commit(s) |
 |---|---|---|---|---|---|
-| 1 | element-geom contacts of any flex other than the first carry the global element id | `second_flex` (control `first_flex`) | 2/2, **no**, 3.2e-2 m/s (control: 1/1, yes, 2.5e-6) | 2/2, yes, 4.6e-6 | a277152 |
-| 2 | flex edge-equality rows ordered by an atomic counter | `row_order_repro.py` on `metal:0` | efc_pos in order off by **8.4e-2** (sorted 1.2e-8); `FlexConstraintTest.test_constraint_parity2/3` fail on Metal | in-order = sorted; 237/237 flex tests on Metal | 9c6e09f |
-| 3 | geom-flex contacts not capped at mjMAXCONPAIR per pair | `plane_cap` | **100**/50, no, 3.7e-2 | 50/50, yes, 2.7e-6 | b2e9ea5, bbe19bb |
-| 4 | box-triangle keeps at most 2 contacts per element | `box_cloth_3x3` (no cap involved) | **16**/24, no, 1.6e-2 | 24/24, yes, 3.2e-7 | b2e9ea5 |
+| 1 | element-geom contacts of any flex other than the first carry the global element id | `second_flex` (control `first_flex`) | 2/2, **no**, 3.2e-2 m/s (control: 1/1, yes, 2.5e-6) | 2/2, yes, 4.6e-6 | [`a277152`](https://github.com/pulipakaa24/mujoco_warp/commit/a2771520f5d9de6a0cdd862c599ee7ff97043415) |
+| 2 | flex edge-equality rows ordered by an atomic counter | `row_order_repro.py` on `metal:0` | efc_pos in order off by **8.4e-2** (sorted 1.2e-8); `FlexConstraintTest.test_constraint_parity2/3` fail on Metal | in-order = sorted; 237/237 flex tests on Metal | [`9c6e09f`](https://github.com/pulipakaa24/mujoco_warp/commit/9c6e09f3725cdae5e47eec48bf8633c9c627591b) |
+| 3 | geom-flex contacts not capped at mjMAXCONPAIR per pair | `plane_cap` | **100**/50, no, 3.7e-2 | 50/50, yes, 2.7e-6 | [`b2e9ea5`](https://github.com/pulipakaa24/mujoco_warp/commit/b2e9ea5c7498f5ecc2c3c290f757d09e2f61e1d2), [`bbe19bb`](https://github.com/pulipakaa24/mujoco_warp/commit/bbe19bb100f03315c07a4764ed830e0317df15da) |
+| 4 | box-triangle keeps at most 2 contacts per element | `box_cloth_3x3` (no cap involved) | **16**/24, no, 1.6e-2 | 24/24, yes, 3.2e-7 | [`b2e9ea5`](https://github.com/pulipakaa24/mujoco_warp/commit/b2e9ea5c7498f5ecc2c3c290f757d09e2f61e1d2) |
 | 3+4 | both, cloth draped on a box | `box_cloth` | **265**/50, no, 6.3e-2 | 50/50, yes, 1.3e-5 | – |
-| 5 | 1D flexes collide as vertex spheres, not capsule segments | `cable_box` | **6**/12, no, 3.6e-2 | 12/12, yes, 2.7e-6 | a277152 |
-| 6 | every tetrahedron of a volume collides, not only active (surface) layers | `soft_cube` | **54**/34, no, 9.6e-8 | 34/34, yes, 9.6e-8 | 6234396 |
+| 5 | 1D flexes collide as vertex spheres, not capsule segments | `cable_box` | **6**/12, no, 3.6e-2 | 12/12, yes, 2.7e-6 | [`a277152`](https://github.com/pulipakaa24/mujoco_warp/commit/a2771520f5d9de6a0cdd862c599ee7ff97043415) |
+| 6 | every tetrahedron of a volume collides, not only active (surface) layers | `soft_cube` | **54**/34, no, 9.6e-8 | 34/34, yes, 9.6e-8 | [`6234396`](https://github.com/pulipakaa24/mujoco_warp/commit/6234396186ca506e27c22513550711ca5689fb5d) |
 
 ## 1. Wrong element for flexes after the first (bug)
 
@@ -94,12 +97,14 @@ median from 3.1e-4 to 6.5e-5 m/s (`docs/research/deformables_2026-09-25.md` §2)
 
 ## 7. Per-pair contact cap too small for large cloths (issue, not a bug fix)
 
-A 1 m, 33 × 33 continuum cloth (E 1e6, ν 0.45, thickness 0.01: Isaac Lab 3.0's PhysX surface defaults) dropped on a
-0.4 m box sinks through the box and falls to the floor in MuJoCo C 3.14 itself: the 50 contacts kept per (body, flex)
-pair cannot hold it. With mjMAXCONPAIR raised to 4000 (MuJoCo C built locally) the raw set is ~290 contacts at impact
-and ~80 at rest and the cloth rests on the box at 0.422 m. MuJoCo Warp (with fixes 3–4) reproduces C in both cases;
-the fork adds `collision_flex.FLEX_MAXCONPAIR` (default 50 = C parity; 400 → 0.420 m on the box). Upstream-worthy as
-an issue for both MuJoCo and MuJoCo Warp (make the flex cap a model option, e.g. per flex); commit 64a1ea5, test
+A 1 m, 33 × 33 continuum cloth (E 1e6, ν 0.45, thickness 0.01: [Isaac Lab](https://github.com/isaac-sim/IsaacLab) 3.0's
+PhysX surface defaults) dropped on a 0.4 m box sinks through the box and falls to the floor in MuJoCo C 3.14 itself: the
+50 contacts kept per (body, flex) pair cannot hold it. With mjMAXCONPAIR raised to 4000 (MuJoCo C built locally) the raw
+set is ~290 contacts at impact and ~80 at rest and the cloth rests on the box at 0.422 m. MuJoCo Warp (with fixes 3–4)
+reproduces C in both cases; [my fork](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-flex) adds
+`collision_flex.FLEX_MAXCONPAIR` (default 50 = C parity; 400 → 0.420 m on the box). Upstream-worthy as an issue for both
+MuJoCo and MuJoCo Warp (make the flex cap a model option, e.g. per flex); commit
+[`64a1ea5`](https://github.com/pulipakaa24/mujoco_warp/commit/64a1ea55cb9a807213ce1e6fb63394ae4fe016ca), test
 `FlexMaxConPairTest`.
 
 ## Also on the branch, lower priority for upstream
@@ -109,16 +114,22 @@ an issue for both MuJoCo and MuJoCo Warp (make the flex cap a model option, e.g.
   (`MESH_FLEX_FACE_NORMAL`, `MESH_FLEX_NORMAL_MIN_SEP`); contact point at the midpoint of the radius-inflated
   penetration (`FLEX_RADIUS_CONTACT_POS`). Mesh scenes still differ from C (EPA witness points, float32), so this one
   should go in as an issue with data rather than a finished fix.
-* Device-side sorts/scans for the flex filter and SAP (`FLEX_DEVICE_SORT`, 361f11f): only relevant where Warp's
-  utilities are host implementations (Apple Metal fork); upstream CUDA unaffected (default off on CUDA).
-* Warp (innate-inc fork, Metal backend): `segmented_sort_pairs` validated segments with a synchronous `.numpy()` and
-  so could not be captured in a graph (pulipakaa24/warp `metalsim-flex` 9dcb140). Belongs to the Warp Metal fork, not
-  mujoco_warp.
+* Device-side sorts/scans for the flex filter and SAP (`FLEX_DEVICE_SORT`,
+  [`361f11f`](https://github.com/pulipakaa24/mujoco_warp/commit/361f11f03ed2efe0845d0090b477045d7e9af7c8)): only
+  relevant where Warp's utilities are host implementations (Apple Metal fork); upstream CUDA unaffected (default off on
+  CUDA).
+* Warp ([innate-inc fork](https://github.com/innate-inc/warp), Metal backend): `segmented_sort_pairs` validated
+  segments with a synchronous `.numpy()` and so could not be captured in a graph
+  ([my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim-flex), branch `metalsim-flex`,
+  [`9dcb140`](https://github.com/pulipakaa24/warp/commit/9dcb1406a49101ff6645f9a8b38221f09e0fc0d6)). Belongs to the Warp
+  Metal fork, not mujoco_warp.
 
 ## Rigid-body neutrality
 
-On the branch's merge into `metalsim`, Go1, Panda and Isaac's G1 run bitwise identical to the unmerged `metalsim`
-over 200 steps × 8 worlds on the CPU device; the Metal run and the MetalSim rigid tests are in the final report
-(`runs/deformable/merge_rigid_ab.log`). Upstream test suite on the branch: 1450 passed, 2 failed (both pre-existing
-and unrelated: `io_test::test_put_data_nefc_zero_dense`, `collision_driver_test::test_hfield_maxconpair` — the latter
-from MetalSim's heightfield patch, fails identically without the flex changes).
+On the branch's merge into `metalsim`
+([my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim)), Go1, Panda and Isaac's G1 run
+bitwise identical to the unmerged `metalsim` over 200 steps × 8 worlds on the CPU device; the Metal run and the MetalSim
+rigid tests are in the final report (`runs/deformable/merge_rigid_ab.log`). Upstream test suite on the branch: 1450
+passed, 2 failed (both pre-existing and unrelated: `io_test::test_put_data_nefc_zero_dense`,
+`collision_driver_test::test_hfield_maxconpair` — the latter from MetalSim's heightfield patch, fails identically
+without the flex changes).

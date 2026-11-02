@@ -1,9 +1,10 @@
 # MPM parity close-out: multi_material and ANYmal against the L4 (2026-10-12)
 
-Question: why was Newton's `multi_material` example on Metal outside the L4's own spread (1.15x the largest of 16
-perturbed L4 runs, in every fast_math mode), and was ANYmal's 1.22x at frames 4-6 real? Method: the column work's,
-one level deeper. Find the first step where Metal leaves the L4 by more than the L4's own arithmetic perturbations
-do, then the first array, then the first operation. Everything below was measured on the M4 Max and on the L4
+Question: why was [Newton](https://github.com/newton-physics/newton)'s `multi_material` example on Metal outside the
+NVIDIA L4 GPU's own spread (1.15x the largest of 16 perturbed L4 runs, in every fast_math mode), and was ANYmal's 1.22x
+at frames 4-6 real? Method: the column work's, one level deeper. Find the first step where Metal leaves the L4 by more
+than the L4's own arithmetic perturbations do, then the first array, then the first operation. Everything below was
+measured on the M4 Max and on the L4
 (`l4a`, Isaac Lab 3.0-EA's Warp 1.16.0 / Newton 1.5.2, driver 580.178.04). The scripts are in this
 directory. Data: `runs/parity/isaaclab3_mpm_closeout/` (L4) and `runs/mpm/closeout/` (Metal). Particle recordings
 are not committed.
@@ -47,10 +48,11 @@ node mass and momentum from particle-to-grid already differed:
      different summation order for every node's mass and momentum.
    * The L4 takes the tiled path in 5 of the 6 floor scenes (`tile_decisions.py`: multi_material, granular,
      column, plate and ANYmal; not two-way).
-   * The Metal fork's SIMD-group reduction already reproduces CUDA's shuffle tree (`tile_reduce.h`,
-     `metal_reduce::simd_reduce`). With the heuristic taking CUDA's choice on Metal, the first step's node mass and
-     velocity **equal the L4's bit for bit**. The tiling decisions of all six scenes equal the L4's call for call.
-     In granular, the cell counts are equal through step 1 and the decisions equal throughout.
+   * The SIMD-group reduction in [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) already reproduces
+     CUDA's shuffle tree (`tile_reduce.h`, `metal_reduce::simd_reduce`). With the heuristic taking CUDA's choice on
+     Metal, the first step's node mass and velocity **equal the L4's bit for bit**. The tiling decisions of all six
+     scenes equal the L4's call for call. In granular, the cell counts are equal through step 1 and the decisions equal
+     throughout.
 2. **`log` / `exp` / `sinh` are libdevice's on CUDA and the Metal library's on Metal.** Fingerprints over all 2^32
    float32 inputs (`libm_hash.py` on both GPUs, `libm_cmp.py`):
 
@@ -88,7 +90,7 @@ node mass and momentum from particle-to-grid already differed:
     subnormals.
   * `ex2.approx.ftz` is MUFU.EX2 through Benjamin Carleton's sass-math model
     ([pyxis-roc/sass-math](https://github.com/pyxis-roc/sass-math), MIT, `ex2.c` and `reduction/rro_ex2.c`). This is
-    the same multifunction-interpolator family as Oberman & Siu, ARITH-17 2005.
+    the same multifunction-interpolator family as [Oberman & Siu, ARITH-17 2005](https://doi.org/10.1109/ARITH.2005.7).
   * **Equal to the L4 on all 2^32 inputs of each function**: every 4,096-input chunk fingerprint matches.
 * `native/metal_cuda_fast_math.h`: `wp_cuda_rsqrt` is MUFU.RSQ through sass-math's rsqrt table, plus the subnormal
   pre-scale that ptxas emits for the non-ftz form. It is bitwise equal to the numpy model (`mufu_model.py`, already
@@ -170,7 +172,9 @@ started, and identical configurations varied by about 3 ms.
 
 ## 7. Verification of the pushed tree
 
-* The rebuilt Warp `43ffc6dd` reproduces the development tree's six floor recordings bit for bit (`bitwise_dirs.py`).
+* [My fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim), rebuilt at
+  [`43ffc6dd`](https://github.com/pulipakaa24/warp/commit/43ffc6dd544ccaa8ae18772ba67b0d292bf01371), reproduces the
+  development tree's six floor recordings bit for bit (`bitwise_dirs.py`).
 * Attribution (multi_material / ANYmal, worst-frame ratio):
   * fem tiling alone: 0.88 / 1.00.
   * fem tiling with `metal_cuda_libm`: 0.80 / 0.94.
@@ -187,5 +191,5 @@ started, and identical configurations varied by about 3 ms.
   added to the snow plastic-flow difference. Inside the floor (0.80).
 * **ANYmal**: (a), a floor-estimation gap: the ensemble had a single rigid-side perturbation. Inside with rigid
   jitter (0.94).
-* No Metal bug was found in the sense of (c). The Metal fork's tile reduction, MUFU models and FMA contraction all
-  reproduced CUDA where tested.
+* No Metal bug was found in the sense of (c). The tile reduction, MUFU models and FMA contraction of
+  [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) all reproduced CUDA where tested.

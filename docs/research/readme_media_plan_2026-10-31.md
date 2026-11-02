@@ -23,13 +23,15 @@ what changed and why.
   `env_margin`.
 - **Bug 3 is worse than stated: it already corrupted provenance.** Besides the frames, `render()` carries `exposure`,
   `probe` and `hardware` over from an old `render.json` and appends to `render_frames.jsonl`. The working-tree
-  `runs/film/g1_flat/hero/render.json` stamps `Mac16,5` (16-inch) for a render made on this Mac16,6 (14-inch), and
-  its `render_frames.jsonl` has 552 rows for a 301-frame film. Do not commit the working-tree G1 re-film as is.
-- **Bug 4 overstated.** README.md has no `runs/policies/` path; GUIDE's are the *output* paths of training commands,
-  which is correct. Broken defaults are the film's `G1_FLAT.checkpoint`, `docs/gallery/scripts/14_g1_policy_video.py`
-  and an example in `metalsim/parity/side_by_side.py`. Fix chosen: track the two G1 checkpoints (0.7 MB, 2.6 MB) next
-  to their tracked logs in `runs/g1regress/ckpt14/`, as `runs/franka_pour/logs/m414_2048_model_299.pt` and
-  `runs/lift_baselinecfg_seed0.pt` already are; release assets stay optional.
+  `runs/film/g1_flat/hero/render.json` stamps `Mac16,5` (the 16-inch MacBook Pro, M4 Max) for a render made on this
+  Mac16,6 (the 14-inch MacBook Pro, M4 Max), and its `render_frames.jsonl` has 552 rows for a 301-frame film. Do not
+  commit the working-tree G1 re-film as is.
+- **Bug 4 overstated.** README.md has no `runs/policies/` path; `docs/GUIDE.md`'s are the *output* paths of training
+  commands, which is correct. Broken defaults are the film's `G1_FLAT.checkpoint`,
+  `docs/gallery/scripts/14_g1_policy_video.py` and an example in `metalsim/parity/side_by_side.py`. Fix chosen: track
+  the two G1 checkpoints (0.7 MB, 2.6 MB) next to their tracked logs in `runs/g1regress/ckpt14/`, as
+  `runs/franka_pour/logs/m414_2048_model_299.pt` and `runs/lift_baselinecfg_seed0.pt` already are; release assets stay
+  optional.
 - **Bug 5 confirmed as far as the geoms go:** the twin has mesh geoms `Cube`, `torso_link_Cube`,
   `right_ankle_roll_link_Cube`; whether they are colliders or USD visuals is open.
 - **Sand clip confirmed:** 1920x1080, 30 fps, 240 frames, 8.0 s, 94.6 MB, with its 241 PNG frames beside it.
@@ -37,7 +39,8 @@ what changed and why.
 - **Render cost confirmed:** the re-film's per-frame log gives a median 0.12 s per frame (1280x720, 16 x 4 spp,
   one panel, OIDN) on the 14-inch on battery in Low Power Mode; 250 frames is about 30 s plus about 4 s set-up.
 - **Section 3, MuJoCo Warp row: checked and adopted as the format to copy exactly** (it should have been checked first;
-  the first encoder pass ran a byte-budget search instead). From its repo (README.md lines 35-79, `mujoco_warp/record.py`,
+  the first encoder pass ran a byte-budget search instead). From
+  [its repo](https://github.com/google-deepmind/mujoco_warp) (README.md lines 35-79, `mujoco_warp/record.py`,
   CONTRIBUTING.md "Contributing Benchmarks"), with four of its files measured:
   - a 3-column HTML `<table>`, cells `<td align="center" width="33%">`, `<img width="320" src="<relative path>">`, then
     `<br><b>reproduce command</b>`;
@@ -51,16 +54,17 @@ what changed and why.
   The rest of section 3 was not re-checked.
 - **README numbers the chart work found wrong** (to fix in the README pass):
   - line 54 quotes 41.0 K / 84.0 K / 61.3 K / 100.5 K and cites `runs/ellip_ws/final.wrapper.log`, but that log and
-    PARITY §1.4 say 41.8 / 42.0 K, 85.7 / 85.9 K, 62.7 K and 102.7 / 103.2 K;
+    [PARITY §1.4](../PARITY.md#14-throughput-on-the-g1-task-isaacs-protocol-4096-envs) say 41.8 / 42.0 K, 85.7 / 85.9 K, 62.7 K and 102.7 / 103.2 K;
   - line 54 puts NVIDIA's RTX 4090 82 K in the flat env-step row, but it is a Rough-G1 with-training figure
     (`docs/research/competitors_2026-09-25.md` §5);
-  - line 57's MPM ratios (1.29x / 1.76x) come from MPM.md 8j, and 8k later measured 1.21x for both scenes.
+  - line 57's MPM ratios (1.29x / 1.76x) come from [MPM.md](../../metalsim/physics/mpm/MPM.md) 8j, and 8k later
+    measured 1.21x for both scenes.
 - **The time estimates were serial human time.** Measured compute for the whole minimum plan is under 10 GPU
   minutes (two G1 takes of about 1 min each, one lidar clip, checkpoint checks of about 10 s each; sand, Franka-Pour,
   WebP and chart are CPU). The work is now split into five parallel streams; wall time is set by the longest code
   stream, not by compute. Compute only dominates for optional work: retraining the G1 policies from a script
   (flat 500 it about 28 min, rough 1000 it about 65 min on the 14-inch, from the checkpoint timestamps), 1080p or
-  higher sample counts, and the deferred race clip (needs the L4).
+  higher sample counts, and the deferred race clip (needs the NVIDIA L4 GPU).
 
 ## 1. Audit of the existing media
 
@@ -123,27 +127,35 @@ Known already (NOW.md): the main venv lacked `pyoidn` (installed on 2026-10-31 o
 
 Why they were not caught: verification is numbers-first (returns, PSNR, env-steps/s, bitwise parity) and the smoke
 tests check exit codes. No step looks at a rendered frame, and the adapter's done mask removed the one metric that
-would have flagged a fallen robot. The demo tag was cut on exit codes.
+would have flagged a fallen robot. The [`demo-2026-10`](https://github.com/pulipakaa24/MetalSim/releases/tag/demo-2026-10)
+tag was cut on exit codes.
 
 ## 3. What comparable projects do (survey of 2026-10-31)
 
 - **MuJoCo Warp**: 3x3 HTML `<table>`, `<img width="320">` animated WebP per cell (320x240, ~30 fps, ~5 s, 0.5 to
   2 MB), no burned-in text; the caption under each cell is the exact reproduce command; numbers live on a nightly
   benchmark dashboard linked by a badge.
-- **Genesis**: same WebP catalogue (480x270, 15 fps, 5 s, ~300 KB each) hosted on an orphan `readme-assets` branch via
-  absolute raw URLs; the famous speed claim lived in a bullet and a static teaser, not an animation.
-- **Newton, NVIDIA Warp**: tables of static thumbnails linked to the example source; tidy, lifeless, no numbers.
-- **Isaac Lab, Isaac Sim**: one static hero JPG, badges, prose; no animation, no evidence.
-- **ManiSkill 3**: static collage plus numbers in bullets; the honest side-by-side video against Isaac Lab (same task,
-  theirs on top, Isaac below) and FPS-vs-envs plots are in the docs.
-- **Brax, Taichi**: uncaptioned inline GIFs, several MB each.
-- **uv, hyperfine, instant-ngp, tiny-cuda-nn** (outside robotics): one speed artefact above the fold (a 10 KB SVG bar
+- **[Genesis](https://github.com/Genesis-Embodied-AI/Genesis)**: same WebP catalogue (480x270, 15 fps, 5 s, ~300 KB
+  each) hosted on an orphan `readme-assets` branch via absolute raw URLs; the famous speed claim lived in a bullet and a
+  static teaser, not an animation.
+- **[Newton](https://github.com/newton-physics/newton), [NVIDIA Warp](https://github.com/NVIDIA/warp)**: tables of
+  static thumbnails linked to the example source; tidy, lifeless, no numbers.
+- **[Isaac Lab](https://github.com/isaac-sim/IsaacLab), [Isaac Sim](https://github.com/isaac-sim/IsaacSim)**: one
+  static hero JPG, badges, prose; no animation, no evidence.
+- **[ManiSkill 3](https://github.com/haosulab/ManiSkill)**: static collage plus numbers in bullets; the honest
+  side-by-side video against Isaac Lab (same task, theirs on top, Isaac below) and FPS-vs-envs plots are in the docs.
+- **[Brax](https://github.com/google/brax), [Taichi](https://github.com/taichi-dev/taichi)**: uncaptioned inline GIFs,
+  several MB each.
+- **[uv](https://github.com/astral-sh/uv), [hyperfine](https://github.com/sharkdp/hyperfine),
+  [instant-ngp](https://github.com/NVlabs/instant-ngp), [tiny-cuda-nn](https://github.com/NVlabs/tiny-cuda-nn)**
+  (outside robotics): one speed artefact above the fold (a 10 KB SVG bar
   chart in dark/light `<picture>`, a 260 KB terminal clip, a convergence GIF with a time claim, a
   steps-vs-reference table).
 - Nobody in robotics shows speed or latency as an animation, and nobody shows a renderer comparison with the
   quality number attached. That gap is the opportunity.
 
-GitHub README constraints (confirmed against the html-pipeline sanitizer allowlist and GitHub docs):
+GitHub README constraints (confirmed against the [html-pipeline](https://github.com/gjtorikian/html-pipeline) sanitizer
+allowlist and GitHub docs):
 animated GIF and WebP autoplay inside `<img>`; `<video>` pointing into the repo is stripped; video only plays from
 files uploaded through the GitHub UI (`github.com/user-attachments/...`), never autoplays, 10 MB on free plans;
 `width`, `height`, `align`, `loading="lazy"` survive, `style` and `class` are removed; `<picture>` with
@@ -170,7 +182,7 @@ lidar through glass. The G1 renders start when the two film streams land; the RE
 | Lidar-through-glass 3-up (RGB, depth, point cloud) from the transparency diagnostic scene | 1 to 2 h | |
 | WebP encode step in `metalsim/render/film/encode.py` (Pillow writes animated WebP; the local ffmpeg has no libwebp), 320 or 480 px, 30 fps, 5 s, 2 MB budget | 1 h | |
 | Throughput bar chart as dark/light SVG from the numbers already in the README table (G1 flat and rough, Franka-Pour; MetalSim vs Isaac Lab Newton and PhysX on the L4, published 4090 marked) | 1 h | |
-| README: the 3x3 table copied from MuJoCo Warp (section 0), 320x240 WebP cells, caption = reproduce command; the chart full width below the table (in a 320 px cell its text would be 4 to 7 px); media in `docs/renders/` by relative path as MuJoCo Warp does (the orphan branch is dropped); `docs/gallery` trimmed. Cells, decided 2026-10-31: row 1 G1 flat, G1 rough, ANYmal on sand; row 2 Franka-Pour, then the same Isaac Lab G1 policy (iteration 1499) in Isaac Sim 5.1 and in MetalSim, two 4:3 crops of the existing side-by-side video `docs/gallery/g1_stage_isaac_it1499.mp4` (0.5 to 4.5 s, 25 fps; PARITY §1.5); an earlier draft used stills, superseded the same day; row 3 lidar through glass as RGB, depth, two-return lidar | 1 h | all above |
+| README: the 3x3 table copied from MuJoCo Warp (section 0), 320x240 WebP cells, caption = reproduce command; the chart full width below the table (in a 320 px cell its text would be 4 to 7 px); media in `docs/renders/` by relative path as MuJoCo Warp does (the orphan branch is dropped); `docs/gallery` trimmed. Cells, decided 2026-10-31: row 1 G1 flat, G1 rough, ANYmal on sand; row 2 Franka-Pour, then the same Isaac Lab G1 policy (iteration 1499) in Isaac Sim 5.1 and in MetalSim, two 4:3 crops of the existing side-by-side video `docs/gallery/g1_stage_isaac_it1499.mp4` (0.5 to 4.5 s, 25 fps; [PARITY §1.5](../PARITY.md#15-learning-on-the-g1-task)); an earlier draft used stills, superseded the same day; row 3 lidar through glass as RGB, depth, two-return lidar | 1 h | all above |
 
 Render cost is not the bottleneck: tier 2 at 1280x720 and 64 spp measured a median 0.12 s per frame during the re-film
 (14-inch, Mac16,6, on battery in Low Power Mode, so an upper bound and not a timing figure), so a 5 s clip renders in
@@ -181,7 +193,8 @@ under a minute. The bottlenecks were the film-tool fixes and a camera move per c
 - **Better comparison cells (next L4 session).** The current cells are crops of a 2048x576 video, 4 s, with a grey
   look. A new pair would be rendered at 640x480 for these cells, 5 s at 30 fps, tracking the robot, with a policy
   trained here (the g1regress checkpoint) as well as Isaac's, and optionally a rendering-only pair replayed from
-  Isaac's recorded poses (`metalsim/render/rtx_parity.py`, the section 1.7 protocol). Only `g1_stage_isaac_*` qualify
+  Isaac's recorded poses (`metalsim/render/rtx_parity.py`, the
+  [PARITY §1.7](../PARITY.md#17-fidelity-protocol-against-isaac-sim-51-on-an-l4-recorded-2026-09-24-physx--rtx) protocol). Only `g1_stage_isaac_*` qualify
   today; `g1_stage_metalsim_*` use pre-fix MetalSim checkpoints that fall.
 
 - Hero race clip: split screen, same G1 scene, MetalSim on the M4 Max vs Isaac Lab on the L4, shared wall clock and
@@ -191,9 +204,11 @@ under a minute. The bottlenecks were the film-tool fixes and a camera move per c
   cropping and captions, not rendering. A progressive-convergence WebP with a time counter would be new work.
 - Learning curves on a wall-clock axis, MetalSim vs Isaac Lab, seeds shaded (data in `runs/il3/`, PARITY 1.5, 1.8).
 - Physics-parity ghost: the PhysX drop trajectory as a translucent overlay on MetalSim's, joint error below.
-- More grid cells: TRON1 on LimX's ONNX policy (`assets/tron1/limx_policy`, a known-good walker; needs a film
-  adapter around `Tron1Sim`), Go2 through boxes with a walking policy, SO-101 lift (`runs/lift_baselinecfg_seed0.pt`),
-  Gaussian-splat background with the robot composited (camera save path only; the path tracer does not draw splats).
+- More grid cells: TRON1 on [LimX's ONNX policy](https://github.com/limxdynamics/tron1-rl-deploy-python)
+  (`assets/tron1/limx_policy`, a known-good walker; needs a film
+  adapter around `Tron1Sim`), Go2 through boxes with a walking policy,
+  [SO-101](https://github.com/TheRobotStudio/SO-ARM100) lift (`runs/lift_baselinecfg_seed0.pt`), Gaussian-splat
+  background with the robot composited (camera save path only; the path tracer does not draw splats).
 - A nightly benchmark page plus badge, MuJoCo Warp style, so the numbers never go stale in the media.
 
 ### 4c. Timing runs
@@ -219,7 +234,7 @@ power, `scripts/gpu_run.sh ... timing`.
   re-filmed with the tracked g1regress checkpoints (`runs/film/g1_{flat,rough}`, docs `docs/renders/G1_*.md`); the
   README's 3x3 table, chart and number corrections; `docs/gallery` trimmed (7 files). Render and sensor tests: 194
   passed, 0 failed, 8 skipped. Agent hand-offs: `runs/readme_media/handoff/`.
-- Merged as PR #83 (2026-10-31 03:26). Follow-up the same day: the G1 clips shuffled (4.0 Hz steps, 5-7 cm foot
+- Merged as [PR #83](https://github.com/pulipakaa24/MetalSim/pull/83) (2026-10-31 03:26). Follow-up the same day: the G1 clips shuffled (4.0 Hz steps, 5-7 cm foot
   lift; our checkpoints were 500 and 1000 iterations). NVIDIA's published Isaac Lab 2.3 checkpoints (iterations 1499
   and 2999) now drive both films: 3.78 Hz and 7 cm lift on flat, a real stair climb on rough. The quick steps are
   Isaac's own gait (3.2-3.8 Hz in PhysX, `docs/research/speculative_contacts_2026-09-27.md`). The film tool now stamps

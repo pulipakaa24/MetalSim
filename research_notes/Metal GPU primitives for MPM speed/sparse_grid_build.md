@@ -1,8 +1,8 @@
 # Sparse-grid (NanoVDB) construction for Newton implicit MPM: the CUDA path, its primitives, and a Metal port
 
 Sources were read locally and checked against upstream on 2026-10-10:
-- **Warp.** The innate-inc Warp fork at `upstream/warp-innate-mpm` (1.18.0.dev20260917). These files are byte-identical (md5) to NVIDIA/warp tag `v1.18.0`: `volume_builder.cu`, `volume_builder.cpp`, `volume_builder.h`, `fem/geometry/nanogrid.py`, `fem/utils.py`, `fem/space/partition.py` and `native/sort.cpp`. `volume.cpp` differs, because it contains the fork's Metal bridge.
-- **Newton.** Newton at `upstream/newton-1.5.2` (tag v1.5.2, commit cf5378db).
+- **Warp.** The [innate-inc Warp fork](https://github.com/innate-inc/warp) at `upstream/warp-innate-mpm` (1.18.0.dev20260917). These files are byte-identical (md5) to NVIDIA/warp tag `v1.18.0`: `volume_builder.cu`, `volume_builder.cpp`, `volume_builder.h`, `fem/geometry/nanogrid.py`, `fem/utils.py`, `fem/space/partition.py` and `native/sort.cpp`. `volume.cpp` differs, because it contains the fork's Metal bridge.
+- **Newton.** Newton at `upstream/newton-1.5.2` (tag [v1.5.2](https://github.com/newton-physics/newton/tree/v1.5.2), upstream commit [`cf5378db`](https://github.com/newton-physics/newton/commit/cf5378db6002b5c19b86344737cdd40cb8e08f0c)).
 - **Short names.** "W118" below means `https://github.com/NVIDIA/warp/blob/v1.18.0/` and "N152" means `https://github.com/newton-physics/newton/blob/v1.5.2/`.
 
 ## Q1. How Warp (1.16-1.18) builds a NanoVDB grid from points on the GPU, what is CUDA-only, and the CPU path
@@ -19,7 +19,7 @@ The only CUDA-specific parts are the CUB calls (`DeviceRadixSort::SortKeys`, `De
 **History: 1.15 vs 1.16+**
 - **Warp ≤1.15 used NanoVDB's builder.** `volume_builder.cu` included `<nanovdb/tools/cuda/PointsToGrid.cuh>` and built grids via `nanovdb::tools::cuda::PointsToGrid<BuildT, Resource> p2g(params.map, stream)` → `p2g.getHandle(...)`. — [warp v1.15.0 volume_builder.cu](https://github.com/NVIDIA/warp/blob/v1.15.0/warp/native/volume_builder.cu)
 - **Warp ≤1.15 had no CPU path.** `allocate_by_tiles` raised "Only CUDA devices are supported for allocate_by_tiles", and `allocate_by_voxels` required CUDA. — [warp v1.15.0 types.py](https://github.com/NVIDIA/warp/blob/v1.15.0/warp/_src/types.py)
-- **Warp 1.16 added rebuildable volumes, including on the CPU.** The changelog (1.16.0, 2026-08-03) reads: "Add rebuildable NanoVDB volumes through `wp.Volume.allocate_by_tiles(..., rebuildable=True)`, `wp.Volume.allocate_by_voxels(..., rebuildable=True)`, and `wp.Volume.rebuild()`. Support fixed capacities, optional point masks, CPU execution, CUDA graph-capturable allocation and rebuilding, and in-place refreshes of rebuildable `warp.fem.Nanogrid` topologies" (GH-1606). — [W118 CHANGELOG.md](https://github.com/NVIDIA/warp/blob/v1.18.0/CHANGELOG.md)
+- **Warp 1.16 added rebuildable volumes, including on the CPU.** The changelog (1.16.0, 2026-08-03) reads: "Add rebuildable NanoVDB volumes through `wp.Volume.allocate_by_tiles(..., rebuildable=True)`, `wp.Volume.allocate_by_voxels(..., rebuildable=True)`, and `wp.Volume.rebuild()`. Support fixed capacities, optional point masks, CPU execution, CUDA graph-capturable allocation and rebuilding, and in-place refreshes of rebuildable `warp.fem.Nanogrid` topologies" ([GH-1606](https://github.com/NVIDIA/warp/issues/1606)). — [W118 CHANGELOG.md](https://github.com/NVIDIA/warp/blob/v1.18.0/CHANGELOG.md)
 - **The 1.16+ `.cu` builder no longer includes PointsToGrid.** Its only external dependency is `<cub/cub.cuh>`. 1.16.0 and 1.18.0 have the same kernel list. — [W118 warp/native/volume_builder.cu](https://github.com/NVIDIA/warp/blob/v1.18.0/warp/native/volume_builder.cu)
 
 **GPU build, step by step (`rebuild_count_points` + `rebuild_populate_grid_from_scratch`)** — source for all items: [W118 volume_builder.cu](https://github.com/NVIDIA/warp/blob/v1.18.0/warp/native/volume_builder.cu), [W118 volume_builder.h](https://github.com/NVIDIA/warp/blob/v1.18.0/warp/native/volume_builder.h)
@@ -51,7 +51,7 @@ The only CUDA-specific parts are the CUB calls (`DeviceRadixSort::SortKeys`, `De
   - masks and bboxes: non-atomic read-modify-write.
 - **Same output.** The sorted unique key sets are identical to the CUDA path's, so node ordering and voxel indices match.
 
-**Metal in the innate-inc fork (not upstream)** — source: the local `warp/native/volume.cpp` in the fork. This is not in NVIDIA/warp, so there is no public URL.
+**Metal in the innate-inc fork (not upstream)** — source: the local `warp/native/volume.cpp` in the fork (public copy: [innate-inc/warp `volume.cpp`](https://github.com/innate-inc/warp/blob/main/warp/native/volume.cpp)). This is not in NVIDIA/warp.
 - **Every Metal volume entry point wraps the host builder.** This covers `wp_volume_from_tiles_device`, `wp_volume_from_active_voxels_device`, `wp_volume_rebuild_from_active_voxels_device` and `get_voxels`. The wrapper is `MetalVolumeScope`, which calls `wp_metal_synchronize(ordinal)` ("inputs may still be written by kernels"). It then calls the `_host` builder on unified memory and re-keys the descriptor under the Metal GPU address (`metal_volume_rekey`).
 - **Cost.** Every grid build drains the GPU and runs serially on the CPU. In the granular example the "Allocate grid" timer measured 11.7-13.4 ms per step on metal:0. — local files `runs/mpm/profile/sections_mpm_granular_now.json`, `granular_branch.json`, `granular_oracle.json`
 
@@ -205,7 +205,7 @@ A fixed or dense `Grid3D` avoids building any grid, but it is a different discre
   3. Replace 64-bit `atomicOr` with a 32-bit `atomic_fetch_or` on the word half containing the bit. This is exact because OR is bitwise.
   4. Keep the exact path's one count readback. For the rebuildable path, use capacities plus the status flag.
   5. Pool the scratch buffers. The CUDA code allocates and frees about 7N×8 bytes per call, which is costly on Metal if done through MTLBuffer creation.
-- *Effort.* Roughly the size of the LBVH port already done in the fork, since it is a similar sort-plus-per-node-kernel structure. The primitives dominate the effort.
+- *Effort.* Roughly the size of the LBVH port already done in [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim), since it is a similar sort-plus-per-node-kernel structure. The primitives dominate the effort.
 - *Parity.* Exact by construction: the output depends only on the set of unique keys. The CPU builder is a ready-made oracle for bitwise testing (compare `get_voxels()` and the raw grid buffer).
 - *Cost reduction.* Keys-only sorts over N particles, plus about 8N for the node grid. With 16-bit or 8-bit digits, the sorts can skip the top bits that are always zero:
   - Upper keys use 63 bits.

@@ -2,7 +2,7 @@
 
 Scope: what Isaac Sim 5.x's Replicator (`omni.replicator.core`) and Isaac Lab's event terms provide
 for synthetic data and domain randomization, what MetalSim has, and the gap list. Low priority
-workstream (WS6).
+workstream ([WS6](../STATUS.md#workstreams)).
 
 ## Sources
 
@@ -155,7 +155,7 @@ The scene layer writes `UsdSemantics.LabelsAPI` "class" labels (body name) on bo
 | `randomize_rigid_body_scale` | none | per-world `geom_size` is batchable, but the renderer's meshes are baked per slot | L (not done) |
 | `randomize_fixed_tendon_parameters`, `reset_nodal_state_uniform` | none | tendons/deformables not in our task set | M (not done) |
 | `randomize_visual_color` | `Randomizer.colors` | Isaac's parameters (`colors` list or r/g/b ranges) | S (done) |
-| dome-light HDR randomization | `Randomizer.environment` (tier 2): one HDR map per episode by key, random yaw / intensity / exposure; GPU texture + sampling table cached per key | Isaac's `Franka stack visuomotor` dome randomization; the map is shared by the batch like Isaac's one dome per stage | S (done 2026-09-25, PARITY §1.7) |
+| dome-light HDR randomization | `Randomizer.environment` (tier 2): one HDR map per episode by key, random yaw / intensity / exposure; GPU texture + sampling table cached per key | Isaac's `Franka stack visuomotor` dome randomization; the map is shared by the batch like Isaac's one dome per stage | S (done 2026-09-25, [PARITY §1.7](../PARITY.md#17-fidelity-protocol-against-isaac-sim-51-on-an-l4-recorded-2026-09-24-physx--rtx)) |
 | `randomize_visual_texture_material` | background images, material roughness/metallic | per-env texture selection needs a renderer change (texture index per env/slot) | M (renderer) |
 | `rep.randomizer.scatter_2d/3d`, `instantiate` | none | pose sampling on surfaces / volumes; object instantiation needs a model rebuild | M (not done) |
 | Replicator graph / triggers (`on_frame`, `on_time`) | Python loop | not needed for batched data generation | n/a |
@@ -169,7 +169,7 @@ analytic ray cast through every pixel centre of a scene of boxes at known poses,
 partly hidden, one two-box body). Pixels whose centre lies within 0.01 px of a silhouette edge are
 "ambiguous" (the rasterizer's fixed-point snapping decides them); all others must match exactly,
 and box extents / counts must lie between the sure-in and maybe-in masks. Costs: 1024 envs,
-128x128, SO-101 lift scene (9 labelled instances, 20 render slots), median of 5,
+128x128, [SO-101](https://github.com/TheRobotStudio/SO-ARM100) lift scene (9 labelled instances, 20 render slots), median of 5,
 `python -m metalsim.replicator.bench` -> `runs/replicator_bench_1024.log`. **The GPU was shared with
 a G1 training run** (the low-priority queue was hours deep; the benchmark is < 1 min), so costs are
 upper bounds; the tier-0 render itself measured 19-36 ms/frame across runs in the same conditions.
