@@ -97,7 +97,7 @@ The probe scene was 1,000 particles at voxel 0.1 and dt 1/60 on a ground plane, 
 - **Repeatability:** two Metal runs of each grid type gave identical `particle_q` MD5 hashes.
 - **Dense vs sparse on Metal:** minimum z **0.0017** (sparse) against 0.0026 (dense), and mean z 0.0342 against 0.0311.
 
-Probe scripts: `metalsim/physics/mpm/probes/mpm_metal_probe.py` and `mpm_metal_probe_f32.py` (the committed versions run 5 steps). The last result matters for parity: **grid type is part of the physics spec**, so references must be recorded with the grid type metalsim will run.
+The probe scripts were in this session's scratchpad (`mpm_metal_probe.py` and `mpm_metal_probe_f32.py`); 5-step versions of both are tracked in `metalsim/physics/mpm/probes/`. The last result matters for parity: **grid type is part of the physics spec**, so references must be recorded with the grid type metalsim will run.
 
 Determinism is structurally favourable:
 

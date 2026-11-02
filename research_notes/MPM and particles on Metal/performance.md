@@ -2,7 +2,8 @@
 
 State as of 2026-10-09. Every literature number names its GPU. "Measured here" means a microbenchmark run for these notes on
 this machine (Apple M4 Max, macOS 26.7.1, runtime-compiled MSL, default language version plus checks under MSL 3.0–4.0).
-Benchmark source: `metalsim/physics/mpm/probes/p2g.swift`. "Estimate" marks anything inferred and not measured.
+Benchmark source: `p2g.swift`, a scratch benchmark at the time, since tracked as
+`metalsim/physics/mpm/probes/p2g.swift`. "Estimate" marks anything inferred and not measured.
 
 **Correction to the task premise, measured here:** on this M4 Max, `atomic_float` add is available in **device** memory
 only. `threadgroup atomic_float` does **not** compile under MSL 3.0, 3.1, 3.2 or 4.0 ("no matching function for call to

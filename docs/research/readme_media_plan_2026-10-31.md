@@ -84,9 +84,8 @@ Every tracked video was sampled frame by frame (contact strips) and every still 
 | [`docs/gallery/rollout.gif`](https://github.com/pulipakaa24/MetalSim/blob/9caff7aa53b01c1638e674e3b767bf2d52705be8/docs/gallery/rollout.gif), tier-0 atlases, `throughput.png`, `isaac_comparison.png` | retire from the front page | 2026-09 test renders; the charts quote superseded numbers |
 | `g1_tier2_policy.mp4` is 68 MB; `docs/gallery/` is 109 MB | move out of the repo | see section 5 |
 
-The inventory covered every checkout on this Mac (`~/MetalSim`, `~/metalsim-fresh/**`, `~/metalsim-splat`,
-`~/MetalSim-purge`) and every video named in the docs and logs. A first pass searched only this checkout and wrongly
-listed the sand clip as missing; corrected the same day.
+The inventory covered every checkout on this Mac (`~/MetalSim`, `~/metalsim-fresh/**`, `~/metalsim-splat`) and every video named in the docs
+and logs. A first pass searched only this checkout and wrongly listed the sand clip as missing; corrected the same day.
 
 Contact strips of each video are reproducible with
 `ffmpeg -i <video> -vf "fps=1,scale=480:-1,tile=6x1" -frames:v 1 strip.jpg`.
