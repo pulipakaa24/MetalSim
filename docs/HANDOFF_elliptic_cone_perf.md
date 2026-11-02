@@ -1,12 +1,15 @@
 # Handoff: elliptic friction cones are 3–4× slower on Metal (generalizing beyond the G1)
 
 **Status 2026-09-25 (evening): done on this machine.** Reproduced (Go2 3.84×, G1 2.83× sparse / 3.24× dense,
-SO-101 2.41×, DeepMind humanoid 6.68×, MetalSim G1 task 7.07×) and fixed in the fork worktree
-`upstream/mujoco_warp-ellip` (branch `metalsim-elliptic`, commit `c301880`, not merged at the time: awaiting the main
-session's approval; **merged since** into the fork's `metalsim`, in the pinned `f1b35e2`, and elliptic cones became the
-G1 default on 2026-09-26): elliptic now costs 1.27–1.59× (G1 task 1.41×). Fix 1 (SM-sized launch) measures within
-3–20 % of the adopted per-world form and is kept as `MJW_JTCJ_MODE=contact`. The G1's slowdown was a second
-fallback (one lane per constraint group in the sparse Hessian assembly), fixed separately. Fixes 3 and 4
+SO-101 2.41×, DeepMind humanoid 6.68×, MetalSim G1 task 7.07×) and fixed in a worktree
+of [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) (`upstream/mujoco_warp-ellip`,
+branch `metalsim-elliptic`, commit
+[`c301880`](https://github.com/pulipakaa24/mujoco_warp/commit/c30188029f6729b9f7cfe69706d6b8069b7f53d2), not merged at
+the time: awaiting the main session's approval; **merged since** into the fork's `metalsim`, in the then-pinned
+[`f1b35e2`](https://github.com/pulipakaa24/mujoco_warp/commit/f1b35e2b3ddc80b197b0c665bf6d71523d175daf), and elliptic
+cones became the G1 default on 2026-09-26): elliptic now costs 1.27–1.59× (G1 task 1.41×). Fix 1 (SM-sized launch)
+measures within 3–20 % of the adopted per-world form and is kept as `MJW_JTCJ_MODE=contact`. The G1's slowdown was a
+second fallback (one lane per constraint group in the sparse Hessian assembly), fixed separately. Fixes 3 and 4
 (fold into the tiled build / incremental cone rows) were evaluated and estimated not to pay. Upstream PR draft:
 `scripts/diagnostics/mjwarp_upstream/DRAFT_elliptic_launch.md` (fork branch `elliptic-jtcj-offcuda`, not
 opened). Fidelity re-check with cheap elliptic cones, the audit of every other non-CUDA fallback, and every
@@ -14,9 +17,10 @@ number: `docs/research/elliptic_cones_2026-09-25.md`; rows in PARITY §1.4, GAPS
 The "also found" item below (G1 physics 84.1 K vs README 81.0 K) was taken up by the throughput agent
 (`docs/research/throughput_regression_2026-09-25.md`).
 
-Branch `perf-elliptic-cone`, based on `main` at `fbaab25`. It contains the findings, the benchmark
-scripts (`scripts/diagnostics/competitors/`) and their logs (`runs/competitors/`). It makes no code
-changes. Everything below was measured on 2026-09-25 on an M4 Max (40-core GPU, 64 GB, on AC power),
+Branch `perf-elliptic-cone`, based on `main` at
+[`e3cb2aa`](https://github.com/pulipakaa24/MetalSim/commit/e3cb2aa0afe135478146820781013056c455131e). It contains the
+findings, the benchmark scripts (`scripts/diagnostics/competitors/`) and their logs (`runs/competitors/`). It makes no
+code changes. Everything below was measured on 2026-09-25 on an M4 Max (40-core GPU, 64 GB, on AC power),
 with every timing job run through `scripts/gpu_run.sh ... timing` on an idle GPU.
 
 ## Summary
@@ -25,7 +29,8 @@ MetalSim's throughput work was done on the Isaac G1, which uses **pyramidal** fr
 that uses **elliptic** cones takes a MuJoCo Warp solver path that was never optimized for Metal, and it
 costs 2.9–3.9× throughput. Elliptic cones are common:
 
-- MuJoCo Menagerie's Go2 declares `<option cone="elliptic" impratio="100"/>`.
+- [MuJoCo Menagerie](https://github.com/google-deepmind/mujoco_menagerie)'s Go2 declares
+  `<option cone="elliptic" impratio="100"/>`.
 - MuJoCo's documentation recommends elliptic cones with a high `impratio` for grasping. The
   so101Sim/YAM grasp study found the same thing: 1–2 mm in-hand creep with elliptic cones against
   1–2.8 cm with pyramidal.
@@ -41,7 +46,9 @@ The setup is the same Menagerie MJCF in both engines:
 - synchronized timing over 1000 steps after 100 warm-up steps.
 
 Scripts: `scripts/diagnostics/competitors/{metalsim_step,genesis_step}.py`; `CONE=pyramidal|elliptic`
-overrides the model's cone. Genesis is v1.4.2 (`a4b45ff`) on `gs.metal`.
+overrides the model's cone. [Genesis](https://github.com/Genesis-Embodied-AI/genesis-world) is v1.4.2
+([`a4b45ff`](https://github.com/Genesis-Embodied-AI/genesis-world/commit/a4b45ff15242c349bbc8fb988d25545666134b19)) on
+`gs.metal`.
 
 | model, cone | MetalSim steps/s | Genesis steps/s | MetalSim cost of elliptic | Genesis cost of elliptic |
 |---|---|---|---|---|
@@ -92,7 +99,8 @@ The file is `upstream/mujoco_warp` (fork branch `metalsim`), `mujoco_warp/_src/s
 2. **Atomics.** Each active contact thread adds into `ctx_h_out[worldid, dof1id, dof2id]` with `+=`,
    which Warp lowers to an atomic add. All contacts of a world contend on the same entries.
 3. **No fast path.** The fork's fused path (the incremental Hessian update fused into the register
-   Cholesky, `ccfaffb`) and the incremental update only apply to pyramidal cones. With elliptic cones
+   Cholesky, [`ccfaffb`](https://github.com/pulipakaa24/mujoco_warp/commit/ccfaffb38d9e4ff765214d24c2eebbbdb4358b1d))
+   and the incremental update only apply to pyramidal cones. With elliptic cones
    the solver rebuilds H from scratch every iteration: `JTDAJ_dense_tiled`, then `JTCJ_dense`, then
    the Cholesky, ×11 per step.
 
@@ -130,20 +138,27 @@ CPU" branch affects every non-CUDA backend. List it in `METALSIM_CHANGES.md` and
 
 ## Also found in this session (separate issue, not investigated)
 
-On this machine, `scripts/diagnostics/g1_tp_variants.py 4096` at `main` `fbaab25` with the forks at
-their `metalsim` heads (Warp `4127c48`, MuJoCo Warp `07a51a6`) measures:
+On this machine, `scripts/diagnostics/g1_tp_variants.py 4096` at `main`
+[`e3cb2aa`](https://github.com/pulipakaa24/MetalSim/commit/e3cb2aa0afe135478146820781013056c455131e) with the forks at
+their `metalsim` heads (Warp
+[`4127c48`](https://github.com/pulipakaa24/warp/commit/4127c4818334080de6f3d23aef522e582ff6a2a7), MuJoCo Warp
+[`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc)) measures:
 - physics only **84.1K** (README 81.0K);
 - full env step **55.2K** (README 67.6K);
 - full PPO loop **50.2K** (README 56.6K).
 
 `g1_step_profile.py` puts the difference in `solver.solve`: 5.50 ms per substep here against 4.23 ms in
 `runs/mjw_tp/final_checks.log`. Kernels and dispatch counts are the same. Candidates:
-- the flex merge `8fbf965` in the MuJoCo Warp fork, which the headline numbers predate (they were taken
-  at `ccfaffb`/`1791414`);
+- the flex merge [`8fbf965`](https://github.com/pulipakaa24/mujoco_warp/commit/8fbf965acb630aa32573dda802404d519c843a99)
+  in the MuJoCo Warp fork, which the headline numbers predate (they were taken
+  at
+  [`ccfaffb`](https://github.com/pulipakaa24/mujoco_warp/commit/ccfaffb38d9e4ff765214d24c2eebbbdb4358b1d)/[`1791414`](https://github.com/pulipakaa24/mujoco_warp/commit/17914144d132dec4c0aa3bccfe743816faec72c9));
 - a difference between the machines (the reference ran in the main checkout on the 16-inch M4 Max).
 
-A back-to-back run at `1791414` against `07a51a6` on one machine settles it. The logs are in
-`runs/competitors/metalsim_g1_*.log`.
+A back-to-back run at
+[`1791414`](https://github.com/pulipakaa24/mujoco_warp/commit/17914144d132dec4c0aa3bccfe743816faec72c9) against
+[`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc) on one machine
+settles it. The logs are in `runs/competitors/metalsim_g1_*.log`.
 
 ## Other competitor results from the same session (for context; full survey in `docs/research/competitors_2026-09-25.md`)
 
@@ -151,8 +166,9 @@ A back-to-back run at `1791414` against `07a51a6` on one machine settles it. The
   full PPO loop, reward rising over 30 iterations. That is Go2, 12 actuators, 2 substeps of 10 ms, no
   self-collision and pyramidal cones, so it is not comparable to the G1 task's 50–57K.
   Log: `runs/competitors/genesis_go2_4096.log`.
-- **MuJoCo-MLX-Cpp** (`20niship/MuJoCo-MLX-Cpp` `3ae0e4a`, its own `bench_baseline`, Euler, zero control,
-  solver budget from the XML):
+- **MuJoCo-MLX-Cpp** ([`20niship/MuJoCo-MLX-Cpp`](https://github.com/20niship/MuJoCo-MLX-Cpp)
+  [`3ae0e4a`](https://github.com/20niship/MuJoCo-MLX-Cpp/commit/3ae0e4a6a9a9de800d03b75526e17402d862afb4), its own
+  `bench_baseline`, Euler, zero control, solver budget from the XML):
   - DeepMind humanoid: 23–40K / hung (3 of 3) / 103K at 256 / 2048 / 4096 envs, against MetalSim's
     46K / 254K / 396K under the same protocol (`metalsim_mlxprotocol.py`).
   - Go2: 34–41K / 126–139K / {hung, 5.7K, 116K}, against MetalSim's 22K / 40K / 43K. The Go2 gap is

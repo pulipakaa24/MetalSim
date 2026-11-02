@@ -4,8 +4,10 @@
 "Remaining" / "Not yet" lists are the state on those days; most of them were done later. The current state is in
 `STATUS.md`, `GAPS.md` and `docs/NOW.md`; what landed when is in `CHANGELOG.md`. Examples: graph-captured batched
 physics, trajectory parity and the zero-host-copy conformance test (Phase 1 "Remaining") are done (PARITY §2); the
-MuJoCo Warp suite result below (1447 passed, 3 failed) is the 2026-09-22 base fork (the flex failures were fixed by the
-fork's flex commits, flex suite 237/237, PARITY §2); per-world physics DR is done (`test_per_world_model_fields`); the
+[MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp) suite result below (1447 passed, 3 failed) is the
+2026-09-22 base fork (the flex failures were fixed by the
+flex commits of [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim), flex suite 237/237,
+PARITY §2); per-world physics DR is done (`test_per_world_model_fields`); the
 heightfield contact test marked xfail below passes since the fork's patch (GAPS "Heightfield contacts").
 
 Machine: Apple M4 Max, 40-core GPU, 64 GB, macOS 26.7, Command Line Tools only (no Xcode.app).
@@ -74,7 +76,8 @@ aliased buffer must be ordered after them (event or sync), otherwise the memset 
 ### Graph replay through indirect command buffers (WS2), measured
 
 Warp's Metal graph replay re-encoded every recorded dispatch on the CPU (~4 µs each; a MuJoCo
-Warp step of the SO-101 scene is 201 dispatches), so small batches were host-bound. The fork now
+Warp step of the SO-101 scene is 201 dispatches), so small batches were host-bound.
+[My fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) now
 encodes a captured graph once into an `MTLIndirectCommandBuffer` (barrier between commands) and
 replays it with one call. SO-101 lift, 4 substeps per step, `tests/test_physics.py`:
 
@@ -113,8 +116,8 @@ Render-only throughput, primitives scene (mjbatch-metal's `bench.py` scene and g
 | 256 | 256 | 211,188 | 3,936 / – |
 
 For scale (reported): MuJoCo Warp's own Warp-kernel renderer, primitives, N=512, on an RTX 4090:
-522,101 steps/s; Isaac Lab Cartpole-RGB tiled camera 100×100, 1024 envs, RTX 4090: 50K env
-steps/s including physics.
+522,101 steps/s; [Isaac Lab](https://github.com/isaac-sim/IsaacLab) Cartpole-RGB tiled camera 100×100, 1024 envs, RTX
+4090: 50K env steps/s including physics.
 
 SO-101 arm scene (348k triangles per env, undecimated): 13.6K env-frames/s at N=64/128 px and
 flat across N, i.e. bound by primitive throughput (~5 G triangles/s on this GPU). mjbatch-metal
@@ -179,7 +182,7 @@ spherical joints with limits and drives from actuators, articulation roots, coll
 convex-hull mesh approximation), UsdPreviewSurface materials with textures written as PNG,
 UsdSemantics labels, cameras with physical intrinsics, lights, and `mjc:` attributes for lossless
 round trip. `tests/test_scene_usd.py` checks the SO-101 scene. Not yet: USD → MuJoCo Warp load
-path, URDF import, MaterialX graphs.
+path, URDF import, [MaterialX](https://github.com/AcademySoftwareFoundation/MaterialX) graphs.
 
 ### Tier-0 lighting: model lights, headlight, shadow maps (measured)
 
@@ -265,13 +268,14 @@ Isaac Lab Cartpole-Direct step+inference on an RTX 4090, 4096 envs (published): 
 
 Lesson: without GPU-side loop conditions, MuJoCo Warp on Metal runs a model's full `iterations`
 budget (MuJoCo's default 100 Newton iterations turned a 2-DOF cartpole substep into 1,081
-dispatches); `BatchSimOptions.solver_iterations` should be set per model, as Isaac Lab sets PhysX
+dispatches); `BatchSimOptions.solver_iterations` should be set per model, as Isaac Lab sets
+[PhysX](https://github.com/NVIDIA-Omniverse/PhysX)
 iteration counts.
 
 ### RL reproducibility: Isaac Lab Cartpole config on the Warp rollout path (measured)
 
-`metalsim.learn.ppo_warp` with rsl_rl's Cartpole config (4096 envs, 16 steps/env, 5 epochs × 4
-minibatches, MLP 32×32 ELU, lr 1e-3 with the adaptive-KL schedule at desired_kl 0.01, gamma
+`metalsim.learn.ppo_warp` with [rsl_rl](https://github.com/leggedrobotics/rsl_rl)'s Cartpole config (4096 envs, 16
+steps/env, 5 epochs × 4 minibatches, MLP 32×32 ELU, lr 1e-3 with the adaptive-KL schedule at desired_kl 0.01, gamma
 0.99, lambda 0.95, entropy 0.005) on the MJCF cartpole with Isaac's reward and reset terms:
 
 | iteration | steps | episode return (max 300) | episode length |

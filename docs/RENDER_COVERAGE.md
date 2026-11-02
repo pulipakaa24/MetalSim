@@ -1,15 +1,19 @@
 # Render coverage: what the simulator simulates vs. what the renderers draw
 
-Date 2026-10-12. Reference state: `origin/metalsim-mpm` (565ae2f). Machine: M4 Max. Sections 3b-3e and 5 add the
-fixes through 2026-10-13; status marks below were brought to main `3670f4b8` on 2026-10-13.
+Date 2026-10-12. Reference state: `origin/metalsim-mpm`
+([`889dd26`](https://github.com/pulipakaa24/MetalSim/commit/889dd262566a5ae772f9caeccf5f7ee0647daf39)). Machine: M4 Max.
+Sections 3b-3e and 5 add the fixes through 2026-10-13; status marks below were brought to main
+[`3b287ba4`](https://github.com/pulipakaa24/MetalSim/commit/3b287ba45f3b83440452e96483df037d1dbb971d) on 2026-10-13.
 
 **Question.** Policies that learn from cameras only see what the renderer draws. If the simulator simulates
 something that the renderer does not draw, or draws in the wrong place, the policy cannot observe it. For each simulated
 feature, this audit asks whether it shows up in RGB, depth and segmentation for every MetalSim renderer.
 
 **Method.**
-1. Listed the simulated features from the code and tests: MuJoCo / MuJoCo Warp model elements, flex deformables,
-   PhysX-port cloth, Newton (XPBD / VBD / MPM), USD import, and per-world randomization.
+1. Listed the simulated features from the code and tests: MuJoCo /
+   [MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp) model elements, flex deformables,
+   PhysX-port cloth, [Newton](https://github.com/newton-physics/newton) (XPBD / VBD / MPM), USD import, and per-world
+   randomization.
 2. Traced each renderer's input path:
    - `scene_tables.build_scene_tables` is the only scene compiler. Tiers 0, 1 and 2 and the ray tracer all use it.
    - Per-frame inputs are `geom_xpos`, `geom_xmat`, `cam_xpos`, `cam_xmat`, `light_xpos` and `light_xdir`. The only
@@ -33,9 +37,9 @@ there is no code path. Those rows are marked "code".
     per-material wrap.
   - The 3D Gaussian splat renderer (`render/splat/`, `shaders/splat.metal`).
 - MPM particle rendering: being built by another agent (branch `metalsim-particle-render`, no commits yet).
-  **Landed since (2026-10-13):** merged to main with PR #4 (tier 2 + tier 0 render grains, two-level grain structures and
-  Metal's acceleration-structure limits), PR #9 (grain chunks of 2^24 - 1, 25 M-grain validation on the 14-inch) and
-  PRs #14 / #15 (25 M-grain benchmark on the 16-inch, logs); see the
+  **Landed since (2026-10-13):** merged to main in four steps (tier 2 + tier 0 render grains, two-level grain structures
+  and Metal's acceleration-structure limits; grain chunks of 2^24 - 1, 25 M-grain validation on the 14-inch M4 Max; then
+  the 25 M-grain benchmark on the 16-inch M4 Max, logs); see the
   row in §1c and `metalsim/render/PARTICLES.md`.
 
 ## 1. Coverage table
@@ -109,7 +113,7 @@ Measured coverage of the reference silhouette is shown as rgb / depth / seg.
 | per-world light fields of the model (`light_diffuse` / `specular` / `ambient` / `active` / `type` / `castshadow` / `cutoff` / `exponent` / `attenuation`) | ✅ | ✅ | | **Fixed (§3c).** Per-env light records from the model each frame; an inactive light emits nothing (also `active="false"` lights, which the static table drew lit: code). Tier 2's `usd_lights` keep their USD intensity. |
 | per-world `cam_fovy` / intrinsics in the model | ❌ (use `t_cam_spec`) | ❌ (`set_fovy`) | | |
 | roughness / metallic randomization | ◐ (shared by all envs) | ◐ | | `Randomizer.materials` writes one table through the renderer's `set_materials`. **Fixed (§3c):** the call crashed on a legacy-mode `Tier2Renderer` (`AttributeError`). |
-| texture swap randomization (Isaac Lab `randomize_visual_texture_material`, `rep.randomizer.texture`) | ✅ | ✅ | n/a | **Added (§3d)**: `set_texture_pool(images, projection="uvw", texture_scale, rotations_deg)` + per-(env, slot) ids in `t_material_ids` (GPU tensor): each env's own pick, OmniPBR-style box projection (or the surface's coordinates), texel-exact vs an analytic reference on a box face. |
+| texture swap randomization ([Isaac Lab](https://github.com/isaac-sim/IsaacLab) `randomize_visual_texture_material`, `rep.randomizer.texture`) | ✅ | ✅ | n/a | **Added (§3d)**: `set_texture_pool(images, projection="uvw", texture_scale, rotations_deg)` + per-(env, slot) ids in `t_material_ids` (GPU tensor): each env's own pick, OmniPBR-style box projection (or the surface's coordinates), texel-exact vs an analytic reference on a box face. |
 
 ### 1c. Deformables, particles and other physics engines
 
@@ -117,9 +121,9 @@ Measured coverage of the reference silhouette is shown as rgb / depth / seg.
 |---|---|---|---|
 | MuJoCo Warp flex cloth / cable / soft volume | `physics/deformable.py`, `tests/test_deformable.py` | ✅ every renderer and sensor (workstream A) | GPU path from `DeformableSim` / `BatchSim` buffers: 4 randomized worlds after 40 steps, every env ≥ 0.99 rgb / depth / seg against MuJoCo's renderer at the same vertices (`test_gpu_path_mujoco_warp_flex`). |
 | MetalSim XPBD cloth / rope (the default cloth and rope engine per PARITY) | `physics/deformable.py` | ✅ (workstream A) | `render(xpbd, sources={"flexvert_xpos": xpbd.x})`: drawn as MuJoCo draws the model's flexes; 3 worlds ≥ 0.99 (`test_gpu_path_xpbd_and_physx_cloth`) |
-| PhysX-port particle cloth | `physics/physx_cloth.py`, `tests/test_physx_cloth.py` | ✅ (workstream A) | `extras.DeformableMesh(name, tris, nvert, radius=...)` with `sources={name: sim.x}`; 3 worlds ≥ 0.99 in T0 / T1 / T2 / RT. Isaac draws PhysX cloth as its zero-thickness mesh (`radius=0`). |
-| Newton models (G1 XPBD, VBD cloth / soft / rods, coupled proxy) | `physics/newton_backend.py` | ✅ rigid shapes in T0 / T1 / T2 / RT / Ann through `render/newton_bridge.py` (2026-10-12, [NEWTON_RENDER.md](NEWTON_RENDER.md)); cloth / soft-body surfaces and free particles ✅ through the dynamic-mesh and particle paths, both on main since PR #4 (2026-10-13; first verified on merges of their WIP branches) | Measured: per-body silhouette coverage 1.0 (Menagerie Panda 0.986: z-fighting between coincident links, the same with the MJCF twin), depth p99 ≤ 0.97 mm (T0) and ≤ 0.1 mm (RT) against the same MJCF through the MuJoCo path; batched and spaced worlds. Before: no Newton `State` → renderer path. |
-| Newton MPM particles (sand, fluids, Franka pour) | `physics/mpm/` | ✅ T0 and T2 (render grains: RGB, depth, normals, segmentation id `n_slots + 1`), from numpy or directly from a Warp particle buffer such as Newton's `state.particle_q`; ◐ T1 draws the same raster grains, lit without ray-traced shadows (the grains are not in tier 1's ray-tracing structure; `Tier0Renderer.set_particles`, PARTICLES.md "Limits"; no tier-1 test); ❌ the ray tracer (RT depth / lidar) has no particle path. Merged in PRs #4, #9, #14, #15 (was: in progress on `metalsim-particle-render`) | `tests/test_render_particles.py` (12 tests: single-grain coverage and irradiance within 2 %, white furnace within 3 %, batched envs, bitwise determinism, two-level vs flat, T0 segmentation IoU > 0.9 against T2, Warp input = numpy input); 25.12 M grains build in 654 ms, 1080p 128 spp frame 5.1 s on the 16-inch (`runs/sand25m_16in/`); `metalsim/render/PARTICLES.md` |
+| PhysX-port particle cloth | `physics/physx_cloth.py`, `tests/test_physx_cloth.py` | ✅ (workstream A) | `extras.DeformableMesh(name, tris, nvert, radius=...)` with `sources={name: sim.x}`; 3 worlds ≥ 0.99 in T0 / T1 / T2 / RT. Isaac draws [PhysX](https://github.com/NVIDIA-Omniverse/PhysX) cloth as its zero-thickness mesh (`radius=0`). |
+| Newton models (G1 XPBD, VBD cloth / soft / rods, coupled proxy) | `physics/newton_backend.py` | ✅ rigid shapes in T0 / T1 / T2 / RT / Ann through `render/newton_bridge.py` (2026-10-12, [NEWTON_RENDER.md](NEWTON_RENDER.md)); cloth / soft-body surfaces and free particles ✅ through the dynamic-mesh and particle paths, both on main since 2026-10-13 (first verified on merges of their WIP branches) | Measured: per-body silhouette coverage 1.0 (Menagerie Panda 0.986: z-fighting between coincident links, the same with the MJCF twin), depth p99 ≤ 0.97 mm (T0) and ≤ 0.1 mm (RT) against the same MJCF through the MuJoCo path; batched and spaced worlds. Before: no Newton `State` → renderer path. |
+| Newton MPM particles (sand, fluids, Franka pour) | `physics/mpm/` | ✅ T0 and T2 (render grains: RGB, depth, normals, segmentation id `n_slots + 1`), from numpy or directly from a Warp particle buffer such as Newton's `state.particle_q`; ◐ T1 draws the same raster grains, lit without ray-traced shadows (the grains are not in tier 1's ray-tracing structure; `Tier0Renderer.set_particles`, PARTICLES.md "Limits"; no tier-1 test); ❌ the ray tracer (RT depth / lidar) has no particle path. Merged on 2026-10-13 (was: in progress on `metalsim-particle-render`) | `tests/test_render_particles.py` (12 tests: single-grain coverage and irradiance within 2 %, white furnace within 3 %, batched envs, bitwise determinism, two-level vs flat, T0 segmentation IoU > 0.9 against T2, Warp input = numpy input); 25.12 M grains build in 654 ms, 1080p 128 spp frame 5.1 s on the 16-inch (`runs/sand25m_16in/`); `metalsim/render/PARTICLES.md` |
 | Replicator motion vectors / 3D boxes / point cloud of deformables | `replicator/isaac.py` | ◐ | RGB / depth / segmentation / instance ids ✅ (extras are unlabelled instances with their own `instance_id`); motion vectors and 3D boxes stay geom-pose based (a deformable gets no motion vector and no 3D box) |
 
 ### 1d. USD import (`scene/usd_to_mjcf.py`) visual coverage
@@ -129,7 +133,7 @@ Measured coverage of the reference silhouette is shown as rgb / depth / seg.
 | Cube / Sphere / Cylinder / Capsule / Plane / Mesh gprims | ✅ | |
 | UsdPreviewSurface: diffuse colour / texture, roughness, metallic, ior, opacity | ◐ | Opacity goes to the geom's alpha and is drawn transparent since §3b (was: stored and then drawn opaque). Roughness, normal and occlusion textures are dropped. |
 | OmniPBR: diffuse constant / texture / tint, roughness, metallic, opacity, specular level, emission intensity | ◐ | `texture_scale` / rotate / translate are ignored. Emissive colour is reduced to intensity. Normal and ORM maps are dropped. OmniGlass is opaque. |
-| MaterialX | ◐ | As PARITY §2 (coat, sheen, transmission and normal maps not mapped) |
+| [MaterialX](https://github.com/AcademySoftwareFoundation/MaterialX) | ◐ | As PARITY §2 (coat, sheen, transmission and normal maps not mapped) |
 | mesh UVs | ✅ (importer) | **Fixed (§3c):** `st` / `st0` / `UVMap` / `uv` or the texture reader's varname; faceVarying (indexed or not), vertex / varying, uniform; quads and n-gons fan-triangulated with the positions; USD v-up mapped to MuJoCo's convention. Texture match on the probe plates (MuJoCo renderer) 0.24–0.37 → 1.00. With workstream B's unflipped atlas, tiers 0 / 2 show them as MuJoCo does. |
 | authored mesh normals | ❌ | Ignored; the renderers use MuJoCo's compiled normals with its hard-edge rule since §3b (was: recomputed smooth; see the mesh-normals row) |
 | GeomSubset per-face materials | ✅ | **Fixed (§3c):** one visual geom per `materialBind` subset (`<geom>_<subset>`, plus `<geom>_rest`), the whole mesh kept as an undrawn collider. Right-colour fraction top / sides 0.0 / 0.0 → 0.99 / 1.00. |
@@ -181,8 +185,8 @@ Effort is engineering days for one person including tests, assuming the existing
 | 16 | Area lights, more than 8 lights in T0/T1. **Done 2026-10-13 (§3e; lights: §3b)** | Unlimited lights, area lights with soft shadows | Raise `MAX_LIGHTS` (loop cost), area-light sampling in T2 | 0.5 / 2 | P2 |
 | 17 | hfield sides / base. **Done 2026-10-12 (§3c)** | Terrain meshes are closed | Add skirt triangles | 0.25 | P2 |
 | 18 | Fisheye / lens distortion. **Done 2026-10-12 (§3c)**: f-theta and Kannala-Brandt in T2 / RT, T0 cube faces | `FisheyeCameraCfg`, f-theta | Per-pixel ray directions in T2 and RT (trivial); T0 needs a distortion warp pass | 1–2 | P2 (P1 for wide-FOV nav cameras) |
-| 19 | MPM particles. **Done 2026-10-13 (T0, T2; PRs #4, #9, #14, #15; `metalsim/render/PARTICLES.md`)**; T1 draws the raster grains without ray-traced shadows; RT not covered | Points / mesh-from-particles (fluid isosurface) | Render grains (instanced grain meshes) in T0 and T2 | — | P0 for the MPM tasks |
-| 20 | Splat composite: no segmentation for the splat background, baked lighting (no robot shadows), 10 m composite limit | Isaac Sim 5.x renders 3DGUT Gaussian scenes inside RTX | **WIP elsewhere**; seg = "background" class by design | — | P2 |
+| 19 | MPM particles. **Done 2026-10-13 (T0, T2; `metalsim/render/PARTICLES.md`)**; T1 draws the raster grains without ray-traced shadows; RT not covered | Points / mesh-from-particles (fluid isosurface) | Render grains (instanced grain meshes) in T0 and T2 | — | P0 for the MPM tasks |
+| 20 | Splat composite: no segmentation for the splat background, baked lighting (no robot shadows), 10 m composite limit | [Isaac Sim](https://developer.nvidia.com/isaac/sim) 5.x renders 3DGUT Gaussian scenes inside RTX | **WIP elsewhere**; seg = "background" class by design | — | P2 |
 
 ## 3. Ranked fix list
 
@@ -209,7 +213,7 @@ This workstream fixed gaps #3, #6, #9, #10, #11, #15 and #16 (lights), measured 
   - `render_context.c`: `mjr_uploadMesh`, `makePlane`, `sphere`, `halfSphere`, `cylinder`, `disk`, the box list, `mjr_uploadTexture`.
   - `render_gl3.c`: `settexture`, `mjr_render`'s transparent and skybox passes, `isSupportedLight`.
   - `engine_vis_visualize.c`: `setMaterial`, `mjv_initGeom`.
-- **Isaac / RTX behaviour** comes from NVIDIA's RTX renderer and Replicator docs, forum answers, Isaac Lab issues #2956 and #3847, and the UsdLux / UsdGeom / UsdPreviewSurface specs.
+- **Isaac / RTX behaviour** comes from NVIDIA's RTX renderer and Replicator docs, forum answers, Isaac Lab issues [#2956](https://github.com/isaac-sim/IsaacLab/issues/2956) and [#3847](https://github.com/isaac-sim/IsaacLab/issues/3847), and the UsdLux / UsdGeom / UsdPreviewSurface specs.
 - **Measurements:**
   - Before/after numbers: `scripts/diagnostics/render_appearance_parity.py`, written to `docs/measurements/render_appearance.json`.
   - Tests: `tests/test_render_appearance.py`.
@@ -330,7 +334,9 @@ Coverage = fraction of MuJoCo's object pixels with RGB / depth / segmentation.
 | Newton bridge: per-world `shape_scale` / `shape_color` | read once at build | per frame; IoU > 0.95 (capsule > 0.85) vs the MJCF at that world's values, colour error < 4 (T0) | mesh texture / UVs / roughness / metallic kept in the twin (texture corr. 1.0 vs the MJCF path) |
 
 **Speed** (`scripts/diagnostics/render_world_cost.py`, exclusive `timing` job, device idle at start and end, M4 Max,
-2026-10-12 11:14; ms per frame, median of 30 GPU-path renders; base = 471d156, after = this change):
+2026-10-12 11:14; ms per frame, median of 30 GPU-path renders; base =
+[`25e3e88`](https://github.com/pulipakaa24/MetalSim/commit/25e3e88259b4093f757ac596a1db618290e7ff72), after = this
+change):
 
 | scene | base | after (defaults) | after, far = 100 m | each fix off in turn (skirts / sizes / model sync / reversed z) |
 |---|---|---|---|---|
@@ -368,7 +374,10 @@ Design notes:
 
 ## 3d. Render gaps 2: rolling shutter, per-env textures, haze, tendons, heightfield-side shadows; render cost by feature (2026-10-13)
 
-Branch `render-gaps-2` on `origin/metalsim-mpm` 532577fe (PR #4 merged). M4 Max, Warp 95f6f121 (the pinned fork). References:
+Branch `render-gaps-2` on `origin/metalsim-mpm`
+[`4938ab4c`](https://github.com/pulipakaa24/MetalSim/commit/4938ab4cfe0e5c48bedf6e8b7f2da7b670815f87) (after the render-grain
+merge, §1c). M4 Max, Warp [`95f6f121`](https://github.com/pulipakaa24/warp/commit/95f6f121b7e67025958335c7c15e338ac04a798a) (the
+pin of [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) then). References:
 MuJoCo 3.14.0 source and `mujoco.Renderer`, Isaac Lab clones and NVIDIA's docs; citations in the research note
 `research_notes/Render sensor fidelity/gaps_and_perf.md` (outside the repo). Tests: `tests/test_render_rolling.py`,
 `tests/test_render_env_textures.py`, `tests/test_render_tendons.py`, `tests/test_render_haze.py`; costs:
@@ -384,9 +393,11 @@ MuJoCo 3.14.0 source and `mujoco.Renderer`, Isaac Lab clones and NVIDIA's docs; 
 | heightfield sides / base in T0 shadows | sides cast shadows (MuJoCo, T1 / T2) | culled side chunks also drawn into the caster's shadow map (swept to the scene's lowest point) | floor shadow mask IoU vs tier 1's traced shadow 0.818 → 0.991 | `skirt_shadows=False` |
 
 **Byte identity** (`scripts/diagnostics/render_identity_check.py`, 8 scenes incl. Menagerie Panda / Shadow hand / Go2, the
-extras and drape scenes; T0 rgb / depth / seg / normals, T1, T2, ray depth, lidar; against 532577fe): with the new switches
-off 121 of 121 outputs identical (this includes tier 2's any-hit shadow path and the shader specializations below); with
-the defaults 118 of 121, the 3 others the SO-101 scene's rgb, which shows MuJoCo's haze (skybox + infinite floor).
+extras and drape scenes; T0 rgb / depth / seg / normals, T1, T2, ray depth, lidar; against
+[`4938ab4c`](https://github.com/pulipakaa24/MetalSim/commit/4938ab4cfe0e5c48bedf6e8b7f2da7b670815f87)): with the new
+switches off 121 of 121 outputs identical (this includes tier 2's any-hit shadow path and the shader specializations
+below); with the defaults 118 of 121, the 3 others the SO-101 scene's rgb, which shows MuJoCo's haze (skybox + infinite
+floor).
 
 **Cost of the additions** (exclusive `timing` jobs, ms per frame, best of 3 × 10, GPU path):
 
@@ -405,12 +416,12 @@ pass is repeated at the band's poses) and one structure build per band in T2 (ro
 
 ### Render cost by feature: the 2026-10 slowdowns
 
-**Reported**: after PR #4, tier 1 and tier 2 about 30 % slower (cloth at 4096 envs: tier 1 71 ms, tier 2 96 ms) and the glass
-pane in tier 2 about 5× slower (1.71 → 8.48 ms at 64 envs). **Reproduced** on the pinned Warp (`render_perf_profile.py`;
-trees exported from the branch's commits; cloth = deformable_render_bench's flex scene with one spot light, 64²; tier 2 at
-1 spp / 1 bounce; glass at 128², 4 spp / 2 bounces):
+**Reported**: after the render-grain merge, tier 1 and tier 2 about 30 % slower (cloth at 4096 envs: tier 1 71 ms, tier 2 96
+ms) and the glass pane in tier 2 about 5× slower (1.71 → 8.48 ms at 64 envs). **Reproduced** on the pinned Warp
+(`render_perf_profile.py`; trees exported from the branch's commits; cloth = deformable_render_bench's flex scene with one
+spot light, 64²; tier 2 at 1 spp / 1 bounce; glass at 128², 4 spp / 2 bounces):
 
-| frame (ms) | 2ef6641f (before workstream C) | 5a7cc077 (C merged) | 532577fe (PR #4) | this branch | all fidelity switches off |
+| frame (ms) | [`80357d45`](https://github.com/pulipakaa24/MetalSim/commit/80357d45fd949cce80ffa4cdce19d1c99cf98b92) (before workstream C) | [`e485e2a6`](https://github.com/pulipakaa24/MetalSim/commit/e485e2a6c21fa1b4b2915541553fcb8a4aacc18e) (C merged) | [`4938ab4c`](https://github.com/pulipakaa24/MetalSim/commit/4938ab4cfe0e5c48bedf6e8b7f2da7b670815f87) (render grains merged) | this branch | all fidelity switches off |
 |---|---|---|---|---|---|
 | tier 1 cloth, 1024 envs | 13.23 | 18.06 | 17.91 | **14.68** | 13.76 |
 | tier 1 cloth, 4096 envs | 52.86 | 71.70 | 71.41 | **58.49** | 55.51 |
@@ -434,14 +445,19 @@ transparent surface (a per-env flag the model sync writes each frame) take an an
 transmission loop (same result; 18.5 → 18.2 ms on cloth). Byte identity: 121 of 121 outputs with the switches off.
 
 **What remains, and why:**
-- Tier 1, +11 % over 2ef6641f (58.5 vs 52.9 ms at 4096): 2.7 ms is the spot light's shadow ray (Isaac / RTX shadows every
+- Tier 1, +11 % over
+  [`80357d45`](https://github.com/pulipakaa24/MetalSim/commit/80357d45fd949cce80ffa4cdce19d1c99cf98b92) (58.5 vs 52.9 ms
+  at 4096): 2.7 ms is the spot light's shadow ray (Isaac / RTX shadows every
   light; `shadow_lights="caster"` 55.8 ms), the rest (~3 ms, 5 %) is not attributed to any one switch (all switches off:
   55.5 ms).
-- Tier 2 cloth: within 4 % of 2ef6641f (71.8 vs 69.1 ms); the dynamic layout dominates instead: `dyn_layout="per_env"`
+- Tier 2 cloth: within 4 % of
+  [`80357d45`](https://github.com/pulipakaa24/MetalSim/commit/80357d45fd949cce80ffa4cdce19d1c99cf98b92) (71.8 vs 69.1
+  ms); the dynamic layout dominates instead: `dyn_layout="per_env"`
   57.7 ms (sbvh is the default for tier 2; §5 measured it 13 % slower on cloth too).
 - Glass pane, tier 2: transparency itself (presence sampling of the pane, transmitted shadow rays) is the fidelity cost:
-  4.60 ms vs 1.63 ms with `transparency=False`, 2.8×; 2ef6641f had the same feature at 4.16 ms. The compact env grid's
-  cell clipping saves time here (legacy grid 6.36 ms).
+  4.60 ms vs 1.63 ms with `transparency=False`, 2.8×;
+  [`80357d45`](https://github.com/pulipakaa24/MetalSim/commit/80357d45fd949cce80ffa4cdce19d1c99cf98b92) had the same
+  feature at 4.16 ms. The compact env grid's cell clipping saves time here (legacy grid 6.36 ms).
 - An infinite floor (cloth scene with `size="0 0"`): tier 2 22.9 ms vs 18.9 with the floor finite and nothing continued
   (the ground to the horizon is more visible surface to shade), tier 1 15.0 vs 13.9.
 - Not measurable as a cost: per-env light records (model_fields=False ±0.1 ms), reversed z, appearance="legacy",
@@ -450,7 +466,9 @@ transmission loop (same result; 18.5 → 18.2 ms on cloth). Byte identity: 121 o
 ## 3e. Transparent surfaces in the ray-traced sensors; true area lights (2026-10-13)
 
 Research notes: `research_notes/Render sensor fidelity/transparency_area_lights.md` (Isaac Sim RTX lidar and
-annotators, MuJoCo's `mj_ray` and renderer, real lidars on glass, UsdLux light units). Measurements on an M4 Max, Warp 95f6f121, on main f3b5c62e
+annotators, MuJoCo's `mj_ray` and renderer, real lidars on glass, UsdLux light units). Measurements on an M4 Max, Warp
+[`95f6f121`](https://github.com/pulipakaa24/warp/commit/95f6f121b7e67025958335c7c15e338ac04a798a), on main
+[`692cb13e`](https://github.com/pulipakaa24/MetalSim/commit/692cb13e99e1de89601e5bc5abc64221d352c45f)
 (render-gaps-2 merged); logs in `runs/render_sensor_tr/`.
 
 **What the references do.**
@@ -475,7 +493,8 @@ annotators, MuJoCo's `mj_ray` and renderer, real lidars on glass, UsdLux light u
 - One sub-ray and one return run a streaming kernel (`lidar_tr1`, no candidate arrays), bit-identical to the general
   one (points to float rounding) (`test_streaming_kernel_matches_lidar_ext`).
 - Scenes without transparent geoms run the unchanged kernels: SO-101, the lidar test scene and ANYmal C, default and
-  extended lidar and depth camera, 8 envs, **36 of 36 arrays byte-identical** to `origin/main` (f3b5c62e)
+  extended lidar and depth camera, 8 envs, **36 of 36 arrays byte-identical** to `origin/main`
+  ([`692cb13e`](https://github.com/pulipakaa24/MetalSim/commit/692cb13e99e1de89601e5bc5abc64221d352c45f))
   (`scripts/diagnostics/sensor_identity.py`).
 
 **Checks** (`tests/test_sensor_transparency.py`, glass panes 2 m in front of a wall at 3 m):
@@ -637,7 +656,8 @@ every geom (one geometry) is exactly the previous lookup, so geom hits are uncha
   frame's event waits; `extendedLimits` whenever a count passes Metal's standard limits.
 - A third prototype, merged tiles (at most 64 structures, a geometry per (env, object) placed by a per-geometry
   translation), was dropped: never the fastest, tile-local vertices up to a tile's extent of the env stride (tier 2
-  depth off by up to 1.4 mm), and 469 ms for the Aero hand's tier 2 at 1024 envs (ramp stopped). Commit 1463fd6e has it.
+  depth off by up to 1.4 mm), and 469 ms for the Aero hand's tier 2 at 1024 envs (ramp stopped). Commit
+  [`dad6dbcf`](https://github.com/pulipakaa24/MetalSim/commit/dad6dbcf13a1b32a23db796653b8992f38f53e81) has it.
 
 Equality with per_env (5 envs; wrapping tendons, draped cloth, extras scene): tier 1 byte-identical; ray depth and
 tier 2 depth within 0.0007 mm except one pixel per env (an edge-on triangle at a tendon silhouette) and 2 tier-2 pixels
@@ -688,7 +708,9 @@ The remaining maxima are grazing hits (floor near the horizon, tube silhouettes)
 amplified; hit masks are identical. Largest offsets at 1024 envs: legacy 1.3–1.4 km (tier 2: 62 km), compact 35–78 m.
 Speed is the same or better (cloth 1024 envs: depth 3.3 → 3.2 ms, tier 2 19.0 → 18.8, tier 1 13.1 → 13.3; Aero hand
 tier 2 59 → 41). `env_layout="legacy"` reproduces the previous outputs byte for byte (identity check: 111 of 121
-outputs identical against 471d156, the 10 others the ray-traced outputs of the two scenes with dynamic objects).
+outputs identical against
+[`25e3e88`](https://github.com/pulipakaa24/MetalSim/commit/25e3e88259b4093f757ac596a1db618290e7ff72), the 10 others the
+ray-traced outputs of the two scenes with dynamic objects).
 
 **Unchanged when absent.** Scenes without visible sites / flexes / skins / tendons render byte-identically: 87 of 92
 outputs identical on six scenes (prims, textured heightfield, SO-101, Panda, Shadow hand, Go2) against the previous
@@ -696,7 +718,8 @@ integration-branch commit, every renderer and the depth camera; the five differi
 the lidar's own `imu` site, since fixed by leaving sites out of the sensors (`scripts/diagnostics/render_identity_check.py`;
 `test_scenes_without_extras_are_byte_identical`). Go2's camera images were identical (its site is inside the body).
 The per-env structures (which changed the ray-tracing shaders' slot / mesh lookup) were checked the same way against the
-commit before them (471d156) with the two extras scenes of the tests added: every output of the six scenes without
+commit before them ([`25e3e88`](https://github.com/pulipakaa24/MetalSim/commit/25e3e88259b4093f757ac596a1db618290e7ff72))
+with the two extras scenes of the tests added: every output of the six scenes without
 dynamic objects identical, and the tier 0 / tier 1 images of the two with them; the 10 differing outputs (of 121) are
 their ray-traced ones, with float-level differences (depth ≤ 0.14 mm, a different triangle of the same surface at a few
 edge hits, tier 2 RGB at 0.08 % of values) from vertices now held in the env's own frame.

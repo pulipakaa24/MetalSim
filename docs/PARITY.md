@@ -9,7 +9,8 @@ the equivalence** (file::function, with the assertion it makes), the measured re
 Verdicts: **confirmed** (a test asserts equivalence within a stated tolerance), **equivalent by
 construction** (the same numbers/formulas are applied and a test checks they were applied, but the
 reference implementation cannot run here), **partial** (a documented difference remains),
-**disproved** (a test shows a difference), **not testable here** (needs Isaac Sim, which does not
+**disproved** (a test shows a difference), **not testable here** (needs
+[Isaac Sim](https://developer.nvidia.com/isaac/sim), which does not
 run on Apple Silicon). All figures are **measured** on an Apple M4 Max (40-core GPU, 18.4 TFLOPS
 FP32, 64 GB) unless marked **reported** (NVIDIA's published number, not re-measured).
 
@@ -18,8 +19,8 @@ comparison was not on the same asset, or a setting favours us, the row says so.
 
 ## 1. The benchmarked scene: Isaac-Velocity-{Flat,Rough}-G1-v0 on Isaac's own asset
 
-Isaac Lab publishes step / step+inference / step+train throughput for this task at 4096 envs
-(`benchmark_non_rl.py` protocol: uniform random actions in [-1, 1], 100 frames, wall time per
+[Isaac Lab](https://github.com/isaac-sim/IsaacLab) publishes step / step+inference / step+train throughput for this task
+at 4096 envs (`benchmark_non_rl.py` protocol: uniform random actions in [-1, 1], 100 frames, wall time per
 `env.step`). Our task is `metalsim.learn.g1_velocity` built from `assets/isaac/G1/g1_minimal.usd`,
 the file Isaac Lab loads for the task (44 rigid bodies, 37 revolute joints, three convex colliders),
 loaded through `metalsim.scene.usd_to_mjcf`.
@@ -31,11 +32,11 @@ loaded through `metalsim.scene.usd_to_mjcf`.
 | `g1_minimal.usd` kinematics: joint frames (`localPos0/1`, `localRot0/1`, axis token) define each joint's anchor, axis and zero pose | USD→MjSpec: child body placed at F0·inv(F1), hinge axis from `localRot1`·axis | `tests/test_g1_parity.py::test_joint_frames_and_axes_match_usd` (poses our model at the USD's authored configuration, asserts every joint's world anchor and axis equal the USD joint frames to 1e-5) | 37 joints, worst anchor error 5.6e-7 m, worst axis error 2.4e-6 | confirmed |
 | `PhysicsMassAPI` mass, diagonal inertia, centre of mass per link (unauthored COM = link origin) | copied per body (`explicitinertial`), COM sentinel handled | `tests/test_g1_parity.py::test_mass_properties_match_usd` (44 bodies, mass rel 1e-6, inertia rtol 1e-5, COM 1e-6 m; total 32.24 kg) | pass | confirmed |
 | Collision set of `g1_minimal`: torso and both `ankle_roll` convex meshes | same three mesh geoms + ground | `tests/test_g1_parity.py::test_collision_set_matches_usd` | pass | confirmed |
-| `ImplicitActuatorCfg` groups (G1_CFG: legs 150/200 Nm/rad, 5 Nms/rad, 300 Nm; feet 20, 2, 20 Nm; arms/hands 40, 10, 300 Nm; armature 0.01 / 0.001) override the USD drives | USD drives not converted (`drives=False`); MuJoCo affine actuators τ = kp(q*−q) − kd·q̇ clipped to ±effort; `dof_armature` set | `tests/test_g1_parity.py::test_actuator_gains_match_isaac_implicit_pd` (parses `G1_CFG` from Isaac's source with `ast`, asserts gain, bias, forcerange and armature per joint, all 37) | pass | confirmed (PhysX applies the same PD law inside its solver; MuJoCo applies it as an actuator force inside `implicitfast`, which also treats the damping implicitly) |
+| `ImplicitActuatorCfg` groups (G1_CFG: legs 150/200 Nm/rad, 5 Nms/rad, 300 Nm; feet 20, 2, 20 Nm; arms/hands 40, 10, 300 Nm; armature 0.01 / 0.001) override the USD drives | USD drives not converted (`drives=False`); MuJoCo affine actuators τ = kp(q*−q) − kd·q̇ clipped to ±effort; `dof_armature` set | `tests/test_g1_parity.py::test_actuator_gains_match_isaac_implicit_pd` (parses `G1_CFG` from Isaac's source with `ast`, asserts gain, bias, forcerange and armature per joint, all 37) | pass | confirmed ([PhysX](https://github.com/NVIDIA-Omniverse/PhysX) applies the same PD law inside its solver; MuJoCo applies it as an actuator force inside `implicitfast`, which also treats the damping implicitly) |
 | Initial state: pos z 0.74, joint defaults (hip pitch −0.20, knee 0.42, ankle pitch −0.23, shoulders, elbows 0.87, fingers) | keyframe `init`; `qpos0` left at the USD zero (overwriting it would move every joint's zero) | `tests/test_g1_parity.py::test_scene_settings_match_isaac` (asserts the keyframe and that the same table appears in Isaac's source) | pass | confirmed |
 | Gravity 9.81 (USD authors magnitude 0, which PhysX reads as default) | loader maps 0 → 9.81 | same test | pass | confirmed (an earlier build copied the 0 literally; found by the standing check) |
 | Physics 200 Hz, decimation 4, 20 s episodes | timestep 0.005, 4 substeps per control step, `max_t` 1000 | `tests/test_g1_task_terms.py::test_observation_layout_and_action_mapping` | pass | confirmed |
-| Solver: PhysX TGS, 4 position / 0 velocity iterations (Isaac Lab default), penetration-based contacts, friction 0.8 (static) / 0.6 (dynamic) | MuJoCo Newton, 10 iterations, line-search 20, pyramidal cone, `implicitfast`, eulerdamp off (MuJoCo Warp's own G1 benchmark settings), soft contacts (solref 0.02/1) | `tests/test_g1_parity.py::test_warp_matches_mujoco_c_under_pd_hold` (batched Metal vs MuJoCo C, identical state, 0.5 s incl. landing: max joint diff 1.2e-2 rad, median 3.6e-5, pelvis height 1 mm; both fall onto the torso by 2 s) | pass | **partial**: different contact/solver formulations by design (the plan accepts MuJoCo physics); what is confirmed is that our GPU physics equals our CPU reference, not PhysX |
+| Solver: PhysX TGS, 4 position / 0 velocity iterations (Isaac Lab default), penetration-based contacts, friction 0.8 (static) / 0.6 (dynamic) | MuJoCo Newton, 10 iterations, line-search 20, pyramidal cone, `implicitfast`, eulerdamp off ([MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp)'s own G1 benchmark settings), soft contacts (solref 0.02/1) | `tests/test_g1_parity.py::test_warp_matches_mujoco_c_under_pd_hold` (batched Metal vs MuJoCo C, identical state, 0.5 s incl. landing: max joint diff 1.2e-2 rad, median 3.6e-5, pelvis height 1 mm; both fall onto the torso by 2 s) | pass | **partial**: different contact/solver formulations by design (the plan accepts MuJoCo physics); what is confirmed is that our GPU physics equals our CPU reference, not PhysX |
 | Zero-action behaviour: under Isaac's 20 Nm/rad ankle gains a PD hold at the default pose cannot resist the forward COM offset, the robot pitches onto its torso | same (pitches forward, torso contact at ~1.5 s) | same test, second half | pass | consistent with the published training curves (episodes start short); not a numeric Isaac comparison |
 
 ### 1.2 Task definition (observations, actions, rewards, terminations, commands, terrain)
@@ -49,7 +50,7 @@ loaded through `metalsim.scene.usd_to_mjcf`.
 | Terminations: time out; `illegal_contact` torso force > 1 N | same | `tests/test_g1_parity.py::test_warp_matches_mujoco_c_under_pd_hold` (torso contact ends the episode) | pass | confirmed |
 | Commands: lin x ∈ [0, 1], lin y ∈ [−1, 1], heading command (stiffness 0.5), resample 10 s, 2 % standing | same | `g1_commands` kernel (not unit-tested separately; the term test reads its output) | – | equivalent by construction |
 | Reset: base xy ±0.5 m, yaw ±π, joint pos scale (1, 1), zero velocities | same | `tests/test_g1_parity.py` (the Warp-vs-C test has to override this randomization to compare) | – | equivalent by construction |
-| Rough terrain: `ROUGH_TERRAINS_CFG` 10 rows × 20 cols of 8 m cells, curriculum by row, sub-terrain mix (stairs up/down, boxes, random rough, slopes) | re-implemented from the config on a 0.1 m heightfield (`metalsim.learn.terrain`) | `tests/test_terrain.py::test_terrain_layout`; physics on it: `::test_hfield_mesh_contacts_match_mujoco_c` | layout pass; contacts pass on the current kernel (pin `787a5b3`, meshes on the repaired GJK/EPA, §1.6: min normal z 0.912, max penetration 5.2 mm vs MuJoCo C's 4.6 mm, pelvis within 1 mm; `tests/test_terrain.py` 21 of 21 on Metal at `93e5ce1` and `787a5b3`), as they did on the plane-path kernel before; the rough results built on that kernel were re-run on 2026-10-31 (research note §13) except the rows still marked "plane-path kernel" in §1.4, §1.5 and §1.8 | partial for the layout (same mix/ranges, not the same random heights); curriculum implemented (below) |
+| Rough terrain: `ROUGH_TERRAINS_CFG` 10 rows × 20 cols of 8 m cells, curriculum by row, sub-terrain mix (stairs up/down, boxes, random rough, slopes) | re-implemented from the config on a 0.1 m heightfield (`metalsim.learn.terrain`) | `tests/test_terrain.py::test_terrain_layout`; physics on it: `::test_hfield_mesh_contacts_match_mujoco_c` | layout pass; contacts pass on the current kernel (pin [`787a5b3`](https://github.com/pulipakaa24/mujoco_warp/commit/787a5b3a37acc2551ffc8a2c1af1e9781d76723f), meshes on the repaired GJK/EPA, §1.6: min normal z 0.912, max penetration 5.2 mm vs MuJoCo C's 4.6 mm, pelvis within 1 mm; `tests/test_terrain.py` 21 of 21 on Metal at [`93e5ce1`](https://github.com/pulipakaa24/mujoco_warp/commit/93e5ce18e76854c430ce669314af00ddceb92147) and [`787a5b3`](https://github.com/pulipakaa24/mujoco_warp/commit/787a5b3a37acc2551ffc8a2c1af1e9781d76723f)), as they did on the plane-path kernel before; the rough results built on that kernel were re-run on 2026-10-31 (research note §13) except the rows still marked "plane-path kernel" in §1.4, §1.5 and §1.8 | partial for the layout (same mix/ranges, not the same random heights); curriculum implemented (below) |
 | Terrain curriculum `terrain_levels_vel`: envs start at random levels ≤ 5, move up a level after walking more than half a cell (4 m), down after walking less than half the commanded distance, random level at the top | same rule in the reward/termination kernel at episode end, origins re-drawn from the (rows × types) table; `max_init_terrain_level` 5 | rough smoke test: levels move in 55 of 64 envs over 122 random-action steps (down, as a falling policy should) | – | equivalent by construction |
 | Rough terrain generator: `ROUGH_TERRAINS_CFG` (10 × 20 sub-terrains, 8 × 8 m, stairs / inverted stairs / boxes / random rough / slopes, difficulty (row + U)/rows, 20 m border) | Isaac Lab v2.3.2's generator ported verbatim (`metalsim/learn/isaac_terrain.py`), Isaac's three random streams reproduced (generator RNG, global numpy, torch CUDA Philox for box heights) | `tests/test_terrain.py::test_isaac_rough_terrain_exact` (runs Isaac's own terrain code from `assets/isaac/terrains/` on CPU as the oracle: origins exact, all 2,403,201 grid heights equal the mesh top surface, 99.99 % within 1e-5 m of Isaac's `mesh_query_ray`), `test_isaac_sub_terrain_exact` (9 functions × 5 difficulties bit-for-bit) | exact at grid points; off-grid a 0.1 m heightfield ramps Isaac's vertical walls (mean 8 mm, p99 14 cm); CUDA box heights unconfirmed on NVIDIA hardware | confirmed (grid), partial (walls) |
 | Height scanner: `RayCaster` 1.6 × 1.0 m grid at 0.1 m (187 rays), yaw-aligned, `body_z − hit_z − 0.5` | Warp kernel interpolating the heightfield triangles on the sim queue (capturable; a heightfield needs no ray tracing; `heightscan.metal` remains for arbitrary meshes) | `tests/test_terrain.py::test_height_scan_matches_mj_ray` (vs MuJoCo `mj_ray` on the same heightfield, 1496 rays) | median 0.0 m, 99th pct 0.0 m, max 0.85 m on cell diagonals where MuJoCo's triangulation differs | confirmed |
@@ -66,8 +67,10 @@ loaded through `metalsim.scene.usd_to_mjcf`.
 ### 1.4 Throughput on the G1 task (Isaac's protocol, 4096 envs)
 
 **2026-10-31:** every G1 rough-terrain number in this section was measured on MuJoCo Warp's plane-path heightfield
-kernel (fork pin `8eb51fe` and earlier, §1.6). The pin is now `787a5b3` (`93e5ce1` plus the EPA follow-up of the
-research note's §12), where the G1's mesh feet take the repaired GJK/EPA path; on the 14-inch MacBook Pro that cost
+kernel (fork pin [`8eb51fe`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624) and earlier,
+§1.6). The pin is now [`787a5b3`](https://github.com/pulipakaa24/mujoco_warp/commit/787a5b3a37acc2551ffc8a2c1af1e9781d76723f)
+([`93e5ce1`](https://github.com/pulipakaa24/mujoco_warp/commit/93e5ce18e76854c430ce669314af00ddceb92147) plus the EPA follow-up of
+the research note's §12), where the G1's mesh feet take the repaired GJK/EPA path; on the 14-inch MacBook Pro that cost
 about 15 % of the rough env step under random actions (on battery) and, per PPO iteration, 1.2–1.3× (2.3.2 configs)
 and 1.68× (`rough_il3`) the plane path (indicative ratios, not performance figures:
 `docs/research/hfield_contacts_2026-10-31.md` §8.4, §12). The rough rows keep their numbers and
@@ -80,7 +83,7 @@ plane path / repaired kernel, both settings of these rows). Flat rows are unaffe
 | G1 flat, physics only (4 substeps of MuJoCo Warp, graph replay) | 68,660 env-steps/s | – | – | – |
 | G1 flat, step only (physics + reset/kinematics + obs + reward, one graph per step) | 55,176 env-steps/s (cost-split run 55,960; 45,958 before the post-reset forward pass was replaced by kinematics only) | 94,000 | 0.59× | 2.6× |
 | G1 flat, elliptic default (`recommended`: ellip10, cap 20) vs `recommended_pyramidal` (cap 10), **2026-09-26 12:03, after the fused elliptic iteration + ICB early exit** (`runs/ellip_ws/final.wrapper.log`, two interleaved repeats): physics only 85.9 / 85.7 K vs 103.2 / 102.7 K; env step 41.8 / 42.0 K vs 62.7 K; rollout + inference 39.5 / 39.9 K vs 62.7 / 62.5 K; **PPO loop 37.3 / 37.7 K vs 57.5 / 56.9 K (1.53×; 1.50× with `MJW_LS_NOISE_FLOOR=8`: 38.1 / 38.2 K)**; before (10:52): 34.2–34.4 K vs 57.5–57.7 K (1.68×) | 37.3–38.2 K env-steps/s (elliptic), 56.9–57.5 K (pyramidal) | – | – | – |
-| G1 flat, Isaac's `benchmark_non_rl.py` **measured on the L4** (Isaac Sim 5.1, 4096 envs, 100 frames, debug_vis off, 2026-09-24) | – | mean 46,548 env-steps/s (max 53,171); rough: mean 39,135 (max 46,177) | M4 Max / L4: flat 1.19× (5 ms setting), 0.66× at the 2.5 ms training setting; rough 1.42× (ours on the plane-path kernel; 16-inch re-time pending (2026-10-31)) | – |
+| G1 flat, Isaac's `benchmark_non_rl.py` **measured on the NVIDIA L4** (Isaac Sim 5.1, 4096 envs, 100 frames, debug_vis off, 2026-09-24) | – | mean 46,548 env-steps/s (max 53,171); rough: mean 39,135 (max 46,177) | M4 Max / L4: flat 1.19× (5 ms setting), 0.66× at the 2.5 ms training setting; rough 1.42× (ours on the plane-path kernel; 16-inch re-time pending (2026-10-31)) | – |
 | G1 flat, step + inference (Warp MLP 256-128-128 inside the rollout graph) | 55,397 env-steps/s | 88,000 | 0.63× | 2.8× |
 | G1 flat, full PPO loop (24-step rollout + 5 epochs × 4 minibatches on MPS, clipped value loss) | 47,809 env-steps/s (training log over 20 iterations: 51,742) | 82,000 | 0.58× | 2.6× |
 | G1 rough (patched heightfield kernel, 187-ray height scan), physics only; plane-path kernel; 16-inch re-time pending (2026-10-31) | 61,679 env-steps/s | – | – | – |
@@ -139,8 +142,9 @@ Notes that bear on reading these numbers honestly:
 machine through the timing queue, 4096 worlds, Newton 10 / 20).** MuJoCo Warp's elliptic-cone Newton Hessian
 took two Metal-specific slow paths in the fork (`_update_gradient_JTCJ_dense` launched with
 `dim_block = naconmax`, 33.6 M threads per launch at 4096 Go2 worlds; `_JTDACJ_sparse` with one lane per
-constraint group), fixed in fork commit `c301880` (worktree `upstream/mujoco_warp-ellip`, branch
-`metalsim-elliptic`, pending merge at the time; **merged** into the fork's `metalsim`, in the pinned `f1b35e2`; every previous form kept behind `MJW_JTCJ_MODE` /
+constraint group), fixed in fork commit [`c301880`](https://github.com/pulipakaa24/mujoco_warp/commit/c30188029f6729b9f7cfe69706d6b8069b7f53d2) (worktree
+`upstream/mujoco_warp-ellip`, branch `metalsim-elliptic`, pending merge at the time; **merged** into the fork's `metalsim`, in the pinned
+[`f1b35e2`](https://github.com/pulipakaa24/mujoco_warp/commit/f1b35e2b3ddc80b197b0c665bf6d71523d175daf); every previous form kept behind `MJW_JTCJ_MODE` /
 `MJW_JTDAJ_ELLIPTIC_LANES`). Physics steps/s pyramidal / elliptic before / elliptic after (cost after):
 
 | model | pyramidal | elliptic before | elliptic after | cost after (before) |
@@ -154,8 +158,8 @@ constraint group), fixed in fork commit `c301880` (worktree `upstream/mujoco_war
 
 Physics unchanged to float noise (Warp CPU device and Metal vs `mj_step`: identical envelopes for every launch
 form; Metal graph replay of 512 worlds × 200 steps within the run-to-run floor); fork test suite on Metal 1450
-passed / 39 skipped / 2 failed, both failures pre-existing at `07a51a6`. **2026-09-26 (fork branch
-`metalsim-elliptic2` `b0150ac`, pending merge at the time; research note §8; **merged** as `a33c731` / `b895bff`,
+passed / 39 skipped / 2 failed, both failures pre-existing at [`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc). **2026-09-26 (fork branch
+`metalsim-elliptic2` [`b0150ac`](https://github.com/pulipakaa24/mujoco_warp/commit/b0150acd500679259a6154c828209d7fed17f523), pending merge at the time; research note §8; **merged** as [`a33c731`](https://github.com/pulipakaa24/mujoco_warp/commit/a33c731bfb67d3721bc7166b9469593a907f4b38) / [`b895bff`](https://github.com/pulipakaa24/mujoco_warp/commit/b895bff5a050c7419c3b06d038a07b0baf915fbb),
 `MJW_ELLIPTIC_INCREMENTAL=2` the default, README "MuJoCo Warp fork"):** MuJoCo C's incremental Newton structure
 for elliptic cones (quadratic Hessian kept across iterations, cone term rebuilt per iteration into a second
 buffer, plain register Cholesky) brings the G1 task's elliptic impratio 10 from 55,379 to **64,519
@@ -198,8 +202,14 @@ physics (161 vs 28 ms per step at 4096 envs), an open item. Drift remedies, phys
 The rows above the table use the 5 ms MuJoCo Warp setting of Isaac's task file.
 
 **Throughput work on MuJoCo Warp, 2026-09-25** (`docs/research/mjwarp_throughput_2026-09-25.md`,
-`runs/mjw_tp/`, MetalSim d867143 + df0fda1, Warp fork b9557cb, MuJoCo Warp fork ad22120 / ccfaffb /
-1791414; measured back to back in one session, 4096 envs, 2.5 ms, physics results unchanged to float
+`runs/mjw_tp/`, MetalSim
+[`4ff65d5`](https://github.com/pulipakaa24/MetalSim/commit/4ff65d5f674c62da81e148d537249b7edf493dcc) +
+[`addb27e`](https://github.com/pulipakaa24/MetalSim/commit/addb27ec6e8df2c861162e438e0d1530ff878331), Warp fork
+[`b9557cb`](https://github.com/pulipakaa24/warp/commit/b9557cb987a51b51aae947f5345b61aeb6e28b32), MuJoCo Warp fork
+[`ad22120`](https://github.com/pulipakaa24/mujoco_warp/commit/ad2212000943ac4285afcf6e942754329bf2cf44) /
+[`ccfaffb`](https://github.com/pulipakaa24/mujoco_warp/commit/ccfaffb38d9e4ff765214d24c2eebbbdb4358b1d) /
+[`1791414`](https://github.com/pulipakaa24/mujoco_warp/commit/17914144d132dec4c0aa3bccfe743816faec72c9); measured back
+to back in one session, 4096 envs, 2.5 ms, physics results unchanged to float
 noise: ≤ 3.6e-6 rad after one control step between variants, 4.08e-6 vs MuJoCo C in every variant,
 same training-probe trend, 316 MuJoCo Warp fork tests green on Metal):
 
@@ -218,7 +228,8 @@ came from comparing physics-only (robots standing still) with the full step (ran
 contacts). Two thirds of physics was the dense 43×43 Cholesky, which the Warp fork only kept in
 registers up to size 40. Rough terrain: 23.7 K → 41.9 K full loop (plane-path kernel; 16-inch re-time pending (2026-10-31)). With this, the G1 flat training
 loop on the M4 Max (56.6 K) exceeds Isaac Lab 2.3.2 + PhysX on the L4 (45.9 K, measured) and is 0.69×
-NVIDIA's published 4090 number (82 K, reported). The two settings are now global defaults (`metal_register_cholesky_max=48`, `m_dense_max=32`, commit 109984b) after
+NVIDIA's published 4090 number (82 K, reported). The two settings are now global defaults (`metal_register_cholesky_max=48`, `m_dense_max=32`, commit
+[`9b14689`](https://github.com/pulipakaa24/MetalSim/commit/9b146890f30d7083b736ae219433f7fa5b199749)) after
 verification on cartpole, the SO-101 lift scene, lidar navigation, Tron1, Go1 and Panda: physics within
 run-to-run noise of the old defaults (Panda and Tron1 bitwise after the first step), throughput within ±1 %
 on every scene (the `m_dense_max=0` variant cost Tron1 0.6–1.2 % and was not adopted). Rejected options with
@@ -228,14 +239,18 @@ comparison: PhysX vs XPBD is a different solver; Isaac Lab 3.0 itself moves to N
 like-for-like number will be Isaac Lab 3.0's, which is not measured here.
 
 **Re-measured 2026-09-25 evening under the task's current defaults** (`docs/research/throughput_regression_2026-09-25.md`,
-`runs/mjw_tp/ab/`, `runs/mjw_tp/cc.wrapper.log`; MetalSim `98a41c1`, Warp fork `9050cb54`, MuJoCo Warp fork `1791414`
-installed and `07a51a6` in a worktree, interleaved through the timing queue, AC power, idle GPU logged at both ends):
+`runs/mjw_tp/ab/`, `runs/mjw_tp/cc.wrapper.log`; MetalSim
+[`1209b4e`](https://github.com/pulipakaa24/MetalSim/commit/1209b4e40e87d38372f4ba74974c0199a234c619), Warp fork
+[`9050cb54`](https://github.com/pulipakaa24/warp/commit/9050cb5452de26ca6c80871bee15c389c06f9b10), MuJoCo Warp fork
+[`1791414`](https://github.com/pulipakaa24/mujoco_warp/commit/17914144d132dec4c0aa3bccfe743816faec72c9)
+installed and [`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc) in a
+worktree, interleaved through the timing queue, AC power, idle GPU logged at both ends):
 
 | setting (4096 envs, 2.5 ms, flat) | physics only | full env step | rollout + inference | full PPO loop | `solver.solve` per substep | Newton cap hit |
 |---|---|---|---|---|---|---|
-| task default: `contact_cfg="recommended"` (tau10_impact_hardlimits, the PhysX-parity preset, `e3ba79f`) | 80,982–81,287 | **54,094–54,272** | 53,830–54,225 | **49,509–50,055** | 5.69–5.74 ms | 12–28 of 4096 worlds |
+| task default: `contact_cfg="recommended"` (tau10_impact_hardlimits, the PhysX-parity preset, [`b147342`](https://github.com/pulipakaa24/MetalSim/commit/b14734296ec0c692ac889ef661f672e2ee273e94)) | 80,982–81,287 | **54,094–54,272** | 53,830–54,225 | **49,509–50,055** | 5.69–5.74 ms | 12–28 of 4096 worlds |
 | `contact_cfg=None` (MuJoCo's default contacts and limits: the setting of the headline row above) | 78,023–80,600 | **67,102–67,209** | 61,176–61,366 | **56,154–56,157** | 4.18 ms | none |
-| MuJoCo Warp fork `07a51a6` (flex merge) instead of `1791414`, task default | 81,014–81,041 | 54,035–54,169 | 53,990–54,023 | 49,937–50,022 | 5.72–5.74 ms | 16–22 |
+| MuJoCo Warp fork [`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc) (flex merge) instead of [`1791414`](https://github.com/pulipakaa24/mujoco_warp/commit/17914144d132dec4c0aa3bccfe743816faec72c9), task default | 81,014–81,041 | 54,035–54,169 | 53,990–54,023 | 49,937–50,022 | 5.72–5.74 ms | 16–22 |
 
 The headline (67.6 K / 56.6 K) reproduces to 0.1 % under its own contact setting; the task's PhysX-parity preset,
 adopted the same day for fidelity, costs 19.5 % of the env step and 11 % of the loop, entirely in the Newton solve
@@ -266,13 +281,17 @@ timing queue on the M4 Max, idle GPU logged, 4096 envs, 2.5 ms x 8, `contact_cfg
 like-for-like rough table and its three seeds, per-term means, the transfer tables in both directions and the
 wall-cell transfer counts) was measured on the plane-path heightfield kernel, which missed foot contacts on random-rough
 and slope cells (no contact in 178 of 1000 touching foot placements, §1.6; `docs/research/hfield_contacts_2026-10-31.md`
-§9). The MuJoCo Warp pin is now `787a5b3`. **Re-run on the repaired kernel on 2026-10-31** (research note §13; the
-14-inch on AC power, MuJoCo Warp `93e5ce1`, whose contacts `787a5b3` leaves unchanged at margin = gap = 0 except at
-non-loop EPA horizons): the like-for-like table and its three seeds, our seed-0 checkpoints through both transfer
-protocols, and one old checkpoint plus NVIDIA's pretrained rough policy on both kernels; the new numbers stand next
-to the old ones below. Still marked "plane-path kernel", with what each waits for: Isaac's checkpoints in MetalSim
-(Isaac's 2026-09-25 checkpoints are not on this machine), ours in Isaac (the L4), the per-term means and the
-150-iteration smoke run (not re-run). Isaac's own runs and the flat results are unaffected.
+§9). The MuJoCo Warp pin is now
+[`787a5b3`](https://github.com/pulipakaa24/mujoco_warp/commit/787a5b3a37acc2551ffc8a2c1af1e9781d76723f). **Re-run on the
+repaired kernel on 2026-10-31** (research note §13; the
+14-inch on AC power, MuJoCo Warp
+[`93e5ce1`](https://github.com/pulipakaa24/mujoco_warp/commit/93e5ce18e76854c430ce669314af00ddceb92147), whose contacts
+[`787a5b3`](https://github.com/pulipakaa24/mujoco_warp/commit/787a5b3a37acc2551ffc8a2c1af1e9781d76723f) leaves unchanged
+at margin = gap = 0 except at non-loop EPA horizons): the like-for-like table and its three seeds, our seed-0
+checkpoints through both transfer protocols, and one old checkpoint plus NVIDIA's pretrained rough policy on both
+kernels; the new numbers stand next to the old ones below. Still marked "plane-path kernel", with what each waits for:
+Isaac's checkpoints in MetalSim (Isaac's 2026-09-25 checkpoints are not on this machine), ours in Isaac (the L4), the
+per-term means and the 150-iteration smoke run (not re-run). Isaac's own runs and the flat results are unaffected.
 
 **Two defects found by running Isaac's full 1,500 iterations, both now fixed.**
 
@@ -295,8 +314,8 @@ up for 11–15 s of the 20 s horizon through the second half of training instead
 return is still negative and falls as episodes lengthen (−5 → −18 → −28 → −26): the per-step penalties
 (joint deviation, action rate, torques, orientation) outweigh the tracking terms, i.e. the policy learns
 to stay up, not to walk on command. Whether that is a remaining reward-term mismatch or a physics
-effect is exactly what Isaac's own rsl_rl log of the same task (per-term reward means, recorded on
-the L4) will show; that comparison is pending. Isaac's own training of the
+effect is exactly what Isaac's own [rsl_rl](https://github.com/leggedrobotics/rsl_rl) log of the same task (per-term
+reward means, recorded on the L4) will show; that comparison is pending. Isaac's own training of the
 same task on the L4 (rsl_rl, same config) is recorded on the L4 machine for the side-by-side comparison.
 
 Rough, 2048 envs, Isaac's rough PPO config (512-256-128), 150 iterations on the patched kernel
@@ -342,15 +361,17 @@ in both directions (iteration 500 stands in Isaac, falls in MetalSim; 1000 and 1
 consistent with the repeated-noise defect in the old rollout. **A policy trained in PhysX behaves the
 same in MetalSim's MuJoCo Warp physics** is the strongest single parity statement this document can
 make so far; it is measured on one asset, one task, four checkpoints, one seed. Round two with the fixed learner's own checkpoints (`docs/gallery/g1_stage_metalsim_fixed_it*.mp4`,
-recorded 2026-09-25; MetalSim side on the corrected collider 284dcd1): iteration 1000 walks 3.90 m in
-Isaac's PhysX and 4.06 m in MetalSim, upright in both (pelvis 0.67 / 0.69 m); iteration 500 3.27 vs
+recorded 2026-09-25; MetalSim side on the corrected collider [`284dcd1`](https://github.com/pulipakaa24/mujoco_warp/commit/284dcd12ff37d56ea0201ade4e7f941d772a0f28)): iteration
+1000 walks 3.90 m in Isaac's PhysX and 4.06 m in MetalSim, upright in both (pelvis 0.67 / 0.69 m); iteration 500 3.27 vs
 4.16 m; iteration 300 stands in PhysX (0.05 m) but walks here (3.46 m); iteration 100 falls in both.
 So the transfer holds in both directions once a policy tracks the command, with an early-gait
-exception at iteration 300. MuJoCo Warp collider A/B on the same test (`runs/mjwarp_transfer_collider.log`, fork f2716b4 → a8e6485
+exception at iteration 300. MuJoCo Warp collider A/B on the same test (`runs/mjwarp_transfer_collider.log`, fork
+[`f2716b4`](https://github.com/pulipakaa24/mujoco_warp/commit/f2716b4e7873ed40b8405c0840238610349c7e7e) →
+[`a8e6485`](https://github.com/pulipakaa24/mujoco_warp/commit/a8e64857ea81c5277f55ec7a995adc1e99191e09)
 with the C-exact plane-convex contact set): 3.01 / 2.94 / 3.18 → 2.74 / 2.65 / 2.91 m, i.e. the corrected
 contact set moves MuJoCo Warp from within 5 % of Isaac to 9–12 % short; matching MuJoCo C more exactly is
 not the same as matching PhysX (decision pending the contact-tuning comparison). The same test on
-Newton XPBD (`runs/newton_transfer.log`, pinned upstream build, mean of 4 envs): Isaac's 500 / 1000 /
+[Newton](https://github.com/newton-physics/newton) XPBD (`runs/newton_transfer.log`, pinned upstream build, mean of 4 envs): Isaac's 500 / 1000 /
 1499 checkpoints travel 4.48 / 4.35 / 4.14 m at 4 it. / 1.25 ms and 4.02 / 3.95 / 3.83 m at 0.625 ms,
 against Isaac's 3.19 / 3.02 / 3.11 m and MuJoCo Warp's 3.02 / 2.93 / 3.19 m; all engines keep the
 pelvis at 0.61–0.64 m. Newton over-travels by 37–48 % at the fast setting and 20–35 % at the slow one
@@ -390,7 +411,8 @@ while the per-iteration KL stays at 0.011–0.017 and never drops below rsl_rl's
 0.005; Isaac's action std falls 1.0 → 0.64 by iteration 600); the rsl_rl-on-our-task differential is
 running. Also found on the way: the reference path's feet-slide term used MuJoCo's `cvel` (spatial
 velocity at the subtree COM) as the foot velocity instead of the foot body's own linear velocity
-(Isaac's `body_lin_vel_w`); fixed on both engines (commit af3cd6b, tested against `mj_objectVelocity` to
+(Isaac's `body_lin_vel_w`); fixed on both engines (commit
+[`c3ec67a`](https://github.com/pulipakaa24/MetalSim/commit/c3ec67aebdcc1b3ead45826e5b06ba799f245e58), tested against `mj_objectVelocity` to
 2e-3 m/s; the old term overstated sliding ~2.5× under random actions). Every run in this section used the old term. Newton preflight: termination −4
 and the PPO probe pass; the random-policy return (−8.3, bound −8) and the 3σ stress check (37 of 1024
 worlds blow up in 400 steps at the fast settings; 8 it. at 0.625 ms passes but costs the speed gain)
@@ -415,7 +437,9 @@ seed 0, 4096 envs, 1500 iterations in 98 min (≈25 K env-steps/s):
 episodes by iteration 200 and matches Isaac's linear-velocity tracking by iteration 1000 (0.913 vs
 0.921), with a takeoff about 50 iterations later than Isaac's (unexplained; see the task-config note
 below). Reading `ppo_warp.py` against rsl_rl and checking both on identical data found three rollout
-defects, fixed in commit f0f2115 and covered by `tests/test_ppo_warp_rollout.py`:
+defects, fixed in commit
+[`c6ec1a7`](https://github.com/pulipakaa24/MetalSim/commit/c6ec1a7fc51445f5857f937401714b1394f32f4e) and covered by
+`tests/test_ppo_warp_rollout.py`:
 
 1. **Exploration noise repeated every rollout**: noise (and observation noise, command resampling and
    resets) was keyed on the rollout step index, which restarts every rollout, so every env drew the
@@ -426,9 +450,10 @@ defects, fixed in commit f0f2115 and covered by `tests/test_ppo_warp_rollout.py`
    executed (64 of 64 envs), and so did its action-rate penalty.
 3. **Time-outs treated as falls**: now bootstrapped like rsl_rl (`r += γ V(s)`).
 
-**Isaac's flat configuration ported and the like-for-like curve** (commit 5f208f0: `reward_cfg="flat"` =
-G1FlatEnvCfg's weights and ranges, Isaac's 0.9 soft joint limits, torso-contact termination over a 15 ms
-history via the new ContactSensor; all 13 terms asserted against Isaac's formulas in
+**Isaac's flat configuration ported and the like-for-like curve** (commit
+[`9be6800`](https://github.com/pulipakaa24/MetalSim/commit/9be680043efe98756c2ee708025480e216c961c8):
+`reward_cfg="flat"` = G1FlatEnvCfg's weights and ranges, Isaac's 0.9 soft joint limits, torso-contact termination over a
+15 ms history via the new ContactSensor; all 13 terms asserted against Isaac's formulas in
 `tests/test_g1_task_terms.py` on both engines; rough set unchanged). rsl_rl on the ported task, 400
 iterations, 4096 envs, seed 0 (`runs/g1_flat_rslrl_ppo_isaacflatcfg.log`, measured 2026-09-24):
 
@@ -490,9 +515,10 @@ inside the three-seed spread of the origin runs (26.9 ± 1.3) and next to Isaac'
 the faithful velocity point.
 
 **Elliptic friction cones, confirming run (measured 2026-09-25 night, `runs/il3/g1_flat_flatcfg_ellip10.log`,
-policy `runs/il3/ckpt/g1_flat_flatcfg_ellip10.pt`):** the COM run's settings with `contact_cfg =
-tau10_impact_hardlimits_ellip10` (the recommended preset plus elliptic cones, impratio 10; the cheap cone
-kernel of fork `c301880`, §1.4), seed 0, 1000 iterations. Return / episode length: −5.1 / 83 at iteration 100,
+policy `runs/il3/ckpt/g1_flat_flatcfg_ellip10.pt`):** the COM run's settings with
+`contact_cfg = tau10_impact_hardlimits_ellip10` (the recommended preset plus elliptic cones, impratio 10; the cheap cone
+kernel of fork [`c301880`](https://github.com/pulipakaa24/mujoco_warp/commit/c30188029f6729b9f7cfe69706d6b8069b7f53d2),
+§1.4), seed 0, 1000 iterations. Return / episode length: −5.1 / 83 at iteration 100,
 −5.9 / 926 at 200, 9.8 / 999.5 at 300, 18.5 / 989 at 500, 23.8 / 972 at 750 (23.85 / 1000 at 700), 26.7 / 1000 at 900,
 **+26.31 / 989.9 (n = 40) at 1000**. Next to it, same PPO and seed: +27.1 (COM run, default contacts), +27.85
 (recommended preset), 28.4 / 26.3 / 26.0 (origin-velocity seeds; mean 26.9 ± 1.3), Isaac +27.3. Full episodes
@@ -523,8 +549,10 @@ same config and seed, measured 2026-09-24, 25.3 K env-steps/s including the moni
 **The fixed learner on Newton, all settings** (Isaac's flat weights in every column; 4096 envs, seed 0,
 1000 iterations; return / length averaged over ±5 iterations; measured 2026-09-24/25;
 `runs/g1_flat_newton_ppo_fixed.log`, `runs/g1_flat_newton0625_ppo_fixed.log` on the pinned upstream
-Newton 45458023 with the limit clamp, `runs/g1_flat_newton_forksolver0625_ppo_fixed.log` on the fork
-90e23324 with its in-solver drive, no clamp):
+Newton [`45458023`](https://github.com/newton-physics/newton/commit/45458023f24629c1feffb1f336594808f537db14) with the
+limit clamp, `runs/g1_flat_newton_forksolver0625_ppo_fixed.log` on the fork
+[`90e23324`](https://github.com/pulipakaa24/newton/commit/90e23324521fa86710e483e01d02e80d1dac0060) with its in-solver
+drive, no clamp):
 
 | iteration | Isaac (PhysX) | MuJoCo Warp | Newton 4 it. / 1.25 ms | Newton 4 it. / 0.625 ms | Newton fork drive, 0.625 ms |
 |---|---|---|---|---|---|
@@ -568,7 +596,8 @@ same config and seed, measured 2026-09-24, 25.3 K env-steps/s including the moni
 | 1000 | 773 / −24.3 | 995 / +32.8 | 1000 / +35.5 | 991 / +27.3 |
 
 **The fixed learner on Newton** (`runs/g1_flat_newton_ppo_fixed.log`, 4 it. at 1.25 ms, pinned upstream
-Newton 45458023 with the limit clamp, same config/seed, 1000 iterations in 15.4 min at 106,189
+Newton [`45458023`](https://github.com/newton-physics/newton/commit/45458023f24629c1feffb1f336594808f537db14) with the
+limit clamp, same config/seed, 1000 iterations in 15.4 min at 106,189
 env-steps/s, zero blow-ups; measured 2026-09-24): return / length at 100 / 200 / 300 / 500 / 750 / 1000 =
 −5.1 / 78, −10.9 / 936, −7.2 / 824, −7.1 / 870, −1.1 / 938, **+7.8 / 979**, against MuJoCo Warp's
 +32.6 / 993 at 1000. Survival is learned equally fast on both engines (length ~930 by iteration 200);
@@ -608,10 +637,11 @@ action-rate and joint-deviation costs 1.7× Isaac's.
 
 **Start-state defect (found 2026-09-26).** Every PPOWarp run in this section started each env's first episode from MuJoCo's qpos0 (root at the world origin at z = 0, joints zero, feet 0.75 m below the plane) instead of the task reset: PPOWarp never called `reset_all()` before the first rollout. It affected the first episode only (about the first 10–12 of 1000 iterations). Fixed (`PPOWarpConfig.initial_reset`, default True); the pending 3-seed re-run under the final contact default will supersede these runs.
 
-**Rough terrain, like for like** (0b45075; Isaac's own rsl_rl run of Isaac-Velocity-Rough-G1-v0 on the
-L4, 1500 iterations in 67.3 min at 36.5 K env-steps/s, `runs/parity/isaac/rough/`; ours:
-`reward_cfg="rough_isaac"`, an exact port of G1RoughEnvCfg (the earlier "rough" set had ±1 sideways
-commands and four old formulas; kept), terrain seed 0 = Isaac's env seed (origin table exact to 0.0 m),
+**Rough terrain, like for like**
+([`e88db43`](https://github.com/pulipakaa24/MetalSim/commit/e88db43f80ae290c6f1d657d716d60a47ffbe0c5); Isaac's own
+rsl_rl run of Isaac-Velocity-Rough-G1-v0 on the L4, 1500 iterations in 67.3 min at 36.5 K env-steps/s,
+`runs/parity/isaac/rough/`; ours: `reward_cfg="rough_isaac"`, an exact port of G1RoughEnvCfg (the earlier "rough" set
+had ±1 sideways commands and four old formulas; kept), terrain seed 0 = Isaac's env seed (origin table exact to 0.0 m),
 Isaac's env→column assignment, 4096 envs, seed 0, 1500 iterations at 23.3 K env-steps/s,
 `runs/g1_rough_ppowarp_fixed.log`; measured 2026-09-25 on the plane-path kernel; re-run on 2026-10-31 on the repaired
 kernel with the same settings except the start from the task reset, research note §13):
@@ -658,7 +688,8 @@ kernels and travel 1.1–1.3 m less on pyramid stairs with exact foot contacts (
 random rough; the repaired kernel's run-to-run spread is up to 0.5 m per env).
 Both directions work on pyramid stairs and random rough and fail on vertical-wall terrain, where our
 0.1 m heightfield turns Isaac's walls into ramps (§1.2 terrain row). **Fixed on the collision side**
-(0cfb188, adefb18, `docs/research/terrain_walls_2026-09-25.md`): Isaac's stair and box cells are unions
+([`4b09b04`](https://github.com/pulipakaa24/MetalSim/commit/4b09b0446f296c5c6c17ed16c31f4189a315f084), [`208aed1`](https://github.com/pulipakaa24/MetalSim/commit/208aed1aa113e1e6088aff242e7b368fe4209367),
+`docs/research/terrain_walls_2026-09-25.md`): Isaac's stair and box cells are unions
 of boxes, so the G1 rough task now collides with those boxes exactly (each world holds only the boxes
 within 2.4 m of its robot, 96 slots, at most 50 used), and the height scan samples Isaac's exact top
 on a 0.025 m grid on those cells (within 4.8 µm of Isaac's ray cast over 67,507 rays, vs a 99th
@@ -683,8 +714,8 @@ contact history 6 × 2.5 ms vs 3 × 5 ms; our training run used the old scan ord
 ### 1.6 Rough terrain: MuJoCo Warp's heightfield contacts, found defective and patched
 
 `tests/test_terrain.py::test_hfield_mesh_contacts_match_mujoco_c`: G1 on Isaac's rough-terrain
-layout under a PD hold, MuJoCo Warp vs MuJoCo C on the same model. **Before the patch** (xfail at
-commit `066db94`): heightfield-mesh contacts returned an inverted normal (z = −1.000) with a 2.05 m
+layout under a PD hold, MuJoCo Warp vs MuJoCo C on the same model. **Before the patch** (the test then xfailed):
+heightfield-mesh contacts returned an inverted normal (z = −1.000) with a 2.05 m
 penetration and a witness point 1.1 m from the foot; one of four worlds was launched (pelvis 2.31 m
 vs 0.74 m in C); under random actions joint velocities reached 1e13 rad/s and the acceleration and
 torque reward terms exploded (rough PPO run, iteration 3: return −8.7e25).
@@ -710,12 +741,15 @@ blows up on both flat and rough ground (|q̇| 8.8e6 rad/s flat, 1.3e5 rough; tou
 so that regime is a MuJoCo-vs-PhysX robustness difference under violent position targets with
 Isaac's gains, not a MetalSim defect; it is listed in §3.
 
-**Superseded (2026-10-31, MuJoCo Warp pin `93e5ce1`; `docs/research/hfield_contacts_2026-10-31.md`).** The plane path
+**Superseded (2026-10-31, MuJoCo Warp pin
+[`93e5ce1`](https://github.com/pulipakaa24/mujoco_warp/commit/93e5ce18e76854c430ce669314af00ddceb92147);
+`docs/research/hfield_contacts_2026-10-31.md`).** The plane path
 was itself wrong: it tests mesh vertices against triangle planes, so it cannot see a terrain vertex or edge that pokes
 into a mesh face. On Isaac's random rough tile, Isaac's G1 foot collider pressed 0.5–3 mm into the surface at 1000
 random poses got no contact in 178 and 9.5 % of normals more than 10° off, against the exact per-prism penetration
 (research note §5, §8.1). The GJK/EPA failure this patch worked around had two causes of its own, both now fixed in the
-fork (§3, §4 of the note): upstream MuJoCo Warp's heightfield side-wall override (#928) turned prisms clear of the geom
+fork (§3, §4 of the note): upstream MuJoCo Warp's heightfield side-wall override
+([#928](https://github.com/google-deepmind/mujoco_warp/pull/928)) turned prisms clear of the geom
 into vertical penetrations (a 5 mm sphere 8.6 mm clear came back 25.6 mm deep), and the prism's support function gave
 all six vertices the same index, so EPA on boxes and meshes stopped early (a box 9.25 mm into a prism came back 2.57 mm
 deep; MuJoCo C 3.14 has the same defect, 3.44 mm). The fork now treats the prism as a plain convex polytope as MuJoCo
@@ -723,17 +757,19 @@ C does, keeps penetrating prisms only, skips duplicate contacts instead of stopp
 main's margin convention, and sends meshes through GJK/EPA (`HFIELD_PLANE_CONTACTS = False`; `True` restores the plane
 path, which Warp's deterministic mode still uses for meshes). Whether the override was also behind this section's
 inverted normals and 2 m penetrations is likely but not confirmed (research note §5, **estimated**): this section's minimal
-repro no longer shows a 2 m penetration on `8eb51fe`'s GJK/EPA path.
+repro no longer shows a 2 m penetration on
+[`8eb51fe`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624)'s GJK/EPA path.
 
 **After** (measured; research note §8): contact sets equal the exact geometry within MuJoCo Warp's 4-contact cap in
 99.97 % (5 mm spheres), 100 % (capsules), 99.9 % (boxes) and 99.9 % (the G1 foot mesh) of placements (previous pin
-`8eb51fe`, primitives on the defective GJK/EPA and meshes on the plane path: 88.8 / 82.6 / 76.6 / 52.9 %; MuJoCo C 3.14: 99.5 / 74.5 / 69.4 / 70.7 %, lower from duplicate contacts and
+[`8eb51fe`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624), primitives on the defective GJK/EPA and meshes on the plane path: 88.8 / 82.6
+/ 76.6 / 52.9 %; MuJoCo C 3.14: 99.5 / 74.5 / 69.4 / 70.7 %, lower from duplicate contacts and
 its EPA defect), no normal more than 10° off, depth error p95 0.0 mm. `test_hfield_mesh_contacts_match_mujoco_c` on
 the new pin: min normal z 0.912, max penetration 5.2 mm (MuJoCo C 4.6 mm), pelvis heights within 1 mm of C over
-0.5 s (`tests/test_terrain.py` 21 passed; previous pin `8eb51fe`: 0.913, 4.2 mm, within 3 mm). Unitree's G1 with
-its own policy on Isaac's bumps falls in 75.8 % of 240 robots (5 tile seeds × 3 runs × 16) against 68.3–68.8 % on CPU MuJoCo, inside the
-run-to-run spread (previous pin `8eb51fe`: 18.8 %; the Unitree G1's feet are spheres, so this
-is the GJK/EPA fix, not the plane path). Cost: about 15 % of the G1 rough env step under random actions, all of it
+0.5 s (`tests/test_terrain.py` 21 passed; previous pin [`8eb51fe`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624): 0.913, 4.2 mm, within 3
+mm). Unitree's G1 with its own policy on Isaac's bumps falls in 75.8 % of 240 robots (5 tile seeds × 3 runs × 16) against 68.3–68.8 % on CPU MuJoCo, inside the
+run-to-run spread (previous pin [`8eb51fe`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624): 18.8 %; the Unitree G1's feet are spheres, so
+this is the GJK/EPA fix, not the plane path). Cost: about 15 % of the G1 rough env step under random actions, all of it
 the feet on per-prism GJK/EPA (§8.4, on battery); per PPO iteration 1.2–1.3× (2.3.2 configs) and 1.68× (`rough_il3`)
 the plane path (research note §12, on AC power); indicative ratios from the 14-inch MacBook Pro. Primitives were
 already on GJK/EPA.
@@ -752,7 +788,9 @@ Difference that remains (2026-10-31):
   triangle features; MuJoCo C keeps one contact per penetrating prism, duplicates included.
 - **Deterministic mode** keeps the plane path for meshes (GJK/EPA is not repeatable there), so it still misses terrain
   vertices inside a mesh face; primitives against a heightfield still raise in that mode.
-- **Margin**: MuJoCo C main's convention (8626d3c, 2026-10-06: `dist` is the surface separation), which differs from
+- **Margin**: MuJoCo C main's convention
+  ([`8626d3c`](https://github.com/google-deepmind/mujoco/commit/8626d3c35eceb8b36dbc5182852b25ffde7a6465), 2026-10-06:
+  `dist` is the surface separation), which differs from
   the installed MuJoCo C 3.14 at non-zero margin or gap; every heightfield pair in MetalSim has both at 0.
 
 Rough-terrain numbers in §1.4, §1.5 and §1.8 were measured on the plane-path kernel. The re-runs of the research note's
@@ -872,7 +910,8 @@ Isaac's. Ranked remedies and the archived non-remedies (a PhysX-style sensor win
 MuJoCo's discrete integrator: not in MuJoCo Warp) are in the research note.
 
 **Final contact preset (2026-09-25, `runs/contact_research/final_ranking_2026-09-25.md`, ranked on the
-corrected criteria; feet_slide now in Isaac's centre-of-mass convention, commit 007477b):
+corrected criteria; feet_slide now in Isaac's centre-of-mass convention, commit
+[`b14994b`](https://github.com/pulipakaa24/MetalSim/commit/b14994bc9967016bace11084c71e6947aa979b27)):
 `tau10_impact_hardlimits`** = contact time constant 10 ms with impedance 0.9 at touch-down rising to
 0.999 over 5 mm of penetration (stiff only on impact) and joint limits at 5 ms / 0.99. Against Isaac
 (slide −0.017, air 0.035, 20 ms force 1996 / 2200 / 2190 N, limits 0.004 rad, transfer 3.19 / 3.02 /
@@ -937,7 +976,9 @@ Reading:
   - Speculative rows make the stride PhysX's (0.110 vs 0.1096 m) and so expose the cadence excess.
   - Controls: inert rows reproduce the base preset (constraint count ruled out), and the policy sees no contact
     quantity.
-- Two defects of the prototype were found and fixed on the fork branch (27f1fcd; head e636feb):
+- Two defects of the prototype were found and fixed on the fork branch
+  ([`27f1fcd`](https://github.com/pulipakaa24/mujoco_warp/commit/27f1fcd903e450fe70f435cc95a251408eda713c); head
+  [`e636feb`](https://github.com/pulipakaa24/mujoco_warp/commit/e636feb24440e690e73f0c8dfb18aa67468c0c6d)):
   - MuJoCo's soft elliptic cone pushed and braked bodies skimming inside the gap (119 N on a box 2 mm above the plane;
     PhysX bounds friction by the normal impulse);
   - the friction-row impedance was inconsistent with the normal row's, which made MuJoCo Warp leave a MuJoCo C
@@ -952,7 +993,8 @@ Reading:
 
 **The same protocol on Newton XPBD** (`scripts/diagnostics/newton_record_g1.py`, CPU device which
 matches Metal to ~1e-6, `runs/parity/report_newton_{it4_1p25ms,it4_0p625ms}`, measured 2026-09-24,
-Newton commit 45458023 with the angle-wrap clamp; MuJoCo Warp rows repeated for reference):
+Newton commit [`45458023`](https://github.com/newton-physics/newton/commit/45458023f24629c1feffb1f336594808f537db14)
+with the angle-wrap clamp; MuJoCo Warp rows repeated for reference):
 
 | protocol / engine | joint RMSE 0.5 / 1 / 2 s | divergence | root z RMSE | orientation mean / max | contact mean total / peak N (Isaac) | torque RMS (Isaac) | peak joint speed (Isaac) |
 |---|---|---|---|---|---|---|---|
@@ -978,7 +1020,8 @@ force only; mean totals are within ~30 % of Isaac on every engine and torque RMS
 setting that matches PhysX best costs half of Newton's throughput (74 K physics-only vs 149 K), still
 2.1× MuJoCo Warp.
 
-**Rendering, after the material / light / tone-map / denoiser work** (commit b0cf9b1, measured
+**Rendering, after the material / light / tone-map / denoiser work** (commit
+[`762f44c`](https://github.com/pulipakaa24/MetalSim/commit/762f44cae1797d8946eb15455a998465f9e97ee0), measured
 2026-09-25; `docs/research/rendering_vs_rtx_2026-09-25.md`; `metalsim/render/rtx_parity.py` re-renders
 every Isaac frame from Isaac's own recorded pose so that shading is measured without physics
 differences, silhouette IoU 0.999; PSNR in dB, robot pixels only unless stated):
@@ -990,7 +1033,7 @@ differences, silhouette IoU 0.999; PSNR in dB, robot pixels only unless stated):
 | USD light units (irradiance π·I, which is what Kit's frames fit), 0.53° sun disk, MuJoCo headlight off | 16.4 | 16.8 | – | – |
 | ACES + sRGB tone map, one global exposure fitted once to RTX's sky and lit ground | 24.0 / 0.86 | 27.5 | 19.7 | 168/172/180 |
 | ground darkening at grazing angles + Isaac's 100 m far clip | 23.9 | 28.5 | 44.9 | 168/172/180 |
-| + Open Image Denoise 2.5 on Metal (`pyoidn`, on the renderer's own buffers) | **24.0 / 0.86** | **28.8 / 0.94** | **45.6 / 0.997** | 168/172/180 |
+| + [Open Image Denoise](https://github.com/RenderKit/oidn) 2.5 on Metal (`pyoidn`, on the renderer's own buffers) | **24.0 / 0.86** | **28.8 / 0.94** | **45.6 / 0.997** | 168/172/180 |
 
 For scale, RTX's own real-time and path-traced frames are 25.9 dB apart on the robot, so tier 2 is
 now closer to RTX's path tracer than RTX's real-time mode is. On the physics-replayed protocol frames
@@ -1027,10 +1070,11 @@ records DomeLights as custom text `usd_dome` (file, intensity, exposure, colour,
 `Tier2Renderer.set_environment_from_model`; `Randomizer.environment` picks a map per episode by key (Isaac's
 Franka-stack dome randomization), GPU resources cached per key. **Measured**: constant-map furnace 0.5 ± 0.01;
 bright-window map (0.3 % of the sphere carrying most of the energy) within 2 % of the analytic plane radiance
-at two yaws, the uniform table 6.1× noisier; the parity presets without a map render **bit-for-bit identical** (`runs/render/envmap/run_before.log`: before = HEAD 98a41c1 in a worktree, after = this change; SHA-256 equal and max |diff| = 0 on all five arrays: G1 hdr / rgb / depth, Cartpole hdr / rgb)**
+at two yaws, the uniform table 6.1× noisier; the parity presets without a map render **bit-for-bit identical** (`runs/render/envmap/run_before.log`: before = HEAD [`1209b4e`](https://github.com/pulipakaa24/MetalSim/commit/1209b4e40e87d38372f4ba74974c0199a234c619) in a worktree, after = this change;
+SHA-256 equal and max |diff| = 0 on all five arrays: G1 hdr / rgb / depth, Cartpole hdr / rgb)**
 against the previous commit (`runs/render/envmap/`); cost with / without the map: camera-RL 1024 × 100×100
 4 spp 125.4 / 103.3 ms per 1024-frame batch (host path; +21 %); gallery 1024×768 32 spp 47.2 / 27.3 ms per frame, 676.6 / 343.9 ms at 512 spp (per spp 1.48 / 0.85 ms). Firefly clamp: opt-in only,
-biased (DECISIONS). Gallery: `g1_hdri_tier2.png`. Poly Haven CC0 maps are fetched, not committed.
+biased (DECISIONS). Gallery: `g1_hdri_tier2.png`. [Poly Haven](https://polyhaven.com) CC0 maps are fetched, not committed.
 
 **Rendering, first comparison** (Isaac RTX vs MetalSim, same state per frame; brightness-matched = MetalSim scaled to
 Isaac's mean, because the engines' light units differ):
@@ -1125,19 +1169,24 @@ of Isaac's curve at every milestone from iteration 200; **rough, seed 0, +13.7 /
 5.80** (plane-path kernel; re-run pending: not in the 2026-10-31 re-run pipeline, and its log is not on this machine;
 46.8 K env-steps/s vs 42.0 K on the L4); 0 blow-ups in any run. Before the fixes, the mixed-preset runs gave flat +24.9 /
 rough +6.1 with 44 / 1,615 blow-ups and the corrected preset rough +8.4 with 1,010 (isaaclab3 note §3, §6.8; this
-sentence paired the two until 2026-10-31). Seeds 0–1 ran on MuJoCo Warp fork 9b4e96a, seed 2 and rough on edae7b7.
+sentence paired the two until 2026-10-31). Seeds 0–1 ran on MuJoCo Warp fork
+[`9b4e96a`](https://github.com/pulipakaa24/mujoco_warp/commit/9b4e96af2ddec285e0f58595fbba27c31a64852a), seed 2 and rough
+on [`edae7b7`](https://github.com/pulipakaa24/mujoco_warp/commit/edae7b761a81b67a882375e2cf6c2424a1a237b7).
 
-**`rough_il3` on the repaired heightfield kernel (2026-10-31, MuJoCo Warp `787a5b3`; research note §13).** The
-corrected run of the isaaclab3 note §6.8 (`il3fix_rough_s0`: drive effort clamp on the actuator, so fix (2) is off)
-with the initial reset (fix (1)) added, the 14-inch on AC power: **+12.0 at 1499 (±5-iteration mean +11.5), terrain
-level 5.93**, against the same configuration on the plane path with the `qpos0` start, +8.4 (+8.2) / 5.96, and Isaac
-Newton +14.5 / 5.80. Linear / yaw tracking 0.780 / 0.730 (plane path 0.745 / 0.681, Isaac 0.811 / 0.808); falls 3.3 %
-of episode ends (6.9 %, Isaac 2.9 %); joint-acceleration term 2.0× Isaac's (2.3×); blow-ups 67, all from iteration
+**`rough_il3` on the repaired heightfield kernel (2026-10-31, MuJoCo Warp
+[`787a5b3`](https://github.com/pulipakaa24/mujoco_warp/commit/787a5b3a37acc2551ffc8a2c1af1e9781d76723f); research note
+§13).** The corrected run of the isaaclab3 note §6.8 (`il3fix_rough_s0`: drive effort clamp on the actuator, so fix (2)
+is off) with the initial reset (fix (1)) added, the 14-inch on AC power: **+12.0 at 1499 (±5-iteration mean +11.5),
+terrain level 5.93**, against the same configuration on the plane path with the `qpos0` start, +8.4 (+8.2) / 5.96, and
+Isaac Newton +14.5 / 5.80. Linear / yaw tracking 0.780 / 0.730 (plane path 0.745 / 0.681, Isaac 0.811 / 0.808); falls
+3.3 % of episode ends (6.9 %, Isaac 2.9 %); joint-acceleration term 2.0× Isaac's (2.3×); blow-ups 67, all from iteration
 1012 (plane path 1,010: 823 early from the `qpos0` start, 187 late); no `EPA_HORIZON` or other capacity overflow. One
 seed per side and a different start: the 3.6-point return difference is about one seed sd of the 2.3.2 runs (2.4–3.1
 at 1500), so it is not separable from seed spread (**estimated**).
 
-**Throughput under the elliptic default (measured 2026-09-26 11:00, fork heads mujoco_warp 0a9de8e / warp 9abceff9,
+**Throughput under the elliptic default (measured 2026-09-26 11:00, fork heads mujoco_warp
+[`0a9de8e`](https://github.com/pulipakaa24/mujoco_warp/commit/0a9de8e5cd098bb9c878dc5f5b98d2b53252aec3) / warp
+[`9abceff9`](https://github.com/pulipakaa24/warp/commit/9abceff953313e090084ed5950427a5dccf91258),
 `scripts/diagnostics/g1_tp_variants.py 4096`, two interleaved repeats, `runs/tp26/ellip.wrapper.log`):** pyramidal
 `recommended_pyramidal` (cap 10): physics 93,308 / 93,822, env step 62,069 / 62,539, full PPO loop 57,678 / 57,510
 env-steps/s; elliptic `recommended` (impratio 10, cap 20): physics 54,046 / 54,017, env step 36,371 / 36,513, **full
@@ -1165,7 +1214,8 @@ seed 0, 1500 iterations, `rough_isaac` reward set, both trainer fixes; plane-pat
 default's three seeds gave +16.4 / +22.6 / +19.1 at 6.0–6.1. One seed, so the 3–9 point difference from pyramidal is
 not yet separable from seed spread (the pyramidal seeds spanned 6 points); loop 25.0 K env-steps/s.
 
-**Re-check on main `ad97888e` (2026-10-13, 14-inch, same settings and seed; `docs/research/ppowarp_checkpoint_load_2026-10-13.md`):**
+**Re-check on main [`8b46aca8`](https://github.com/pulipakaa24/MetalSim/commit/8b46aca8ef769a2acbe7a0a9971721c8e53269a7) (2026-10-13,
+14-inch, same settings and seed; `docs/research/ppowarp_checkpoint_load_2026-10-13.md`):**
 rough +4.36 / 976 / level 3.56 at 500 and +7.55 / 985 / 5.86 at 1000 (reference +4.19 / 948 / 3.55 and +8.23 / 973 / 5.65);
 flat +18.64 / 996 at 500 (reference seeds +17.0 to +17.4). Both policies walk when replayed. The G1 rough checkpoints
 that seemed to have stopped walking that day had never been loaded into the rollout (a PPOWarp checkpoint-loading
@@ -1177,9 +1227,14 @@ Isaac Lab 3.0-EA's contrib task: a Franka grasps a 50 g cup holding 735 granular
 them into a receiver; reset-dataset curriculum over 20,000 published start states; terminal-sparse reward. Port:
 `metalsim/learn/franka_pour_scene.py` (model and physics), `franka_pour.py` (MDP), `franka_pour_ppo.py` (PPO);
 reading notes with every source line: `docs/research/franka_pour_2026-10-11.md`. Isaac Lab = `upstream/IsaacLab3`
-at `ae37b028` (release/3.0.0, the L4's install), Newton 1.5.2 (fork `metalsim-1.5.2` `35791a07`), Warp fork
-`152808b7`, rsl_rl 5.4.1: the pins of the first port and of the seed-0 training runs. Current pins: Newton `3fd1f052`,
-Warp `95f6f121` (the seed study below; the evaluation shows the pins do not change the result).
+at [`ae37b028`](https://github.com/isaac-sim/IsaacLab/commit/ae37b028ea415c91ea2bc32609efcd759ed2b974) (release/3.0.0,
+the L4's install), Newton 1.5.2 (fork `metalsim-1.5.2`
+[`35791a07`](https://github.com/pulipakaa24/newton/commit/35791a077dbc74d8e5b4cb9d320faa72af2f3492)), Warp fork
+[`152808b7`](https://github.com/pulipakaa24/warp/commit/152808b7e33ce08fcc17c898c5ce11d567d60795), rsl_rl 5.4.1: the
+pins of the first port and of the seed-0 training runs. Current pins: Newton
+[`3fd1f052`](https://github.com/pulipakaa24/newton/commit/3fd1f052a5ad031578960d9642aaaedc03834e4d),
+Warp [`95f6f121`](https://github.com/pulipakaa24/warp/commit/95f6f121b7e67025958335c7c15e338ac04a798a) (the seed study
+below; the evaluation shows the pins do not change the result).
 
 ### 1b.1 Asset and physics model
 
@@ -1190,8 +1245,8 @@ Warp `95f6f121` (the seed study below; the evaluation shows the pins do not chan
 | Spawner poses: `standardize_xform_ops` replaces the referenced root's transform (the table's authored (0.55, 0, 0) becomes the init pose (0.5, 0, 0), 90 deg yaw) | same, authored on the stage before import (Newton's `add_usd(xform=)` rotated this free body twice) | tabletop AABB x [-0.296, 0.984], y [-0.455, 0.455], top z 0 after the task's 3 mm inset: equal to a pxr computation of Isaac's composition | pass | confirmed |
 | Builder hook (`pour_env.py:141-259`): robot shapes not particle colliders; finger and grasp-proxy gains ke 1e5 / kd 500 / kf 1e3 in MuJoCo force-space mode; bowls particle-only (margin 4 mm, mu 0.9 / 0.8); receiver rigid mesh replaced by a box; tabletop -3 mm, margin 0; kinematic particle-only spill floor; media lattice 7 x 7 x 15 via `add_particle_grid` | the same edits in the same order (`pour_world_hook`, `emit_media`) | `test_scene_settings_match_isaac_cfg` (every literal of `pour_env_cfg.py` / `geometry.py` / `media.py` the port uses, the MPM and MuJoCo solver settings as source fragments) | pass | confirmed for the values; equivalent by construction for the edits |
 | Physics: sim dt 1/120, decimation 4, 2 substeps of `SolverCoupledProxy` (arm: MuJoCo Warp implicitfast, 3 substeps, njmax 2560, nconmax 400, Isaac's MJWarp defaults 100 / 50 iterations; media: implicit MPM voxel 0.015, sparse, P0, APIC, Jacobi 24, pic27, separate worlds, 2 substeps, in place; proxy mass x 1000, staggered), one collide per sim step | the same solver objects with the same arguments; Metal: float32 accumulation and CUDA's stopping rule (`newton_compat`, MPM.md §1) | `test_scene_settings_match_isaac_cfg`; MPM-side parity of this solver vs the L4: MPM.md §5-8c | pass | confirmed for the configuration; the MPM solver itself: MPM.md |
-| `CollisionPipeline(max_triangle_pairs=1e6)` | 4,096 per world (8.4M at 2,048): this scene overflows 1M from ~1,250 worlds and drops contacts (newton-physics/newton#4604, fixed upstream #4605) | – | – | **deviation by design** (Isaac's value loses contacts at 2,048) |
-| Graph capture: one CUDA graph per `sim.step` | one Metal graph per `sim.step`, the action kernel between replays | smoke runs at 2-2,048 worlds | finite at every size; a single graph per *policy* step (`capture_unit="policy"`, not the default) is finite at 2,048 worlds from Warp `41b7bc45` (it replayed NaN before: the capture exceeded the working set) | yes |
+| `CollisionPipeline(max_triangle_pairs=1e6)` | 4,096 per world (8.4M at 2,048): this scene overflows 1M from ~1,250 worlds and drops contacts ([newton-physics/newton#4604](https://github.com/newton-physics/newton/issues/4604), fixed upstream [#4605](https://github.com/newton-physics/newton/pull/4605)) | – | – | **deviation by design** (Isaac's value loses contacts at 2,048) |
+| Graph capture: one CUDA graph per `sim.step` | one Metal graph per `sim.step`, the action kernel between replays | smoke runs at 2-2,048 worlds | finite at every size; a single graph per *policy* step (`capture_unit="policy"`, not the default) is finite at 2,048 worlds from Warp [`41b7bc45`](https://github.com/pulipakaa24/warp/commit/41b7bc45077b4cd665e976ae9475f1b19f9fd57a) (it replayed NaN before: the capture exceeded the working set) | yes |
 
 ### 1b.2 Task definition (the MDP)
 
@@ -1233,22 +1288,25 @@ Isaac's step-only runtime benchmark (`isaaclab benchmark runtime`) rejects the c
 ("Unsupported concrete physics config"), so the L4 row is rsl_rl's collection time, which includes inference.
 This Mac's first timing rows ran while the idle check read 100 % (a GPU later found hung by another job); the
 re-measure on an idle device (0-3 %) gives 986 / 999 / 979. All throughput figures here are from this Mac (the
-training runs on the second M4 Max are not timing measurements). With the 2026-10-13 pins (Warp `31cf79d7`, Newton
-`addd10cb`, MPM.md 8k) the 2,048-env step-only time is 1.80 s with or without the new tiled product and the harvest
+training runs on the second M4 Max are not timing measurements). With the 2026-10-13 pins (Warp
+[`31cf79d7`](https://github.com/pulipakaa24/warp/commit/31cf79d781e4b10d8ff85c8cbd98fc0e40f75953), Newton
+[`addd10cb`](https://github.com/pulipakaa24/newton/commit/addd10cbeb25e946b3a4c2bb1d4097acc7a98ca2), MPM.md 8k) the 2,048-env
+step-only time is 1.80 s with or without the new tiled product and the harvest
 compaction (`runs/mpm/coupled_speed/b08/`, `hv1/`); with `rigid_deterministic` the 64-env rollout repeats bitwise. The
 trajectories change by rounding (summation order); the throughput above does not. Isaac's 3,000 iterations x 196,608 steps = 590M
 steps take about 7 days at 979 env-steps/s (Isaac on an L4 cannot run them at 2,048 envs).
 
 ### 1b.5 Learning
 
-Isaac publishes no curve for this task (README, task source, docs at `ae37b028`); the README only gives the launch
-(`--num_envs 2048 --max_iterations 3000`). The reference is therefore measured: Isaac's own task (with the asset patch
-of §1b.1) trained on the L4 at **1,024 envs** (the most the L4 holds), 60 iterations, seed 0, against ours at the
-same env count, iterations and seed on the 14-inch M4 Max. Metric: Isaac's logged `Episode_Termination/success` (the
-README's "terminal particle transfer" success: fraction of envs whose last finished episode ended in success, averaged
-over the iteration's steps), mean reward and episode length over the last 100 episodes (rsl_rl). Logs:
-`runs/parity/isaaclab3_pour/train_1024_curve.log`, `runs/franka_pour/logs/m414_1024_log.jsonl`, side by side in
-`runs/franka_pour/logs/matched_1024_curves.json` (`python -m metalsim.learn.franka_pour_curve`).
+Isaac publishes no curve for this task (README, task source, docs at
+[`ae37b028`](https://github.com/isaac-sim/IsaacLab/commit/ae37b028ea415c91ea2bc32609efcd759ed2b974)); the README only
+gives the launch (`--num_envs 2048 --max_iterations 3000`). The reference is therefore measured: Isaac's own task (with
+the asset patch of §1b.1) trained on the L4 at **1,024 envs** (the most the L4 holds), 60 iterations, seed 0, against
+ours at the same env count, iterations and seed on the 14-inch M4 Max. Metric: Isaac's logged
+`Episode_Termination/success` (the README's "terminal particle transfer" success: fraction of envs whose last finished
+episode ended in success, averaged over the iteration's steps), mean reward and episode length over the last 100
+episodes (rsl_rl). Logs: `runs/parity/isaaclab3_pour/train_1024_curve.log`, `runs/franka_pour/logs/m414_1024_log.jsonl`,
+side by side in `runs/franka_pour/logs/matched_1024_curves.json` (`python -m metalsim.learn.franka_pour_curve`).
 
 | iterations (1,024 envs) | ours: success / reward / length | Isaac on the L4: success / reward / length |
 |---|---|---|
@@ -1271,15 +1329,19 @@ asset composition, the task terms (§1b.2 tests), the solver configuration (§1b
 
 **Seed study (2026-10-13).** The same matched configuration (1,024 envs, 60 iterations, the task's runner config).
 
-* Ours: seeds 1-4 on main `c3a25d9d` (Warp `95f6f121`, Newton `3fd1f052`; seeds 1-2 on the 14-inch M4 Max, 3-4 on
-  this Mac; learning runs only, no timing taken from them), plus the seed-0 run above (training pins). Driver:
-  `metalsim/learn/franka_pour_seeds.sh` (resumable: checkpoints every 5 iterations, `--save-interval`). Logs:
-  `runs/franka_pour/seeds/s{1..4}/log.jsonl` and their console logs.
+* Ours: seeds 1-4 on main
+  [`e20bb546`](https://github.com/pulipakaa24/MetalSim/commit/e20bb5464031d8516b37e1159dcb0f1704ebb93a) (Warp
+  [`95f6f121`](https://github.com/pulipakaa24/warp/commit/95f6f121b7e67025958335c7c15e338ac04a798a), Newton
+  [`3fd1f052`](https://github.com/pulipakaa24/newton/commit/3fd1f052a5ad031578960d9642aaaedc03834e4d); seeds 1-2 on the
+  14-inch M4 Max, 3-4 on this Mac; learning runs only, no timing taken from them), plus the seed-0 run above (training
+  pins). Driver: `metalsim/learn/franka_pour_seeds.sh` (resumable: checkpoints every 5 iterations, `--save-interval`).
+  Logs: `runs/franka_pour/seeds/s{1..4}/log.jsonl` and their console logs.
 * Isaac: seeds 1 and 2 on two L4 machines on 2026-10-13. Seed 2 ran on the machine that ran seed 0. Seed 1 ran on
   a second L4 machine set up identically to the seed-0 one. Both ran with the same `stage_pour.sh` and asset
   patch as seed 0. `fingerprint.sh` ran on each machine, and the second machine's seed was launched only
   on an exact match with the seed-0 setup. The two machines agree on:
-  * Isaac Lab `ae37b028` with a clean tree; Isaac Sim 6.1.0.0; isaaclab 17.0.2 / isaaclab_newton 5.4.1 /
+  * Isaac Lab [`ae37b028`](https://github.com/isaac-sim/IsaacLab/commit/ae37b028ea415c91ea2bc32609efcd759ed2b974) with a
+    clean tree; Isaac Sim 6.1.0.0; isaaclab 17.0.2 / isaaclab_newton 5.4.1 /
     isaaclab_tasks 18.0.1;
   * Newton 1.5.2, warp-lang 1.16.0, mujoco-warp 3.11.0, torch 2.11.0+cu128, rsl_rl 5.4.1;
   * driver 580.178.04, CUDA 13.0, Ubuntu 24.04.5, Python 3.12.3;
@@ -1385,7 +1447,7 @@ checkpoint and harness, 2,048 envs, success rate (`runs/franka_pour/eval/diag*/`
 | deterministic, uniform rows, current pins (this Mac; two runs) | 0.457 / 0.477 | 0.606 | 0.399 |
 | stochastic (training's sampled actions), uniform rows | 0.453 | 0.596 | 0.398 |
 | stochastic, rows from the training curriculum restored from the checkpoint, continuous rollout | 0.599 | 0.715 | 0.514 (from a cold start) |
-| deterministic, uniform rows, **training pins** (Warp `152808b7`, Newton `35791a07`; 14-inch) | 0.479 | 0.616 | 0.409 |
+| deterministic, uniform rows, **training pins** (Warp [`152808b7`](https://github.com/pulipakaa24/warp/commit/152808b7e33ce08fcc17c898c5ce11d567d60795), Newton [`35791a07`](https://github.com/pulipakaa24/newton/commit/35791a077dbc74d8e5b4cb9d320faa72af2f3492); 14-inch) | 0.479 | 0.616 | 0.409 |
 | deterministic, uniform rows, current pins (14-inch, same machine) | 0.474 | 0.616 | 0.405 |
 
 * Action noise does nothing measurable: deterministic 0.457, stochastic 0.453.
@@ -1409,7 +1471,7 @@ logged 0.62 is the curriculum- and duration-weighted rate. Both are reproduced b
 | Zero host synchronization per step | tensors stay on device; one sync per rollout | runtime counters as the conformance instrument | `tests/test_physics.py::test_step_does_not_block_host` (0 syncs, 0 host ops, host time < 25 % of GPU time and independent of batch size); `tests/test_render_tier0.py::test_gpu_path_with_batchsim_no_host_sync`; `tests/test_sensors_rt.py::test_gpu_path_ordering_with_sim` | pass | confirmed |
 | Zero-copy tensors between physics/render and the learner | PhysX views as torch tensors | Warp Metal buffers aliased as MPS tensors, event ordering across queues | `tests/test_interop.py` (11 tests: alias, lifetime, 2-D/vec dtypes, wait/signal both directions, ping-pong) | pass | confirmed |
 | Per-world physics randomization | PhysX per-env mass/friction | per-world model fields + `recompute_constants` | `tests/test_physics.py::test_per_world_model_fields` | pass | confirmed |
-| USD scene layer | USD + UsdPhysics/UsdShade/UsdSemantics; URDF/MJCF importers | MJCF/URDF→USD, USD→MjSpec (lossless + generic UsdPhysics) | `tests/test_scene_usd.py` (3 tests: import fields, round trip to MuJoCo, URDF), the G1 rows above (a real Isaac asset) | pass | confirmed for the subset used; MaterialX graphs, Hydra viewing not implemented |
+| USD scene layer | USD + UsdPhysics/UsdShade/UsdSemantics; URDF/MJCF importers | MJCF/URDF→USD, USD→MjSpec (lossless + generic UsdPhysics) | `tests/test_scene_usd.py` (3 tests: import fields, round trip to MuJoCo, URDF), the G1 rows above (a real Isaac asset) | pass | confirmed for the subset used; [MaterialX](https://github.com/AcademySoftwareFoundation/MaterialX) graphs, Hydra viewing not implemented |
 | Renderer tier 0 (raster + PBR + shadows) vs a reference rasterizer | Isaac RTX rasterizer | native Metal raster reading physics buffers | `tests/test_render_tier0.py::test_silhouette_and_depth_and_seg_parity_primitives` (vs `mujoco.Renderer`: IoU > 0.95, depth median < 1 cm, seg IoU > 0.85), `::test_texture_pattern_parity` (corr > 0.97) | IoU 0.994–0.997, depth 0.1 mm, corr 0.996 | confirmed vs MuJoCo; **not testable vs Isaac RTX** here |
 | Renderer tier 1 (hybrid RT: soft shadows, AO, reflections) | RTX real-time | fragment-stage Metal ray queries | fidelity benchmark (`metalsim.bench.render_fidelity`): PSNR 19.7 / FLIP 0.30 vs MuJoCo; rollout: `tests/test_render_tier2.py` sibling path (`CartpoleRGBEnv(tier=1)`) | measured | partial (no denoiser / MetalFX upscale yet) |
 | Renderer tier 2 (path tracer) | RTX path tracer (Isaac "PathTracing" mode) | progressive Metal RT path tracer, NEE, GGX+Lambert, Russian roulette | `tests/test_render_tier2.py::test_lambertian_plane_analytic` (radiance 0.4000 exact), `::test_white_furnace_uniform_sky` (0.498 vs 0.5), `::test_monte_carlo_convergence` (noise ratio 4.05 for 16× spp; ideal 4.0), `::test_direct_light_matches_tier0` (PSNR 43.7–45.1 dB, depth 1 mm, seg IoU 1.0), `::test_gpu_path_from_batchsim_matches_host`, `::test_cartpole_rgb_rollout_tier2` (full env rollout at tier 2) | pass | confirmed radiometrically; not compared to Isaac's path tracer (not testable here); no denoiser |
@@ -1417,12 +1479,12 @@ logged 0.62 is the curriculum- and duration-weighted rate. Both are reproduced b
 | USD area lights (Rect, Disk, Cylinder, Sphere with radius; 2026-10-13, docs/RENDER_COVERAGE.md §3e) | RTX area lights in nits: L = intensity x 2^exposure x color (/ area with `normalize`), soft shadows | T2: next-event estimation on the emitter (area / cone sampling, shadow ray per sample), frames per env from `xmat`; T1: emitter samples with shadow rays over the closed-form irradiance; T0: far-field spot / point lights; importer honours SphereLight radius / exposure / normalize | `tests/test_area_lights.py` (floor irradiance vs Lambert's polygon formula, the sphere's closed form, cylinder quadrature at 0.5 / 1 / 3 light sizes; tier 1 vs closed form and vs tier 2's soft shadow; moving light, GPU vs host path) | T2 mean within 0.1 %, worst 4 x 4 block 1.3 % (far-field import was +19 % on axis at one size); T1 median 0.3-0.5 % (8-bit), soft shadow within 0.9 % mean of T2 | confirmed analytically; not compared to RTX images (not testable here) |
 | Renderer world extent, per-env fields and camera models (workstream C, 2026-10-12) | RTX camera `clipping_range` (Isaac Lab default (0.01, 1e6)); `GroundPlaneCfg` 100 m visual, terrain-importer plane 2e6 m; closed terrain meshes; per-env USD scale / colour; `FisheyeCameraCfg` (f-theta polynomial, 200°) | `Tier0Renderer(far=...)` with reversed-z depth; MuJoCo infinite planes drawn to the far plane / sensor range with MuJoCo's texture mapping; heightfield sides and base; per-world `geom_size` / colour / light fields read every frame (`render/model_sync.py`); f-theta and Kannala-Brandt lenses (`render/lens.py`, T2 / RT per-pixel rays, T0 cube faces) | `tests/test_render_world.py` (vs mujoco.Renderer and vs the model compiled with each world's values), `tests/test_render_newton_perworld.py` | ground coverage 0.369 → 1.0; boxes beyond 10 m 0 → 1.0; 2 km depth error 21 m → 0 at far 1e6; hfield 0.58 → 1.0; per-world size IoU 0.36–0.82 → ≥ 0.989; fisheye centroids ≤ 0.27 px vs the lens model | confirmed vs MuJoCo; fisheye vs Isaac images not compared (no Isaac Lab task uses a fisheye camera; RTX's nominal-to-render scaling unconfirmed) |
 | Renderer gaps 2 (2026-10-13, docs/RENDER_COVERAGE.md §3d): rolling shutter, per-env textures, MuJoCo haze / fog, tendon catenary and limit colour, heightfield-side shadows; tier 1 / tier 2 slowdowns | RTX: per-pixel shutter-time texture (0 = previous frame, 1 = current), global shutter by default (Isaac Lab exposes none); Isaac Lab `randomize_visual_texture_material` (new OmniPBR per prim, projected UVW); MuJoCo `mjv_catenary`, limit impedance colour, haze cone / GL fog | `render/rolling.py` (row bands at poses interpolated from per-env history), `render/env_materials.py` (per-(env, slot) material entries, texture pool), `render/haze.py`, catenary / tint kernels in `shaders/dynamic_mesh.metal`; ray kernels specialized per scene (`GRID_PLANES`, `HAZE_ON`, `ENV_MATS`) | `tests/test_render_rolling.py`, `tests/test_render_env_textures.py`, `tests/test_render_haze.py`, `tests/test_render_tendons.py`; `scripts/diagnostics/render_perf_profile.py`, `render_gaps2_cost.py` | rolling: edge within 1 px of the analytic skew per row; textures: per-world matid env = compiled model (< 1 level), pool texel-exact; haze ≤ 3 levels vs mujoco.Renderer; catenary capsules = mjv_updateScene to 2e-5 m; side shadows IoU vs T1 0.82 → 0.99. Speed (4096 envs, cloth): tier 1 71.4 → 58.5 ms, tier 2 96.0 → 71.8 ms; glass pane tier 2 (64 envs) 12.15 → 4.60 ms (the 2026-10 regression was register pressure from the inlined infinite-plane continuation; the rest is the spot light's shadow ray and transparency itself); byte-identical with the new switches off (121/121) | confirmed vs MuJoCo; Isaac behaviour from docs (RTX rolling shutter not testable here) |
-| Camera-based RL: Isaac-Cartpole-RGB-Camera-Direct-v0 with the skrl agent Isaac Lab ships (image-only 100×100, NatureCNN + 512 ELU, 64-step rollouts, 4 epochs, 32 minibatches, lr 1e-4 KL-adaptive 0.008, value clip, per-image mean subtraction, running value scaler) | same config on `metalsim.learn.ppo` over the tier-0 renderer, 1024 envs (`metalsim.learn.train_cartpole_rgb`) | `runs/camera_cartpole_tier0.log`: 8M steps, return 8 → 85 (episode length 27 → 133 of 300), still rising; 7.5K env-steps/s incl. training, 76 % of it the CNN update on MPS. **2026-09-25, `fast_update` + Metal gradient kernels (`runs/camera_cartpole_tier0_fast.log`): 12,688 env-steps/s incl. training at the legacy tier-2 path, 1 spp; **8,809 env-steps/s at the new physical default** (OmniPBR BRDF, sun disk, ACES + sRGB, 4 spp, exposure 0.25; 2ce2461; the 26 ms per 1024-env step is the 4 spp, the tone map and sun disk are free; learning signal unchanged: full 8 M-step run `runs/camera_cartpole_physical_full.log` (a87bc5e): mean return over the last 20 iterations 85.3 vs the tier-0 reference's 86.3, 8,788 env-steps/s incl. training; an earlier attempt that produced NaN at iteration 1 had run without the GPU lock and hit a Metal out-of-memory in the PPO update, not a renderer defect; the path tracer now discards non-finite samples and `test_physical_preset_batch_is_finite` renders 1024 frames under the preset) (`runs/camera_cartpole_tier0_fast2.log`: 8.06 M steps in 635 s vs 1077 s, last-20-iteration return 86.3 vs 86.3), update 3.22 s (was 7.2), kernels within 1e-4 of PyTorch's gradients; MLX whole-update measured not faster in fp32** | learns from pixels; Isaac publishes throughput only (32K on a 4090, 21K on an L40; measured 14.2K rollout-only on the L4), no curve to match; tier 1 and tier 2 runs pending (tier 2: done, the 8 M-step run at the physical default in this row; tier 1: no learning run recorded) | confirmed (learning), partial (throughput) |
+| Camera-based RL: Isaac-Cartpole-RGB-Camera-Direct-v0 with the [skrl](https://github.com/Toni-SM/skrl) agent Isaac Lab ships (image-only 100×100, NatureCNN + 512 ELU, 64-step rollouts, 4 epochs, 32 minibatches, lr 1e-4 KL-adaptive 0.008, value clip, per-image mean subtraction, running value scaler) | same config on `metalsim.learn.ppo` over the tier-0 renderer, 1024 envs (`metalsim.learn.train_cartpole_rgb`) | `runs/camera_cartpole_tier0.log`: 8M steps, return 8 → 85 (episode length 27 → 133 of 300), still rising; 7.5K env-steps/s incl. training, 76 % of it the CNN update on MPS. **2026-09-25, `fast_update` + Metal gradient kernels (`runs/camera_cartpole_tier0_fast.log`): 12,688 env-steps/s incl. training at the legacy tier-2 path, 1 spp; **8,809 env-steps/s at the new physical default** (OmniPBR BRDF, sun disk, ACES + sRGB, 4 spp, exposure 0.25; [`a14b6a8`](https://github.com/pulipakaa24/MetalSim/commit/a14b6a8736baf4030960f195810063bb4ed2eb03); the 26 ms per 1024-env step is the 4 spp, the tone map and sun disk are free; learning signal unchanged: full 8 M-step run `runs/camera_cartpole_physical_full.log` ([`89233b8`](https://github.com/pulipakaa24/MetalSim/commit/89233b8e585ffc829d437dc5460badbea4aed1b6)): mean return over the last 20 iterations 85.3 vs the tier-0 reference's 86.3, 8,788 env-steps/s incl. training; an earlier attempt that produced NaN at iteration 1 had run without the GPU lock and hit a Metal out-of-memory in the PPO update, not a renderer defect; the path tracer now discards non-finite samples and `test_physical_preset_batch_is_finite` renders 1024 frames under the preset) (`runs/camera_cartpole_tier0_fast2.log`: 8.06 M steps in 635 s vs 1077 s, last-20-iteration return 86.3 vs 86.3), update 3.22 s (was 7.2), kernels within 1e-4 of PyTorch's gradients; MLX whole-update measured not faster in fp32** | learns from pixels; Isaac publishes throughput only (32K on a 4090, 21K on an L40; measured 14.2K rollout-only on the L4), no curve to match; tier 1 and tier 2 runs pending (tier 2: done, the 8 M-step run at the physical default in this row; tier 1: no learning run recorded) | confirmed (learning), partial (throughput) |
 | Tier 1 / tier 2 full rollouts (throughput) | Isaac Cartpole-RGB: 50K steps/s at 1024 envs on a 4090 (rasterized RTX, reported); **measured on the L4** (Isaac Sim 5.1, `benchmark_non_rl.py --enable_cameras`, 1024 envs, 100 frames, 2026-09-24): mean 14,233, max 15,570 env-steps/s | Cartpole-RGB 100×100, 1024 envs, physics + render + reward/reset, one run each, uncontended | `metalsim.learn.cartpole_rgb` (`python -m metalsim.learn.cartpole_rgb 1024`) | tier 0 47,911; tier 1 43,368; tier 2 (1 spp, 1 bounce) 36,896; tier 2 (1 spp, 2 bounces) 35,160; tier 2 (4 spp, 2 bounces) 19,894 env-steps/s (uncontended pass 2026-09-24) | measured; the tier-2 rollout is a full path-traced observation stream at 70 % of the raster rate (1 spp, noisy) |
 | Ray-traced sensors (lidar, depth) | RTX lidar | Metal RT acceleration structures refit from physics | `tests/test_sensors_rt.py::test_lidar_vs_mujoco_ray` (median < 2 mm, 95th < 2 cm, hit pattern within 3 %), `::test_raycast_depth_vs_raster_depth` (99.5 % agree, median < 1 mm) | pass | confirmed vs MuJoCo `mj_ray`; **not testable vs Isaac RTX lidar** |
-| Deformables: Isaac Lab `DeformableObject` (PhysX FEM soft bodies, cloth) | MuJoCo Warp flex on Metal (fork branch `metalsim-flex`, 9 commits; Warp fork `metalsim-flex` 9dcb140 for segmented sort inside graph capture): cloth (grid flex), cables, soft volumes, mesh flex; contact model made to match MuJoCo C (50-contact farthest-point cap, up to 11 contacts per triangle on boxes, capsule cable segments, surface-layer-only volumes, a wrong-element bug for any flex after the first that also affects CUDA); `metalsim/physics/deformable.py` demo (10×10 cloth + 12-vertex cable on a box, 336 DoF, 2 ms) | MuJoCo Warp's flex suite 237/237 on Metal (was 2 failures: constraint-row order); `tests/test_deformable.py` (10 tests: one step from MuJoCo C's state within ~2e-5 m/s on plane, box and cable scenes, 84/84 equal contact sets; cloth landing within 5e-5 m over 100 steps; graph replay) | 54.1 K env-steps/s at 4096 envs (36.5 K at 1024; GPU sorts gave 2–3.6× over Warp's CPU sorts); 20×20 cloth 9.6 K; G1 + cloth + cable 20.0 K at 2048 (4096 out of memory); MetalSim's own XPBD cloth 2.35 M but 5–15 cm vertex error vs MuJoCo C (kept, not default) | **Isaac Lab 3.0 recordings on both backends** (`runs/parity3/isaac/deformable/`, structured tet meshes since 3.0's automatic tet-meshing dependency crashed Kit; measured 2026-09-25): **the locking explanation is confirmed on PhysX's own solver**: the rope's swing period is 1.016 / 1.117 / 1.261 / 1.477 s at 1 / 2 / 4 / 8 cells across (thin-rod value 1.11 s), i.e. the coarse mesh is artificially stiff and the mesh crosses the physical value between 2 and 4 cells; Newton VBD also softens with refinement but at Isaac Lab's Newton default density of 1 kg/m³ its rod moves away from the (then almost rigid) thin-rod value, which points at its 20 solver iterations. Against PhysX 3.0 (CPU device, parameters mapped from PhysX's values, **nothing fitted**): soft cube (4 cells per edge) bounce 0.152 vs 0.155 m, settle 0.49 vs 0.50 s, rest centroid 0.120 vs 0.120 m with flex + implicit damping and PhysX's own parameters; rope 1.113 s / 0.459 m tip drop with the XPBD `physical` preset vs PhysX 1.12 s at 2 cells; cloth top 0.414 vs 0.421 m, mean 0.248 vs 0.272, extent 0.637 vs 0.698, settle 0.78 vs 1.01 s with XPBD (stiffness from Young's modulus × thickness, no bending). So the 20–40× damping fits reported against the 5.1 recording were an artefact of PhysX 5.1's older deformable implementation; PhysX 6's FEM matches with its declared parameters. Newton's own VBD replayed on Metal matches the Isaac Newton recording to under 1 mm over 0.3 s on CPU (full 5 s Metal replay and throughput queued; **done**, at the end of this row). Defaults per type: cloth XPBD (312 K env-steps/s at 4096 on a 441-vertex cloth), rope XPBD `physical`, soft volume flex + implicit damping, Newton backend VBD on Metal. Open: the flex continuum cloth fell through the box (bug), the Newton cable cannot be pinned (NaN), the physx_cloth port lacks self-collision. Earlier: **first PhysX comparison measured** (Isaac Sim 5.1 recording, `runs/deformable/isaac51/`, bulk measures; PhysX 5.1's particle cloth is position-based springs in 16 substeps, the same family as our XPBD cloth, so its parameters map directly; Isaac Lab 2.3.2 exposes soft volumes but no cloth object): cloth over a box settles at 0.427 m in 1.07 s in PhysX vs **XPBD 0.425 m / 1.14 s, height map within 3.3 cm** (flex 3.8 cm / 2.62 s); hanging rope swing period 1.026 s with log decrement 0.59 vs flex 1.006 s but decrement 0.09 (XPBD chain 1.323 s); soft cube bounces to 0.135 m and settles in 0.55 s vs flex 0.262 m / 1.97 s. Recommended defaults: XPBD for cloth (312 K env-steps/s at 4096), flex for cables and soft volumes (11.7 K / 3.9 K); main gap: flex cannot reach PhysX's damping (its elasticity damping blows up above ~1e-4 at 0.5 ms). Isaac Lab 3.0 recordings (PhysX FEM cloth and Newton VBD) pending; the earlier MuJoCo C comparison establishes implementation correctness only (the reference is PhysX; matching MuJoCo C more exactly is not the same as matching PhysX, cf. the foot-collider result in §1.5); an Isaac-side deformable protocol (cloth drape, cable swing, soft-cube drop with PhysX FEM/cloth and Isaac Lab's material defaults, compared on bulk behaviour) is queued. Also partial: mesh contacts on Metal differ from CPU (3.7e-2 m/s median one-step error; matters for cloth on the G1's mesh colliders); no kinematic node targets, per-element stress, per-world material randomization, tetrahedral-mesh bodies, flex–heightfield collision; Isaac publishes no deformable throughput **Newton VBD on Metal replays Isaac Lab 3.0's Newton recording** (same solver, Metal vs CUDA; `.venv-newton152`, Newton 1.5.2; measured 2026-09-25 evening, `runs/parity3/isaac/deformable/newton_metal.log`, research note §13): cloth 1089 particles within 0.7 mm at 5 s (height on box 0.427 / 0.427 m, extent 0.857 / 0.857 m, settle 4.93 / 4.93 s), cubes 2/4/8 cells within 0.2–0.4 mm (4-cell bounce 0.1110 / 0.1112 m), rods 1/2/4 cells across within 0.1–1.2 mm with identical droop and period; the 8-cell rod (6561 nodes) matches to 1.9 mm at 2 s and diverges to 14 cm at 5 s while still swinging undamped (float32 rounding growth; period 0.658 / 0.658 s). Newton VBD throughput on Metal, 20 iterations × 4 substeps per 5 ms frame, 256 / 1024 / 4096 worlds: cloth 1.54 / 1.43 / 1.21 K env-steps/s, rod (44 nodes) 6.7 / 11.8 / 6.6 K, cube (125 nodes) 2.7 / 0.94 / 0.84 K; at 4096 worlds MetalSim's XPBD cloth (441 vertices) does 0.31 M, flex cube 2.9 K, XPBD rod 2.57 M. Newton VBD is the engine for comparisons against 3.0's Newton backend; MetalSim's defaults stay XPBD (cloth, rope) and flex + implicit damping (soft volumes). |
-| Replicator: annotators (rgb, distance to image plane / camera, normals, semantic / instance / instance-id segmentation with Isaac's label maps, 2D tight and loose boxes with occlusion ratio, 3D boxes, point cloud, motion vectors, camera params), BasicWriter layout, semantics labelling, Isaac Lab event terms with startup / reset / interval scheduling | `metalsim/replicator/` (d1ab426): single-pass Warp kernels over tier 0's id / depth / normal buffers; `BasicWriter` writes Replicator 1.12's exact file set (old writer kept as `NpzWriter`); event manager with material, mass/inertia, COM, gains, joint parameters, gravity, external force, push, root/joint reset, colour | `tests/test_replicator_annotators.py` (24 tests: boxes at known poses vs an analytic ray cast, exact on every unambiguous pixel; 3D boxes to 2e-6; point cloud within 5e-4 m; motion vectors within 2e-3 px; writer file set exact; COM reset velocity to 1e-5) | cost per frame at 1024 envs × 128² (upper bounds, measured alongside a training run): segmentation 1.3 ms, tight boxes 1.4, 3D boxes 1.8, distance 3.7, normals 2.7, point cloud 12.3, motion 4.8; exact loose boxes 153 (one id render per object), hull-projected loose boxes 55 | confirmed (listed annotators and events); not done: per-pixel occlusion, skeleton, collider offsets, scatter randomizers (texture swap: the renderers' `set_texture_pool` / `t_material_ids`, RENDER_COVERAGE §3d; no event term wraps it yet); rigid-body scale and visual colour written into the model's per-world `geom_size` / `geom_rgba` (MuJoCo Warp) or `shape_scale` / `shape_color` (Newton bridge) now reach every renderer (docs/RENDER_COVERAGE.md §3c; the scale event term itself is not ported) |
-| MaterialX materials (Isaac Sim converts MaterialX graphs to MDL; SimReady assets use `open_pbr_surface`) | `metalsim/scene/materialx.py` (a2013aa): reads `.mtlx` with the MaterialX 1.39.5 package (our USD build has no UsdMtlx), rebuilds the material prims in the session layer, flattens `standard_surface`, `open_pbr_surface`, `UsdPreviewSurface` and `gltf_pbr` graphs with textures and simple arithmetic into the existing material table at load time | `tests/test_materialx.py` (4 tests: hand-computed parameters for the four surface types; a USD scene referencing the file binds all cubes; tier-0 render matches the same materials written in MJCF within 0.1 of a colour level) | exact: base colour and texture, metalness, roughness, specular from IOR, opacity; approximate: emission (brightness, not hue), non-base textures averaged; not mapped: coat, sheen, transmission, subsurface, thin film, anisotropy, normal maps, low-level BSDF graphs. Render cost 0 (table identical to 6e-8; 2.76 vs 2.68 ms/frame noise); +3 ms load | partial (common surface types covered, exotic lobes not) |
+| Deformables: Isaac Lab `DeformableObject` (PhysX FEM soft bodies, cloth) | MuJoCo Warp flex on Metal (fork branch `metalsim-flex`, 9 commits; Warp fork `metalsim-flex` [`9dcb140`](https://github.com/pulipakaa24/warp/commit/9dcb1406a49101ff6645f9a8b38221f09e0fc0d6) for segmented sort inside graph capture): cloth (grid flex), cables, soft volumes, mesh flex; contact model made to match MuJoCo C (50-contact farthest-point cap, up to 11 contacts per triangle on boxes, capsule cable segments, surface-layer-only volumes, a wrong-element bug for any flex after the first that also affects CUDA); `metalsim/physics/deformable.py` demo (10×10 cloth + 12-vertex cable on a box, 336 DoF, 2 ms) | MuJoCo Warp's flex suite 237/237 on Metal (was 2 failures: constraint-row order); `tests/test_deformable.py` (10 tests: one step from MuJoCo C's state within ~2e-5 m/s on plane, box and cable scenes, 84/84 equal contact sets; cloth landing within 5e-5 m over 100 steps; graph replay) | 54.1 K env-steps/s at 4096 envs (36.5 K at 1024; GPU sorts gave 2–3.6× over Warp's CPU sorts); 20×20 cloth 9.6 K; G1 + cloth + cable 20.0 K at 2048 (4096 out of memory); MetalSim's own XPBD cloth 2.35 M but 5–15 cm vertex error vs MuJoCo C (kept, not default) | **Isaac Lab 3.0 recordings on both backends** (`runs/parity3/isaac/deformable/`, structured tet meshes since 3.0's automatic tet-meshing dependency crashed Kit; measured 2026-09-25): **the locking explanation is confirmed on PhysX's own solver**: the rope's swing period is 1.016 / 1.117 / 1.261 / 1.477 s at 1 / 2 / 4 / 8 cells across (thin-rod value 1.11 s), i.e. the coarse mesh is artificially stiff and the mesh crosses the physical value between 2 and 4 cells; Newton VBD also softens with refinement but at Isaac Lab's Newton default density of 1 kg/m³ its rod moves away from the (then almost rigid) thin-rod value, which points at its 20 solver iterations. Against PhysX 3.0 (CPU device, parameters mapped from PhysX's values, **nothing fitted**): soft cube (4 cells per edge) bounce 0.152 vs 0.155 m, settle 0.49 vs 0.50 s, rest centroid 0.120 vs 0.120 m with flex + implicit damping and PhysX's own parameters; rope 1.113 s / 0.459 m tip drop with the XPBD `physical` preset vs PhysX 1.12 s at 2 cells; cloth top 0.414 vs 0.421 m, mean 0.248 vs 0.272, extent 0.637 vs 0.698, settle 0.78 vs 1.01 s with XPBD (stiffness from Young's modulus × thickness, no bending). So the 20–40× damping fits reported against the 5.1 recording were an artefact of PhysX 5.1's older deformable implementation; PhysX 6's FEM matches with its declared parameters. Newton's own VBD replayed on Metal matches the Isaac Newton recording to under 1 mm over 0.3 s on CPU (full 5 s Metal replay and throughput queued; **done**, at the end of this row). Defaults per type: cloth XPBD (312 K env-steps/s at 4096 on a 441-vertex cloth), rope XPBD `physical`, soft volume flex + implicit damping, Newton backend VBD on Metal. Open: the flex continuum cloth fell through the box (bug), the Newton cable cannot be pinned (NaN), the physx_cloth port lacks self-collision. Earlier: **first PhysX comparison measured** (Isaac Sim 5.1 recording, `runs/deformable/isaac51/`, bulk measures; PhysX 5.1's particle cloth is position-based springs in 16 substeps, the same family as our XPBD cloth, so its parameters map directly; Isaac Lab 2.3.2 exposes soft volumes but no cloth object): cloth over a box settles at 0.427 m in 1.07 s in PhysX vs **XPBD 0.425 m / 1.14 s, height map within 3.3 cm** (flex 3.8 cm / 2.62 s); hanging rope swing period 1.026 s with log decrement 0.59 vs flex 1.006 s but decrement 0.09 (XPBD chain 1.323 s); soft cube bounces to 0.135 m and settles in 0.55 s vs flex 0.262 m / 1.97 s. Recommended defaults: XPBD for cloth (312 K env-steps/s at 4096), flex for cables and soft volumes (11.7 K / 3.9 K); main gap: flex cannot reach PhysX's damping (its elasticity damping blows up above ~1e-4 at 0.5 ms). Isaac Lab 3.0 recordings (PhysX FEM cloth and Newton VBD) pending; the earlier MuJoCo C comparison establishes implementation correctness only (the reference is PhysX; matching MuJoCo C more exactly is not the same as matching PhysX, cf. the foot-collider result in §1.5); an Isaac-side deformable protocol (cloth drape, cable swing, soft-cube drop with PhysX FEM/cloth and Isaac Lab's material defaults, compared on bulk behaviour) is queued. Also partial: mesh contacts on Metal differ from CPU (3.7e-2 m/s median one-step error; matters for cloth on the G1's mesh colliders); no kinematic node targets, per-element stress, per-world material randomization, tetrahedral-mesh bodies, flex–heightfield collision; Isaac publishes no deformable throughput **Newton VBD on Metal replays Isaac Lab 3.0's Newton recording** (same solver, Metal vs CUDA; `.venv-newton152`, Newton 1.5.2; measured 2026-09-25 evening, `runs/parity3/isaac/deformable/newton_metal.log`, research note §13): cloth 1089 particles within 0.7 mm at 5 s (height on box 0.427 / 0.427 m, extent 0.857 / 0.857 m, settle 4.93 / 4.93 s), cubes 2/4/8 cells within 0.2–0.4 mm (4-cell bounce 0.1110 / 0.1112 m), rods 1/2/4 cells across within 0.1–1.2 mm with identical droop and period; the 8-cell rod (6561 nodes) matches to 1.9 mm at 2 s and diverges to 14 cm at 5 s while still swinging undamped (float32 rounding growth; period 0.658 / 0.658 s). Newton VBD throughput on Metal, 20 iterations × 4 substeps per 5 ms frame, 256 / 1024 / 4096 worlds: cloth 1.54 / 1.43 / 1.21 K env-steps/s, rod (44 nodes) 6.7 / 11.8 / 6.6 K, cube (125 nodes) 2.7 / 0.94 / 0.84 K; at 4096 worlds MetalSim's XPBD cloth (441 vertices) does 0.31 M, flex cube 2.9 K, XPBD rod 2.57 M. Newton VBD is the engine for comparisons against 3.0's Newton backend; MetalSim's defaults stay XPBD (cloth, rope) and flex + implicit damping (soft volumes). |
+| Replicator: annotators (rgb, distance to image plane / camera, normals, semantic / instance / instance-id segmentation with Isaac's label maps, 2D tight and loose boxes with occlusion ratio, 3D boxes, point cloud, motion vectors, camera params), BasicWriter layout, semantics labelling, Isaac Lab event terms with startup / reset / interval scheduling | `metalsim/replicator/` ([`f690cba`](https://github.com/pulipakaa24/MetalSim/commit/f690cba0570bc164093136b89b7e86474f760d93)): single-pass Warp kernels over tier 0's id / depth / normal buffers; `BasicWriter` writes Replicator 1.12's exact file set (old writer kept as `NpzWriter`); event manager with material, mass/inertia, COM, gains, joint parameters, gravity, external force, push, root/joint reset, colour | `tests/test_replicator_annotators.py` (24 tests: boxes at known poses vs an analytic ray cast, exact on every unambiguous pixel; 3D boxes to 2e-6; point cloud within 5e-4 m; motion vectors within 2e-3 px; writer file set exact; COM reset velocity to 1e-5) | cost per frame at 1024 envs × 128² (upper bounds, measured alongside a training run): segmentation 1.3 ms, tight boxes 1.4, 3D boxes 1.8, distance 3.7, normals 2.7, point cloud 12.3, motion 4.8; exact loose boxes 153 (one id render per object), hull-projected loose boxes 55 | confirmed (listed annotators and events); not done: per-pixel occlusion, skeleton, collider offsets, scatter randomizers (texture swap: the renderers' `set_texture_pool` / `t_material_ids`, RENDER_COVERAGE §3d; no event term wraps it yet); rigid-body scale and visual colour written into the model's per-world `geom_size` / `geom_rgba` (MuJoCo Warp) or `shape_scale` / `shape_color` (Newton bridge) now reach every renderer (docs/RENDER_COVERAGE.md §3c; the scale event term itself is not ported) |
+| MaterialX materials (Isaac Sim converts MaterialX graphs to MDL; SimReady assets use `open_pbr_surface`) | `metalsim/scene/materialx.py` ([`3adf1c4`](https://github.com/pulipakaa24/MetalSim/commit/3adf1c45a601690429a61ce43473a3f232f8f2f9)): reads `.mtlx` with the MaterialX 1.39.5 package (our USD build has no UsdMtlx), rebuilds the material prims in the session layer, flattens `standard_surface`, `open_pbr_surface`, `UsdPreviewSurface` and `gltf_pbr` graphs with textures and simple arithmetic into the existing material table at load time | `tests/test_materialx.py` (4 tests: hand-computed parameters for the four surface types; a USD scene referencing the file binds all cubes; tier-0 render matches the same materials written in MJCF within 0.1 of a colour level) | exact: base colour and texture, metalness, roughness, specular from IOR, opacity; approximate: emission (brightness, not hue), non-base textures averaged; not mapped: coat, sheen, transmission, subsurface, thin film, anisotropy, normal maps, low-level BSDF graphs. Render cost 0 (table identical to 6e-8; 2.76 vs 2.68 ms/frame noise); +3 ms load | partial (common surface types covered, exotic lobes not) |
 | Contact sensor: Isaac `ContactSensor` (net force vectors per body, substep history, filtered force matrix, air/contact time, first-contact flags) | `metalsim/sensors/contact.py`, Warp kernels after every substep inside the captured step graph, normal-force mode by default like Isaac's docs, `force_mode="total"` adds friction | `tests/test_sensors_contact.py` (G1 landing, 4 worlds × 200 steps: per-body sums within 6.9e-5 N of MuJoCo C's `mj_contactForce` on the same contacts, within 1.3e-4 N on an independent C solve where the contact sets agree; sign/frame; history shift; air time equals a numpy replay of Isaac's update) | +0.16–0.23 ms per step at 4096 envs (+0.3–0.4 %) | confirmed |
 | RTX lidar extras: beam divergence (`divergenceHorDeg`/`VerDeg`, ray type), `maxReturns`, `minDistBetweenEchosM`, material reflectance intensity | `lidar_ext` Metal kernel: sub-ray bundle per beam, re-cast multi-return with power-weighted echo merging, per-geom reflectance; default kernel untouched (scan == `mj_ray`) | `tests/test_lidar_extras.py` (edge beam returns the intermediate range 2.09 m between 2.0 and 2.2 m surfaces or both with finer separation; 6 mm pole before a wall gives two returns; intensity follows the table) | 64-beam scan at 1024 envs: default 23.5 µs, 2 returns 58 µs, 4 sub-rays 92 µs, 16 sub-rays 494 µs | partial (NVIDIA's echo rule and intensity formula are undocumented; intra-scan motion and fire timing not modelled) |
 | Transparent / translucent surfaces in the ray-traced depth camera and lidar (2026-10-13, docs/RENDER_COVERAGE.md §3e) | RTX: depth on glass at the surface; opacity cut out (Real-Time) or presence (path tracer), `opacity_threshold`; RTX lidar non-visual materials (`clear_glass`, `mirror`, ...), `maxReturns`, `transmissionPowerFraction`, `returnType` First / Last / Strongest / Multiple (formula unpublished; 6.0 glass pass-through reported broken) | SENSOR_TR kernels (`shaders/rt.metal`): depth `transparent_ids` surface / behind / `alpha_threshold`; lidar `transparency` transmit (alpha as presence: partial return `a rho cos / r^2`, `(1 - a)` passes) / surface (`mj_ray`) / behind; `lidar_materials` (Fresnel + Beckmann specular backscatter, transmission, mirror ghosts); return modes incl. dual; detection threshold | `tests/test_sensor_transparency.py` (depth vs `mj_ray` < 0.2 mm; analytic pane / wall ranges 0.2 mm and intensities 1e-4; return modes; clear glass on / off normal; mirror ghost at the path length; streaming kernel bit-identical (points to rounding); plain kernels bit-identical when forced); `scripts/diagnostics/sensor_identity.py` (36 / 36 arrays byte-identical on non-transparent scenes) | 16 x 360 lidar at 4096 envs: 6.9 ms plain; glass scene (33 % of beams cross a pane) opaque 9.4, surface 9.8, behind 16.3, transmit 23.3 ms; 64 x 64 depth behind 9.2 vs 3.2 ms | confirmed vs MuJoCo (`mj_ray`, `mujoco.Renderer` depth: alpha > 0 is a surface, alpha 0 invisible); Isaac behaviour from docs and NVIDIA forum answers (not testable here) |
@@ -1448,8 +1510,9 @@ CUDA; the CPU SDK has no supported Apple build).
 NVIDIA's Newton engine (Warp-based; Isaac Lab 3.0's physics layer) runs on the MetalSim Warp fork
 unmodified: its **XPBD** solver (same substepped position-based family as PhysX TGS), Featherstone and
 Semi-Implicit run on Metal; VBD fails to compile; the GJK/MPR narrow phase needed Warp fixed-size arrays,
-added to the Metal codegen in fork commit 786cdae (see below). Newton's UsdPhysics
-importer loads `g1_minimal.usd` directly (44 bodies, 44 joints, 43 DoF, drives included). A box rests
+added to the Metal codegen in fork commit
+[`786cdae`](https://github.com/pulipakaa24/warp/commit/786cdae38050b04cc3e3a00e71546ce949b9e50a) (see below). Newton's
+UsdPhysics importer loads `g1_minimal.usd` directly (44 bodies, 44 joints, 43 DoF, drives included). A box rests
 with 0.3 mm penetration under XPBD.
 
 Newton XPBD on Metal, after the roadblocks were worked (2026-09-24, all numbers measured on the M4
@@ -1473,9 +1536,10 @@ Max, `metalsim/physics/newton_backend.py`, `scripts/diagnostics/newton_xpbd_*.py
   4 it. at 1.25 ms 0.704 / 0.701 / 0.683 / 0.604 / 0.250 (worst joint difference at 0.5 s ≤ 0.022 rad);
   8 it. at 2.5 ms 0.697 / 0.689 / 0.677 / 0.591 / 0.214 (≤ 0.044 rad). Newton rests about 1 cm lower
   than MuJoCo (0.69–0.70 vs 0.71 m); cause not found.
-* **Mesh colliders on Metal.** Warp fork commit 786cdae adds fixed-size arrays to the Metal codegen
-  (a per-thread slice of GPU scratch), so the GJK/MPR narrow phase compiles: Warp's fixed-array tests
-  pass 20/20 on CPU and Metal including graph capture; a box as convex hull or triangle mesh gives the
+* **Mesh colliders on Metal.** Warp fork commit
+  [`786cdae`](https://github.com/pulipakaa24/warp/commit/786cdae38050b04cc3e3a00e71546ce949b9e50a) adds fixed-size
+  arrays to the Metal codegen (a per-thread slice of GPU scratch), so the GJK/MPR narrow phase compiles: Warp's
+  fixed-array tests pass 20/20 on CPU and Metal including graph capture; a box as convex hull or triangle mesh gives the
   same 4 contacts as the box primitive (−1.000 mm, 0.043 mm resting penetration, Metal = CPU to
   0.001 mm); the G1 runs on its own convex-mesh colliders with the same trajectory as the box stand-ins.
 * **Effort limits and armature.** Peak leg torque is 61–63 Nm in the hold and 173–188 Nm on a drop

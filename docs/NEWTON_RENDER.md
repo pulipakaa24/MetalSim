@@ -6,10 +6,11 @@ and `tests/test_newton_bridge_poses.py` (geometry level, no Metal renderer neede
 `scripts/diagnostics/newton_render_bridge_speed.py` (cost).
 
 **Problem.** Every MetalSim renderer compiles its scene from a `mujoco.MjModel` (`scene_tables.build_scene_tables`).
-Each frame, it reads the poses from a MuJoCo Warp `BatchSim` (`sim.d.geom_xpos`, ...). Nothing simulated through
-Newton reached a renderer, camera sensor or annotator (RENDER_COVERAGE.md gap #2). This covers rigid shapes, meshes,
-heightfields, cloth, soft bodies and particles, whether stepped by `SolverMuJoCo` (MuJoCo-via-Newton), XPBD,
-Featherstone or VBD.
+Each frame, it reads the poses from a [MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp) `BatchSim`
+(`sim.d.geom_xpos`, ...). Nothing simulated through
+[Newton](https://github.com/newton-physics/newton) reached a renderer, camera sensor or annotator (RENDER_COVERAGE.md
+gap #2). This covers rigid shapes, meshes, heightfields, cloth, soft bodies and particles, whether stepped by
+`SolverMuJoCo` (MuJoCo-via-Newton), XPBD, Featherstone or VBD.
 
 **Result.** `NewtonRenderSource(model)` is a "sim" object for any Newton model. Tiers 0, 1 and 2, the ray-traced
 sensors (depth camera, lidar, radar), `Annotators` and `IsaacAnnotators` take it unchanged. The renderer code is not
@@ -48,7 +49,7 @@ one world plus the global (world -1) shapes:
 | mesh, convex mesh | a mesh asset with the scale baked in; a negative scale flips the winding |
 | cone | `newton.Mesh.create_cone`, the tessellation the Newton viewer draws |
 | heightfield | an hfield. `z = min_z + data (max_z - min_z)` is renormalised to MuJoCo's `[0, 1] × size_z`, and the offset is moved into the geom frame |
-| `SITE` shapes | MuJoCo sites (group 4, not drawn; as in the Newton viewer and Isaac Lab), usable as lidar / radar mounts |
+| `SITE` shapes | MuJoCo sites (group 4, not drawn; as in the Newton viewer and [Isaac Lab](https://github.com/isaac-sim/IsaacLab)), usable as lidar / radar mounts |
 | Gaussian | not drawn (warning) |
 
 Notes on the Newton twin:
@@ -189,7 +190,7 @@ Environments:
   with the rest of the bridge suites: 15 passed, 2 SolverMuJoCo skips) and of `metalsim-particle-render` (particles:
   passed). Those two WIP branches
   conflict with each other in `tier0.py` / `tier2.py` / `raytrace.py`, so they were not tested together.
-- **Since 2026-10-13 (PR #4)** both paths are on main (`metalsim/render/extras.py`, `set_particles` in tiers 0 and 2),
+- **Since 2026-10-13** both paths are on main (`metalsim/render/extras.py`, `set_particles` in tiers 0 and 2),
   so the cloth and particle tests no longer skip for that reason (skip reasons of the 2026-10-13 audit run:
   `runs/docs_audit/`). The two branches' conflicts were resolved in that merge.
 

@@ -29,12 +29,13 @@ Training code uses the GPU paths directly: `scene.cameras[name].renderer.render(
 
 ## Schema
 
-Field names follow Isaac Lab 3.0 (`upstream/IsaacLab3` at `ae37b028`), so an Isaac scene config maps across almost
-field for field. The classes are in `metalsim/scene/cfg.py`.
+Field names follow [Isaac Lab](https://github.com/isaac-sim/IsaacLab) 3.0 (`upstream/IsaacLab3` at
+[`ae37b028`](https://github.com/isaac-sim/IsaacLab/commit/ae37b028ea415c91ea2bc32609efcd759ed2b974)), so an Isaac scene
+config maps across almost field for field. The classes are in `metalsim/scene/cfg.py`.
 
 | Isaac Lab | here | notes |
 |---|---|---|
-| `InteractiveSceneCfg(num_envs, env_spacing)` | top level `num_envs`, `env_spacing` | envs are separate MuJoCo Warp worlds, each in its own frame |
+| `InteractiveSceneCfg(num_envs, env_spacing)` | top level `num_envs`, `env_spacing` | envs are separate [MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp) worlds, each in its own frame |
 | `ArticulationCfg(spawn, init_state)` | `robot:` | `MjcfFileCfg` / `UrdfFileCfg` / `UsdFileCfg`; `init_state.joint_pos` {regex: value}; the MJCF's `home` keyframe is the default |
 | `RigidObjectCfg` | `objects: {name: ...}` | `CuboidCfg` / `SphereCfg` / `CylinderCfg` / `CapsuleCfg` / `MeshFileCfg`; `mass_props`, `visual_material.diffuse_color`, `physics_material`; `count:` replicates |
 | `init_state.rot` | same | **(x, y, z, w)**: Isaac Lab 3.0's order (2.x was w-first) |
@@ -61,13 +62,14 @@ occlude the splats by depth.
 |---|---|---|
 | `plane` | a plane at `plane_z` | Isaac Lab's NuRec recipe: the floor aligned at z = 0, a ground plane added (`docs/source/features/imitation-learning/humanoids_imitation.rst`) |
 | `mesh` | a supplied mesh (.obj / .stl / .usd, e.g. a NuRec scene's `mesh.usd`) | NVIDIA's NuRec scenes reference an nvblox mesh as the volume's `proxy`; World Labs Marble exports a GLB collider |
-| `structure` | floor plane + every wall of the floor plan as a box | InteriorGS `structure.json`; doors are closed |
+| `structure` | floor plane + every wall of the floor plan as a box | [InteriorGS](https://huggingface.co/datasets/spatialverse/InteriorGS) `structure.json`; doors are closed |
 | `occupancy` | a height field from the 2D occupancy map, furniture included | InteriorGS `occupancy.png` / `occupancy.json` |
 
 Research behind this (2026-10-14):
 - **Isaac Lab 3.0.** It loads a splat as a plain `AssetBaseCfg(spawn=UsdFileCfg(...usdz))` with no collision
   (`scripts/demos/sensors/ppisp_camera.py`), or adds a ground plane for NuRec scenes.
-- **Isaac Sim's NuRec volumes.** These take up to four proxy meshes for shadows and physics.
+- **[Isaac Sim](https://developer.nvidia.com/isaac/sim)'s NuRec volumes.** These take up to four proxy meshes for
+  shadows and physics.
 - **Research systems.** They build a mesh from the reconstruction:
   - GaussGym: NKSR.
   - Vid2Sim: TSDF fusion of rendered depth.

@@ -1,18 +1,22 @@
 # Handoff: tier 2 HDR environment-map lighting (port onto main)
 
-**Status: ported on `302bab5` (main, 2026-09-26)**. The port's files entered the tree in that commit (its subject is another agent's elliptic-cone run: the shared index swept the staged port in); the follow-up commit that carries the port's own message and this line is the record to cite. What landed: `set_environment` / `env_sampling_table` / `set_environment_pose` with MIS against main's diffuse/GGX mixture pdf, the denoiser guide on a primary miss, the non-finite guard kept, bindings flag 32 / buffer 26 / texture 1 / sampler 1 (`PTConsts` 28 words), both env-map tests plus a USD DomeLight import test and a replicator test (13 passed vs 9 before), `set_fovy`, `set_materials`, opt-in `firefly_clamp` (DECISIONS), the RGBE reader `metalsim/render/hdr.py` (no OpenCV), USD import of DomeLights (`usd_dome` custom text), `Randomizer.environment`, gallery `docs/gallery/g1_hdri_tier2.png`, costs and the dome-orientation research in `docs/research/rendering_vs_rtx_2026-09-25.md` §6 / PARITY §1.7. Convention change from this patch: the dome is oriented as Kit/RTX renders a USD DomeLight on a z-up stage (u = 0.5 faces −y, u = 0.25 faces +x), not `atan2(y, x)`. The superseded items below were not ported.
+**Status: ported on [`c2f469e`](https://github.com/pulipakaa24/MetalSim/commit/c2f469e5c6bb17d4f41d7ecb50036991690057ff) (main, 2026-09-26)**. The port's files entered the tree in that commit (its subject is another agent's elliptic-cone run: the shared index swept the staged port in); the follow-up commit that carries the port's own message and this line is the record to cite. What landed: `set_environment` / `env_sampling_table` / `set_environment_pose` with MIS against main's diffuse/GGX mixture pdf, the denoiser guide on a primary miss, the non-finite guard kept, bindings flag 32 / buffer 26 / texture 1 / sampler 1 (`PTConsts` 28 words), both env-map tests plus a USD DomeLight import test and a replicator test (13 passed vs 9 before), `set_fovy`, `set_materials`, opt-in `firefly_clamp` (DECISIONS), the RGBE reader `metalsim/render/hdr.py` (no OpenCV), USD import of DomeLights (`usd_dome` custom text), `Randomizer.environment`, gallery `docs/gallery/g1_hdri_tier2.png`, costs and the dome-orientation research in `docs/research/rendering_vs_rtx_2026-09-25.md` §6 / PARITY §1.7. Convention change from this patch: the dome is oriented as Kit/RTX renders a USD DomeLight on a z-up stage (u = 0.5 faces −y, u = 0.25 faces +x), not `atan2(y, x)`. The superseded items below were not ported.
 
-Branch `tier2-hdri-envmap`, based on `main` at `fbaab25`. It contains no renderer changes yet. It carries
-uncommitted work from an old checkout (base `4e6d663`, 2026-09-23) that `main` does not have, as a
-reference patch plus the pieces that apply as-is. The task is to port the feature onto `main`'s tier 2
-path tracer, which was restructured after `4e6d663`, so the patch does not apply directly.
+Branch `tier2-hdri-envmap`, based on `main` at
+[`e3cb2aa`](https://github.com/pulipakaa24/MetalSim/commit/e3cb2aa0afe135478146820781013056c455131e). It contains no
+renderer changes yet. It carries uncommitted work from an old checkout (base
+[`8f87de2`](https://github.com/pulipakaa24/MetalSim/commit/8f87de2922b3bd499d1ac31ef7bbde9885e3e331), 2026-09-23) that
+`main` does not have, as a reference patch plus the pieces that apply as-is. The task is to port the feature onto
+`main`'s tier 2 path tracer, which was restructured after
+[`8f87de2`](https://github.com/pulipakaa24/MetalSim/commit/8f87de2922b3bd499d1ac31ef7bbde9885e3e331), so the patch does
+not apply directly.
 
 ## Files on this branch
 
 | file | what |
 |---|---|
-| `patches/handoff/tier2-hdri-envmap-on-4e6d663.patch` | the old diff of `metalsim/render/tier2.py`, `metalsim/render/shaders/pathtrace.metal` and `tests/test_render_tier2.py` against `4e6d663`. Reference only: read it, don't `git apply` it |
-| `scripts/fetch_polyhaven_assets.sh` | fetches CC0 Poly Haven 2k equirectangular HDRIs (10 train and 3 held-out rooms) and 5 wood/laminate textures into `assets/polyhaven/{hdri,tex}/{train,heldout}` |
+| `patches/handoff/tier2-hdri-envmap-on-4e6d663.patch` | the old diff of `metalsim/render/tier2.py`, `metalsim/render/shaders/pathtrace.metal` and `tests/test_render_tier2.py` against [`8f87de2`](https://github.com/pulipakaa24/MetalSim/commit/8f87de2922b3bd499d1ac31ef7bbde9885e3e331). Reference only: read it, don't `git apply` it |
+| `scripts/fetch_polyhaven_assets.sh` | fetches CC0 [Poly Haven](https://polyhaven.com) 2k equirectangular HDRIs (10 train and 3 held-out rooms) and 5 wood/laminate textures into `assets/polyhaven/{hdri,tex}/{train,heldout}` |
 | `.gitignore` | ignores `assets/polyhaven/` |
 
 ## What to port (worth keeping)

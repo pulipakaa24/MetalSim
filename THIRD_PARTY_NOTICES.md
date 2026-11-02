@@ -20,28 +20,28 @@ Three kinds of relationship occur:
 | component | licence | relationship | where in this repository |
 |---|---|---|---|
 | NVIDIA Warp, via innate-inc/warp (Metal backend) | Apache-2.0 | fork, dependency; patches | `patches/warp/`, `patches/0001-Metal-fixed-size-arrays-*.patch`, `patches/warp-innate-metal-pending-frees.patch`, `scripts/setup_warp.sh` |
-| MuJoCo Warp (Google DeepMind), incl. David Dobas's Metal device patch | Apache-2.0 | fork, dependency; patches | `patches/mujoco_warp/`, `patches/mujoco_warp-*.patch`, `scripts/setup_flex.sh` |
+| [MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp) (Google DeepMind), incl. David Dobas's Metal device patch | Apache-2.0 | fork, dependency; patches | `patches/mujoco_warp/`, `patches/mujoco_warp-*.patch`, `scripts/setup_flex.sh` |
 | MuJoCo (Google DeepMind) | Apache-2.0 | dependency (`mujoco`) | imported throughout |
-| Newton (Newton project, Linux Foundation) | Apache-2.0 | fork, optional dependency; derived; **vendored, modified** (implicit MPM solver package, fork commit `addd10cb`) | `metalsim/physics/newton_backend.py`, `scripts/setup_newton*.sh`, `scripts/diagnostics/newton_upstream/`, `metalsim/physics/mpm/fused_gs.py`, `metalsim/physics/mpm/implicit_mpm/` (Apache-2.0; `scripts/vendor_mpm152.py`) |
-| NVIDIA PhysX 5.6.1 | BSD-3-Clause | derived (one module, algorithm port) | `metalsim/physics/physx_cloth.py`; no PhysX source files |
-| Isaac Lab (v2.3.2) source files | BSD-3-Clause | included (headers kept); derived (terrain port) | `assets/isaac/**/*.py`, `assets/isaac/*.yaml`, `metalsim/learn/isaac_terrain.py` |
-| Isaac Sim assets (`g1_minimal.usd`) | NVIDIA asset terms | fetched, **not redistributed** | `scripts/fetch_isaac_assets.sh`; `.gitignore` |
+| [Newton](https://github.com/newton-physics/newton) (Newton project, Linux Foundation) | Apache-2.0 | fork, optional dependency; derived; **vendored, modified** (implicit MPM solver package, commit [`addd10cb`](https://github.com/pulipakaa24/newton/commit/addd10cbeb25e946b3a4c2bb1d4097acc7a98ca2) of [my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim-1.5.2)) | `metalsim/physics/newton_backend.py`, `scripts/setup_newton*.sh`, `scripts/diagnostics/newton_upstream/`, `metalsim/physics/mpm/fused_gs.py`, `metalsim/physics/mpm/implicit_mpm/` (Apache-2.0; `scripts/vendor_mpm152.py`) |
+| NVIDIA [PhysX](https://github.com/NVIDIA-Omniverse/PhysX) 5.6.1 | BSD-3-Clause | derived (one module, algorithm port) | `metalsim/physics/physx_cloth.py`; no PhysX source files |
+| [Isaac Lab](https://github.com/isaac-sim/IsaacLab) (v2.3.2) source files | BSD-3-Clause | included (headers kept); derived (terrain port) | `assets/isaac/**/*.py`, `assets/isaac/*.yaml`, `metalsim/learn/isaac_terrain.py` |
+| [Isaac Sim](https://developer.nvidia.com/isaac/sim) assets (`g1_minimal.usd`) | NVIDIA asset terms | fetched, **not redistributed** | `scripts/fetch_isaac_assets.sh`; `.gitignore` |
 | Isaac Sim / Isaac Lab (runtime, on the reference L4 machine) | Isaac Sim licence / BSD-3-Clause | used on an NVIDIA machine; recordings of its outputs committed | `metalsim/parity/isaac_side/`, `runs/parity*/`, `docs/gallery/` |
-| MuJoCo Menagerie: Unitree G1 | BSD-3-Clause (Unitree) | included | `assets/menagerie/unitree_g1/` (with `LICENSE`) |
+| [MuJoCo Menagerie](https://github.com/google-deepmind/mujoco_menagerie): Unitree G1 | BSD-3-Clause (Unitree) | included | `assets/menagerie/unitree_g1/` (with `LICENSE`) |
 | MuJoCo Menagerie: The Robot Studio SO-101 | Apache-2.0 | included | `assets/so101/` (with `LICENSE`) |
 | MuJoCo Playground (G1 joystick task) | Apache-2.0 (G1 model: BSD-3-Clause, Unitree) | included | `assets/playground/` |
 | LimX Dynamics TRON1 robot description, policies, deploy code, SDK types | Apache-2.0 | included; derived | `assets/tron1/` (with both `LICENSE-*`), `metalsim/tron1/limx_policy.py`, `metalsim/tron1/sdk.py` |
 | Unitree Robotics `unitree_rl_gym` (G1 model and meshes, pretrained G1 walking policy `motion.pt`, MuJoCo sim2sim script and config) | BSD-3-Clause | fetched at a pinned commit, **not committed** (`.gitignore`); derived (one module, the playback loop's observation and PD control) | `scripts/fetch_unitree_rl_gym.sh` -> `assets/unitree_rl_gym/`; `metalsim/render/film/unitree.py`; licence: `licenses/BSD-3-Clause-Unitree.txt`; renders of it in `docs/renders/g1_unitree*` |
-| rsl_rl (`rsl-rl-lib`, ETH Zurich and NVIDIA) | BSD-3-Clause | optional dependency | `metalsim/learn/train_g1_rslrl.py`, `metalsim/learn/rslrl_adapter.py` |
-| skrl | MIT | not used; Isaac Lab's skrl agent config reproduced | `assets/isaac/cartpole_skrl_camera_ppo_cfg.yaml`, `metalsim/learn/ppo.py` |
-| Intel Open Image Denoise, via `pyoidn` | Apache-2.0 (OIDN), MIT (`pyoidn`) | optional runtime library, loaded with ctypes | `metalsim/render/denoise.py` |
-| MaterialX (ASWF) | Apache-2.0 | optional runtime import | `metalsim/scene/materialx.py` |
+| [rsl_rl](https://github.com/leggedrobotics/rsl_rl) (`rsl-rl-lib`, ETH Zurich and NVIDIA) | BSD-3-Clause | optional dependency | `metalsim/learn/train_g1_rslrl.py`, `metalsim/learn/rslrl_adapter.py` |
+| [skrl](https://github.com/Toni-SM/skrl) | MIT | not used; Isaac Lab's skrl agent config reproduced | `assets/isaac/cartpole_skrl_camera_ppo_cfg.yaml`, `metalsim/learn/ppo.py` |
+| Intel [Open Image Denoise](https://github.com/RenderKit/oidn), via `pyoidn` | Apache-2.0 (OIDN), MIT (`pyoidn`) | optional runtime library, loaded with ctypes | `metalsim/render/denoise.py` |
+| [MaterialX](https://github.com/AcademySoftwareFoundation/MaterialX) (ASWF) | Apache-2.0 | optional runtime import | `metalsim/scene/materialx.py` |
 | OpenUSD (`usd-core`, Pixar) | Tomorrow Open Source Technology License 1.0 | dependency | `metalsim/scene/` |
 | PyTorch | BSD-3-Clause (and others, per its wheel) | dependency | `metalsim/interop/`, `metalsim/native/torch_metal_bridge.mm`, learners |
 | MLX (Apple) | MIT | not a dependency; one diagnostic script | `scripts/diagnostics/camera_update_profile.py` |
 | imageio-ffmpeg | BSD-2-Clause (the ffmpeg binary it downloads has its own licence) | optional dependency (`parity` extra) | video scripts under `scripts/gallery/` |
-| Poly Haven HDRIs and textures | CC0 1.0 (public domain) | fetched, **not committed** (`.gitignore`); one rendered frame in the gallery | `scripts/fetch_polyhaven_assets.sh` -> `assets/polyhaven/`; `docs/gallery/g1_hdri_tier2.png` |
-| InteriorGS (SpatialVerse / Manycore) Gaussian splat scenes | InteriorGS Terms of Use (non-commercial research / education, no redistribution) | fetched (gated), **not committed** (`.gitignore`); no renders of it committed | `scripts/fetch_splat_scenes.sh` -> `assets/splats/interiorgs/`; tests and `scripts/splat_bench.py` read it |
+| [Poly Haven](https://polyhaven.com) HDRIs and textures | CC0 1.0 (public domain) | fetched, **not committed** (`.gitignore`); one rendered frame in the gallery | `scripts/fetch_polyhaven_assets.sh` -> `assets/polyhaven/`; `docs/gallery/g1_hdri_tier2.png` |
+| [InteriorGS](https://huggingface.co/datasets/spatialverse/InteriorGS) (SpatialVerse / Manycore) Gaussian splat scenes | InteriorGS Terms of Use (non-commercial research / education, no redistribution) | fetched (gated), **not committed** (`.gitignore`); no renders of it committed | `scripts/fetch_splat_scenes.sh` -> `assets/splats/interiorgs/`; tests and `scripts/splat_bench.py` read it |
 | dxgl/multiview-datasets object splat (`modern_arm_chair.ply`) | CC0 1.0 | fetched, **not committed** | `scripts/fetch_splat_scenes.sh` -> `assets/splats/dxgl/` |
 | NVIDIA PhysicalAI-Robotics-NuRec `zh_lounge` (optional) | CC-BY-4.0 | fetched on request, **not committed** | `scripts/fetch_splat_scenes.sh nurec_lounge` -> `assets/splats/nurec/` |
 | splat file formats: SPZ (open-source `spz` reference library), SuperSplat compressed PLY (PlayCanvas engine), NVIDIA NuRec `.nurec` (layout read from files) | MIT (`spz`, PlayCanvas engine); NuRec: no code or data used | reimplemented decoders, no code copied | `metalsim/render/splat/formats.py` |
@@ -61,11 +61,13 @@ runs on. MetalSim is an independent project, not affiliated with or endorsed by 
 
 - Upstream: [NVIDIA/warp](https://github.com/NVIDIA/warp), Apache-2.0, copyright NVIDIA Corporation & Affiliates.
   Metal backend: [innate-inc/warp](https://github.com/innate-inc/warp), where David Dobas develops it (also published
-  as [DavidDobas/warp-metal](https://github.com/DavidDobas/warp-metal)), Apache-2.0, base commit `ce15f6bb`; not
+  as [DavidDobas/warp-metal](https://github.com/DavidDobas/warp-metal)), Apache-2.0, base commit
+  [`ce15f6bb`](https://github.com/innate-inc/warp/commit/ce15f6bb2545e2d6c4a4c1fac8e40bb800db7265); not
   affiliated with NVIDIA.
-- MetalSim's fork: [pulipakaa24/warp](https://github.com/pulipakaa24/warp), branches `metalsim` and
+- [My fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim)
+  ([pulipakaa24/warp](https://github.com/pulipakaa24/warp)), branches `metalsim` and
   `metalsim-flex`; `LICENSE.md` and `licenses/` are byte-identical to NVIDIA/warp's. The fork's
-  `METALSIM_CHANGES.md` lists the changes.
+  [`METALSIM_CHANGES.md`](https://github.com/pulipakaa24/warp/blob/metalsim/METALSIM_CHANGES.md) lists the changes.
 - In this repository: `patches/warp/0001-0007` (the fork's seven code commits), and two older single-commit
   exports, `patches/0001-Metal-fixed-size-arrays-wp.zeros-in-kernels-thread-q.patch` and
   `patches/warp-innate-metal-pending-frees.patch`. **Each patch modifies Apache-2.0 code and is offered under the
@@ -75,10 +77,12 @@ runs on. MetalSim is an independent project, not affiliated with or endorsed by 
 
 ### MuJoCo Warp and MuJoCo
 
-- Upstream: [google-deepmind/mujoco_warp](https://github.com/google-deepmind/mujoco_warp) v3.14.0 (`88af9cc`),
+- Upstream: [google-deepmind/mujoco_warp](https://github.com/google-deepmind/mujoco_warp) v3.14.0
+  ([`88af9cc`](https://github.com/google-deepmind/mujoco_warp/commit/88af9cc682d42e2e925daa0bae25f53277999f7b)),
   Apache-2.0, copyright The Newton Developers (MuJoCo Warp is developed by Google DeepMind and NVIDIA). The Metal device support is David Dobas's patch
   ([DavidDobas/mujoco_warp#1](https://github.com/DavidDobas/mujoco_warp/pull/1), Apache-2.0).
-- MetalSim's fork: [pulipakaa24/mujoco_warp](https://github.com/pulipakaa24/mujoco_warp), branches `metal`,
+- [My fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim)
+  ([pulipakaa24/mujoco_warp](https://github.com/pulipakaa24/mujoco_warp)), branches `metal`,
   `metalsim` and `metalsim-flex`; `LICENSE` is byte-identical to upstream's.
 - In this repository: `patches/mujoco_warp/0001-0016` (0001 is David Dobas's patch; 0002-0016 are MetalSim's) and
   the older exports `patches/mujoco_warp-hfield-plane-contacts.patch` and
@@ -91,15 +95,20 @@ runs on. MetalSim is an independent project, not affiliated with or endorsed by 
 
 - Upstream: [newton-physics/newton](https://github.com/newton-physics/newton), Apache-2.0, copyright The Newton
   Developers.
-- MetalSim's fork: [pulipakaa24/newton](https://github.com/pulipakaa24/newton), branches `metalsim`,
+- [My fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim)
+  ([pulipakaa24/newton](https://github.com/pulipakaa24/newton)), branches `metalsim`,
   `metalsim-hashtable-metal` and `metalsim-1.5.2` (Newton 1.5.2 for MPM and Franka-Pour); `LICENSE.md`
   byte-identical to upstream's. Pull-request branches `fix/xpbd-revolute-angle-wrap`, `fix/xpbd-joint-relaxation`,
-  `feat/xpbd-pd-joint-drive` (upstream PRs #4316-#4318).
+  `feat/xpbd-pd-joint-drive` (upstream PRs
+  [#4316](https://github.com/newton-physics/newton/pull/4316)-[#4318](https://github.com/newton-physics/newton/pull/4318)).
 - In this repository: `metalsim/physics/newton_backend.py` calls Newton's API (MetalSim code);
   `scripts/diagnostics/newton_upstream/` holds the issue and pull-request texts filed upstream: MetalSim-written
   reproducers against Newton's public API and permalinks into Newton's source, no copied source. The optional
-  `newton` extra installs upstream Newton `45458023` plus only the fork's Metal fixes (branch
-  `metalsim-hashtable-metal`, `a4be3604`; `pyproject.toml`); `scripts/setup_newton152.sh` installs `metalsim-1.5.2`,
+  `newton` extra installs upstream Newton
+  [`45458023`](https://github.com/newton-physics/newton/commit/45458023f24629c1feffb1f336594808f537db14) plus only the
+  fork's Metal fixes (branch `metalsim-hashtable-metal`,
+  [`a4be3604`](https://github.com/pulipakaa24/newton/commit/a4be3604bc218bb366d12164fa3e1025f333bdae);
+  `pyproject.toml`); `scripts/setup_newton152.sh` installs `metalsim-1.5.2`,
   which `metalsim/physics/mpm` and the Franka-Pour task run on.
 - **Derived** (Apache-2.0, Newton's notice applies): `metalsim/physics/mpm/fused_gs.py` adapts Newton 1.5.2's colored Gauss-Seidel stress kernel
   (`rheology_solver_kernels.py`, `make_gs_solve_kernel` / `make_compute_local_strain`), its nodal friction kernel
@@ -108,8 +117,9 @@ runs on. MetalSim is an independent project, not affiliated with or endorsed by 
   `SPDX-License-Identifier: Apache-2.0` with a modification notice. It calls
   Newton's own per-node functions at run time. The rest of `metalsim/physics/mpm` calls Newton's API (MetalSim code).
 - **Vendored source, `metalsim/physics/mpm/implicit_mpm/`**: Newton's implicit MPM solver package
-  (`newton/_src/solvers/implicit_mpm/`) from MetalSim's fork, [pulipakaa24/newton](https://github.com/pulipakaa24/newton)
-  commit `addd10cbeb25e946b3a4c2bb1d4097acc7a98ca2` (branch `metalsim-1.5.2`, off upstream `v1.5.2`), copyright The
+  (`newton/_src/solvers/implicit_mpm/`) from [my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim-1.5.2),
+  commit [`addd10cbeb25e946b3a4c2bb1d4097acc7a98ca2`](https://github.com/pulipakaa24/newton/commit/addd10cbeb25e946b3a4c2bb1d4097acc7a98ca2) (branch `metalsim-1.5.2`, off
+  upstream [`v1.5.2`](https://github.com/newton-physics/newton/tree/v1.5.2)), copyright The
   Newton Developers, **Apache-2.0** ([`licenses/Apache-2.0.txt`](licenses/Apache-2.0.txt)). Every file keeps its SPDX
   copyright and licence header. Modifications (Apache-2.0 section 4(b)), stated in each file and in the directory's `NOTICE.txt`: a modification notice after the header and
   the six relative imports that leave the package rewritten to absolute `newton._src` imports; nothing else.
@@ -157,9 +167,11 @@ runs on. MetalSim is an independent project, not affiliated with or endorsed by 
   (`metalsim/learn/g1_velocity.py`, `g1_il3.py`, `metalsim/sensors/contact.py`, `metalsim/replicator/events.py`)
   reimplement Isaac Lab's documented term formulas and semantics as Warp kernels and cite the Isaac Lab function they
   match; they are MetalSim code.
-- **Included, unchanged, header kept** (Isaac Lab 3.0.0-EA, release/3.0.0 `ae37b028`): `metalsim/learn/isaac_math.py` =
-  `source/isaaclab/isaaclab/utils/math.py`. **Derived** (BSD-3-Clause, Isaac Lab's notice applies): the Franka-Pour
-  task terms, reset-dataset sampler and digest encoder in `metalsim/learn/franka_pour.py` and the scene constants and
+- **Included, unchanged, header kept** (Isaac Lab 3.0.0-EA, release/3.0.0
+  [`ae37b028`](https://github.com/isaac-sim/IsaacLab/commit/ae37b028ea415c91ea2bc32609efcd759ed2b974)):
+  `metalsim/learn/isaac_math.py` = `source/isaaclab/isaaclab/utils/math.py`. **Derived** (BSD-3-Clause, Isaac Lab's
+  notice applies): the Franka-Pour task terms, reset-dataset sampler and digest encoder in
+  `metalsim/learn/franka_pour.py` and the scene constants and
   builder-hook edits in `metalsim/learn/franka_pour_scene.py` are transcriptions of
   `source/isaaclab_tasks/isaaclab_tasks/contrib/franka_pour/` (each cites the file and lines);
   `metalsim/parity/isaac_side/isaaclab3/franka_pour_published_asset.patch` is a diff against that task's
@@ -179,9 +191,11 @@ runs on. MetalSim is an independent project, not affiliated with or endorsed by 
   and `reset_dataset.pt`, from the Isaac 6.1 asset root) are likewise **not redistributed**: `scripts/fetch_isaac_assets.sh`
   downloads them and checks SHA-256; `.gitignore` excludes the directory.
 - `assets/isaac/G1/g1_minimal_from_usd.xml`, an MJCF conversion of that USD (kinematics, inertials and the three
-  collision boxes), was committed on 2026-09-22 (`1359a52`) and removed from the tree in this audit because it is a
-  derivative of NVIDIA's asset and nothing referenced it. It remains in the history of `1359a52` and later commits up
-  to the removal (see "History" below). It can be regenerated locally from the fetched USD with
+  collision boxes), was committed on 2026-09-22
+  ([`1359a52`](https://github.com/pulipakaa24/MetalSim/commit/1359a5284dda87d516c858b69e711bee56ab6cfe)) and removed
+  from the tree in this audit because it is a derivative of NVIDIA's asset and nothing referenced it. It remains in the
+  history of [`1359a52`](https://github.com/pulipakaa24/MetalSim/commit/1359a5284dda87d516c858b69e711bee56ab6cfe) and
+  later commits up to the removal (see "History" below). It can be regenerated locally from the fetched USD with
   `metalsim.scene.usd_to_mjcf.load_usd(...).to_xml()`; `.gitignore` now excludes `assets/isaac/**/*_from_usd.xml`.
 - The robot model inside NVIDIA's asset originates from Unitree's G1 description
   ([unitree_ros](https://github.com/unitreerobotics/unitree_ros), BSD-3-Clause).
@@ -197,7 +211,8 @@ runs on. MetalSim is an independent project, not affiliated with or endorsed by 
 ### MuJoCo Menagerie and MuJoCo Playground
 
 - [google-deepmind/mujoco_menagerie](https://github.com/google-deepmind/mujoco_menagerie) (each model under its own
-  licence), files identical to Menagerie `822c2d8`:
+  licence), files identical to Menagerie
+  [`822c2d8`](https://github.com/google-deepmind/mujoco_menagerie/commit/822c2d8f877dd166c5b7d3c9f7e3c3b6589473b7):
   - `assets/menagerie/unitree_g1/` (`g1.xml`, `g1_with_hands.xml`, `README.md`, `LICENSE`): Unitree G1, BSD-3-Clause,
     copyright HangZhou YuShu Technology Co., Ltd. (Unitree Robotics). Meshes are not included.
   - `assets/so101/` (`so101.xml`, `scene.xml`, `scene_box.xml`, STL meshes, `README.md`, `CHANGELOG.md`, `LICENSE`):
@@ -219,7 +234,9 @@ runs on. MetalSim is an independent project, not affiliated with or endorsed by 
     variants) from [limxdynamics/tron1-rl-deploy-python](https://github.com/limxdynamics/tron1-rl-deploy-python)
     (licence: `assets/tron1/LICENSE-rl-deploy-python`).
 - **Derived**: `metalsim/tron1/limx_policy.py` ports that repository's `controllers/WheelfootController.py`
-  (commit `035e4c9`); header `SPDX-License-Identifier: Apache-2.0`, and the docstring states the changes.
+  (commit
+  [`035e4c9`](https://github.com/limxdynamics/tron1-rl-deploy-python/commit/035e4c9e2f24e916fa5e8363ac6f0f788a2e1e8c));
+  header `SPDX-License-Identifier: Apache-2.0`, and the docstring states the changes.
   `metalsim/tron1/sdk.py` mirrors the message field names, units and motor order of
   [limxdynamics/limxsdk-lowlevel](https://github.com/limxdynamics/limxsdk-lowlevel) (Apache-2.0) `datatypes.h`.
   The `limxsdk` binaries are not included; `metalsim/tron1/limx_bridge.py` imports them when installed on the robot.
@@ -230,14 +247,16 @@ runs on. MetalSim is an independent project, not affiliated with or endorsed by 
   time-out bootstrapping) independently, with comments naming the rsl_rl behaviour it matches.
 - skrl ([Toni-SM/skrl](https://github.com/Toni-SM/skrl), MIT) is not used. `metalsim/learn/ppo.py` reproduces the
   network and hyperparameters of Isaac Lab's skrl configuration (above).
-- Stable-Baselines3 (MIT) and gymnasium (MIT): optional `learn` extra.
+- [Stable-Baselines3](https://github.com/DLR-RM/stable-baselines3) (MIT) and
+  [gymnasium](https://github.com/Farama-Foundation/Gymnasium) (MIT): optional `learn` extra.
 
 ### Unitree Robotics unitree_rl_gym
 
 - [unitreerobotics/unitree_rl_gym](https://github.com/unitreerobotics/unitree_rl_gym), BSD-3-Clause, copyright
   2016-2023 HangZhou YuShu TECHNOLOGY CO.,LTD. ("Unitree Robotics") (licence:
   [`licenses/BSD-3-Clause-Unitree.txt`](licenses/BSD-3-Clause-Unitree.txt), the repository's `LICENSE`).
-  `scripts/fetch_unitree_rl_gym.sh` makes a shallow, sparse checkout at commit `276801e4` into
+  `scripts/fetch_unitree_rl_gym.sh` makes a shallow, sparse checkout at commit
+  [`276801e4`](https://github.com/unitreerobotics/unitree_rl_gym/commit/276801e46c5d433564f24658bac64f254b7d2d4b) into
   `assets/unitree_rl_gym/`, which is git-ignored: nothing of it is committed. The film tool's `g1_unitree` task reads
   from it Unitree's pretrained G1 walking policy (`deploy/pre_train/g1/motion.pt`, TorchScript, sha256 `cf668f75...`
   as fetched), the sim2sim config (`deploy/deploy_mujoco/configs/g1.yaml`) and the G1 model with its STL meshes
@@ -256,10 +275,13 @@ runs on. MetalSim is an independent project, not affiliated with or endorsed by 
   `libOpenImageDenoise` with ctypes when installed; not a declared dependency.
 - MaterialX ([AcademySoftwareFoundation/MaterialX](https://github.com/AcademySoftwareFoundation/MaterialX),
   Apache-2.0): imported by `metalsim/scene/materialx.py` to read `.mtlx` documents when installed.
-- OpenUSD `usd-core` (Pixar, Tomorrow Open Source Technology License 1.0): dependency of `metalsim.scene`.
-- imageio-ffmpeg (BSD-2-Clause): `parity` extra; it downloads an ffmpeg binary under ffmpeg's licence, which is not
-  redistributed here.
-- lpips (BSD-2-Clause), flip-evaluator (NVIDIA FLIP, BSD-3-Clause), scikit-image (BSD-3-Clause): `parity` extra.
+- [OpenUSD](https://github.com/PixarAnimationStudios/OpenUSD) `usd-core` (Pixar, Tomorrow Open Source Technology License
+  1.0): dependency of `metalsim.scene`.
+- [imageio-ffmpeg](https://github.com/imageio/imageio-ffmpeg) (BSD-2-Clause): `parity` extra; it downloads an ffmpeg
+  binary under ffmpeg's licence, which is not redistributed here.
+- [lpips](https://github.com/richzhang/PerceptualSimilarity) (BSD-2-Clause), flip-evaluator
+  ([NVIDIA FLIP](https://github.com/NVlabs/flip), BSD-3-Clause),
+  [scikit-image](https://github.com/scikit-image/scikit-image) (BSD-3-Clause): `parity` extra.
 
 ### Poly Haven assets (environment maps and textures)
 
@@ -272,36 +294,50 @@ runs on. MetalSim is an independent project, not affiliated with or endorsed by 
 
 ### Gaussian splat scenes and formats
 
-- InteriorGS (https://huggingface.co/datasets/spatialverse/InteriorGS; Miao et al., arXiv 2510.21307): its Terms of Use
+- InteriorGS (https://huggingface.co/datasets/spatialverse/InteriorGS; Miao et al.,
+  [arXiv 2510.21307](https://arxiv.org/abs/2510.21307)): its Terms of Use
   allow non-commercial research and education only and forbid redistribution in whole or in part. One scene is the
   splat renderer's reference; `scripts/fetch_splat_scenes.sh` downloads it (gated: each user accepts the terms on
   Hugging Face) into the ignored `assets/splats/`, pinned by dataset revision and SHA-256. Nothing from it (data, renders,
   derived files) is committed; the repository holds only measured numbers (`metalsim/render/SPLAT.md`).
-- dxgl/multiview-datasets (CC0 1.0, splats of CC0 Poly Haven models): one object fetched the same way.
+- [dxgl/multiview-datasets](https://huggingface.co/datasets/dxgl/multiview-datasets) (CC0 1.0, splats of CC0 Poly Haven
+  models): one object fetched the same way.
 - NVIDIA PhysicalAI-Robotics-NuRec (https://huggingface.co/datasets/nvidia/PhysicalAI-Robotics-NuRec, CC-BY-4.0,
   attribution NVIDIA Corporation): the `zh_lounge` scene, optional, fetched the same way.
 - Format decoders in `metalsim/render/splat/formats.py` reimplement published layouts in numpy: SPZ (the MIT-licensed
-  `spz` reference library's `load-spz.cc`), the SuperSplat compressed PLY (PlayCanvas engine, MIT,
+  [`spz`](https://github.com/nianticlabs/spz) reference library's `load-spz.cc`), the SuperSplat compressed PLY
+  ([PlayCanvas engine](https://github.com/playcanvas/engine), MIT,
   `gsplat-compressed-data.js`) and the 3DGS training PLY; the NuRec `.nurec` layout was read from files (no NVIDIA code).
-  The rasterizer follows the 3DGS / gsplat papers and their published rules (SPLAT.md §2), no code copied.
+  The rasterizer follows the [3DGS](https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/) /
+  [gsplat](https://arxiv.org/abs/2409.06765) papers and their published rules (SPLAT.md §2), no code copied.
 
 ### PyTorch and MLX
 
-- PyTorch (BSD-3-Clause and the licences listed in its wheel): dependency. `metalsim/native/torch_metal_bridge.mm`
-  uses PyTorch's public C++ extension and MPS APIs. `metalsim/learn/isaac_terrain.py` reproduces the output stream
+- [PyTorch](https://github.com/pytorch/pytorch) (BSD-3-Clause and the licences listed in its wheel): dependency.
+  `metalsim/native/torch_metal_bridge.mm` uses PyTorch's public C++ extension and MPS APIs.
+  `metalsim/learn/isaac_terrain.py` reproduces the output stream
   of PyTorch's CUDA uniform generator (Philox4x32-10 via curand) in numpy so the terrain matches Isaac's on NVIDIA
   GPUs; it implements the published Philox algorithm and contains no PyTorch or CUDA source.
-- MLX (MIT): only `scripts/diagnostics/camera_update_profile.py` imports it, for a measurement recorded in
-  `docs/research/metal_cnn_update_2026-09-24.md`. It is not a dependency of the package.
+- [MLX](https://github.com/ml-explore/mlx) (MIT): only `scripts/diagnostics/camera_update_profile.py` imports it, for a
+  measurement recorded in `docs/research/metal_cnn_update_2026-09-24.md`. It is not a dependency of the package.
 
 ### Algorithms from publications
 
-Implemented from the papers, no code copied: XPBD (Macklin, Müller, Chentanez 2016; small-step XPBD, Macklin et al.
-2019) in `metalsim/physics/deformable.py`; edge-avoiding a-trous wavelet filter (Dammertz et al., HPG 2010) and the
-spatial pass of SVGF (Schied et al., HPG 2017) in `metalsim/render/shaders/denoise.metal` and `tier2.py`; the ACES
-filmic curve fit (Narkowicz 2015) and the split-sum GGX albedo fit (Karis 2013) in `pathtrace.metal`; the Philox
-counter-based generator (Salmon et al., SC 2011); stable PD control (Tan, Liu, Turk 2011) in `newton_backend.py`;
-PPO implementation details (Huang et al. 2022) cited in `metalsim/learn/monitor.py`.
+Implemented from the papers, no code copied: XPBD
+([Macklin, Müller, Chentanez 2016](https://doi.org/10.1145/2994258.2994272); small-step XPBD,
+[Macklin et al. 2019](https://doi.org/10.1145/3309486.3340247)) in `metalsim/physics/deformable.py`; edge-avoiding
+a-trous wavelet filter ([Dammertz et al., HPG 2010](https://doi.org/10.2312/EGGH/HPG10/067-075)) and the
+spatial pass of SVGF ([Schied et al., HPG 2017](https://doi.org/10.1145/3105762.3105770)) in
+`metalsim/render/shaders/denoise.metal` and `tier2.py`; the ACES
+filmic curve fit ([Narkowicz 2015](https://knarkowicz.wordpress.com/2016/01/06/aces-filmic-tone-mapping-curve/)) and the
+split-sum GGX albedo fit
+([Karis 2013](https://blog.selfshadow.com/publications/s2013-shading-course/karis/s2013_pbs_epic_notes_v2.pdf)) in
+`pathtrace.metal`; the Philox counter-based generator
+([Salmon et al., SC 2011](https://doi.org/10.1145/2063384.2063405)); stable PD control
+([Tan, Liu, Turk 2011](https://doi.org/10.1109/MCG.2011.30)) in `newton_backend.py`;
+PPO implementation details
+([Huang et al. 2022](https://iclr-blog-track.github.io/2022/03/25/ppo-implementation-details/)) cited in
+`metalsim/learn/monitor.py`.
 
 ## History (committed then removed)
 
@@ -310,7 +346,7 @@ committed and later removed:
 
 | path | status | rewrite needed? |
 |---|---|---|
-| `assets/isaac/G1/g1_minimal_from_usd.xml` | MJCF conversion of NVIDIA's `g1_minimal.usd` (numbers and three boxes; no meshes, no USD); in history from `1359a52` (2026-09-22), removed in this audit | Recommended if strict: it is the one derived NVIDIA-asset file in the public history. The underlying kinematic and inertial values originate from Unitree's BSD-3-Clause G1 description, so the practical exposure is small. Not rewritten (report only). |
+| `assets/isaac/G1/g1_minimal_from_usd.xml` | MJCF conversion of NVIDIA's `g1_minimal.usd` (numbers and three boxes; no meshes, no USD); in history from [`1359a52`](https://github.com/pulipakaa24/MetalSim/commit/1359a5284dda87d516c858b69e711bee56ab6cfe) (2026-09-22), removed in this audit | Recommended if strict: it is the one derived NVIDIA-asset file in the public history. The underlying kinematic and inertial values originate from Unitree's BSD-3-Clause G1 description, so the practical exposure is small. Not rewritten (report only). |
 | `orchard/**` | MetalSim's own code before the rename to `metalsim` | no |
 | `patches/warp/0005-Metal-configurable-register-Cholesky-bound-*.patch` | own patch, renumbered | no |
 | `runs/contact_tuning_bench_4096*.log` | own logs | no |
@@ -331,6 +367,8 @@ No USD, MDL, Omniverse, PhysX or other NVIDIA binary file appears anywhere in th
    `port of`, `verbatim`, `copied from`, `derived from`, `et al`, and for every URL in code and docstrings.
 3. Every path ever committed (`git log --all --name-only`) compared with the current tree, and searched for
    USD / MDL / shared-library / PhysX / Omniverse files.
-4. Included third-party files compared with their upstream checkouts (Menagerie `822c2d8`, Isaac Lab `v2.3.2`);
+4. Included third-party files compared with their upstream checkouts (Menagerie
+   [`822c2d8`](https://github.com/google-deepmind/mujoco_menagerie/commit/822c2d8f877dd166c5b7d3c9f7e3c3b6589473b7),
+   Isaac Lab [`v2.3.2`](https://github.com/isaac-sim/IsaacLab/tree/v2.3.2));
    fork `LICENSE` files compared by blob hash with upstream.
 5. Licences of dependencies read from their PyPI metadata and GitHub.

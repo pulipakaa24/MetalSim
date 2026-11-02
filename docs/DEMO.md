@@ -1,22 +1,26 @@
 # Demo: what works at `demo-2026-10`
 
-This page covers each demo that runs on this tag: the command to run it, the numbers the shipped docs measured for it,
+This page covers each demo that runs on [this tag](https://github.com/pulipakaa24/MetalSim/tree/demo-2026-10): the
+command to run it, the numbers the shipped docs measured for it,
 and the limits that are still open. Every number below is quoted from the doc named next to it, and none was measured
 for this page.
 
 Timings come from the 16-inch M4 Max (40-core GPU, 64 GB, macOS 26) unless a line says otherwise. The 14-inch M4 Max
 was used for correctness only.
 
-Install first, as `docs/GUIDE.md` §1 describes (`pip install -e ".[full]"`, the Warp / MuJoCo Warp forks,
+Install first, as `docs/GUIDE.md` §1 describes (`pip install -e ".[full]"`, my forks of
+[Warp](https://github.com/pulipakaa24/warp/tree/metalsim) and
+[MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim),
 `scripts/setup_newton152.sh`, the asset fetch scripts). Run every command from the repository root.
 
-**Verified:** `scripts/fresh_install_check.sh` ran on commit `168637f0` from a brand-new clone on both Macs.
+**Verified:** `scripts/fresh_install_check.sh` ran on commit
+[`c6fdc9f5`](https://github.com/pulipakaa24/MetalSim/commit/c6fdc9f5c7a56308653b0d68e54e65f34875659e) from a brand-new
+clone on both Macs.
 - 23 of 24 steps passed on each Mac, including all six demo smokes (steps 20–25 below).
 - The one failure, `test_go2_boxes_gpu` in step 11, was fixed in two steps:
-  - `bf8ee2ba` compares depth with each pixel ray's first hit.
-  - `ff6b63f8` makes the lidar keep its configured name.
-- `tests/test_compose.py` then passed 15/15 on the 16-inch at `ff6b63f8` (`runs/checks/fix3/test_compose_16in.log`).
-- The fresh-install results table is in PR #51.
+  - [`1fd9ccc9`](https://github.com/pulipakaa24/MetalSim/commit/1fd9ccc99495db2191091f644e58922fb1508447) compares depth with each pixel ray's first hit.
+  - [`b44cbc0c`](https://github.com/pulipakaa24/MetalSim/commit/b44cbc0c2f69a8f270bb4c5fe590f971292607c4) makes the lidar keep its configured name.
+- `tests/test_compose.py` then passed 15/15 on the 16-inch at [`b44cbc0c`](https://github.com/pulipakaa24/MetalSim/commit/b44cbc0c2f69a8f270bb4c5fe590f971292607c4) (`runs/checks/fix3/test_compose_16in.log`).
 
 ## Demos
 
@@ -29,13 +33,15 @@ python -m metalsim.render.film g1_flat                             # film: recor
 ```
 
 Measured (README "Measured state", `docs/PARITY.md` §1.4–1.5, §1.8):
-- **Flat-terrain training, return at iteration 1000:** +26.8 ± 0.2 over three seeds, against Isaac Lab 2.3.2 + PhysX's
+- **Flat-terrain training, return at iteration 1000:** +26.8 ± 0.2 over three seeds, against
+  [Isaac Lab](https://github.com/isaac-sim/IsaacLab) 2.3.2 + [PhysX](https://github.com/NVIDIA-Omniverse/PhysX)'s
   +27.3 (one seed).
 - **Isaac Lab 3.0-EA's G1 flat task:** +27.0 ± 1.4 at iteration 1499, against Isaac's +27.5.
 - **Throughput at 4,096 envs, full PPO loop:**
   - elliptic default: 37.3–37.7 K env-steps/s;
   - pyramidal: 56.9–57.5 K env-steps/s;
-  - reference: Isaac Lab 3.0's env step alone on the L4 is 72.0 K (Newton / MuJoCo Warp).
+  - reference: Isaac Lab 3.0's env step alone on the NVIDIA L4 is 72.0 K
+    ([Newton](https://github.com/newton-physics/newton) / MuJoCo Warp).
 - **Film:** `docs/renders/g1_flat.mp4` ([G1_FLAT.md](renders/G1_FLAT.md)), re-filmed 2026-10-31 with the tracked
   checkpoint `runs/g1regress/ckpt14/flat_main_s0.pt`. The film committed with the demo tag used an untracked checkpoint
   whose robots fell within about 3 s, and the record stage did not detect it
@@ -128,7 +134,8 @@ python -m pytest -q tests/test_render_splat_public.py
 python scripts/splat_bench.py verify && python scripts/splat_bench.py bench
 ```
 
-Measured on InteriorGS 0204_840158 (972,596 splats, 640×360; `metalsim/render/SPLAT.md` §4–5):
+Measured on [InteriorGS](https://huggingface.co/datasets/spatialverse/InteriorGS) 0204_840158 (972,596 splats, 640×360;
+`metalsim/render/SPLAT.md` §4–5):
 - **Against an independent float64 reference:** PSNR 58.9 dB.
 - **Speed:** 0.68 ms for one camera, 0.43 ms per camera at 8 (2,309 cameras/s).
 
@@ -168,7 +175,7 @@ The scene file uses Isaac Lab 3.0 names; see `docs/SCENES.md`. Filmed tasks are 
 - **ANYmal on sand is one-way coupled by design.** The robot is kinematic for the sand (`docs/NOW.md`).
 - **Coupled scenes are slower than the L4.** ANYmal takes about 30 ms per frame against the L4's 24.2
   (`metalsim/physics/mpm/MPM.md` §8k).
-- **BatchSim is not run-to-run bitwise repeatable by default.** The opt-in deterministic mode (PR #29) still fails on
+- **BatchSim is not run-to-run bitwise repeatable by default.** The opt-in deterministic mode still fails on
   the captured G1 at 1,024 worlds.
 - **Franka-Pour learning against Isaac:** equal through iteration 49. At 50–59 Isaac's mean success is 0.035 higher,
   which is not significant (p = 0.09) but not ruled out (`docs/PARITY.md` §1b.5).

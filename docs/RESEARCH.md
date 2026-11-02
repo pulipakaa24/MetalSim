@@ -5,10 +5,12 @@ Consolidated from five research passes run at project start. Facts are labelled
 
 **Snapshot of 2026-09-22, kept as written (note added 2026-10-13).** Later research is one question per note in
 `docs/research/` (index in the README, "Research notes"), `reports/` and `research_notes/`. Superseded here since:
-MetalSim builds its own Warp fork (pulipakaa24/warp `metalsim`, pinned `95f6f121`), not innate-inc's `main`; the
-MuJoCo Warp suite figure is the base fork's (the elliptic branch gave 1450 passed / 2 failed on 2026-09-25, PARITY
-§1.4; flex 237/237 after the fork's flex fixes); Newton runs on `metal:0` through the Warp fork (PARITY §2.1,
-`docs/research/newton_vbd_metal_2026-09-25.md`), and Newton 1.5.2's MPM runs there too (`metalsim/physics/mpm/MPM.md`).
+MetalSim builds [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) (branch `metalsim`), not
+innate-inc's `main`; the [MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp) suite figure is the base fork's
+(the elliptic branch gave 1450 passed / 2 failed on 2026-09-25, PARITY
+§1.4; flex 237/237 after the fork's flex fixes); [Newton](https://github.com/newton-physics/newton) runs on `metal:0`
+through the Warp fork (PARITY §2.1, `docs/research/newton_vbd_metal_2026-09-25.md`), and Newton 1.5.2's MPM runs there
+too (`metalsim/physics/mpm/MPM.md`).
 
 ## Physics on Apple GPUs
 
@@ -24,9 +26,11 @@ MuJoCo Warp suite figure is the base fork's (the elliptic branch gave 1450 passe
   `io_test::test_put_data_nefc_zero_dense`), 39 skipped, 174 s. verified.
 - mjlab 1.6.0 pins `mujoco~=3.11`, `mujoco-warp~=3.11`, Python <3.14; `MJLAB_AGENT_DEVICE=mps`
   is only on the DavidDobas `metal` branch. Newton 1.6.0 is CPU-only on macOS officially;
-  untested on `metal:0`. Isaac Lab 3.0.0-EA (2026-09-16) targets Isaac Sim 6.1, Warp 1.16,
+  untested on `metal:0`. [Isaac Lab](https://github.com/isaac-sim/IsaacLab) 3.0.0-EA (2026-09-16) targets
+  [Isaac Sim](https://developer.nvidia.com/isaac/sim) 6.1, Warp 1.16,
   Newton 1.5.2, backend `newton_mjwarp`. reported.
-- Genesis 1.4.1 has an official Metal path via its Quadrants compiler; jax-metal is unmaintained.
+- [Genesis](https://github.com/Genesis-Embodied-AI/genesis-world) 1.4.1 has an official Metal path via its Quadrants
+  compiler; jax-metal is unmaintained.
 - Metal constraints (fork docs): no float64; tile kernels forward-only; 32 KB threadgroup memory;
   32-bit atomics only (64-bit add split); no spinlocks; Apple compiler miscompiles large unrolled
   matrix products (Warp works around its own matmul). verified in docs.
@@ -45,7 +49,8 @@ MuJoCo Warp suite figure is the base fork's (the elliptic branch gave 1450 passe
 - Warp and torch hold the **same `id<MTLDevice>` object** on this machine. verified.
 - No CUDA-graph equivalent on MPS; inductor MPS backend is an elementwise prototype. Launch
   count is the only lever for the learner. reported.
-- MLX 0.32.2 has zero-copy Metal DLPack with torch (PR #3531) but no Python event/queue API.
+- MLX 0.32.2 has zero-copy Metal DLPack with torch ([PR #3531](https://github.com/ml-explore/mlx/pull/3531)) but no
+  Python event/queue API.
 
 ## Metal and PyObjC
 
@@ -62,16 +67,17 @@ MuJoCo Warp suite figure is the base fork's (the elliptic branch gave 1450 passe
 - Page size is 16 KB; `newBufferWithBytesNoCopy` needs page alignment.
 - Tile shaders/imageblocks: 32 KB tile memory, memoryless attachments; deferred lighting in one
   pass is Apple's reference structure.
-- PyObjC 12.2.2 covers Metal 4 and MetalFX; bug #690 over-retains instance `new*` methods (leak,
-  fixed in unreleased 12.2.3); `contents().as_buffer(n)` gives zero-copy numpy; ~41 µs per
-  Python-driven single-dispatch command buffer. verified.
+- PyObjC 12.2.2 covers Metal 4 and MetalFX; bug [#690](https://github.com/ronaldoussoren/pyobjc/issues/690) over-retains
+  instance `new*` methods (leak, fixed in unreleased 12.2.3); `contents().as_buffer(n)` gives zero-copy numpy; ~41 µs
+  per Python-driven single-dispatch command buffer. verified.
 - No Apple-published rays/s figures; Blender Open Data medians: M4 Max 40c 5,208 samples/min,
   M5 Max 8,113, M5 Ultra 13,113. reported.
 
 ## Scene layer
 
 - `usd-core 26.8` wheels for cp39–cp314 (universal2) include UsdPhysics, UsdShade, UsdLux,
-  UsdSemantics (LabelsAPI), UsdRender; **exclude** Hydra/Storm/HgiMetal, usdview, MaterialX
+  UsdSemantics (LabelsAPI), UsdRender; **exclude** Hydra/Storm/HgiMetal, usdview,
+  [MaterialX](https://github.com/AcademySoftwareFoundation/MaterialX)
   plugins. Storm-on-Metal needs a self-built OpenUSD with imaging + MaterialX. reported.
 - MaterialX 1.39.5 wheels (cp39–cp314 arm64) include the **MSL shader generator**
   (`PyMaterialXGenMsl.MslShaderGenerator`), OpenPBR 1.1.1, standard_surface, and an
@@ -80,7 +86,8 @@ MuJoCo Warp suite figure is the base fork's (the elliptic branch gave 1450 passe
   0.3.3 (newton-physics org, Apache-2.0, Python <3.13): field mappings documented in
   RESEARCH notes above (gainprm/biasprm → DriveAPI, frictionloss → PhysxJointAPI.jointFriction,
   armature → PhysxJointAPI.armature, `mjc:` attrs retained). SimReady Foundation defines
-  runtime variants (PhysX/Newton/MuJoCo) and semantic/nonvisual-material capabilities.
+  runtime variants ([PhysX](https://github.com/NVIDIA-Omniverse/PhysX)/Newton/MuJoCo) and semantic/nonvisual-material
+  capabilities.
 - Cycles: Metal backend with MetalRT on M3+; Hydra delegate builds against USD ≥25.11; no
   official macOS-Hydra statement. `gatling` (pablode) is a Hydra path tracer with Apple M3+
   hardware RT support. reported.
@@ -93,7 +100,8 @@ MuJoCo Warp suite figure is the base fork's (the elliptic branch gave 1450 passe
 - MuJoCo Playground (A100): CartpoleBalance 718,626; Go1 joystick 417,451; PandaPickCube
   140,386; pixels via Madrona: CartpoleBalance ~403K, PandaPickCubeCartesian ~37K (4090).
 - MJX humanoid: M3 Max CPU 650K SPS; A100 950K (batch 8192).
-- mjwarp-testspeed primitives render N=512 on 4090: 522,101 steps/s (PR #1113).
+- mjwarp-testspeed primitives render N=512 on 4090: 522,101 steps/s
+  ([mujoco_warp PR #1113](https://github.com/google-deepmind/mujoco_warp/pull/1113)).
 - Physics tolerances: MJWarp forward tests 5e-4 (smooth), 1e-3 (step), 5e-3 (implicit);
   solver tests atol=rtol=0.1 on qacc/efc_force; Newton Menagerie FK atol 2e-6, dynamics
   1e-6..5e-4 per robot.
@@ -102,8 +110,8 @@ MuJoCo Warp suite figure is the base fork's (the elliptic branch gave 1450 passe
 - Sensors: Isaac RTX lidar schema attributes (OmniLidar, `OmniSensorGenericLidarCoreAPI`,
   emitter-state arrays; per-material `omni:simready:nonvisual:*` tokens); IMU/contact/camera
   attribute lists recorded in the agent report.
-- RL configs: Isaac Lab rsl_rl PPO (Cartpole 16 steps/env, 150 iters, MLP 32×32; Anymal rough
-  24 steps/env, 1500 iters, MLP 512/256/128); Playground brax PPO configs per task.
+- RL configs: Isaac Lab [rsl_rl](https://github.com/leggedrobotics/rsl_rl) PPO (Cartpole 16 steps/env, 150 iters, MLP
+  32×32; Anymal rough 24 steps/env, 1500 iters, MLP 512/256/128); Playground brax PPO configs per task.
 
 ## Addendum (2026-09-22, evening)
 
