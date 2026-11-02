@@ -182,6 +182,12 @@ class MPMConfig:
     chunk_graph: bool = True
     gpu_exit: bool = True
     metal_fast_math: str = "off"
+    # Startup compilation on this many CPU threads (metalsim.physics.warmup.CompileManifest): the first coupled step
+    # is eager (the solver sizes its buffers from device results), so it cannot be preloaded under a capture; instead
+    # the named modules it loaded are written to a manifest, and later runs load them in parallel before that step
+    # (kernels generated during the step still compile when launched; MuJoCo Warp's modules are BatchSim's preload's
+    # and are never in the manifest). None = METALSIM_PRELOAD_WORKERS, else 0 (off).
+    preload_workers: int | None = None
 
     def solver_config(self, cls, particles_per_world: int, worlds: int):
         cfg = cls.Config()
@@ -415,6 +421,7 @@ class MPMCoupling:
                                            int(self.solver_cfg.max_active_cell_count) > 0)
         self._graph = None
         self._eager_steps = 0
+        self.preload_stats = None   # set by the first eager step when startup compilation runs in parallel
         self._reset_graphs = {}
         self._eager_resets = 0
         self.reset_mask = None
@@ -536,7 +543,10 @@ class MPMCoupling:
         if capturing and self._eager_steps == 0:
             raise RuntimeError("MPMCoupling.launch_step: run one step() eagerly before capturing it")
         with wp.ScopedDevice(self.sim.device):
-            self._launch_coupled_step()
+            if capturing:
+                self._launch_coupled_step()
+            else:
+                self._first_eager(self._launch_coupled_step)
         if not capturing:
             self._eager_steps += 1
 
@@ -554,9 +564,33 @@ class MPMCoupling:
                 self._graph = cap.graph
                 wp.capture_launch(self._graph)
             else:
-                self._launch_coupled_step()
+                self._first_eager(self._launch_coupled_step)
                 self._eager_steps += 1
         return self.sim._signal()
+
+    def _first_eager(self, launch) -> None:
+        """Run ``launch``; around the first eager step, preload the manifest's modules and record a new manifest."""
+        from metalsim.physics import warmup
+        from metalsim.physics.batch import _warp_mujoco_modules
+
+        workers = warmup.preload_workers(self.cfg.preload_workers)
+        if self._eager_steps or not workers:
+            launch()
+            return
+        # MuJoCo Warp's modules stay out: BatchSim preloads them, and in deterministic mode they must load inside
+        # BatchSim.det_scope (a generated module's hash is fixed by the config at its first load)
+        manifest = warmup.CompileManifest(self._manifest_key(), exclude=lambda: set(_warp_mujoco_modules()))
+        manifest.mark(self.sim.device)
+        self.preload_stats = manifest.preload(self.sim.device, workers)
+        launch()
+        manifest.record(self.sim.device)
+
+    def _manifest_key(self) -> str:
+        import hashlib
+
+        cfg = repr(sorted((f.name, repr(getattr(self.cfg, f.name))) for f in fields(self.cfg)
+                          if f.name != "preload_workers"))
+        return "mpm_coupling_" + hashlib.sha256(cfg.encode()).hexdigest()[:16]
 
     # -- state -----------------------------------------------------------------------------------------------------
 
