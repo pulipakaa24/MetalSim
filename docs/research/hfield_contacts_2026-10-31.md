@@ -548,8 +548,10 @@ The re-runs of section 9 that need neither the L4 nor the timing machine, run on
 through the GPU queue, every job on AC power (battery 75-85 %, charging, powermode 2). Job directory
 `runs/rough_rerun_2026-10-31/`: the pipeline `run_all.sh` and `run_il3fix.sh` (their header names the original commands;
 the flags map those settings onto today's CLI), `job.sh`, `jobs/`, `status.jsonl`, `logs/<job>.out` (each with a
-provenance header), training logs `logs/<job>.log`, `transfer/`; its checkpoints (`ckpt/`) and the exports for Isaac
-(`isaac_export/`) are not published. Analysis: `runs/readme_media/records/rough-parity/` (`analyze_training.py`,
+provenance header), training logs `logs/<job>.log`, `transfer/`, and the exports for Isaac
+([`isaac_export/metalsim_ckpts_rough/`](/runs/rough_rerun_2026-10-31/isaac_export/metalsim_ckpts_rough): the nine
+`rerun_s{0,1,2}_it{500,1000,1500}.pt`, 1.3 MB each, with their `SHA256`); its training checkpoints (`ckpt/`) are not
+published. Analysis: `runs/readme_media/records/rough-parity/` (`analyze_training.py`,
 `analyze_transfer.py` and their outputs `training.md`, `transfer.md`, `curriculum.txt`, `anomalies.txt`). "Old" is the
 record PARITY cites (plane-path kernel, 2026-09-25/26 code), "new" these runs. **measured** unless marked.
 
