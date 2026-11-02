@@ -101,7 +101,7 @@ tile Cholesky (`wp.config.metal_register_cholesky_max`), `segmented_sort_pairs` 
 installs it editable. `METALSIM_WARP_REPO` and `METALSIM_WARP_REF` (branch, tag or commit) point it
 elsewhere. If the fork cannot be cloned, the script clones innate-inc/warp at
 [`ce15f6b`](https://github.com/innate-inc/warp/commit/ce15f6bb2545e2d6c4a4c1fac8e40bb800db7265) and applies
-`patches/warp/metalsim-52c09cdd.diff`, which gives the same source tree as the pinned commit
+`patches/warp/metalsim-23e0fa98.diff`, which gives the same source tree as the pinned commit
 ([`patches/warp/0001-0007`](../patches/warp) are the first seven commits, the tree of [`f194006`](https://github.com/pulipakaa24/warp/commit/f194006a4cf197fda93633252af81bc3f57f5561)). The
 commits since (MPM, scalable deterministic mode, FMA contraction
 from `fuse_fp`, GPU sort / BSR / NanoVDB builders, `fast_math` forms with `warp.config.metal_fast_math = "off"` by

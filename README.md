@@ -104,9 +104,61 @@ Like-for-like pairs only, every number with its log in
 [`scripts/readme_media/throughput_chart.py`](scripts/readme_media/throughput_chart.py); the row-by-row evidence is
 in [`docs/PARITY.md`](docs/PARITY.md).
 
+## Which Mac
+
+MetalSim has run only on M4 Max Macs (40-core GPU, 64 GB), and every timing on this page comes from one. It needs
+Apple silicon and macOS 15 or later: the Metal backend of
+[my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) keeps its buffers resident with residency sets,
+which macOS 15 introduced (development was on macOS 26 and 27). Other Apple silicon Macs are untested. What to expect
+on them:
+
+- **Speed:** fewer GPU cores and less memory bandwidth make every run slower, and a fanless MacBook Air throttles under
+  sustained load such as a long training run (neither measured here).
+- **M1 and M2** trace rays without ray-tracing hardware (it arrived with M3), so the lidar, the height scanner and the
+  tier-1 and tier-2 renderers run slower there (not measured).
+- **M1** has no 64-bit atomic min / max (Apple's feature tables list it from M2 on). Warp's `atomic_min` /
+  `atomic_max` on 64-bit integers compile to it on Metal, so kernels that use them do not build there.
+
+Memory decides which runs fit. A run needs its GPU allocation within the working set macOS grants a process
+(`recommendedMaxWorkingSetSize`: 55.7 GB of the M4 Max's 64 GB; smaller Macs get less, and their values were not
+measured here), and its footprint, GPU memory included, within RAM next to macOS and your other apps. Print your
+working set with `python -c "import Metal; print(Metal.MTLCreateSystemDefaultDevice().recommendedMaxWorkingSetSize() / 1e9)"`.
+Past the working set Metal does not keep every buffer resident, and kernels read wrong data without any error, so
+my fork of Warp refuses an allocation that would pass it with an "out of Metal memory" error. To try a run against a
+smaller Mac's budget, set `WP_METAL_WORKING_SET_GB` to that budget in GB.
+
+Peaks measured on 2026-11-01 (Mac16,6: M4 Max, 64 GB, macOS 27.0.1) with
+[`scripts/diagnostics/peak_memory.py`](scripts/diagnostics/peak_memory.py), over start-up, graph capture and the first
+iterations, where memory peaks (it stays flat after the first iteration); records in
+[`runs/peak_memory_2026-11-01/`](runs/peak_memory_2026-11-01):
+
+| Run | GPU allocation | Footprint |
+|---|---|---|
+| G1 flat velocity training, 4,096 envs | 3.0 GB | 4.5 GB |
+| G1 rough velocity training, 4,096 envs, 2.5 ms physics | 7.5 GB | 10.0 GB |
+| Cartpole-RGB camera PPO, 1,024 envs, tier 2 | 4.6 GB | 6.1 GB |
+| Franka-Pour PPO, 1,024 envs, Isaac's MPM capacities (the default) | 18.7 GB | about 19 GB (read mid-run) |
+| Franka-Pour PPO, 1,024 envs, `--mpm-grid-budget measured --mpm-cells-per-world 256` | 9.4 GB | about 10 GB (read mid-run) |
+| Franka-Pour, 2,048 envs (the trained policy's size), [MPM.md §8h](metalsim/physics/mpm/MPM.md) | 34.5 GB; 15.7 GB with both options | not recorded |
+| ANYmal on sand, demo-scale simulation (669,372 particles) | 1.0 GB | 2.0 GB |
+| ANYmal on sand, 25 M-grain 1080p render, [PARTICLES.md](metalsim/render/PARTICLES.md) | 10.5–11.1 GB; 2.9–5.5 GB at 6.3 M grains | not recorded |
+| A README film (`film g1_bumps`): recording, then path tracing | 0.2 GB, then 2.3 GB | 2.5 GB, then 6.0 GB |
+
+What that means by Mac. This is an estimate from the peaks above, because the working sets of smaller Macs were not
+measured:
+
+- **64 GB or more:** everything on this page.
+- **32 to 48 GB:** everything except Franka-Pour at 2,048 envs with Isaac's capacities (34.5 GB). At 1,024 envs with
+  Isaac's capacities (18.7 GB) it is tight on 32 GB. With the two options (9.4 GB) it fits. The options are capacities
+  measured with random actions, and an overflow is reported, not silent (MPM.md §8h).
+- **16 to 24 GB:** the G1 tasks at 4,096 envs (rough, at a 10 GB footprint, leaves little room on 16 GB), camera RL,
+  the films and the ANYmal simulation. Franka-Pour fits only with the two options and fewer envs: memory grows about in
+  proportion to envs (18.7 GB at 1,024, 34.5 GB at 2,048). The 25 M-grain render needs about 11 GB of GPU memory, so
+  render fewer grains per particle (`--grains`).
+
 ## Install
 
-Apple silicon Mac, macOS with the Xcode Command Line Tools, Python 3.12 or newer (macOS's own `python3` is 3.9: use
+Apple silicon Mac, macOS 15 or later (see "Which Mac" above) with the Xcode Command Line Tools, Python 3.12 or newer (macOS's own `python3` is 3.9: use
 python.org's, Homebrew's or `uv python install 3.12`), [uv](https://docs.astral.sh/uv/) for the optional environments:
 
 ```
@@ -294,6 +346,7 @@ of 2026-10-13 is pinned by
   with the task's opt-in grid budgets; bitwise.
 
 - Deterministic counters checked (2026-10-13, [`9346cf72`](https://github.com/pulipakaa24/warp/commit/9346cf72bd96888c687f63b3937d706f84039450); `research_notes/MPM in main simulator/deterministic_ccd_divergence.md`): a kernel whose slot-counter calls differ between the counting and the execution pass (the counting pass suppresses stores) raises "Deterministic counter phase mismatch" instead of silently handing slots to the wrong calls.
+- Allocations past the working set fail (2026-11-01, [`23e0fa98`](https://github.com/pulipakaa24/warp/commit/23e0fa9824684684cde02d68efcce01e6bae072b)): an allocation that would take the device past `recommendedMaxWorkingSetSize` raises "out of Metal memory" instead of the one-time warning, because past it kernels read buffers that are not resident without any error. `WP_METAL_WORKING_SET_GB` sets the limit ("Which Mac" above).
 
 Branch [`metalsim-flex`](https://github.com/pulipakaa24/warp/tree/metalsim-flex), head
 [`01ccf4a`](https://github.com/pulipakaa24/warp/commit/01ccf4ad687c0ebcdee139ee1131fbe2ad97bf51) (code

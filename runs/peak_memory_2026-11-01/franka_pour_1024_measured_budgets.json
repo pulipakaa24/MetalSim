@@ -1,0 +1,14 @@
+{
+ "cmd": "-m metalsim.learn.franka_pour_ppo bench --num-envs 1024 --mode ppo --steps 1 --warmup 1 --mpm-grid-budget measured --mpm-cells-per-world 256",
+ "status": "ok",
+ "wall_s": 391.8,
+ "peak_metal_gb": 9.36,
+ "peak_metal_at_s": 128.5,
+ "peak_rss_gb": 5.29,
+ "working_set_gb": 55.66,
+ "device": "Apple M4 Max",
+ "machine": "Mac16,6 (Apple M4 Max, 40-core GPU, 64 GB), macOS 27.0.1",
+ "date": "2026-11-01",
+ "peak_footprint_gb": null,
+ "note": "Newton 1.5.2 environment (scripts/setup_newton152.sh). Run before the footprint reading was added: macOS's footprint tool read 10 GB mid-run, not the peak. Ran alongside other GPU jobs (allocations are per process; wall time is not a timing)."
+}

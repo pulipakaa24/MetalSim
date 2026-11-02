@@ -42,6 +42,8 @@ Measured (README "Measured state", `docs/PARITY.md` §1.4–1.5, §1.8):
   - pyramidal: 56.9–57.5 K env-steps/s;
   - reference: Isaac Lab 3.0's env step alone on the NVIDIA L4 is 72.0 K
     ([Newton](https://github.com/newton-physics/newton) / MuJoCo Warp).
+- **Memory, training at 4,096 envs:** flat 3.0 GB of GPU allocation and a 4.5 GB footprint; rough (2.5 ms physics)
+  7.5 GB and 10.0 GB (`runs/peak_memory_2026-11-01/`). Which Macs that fits: README "Which Mac".
 - **Film:** `docs/renders/g1_flat.mp4` ([G1_FLAT.md](renders/G1_FLAT.md)), re-filmed 2026-10-31 with the tracked
   checkpoint `runs/g1regress/ckpt14/flat_main_s0.pt`. The film committed with the demo tag used an untracked checkpoint
   whose robots fell within about 3 s, and the record stage did not detect it
@@ -61,6 +63,10 @@ Measured:
 - **Trained policy, 2,048 envs, 300 iterations:** 47.7 % success over 2,048 first episodes
   (`runs/franka_pour/eval/eval_2048_isaac_budget.json`).
 - **Film:** 1920×1080 at 256 spp, 3.96 s per frame, 13.8 min end to end for both shots (`docs/renders/FRANKA_POUR.md`).
+- **Memory (GPU allocation):** at 1,024 envs, 18.7 GB with Isaac's MPM capacities and 9.4 GB with
+  `--mpm-grid-budget measured --mpm-cells-per-world 256` (`runs/peak_memory_2026-11-01/`); at 2,048 envs, 34.5 GB, or
+  15.7 GB with both options (`metalsim/physics/mpm/MPM.md` §8h). The trained 2,048-env policy with Isaac's capacities
+  needs a 64 GB Mac; README "Which Mac" covers smaller ones.
 
 ### ANYmal C on MPM sand (Newton 1.5.2's `example_mpm_anymal`, path-traced)
 
@@ -72,6 +78,7 @@ python scripts/particle_demo/render_anymal.py --sim runs/demo/anymal_small --out
 Measured (`metalsim/physics/mpm/MPM.md` §8k, `metalsim/render/PARTICLES.md` "Demo"):
 - **Captured coupled step:** 29.9–31.2 ms per frame against the L4's 24.2, that is 1.23–1.29×.
 - **Full demo (14-inch):** 669,372 sand particles at 46 ms per simulated frame.
+- **Memory, demo-scale simulation:** 1.0 GB of GPU allocation, 2.0 GB footprint (`runs/peak_memory_2026-11-01/`).
 
 ### Box on sand (`MPMCoupling`: MuJoCo Warp `BatchSim` + the vendored implicit MPM, two-way)
 
@@ -102,7 +109,8 @@ python scripts/particle_demo/render_anymal.py --sim runs/demo/anymal_sim --out r
 
 Measured (`metalsim/render/PARTICLES.md`; logs in `runs/sand25m_16in/`):
 - **Grains:** 25.12 M, structure built in 654 ms.
-- **1080p frame at 128 spp:** 5.1 s, using 10.5 GB of Metal memory.
+- **1080p frame at 128 spp:** 5.1 s, using 10.5 GB of Metal memory (11.1 GB in the 14-inch validation run; 2.9–5.5 GB
+  at 6.3 M grains). On a Mac with less memory, check its working set (README "Which Mac") and lower `--grains`.
 - **Earlier 240-frame clip (14-inch):** 10.4 s per frame.
 
 The fresh-install check runs the small version only (step 24). Run the full scale on a machine whose other work is
@@ -159,6 +167,8 @@ Measured (`runs/scenes/go2_boxes/run/run.json`, 16-inch, 4 envs):
 - **Control step:** 6.0 ms median.
 - **Tier-1 head camera at 640×360:** 1.7 ms.
 - **Lidar of 16×360 beams:** 0.6 ms.
+- **Memory of a README film** (`film g1_bumps`, `runs/peak_memory_2026-11-01/`): recording 0.2 GB of GPU allocation and
+  a 2.5 GB footprint, path tracing 2.3 GB and 6.0 GB.
 
 Where these commands have run:
 - `tests/test_compose.py` runs in the fresh-install check's rigid suite.
