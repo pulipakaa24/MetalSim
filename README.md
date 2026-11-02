@@ -573,6 +573,7 @@ Recordings, logs and benchmark JSON are under `runs/parity/`, `runs/parity3/` an
 - [`franka_pour_2026-10-11.md`](docs/research/franka_pour_2026-10-11.md): Isaac Lab 3.0-EA's Franka-Pour task read from Isaac's source, for the port.
 - [`ppowarp_checkpoint_load_2026-10-13.md`](docs/research/ppowarp_checkpoint_load_2026-10-13.md): checkpoints loaded into PPOWarp ran the untrained weights (fixed), and which results it touched.
 - [`hfield_contacts_2026-10-31.md`](docs/research/hfield_contacts_2026-10-31.md): heightfield contacts in the MuJoCo Warp fork against the exact geometry and MuJoCo C: three defects, the fix, its cost and the results it touches.
+- [`gpu_watchdog_handover_2026-11-01.md`](docs/research/gpu_watchdog_handover_2026-11-01.md): PPO updates that silently trained on zeros when a rollout outlasted macOS's GPU watchdog (PyTorch 2.14 ignores aborted command buffers), the fix, and the 2026-09-25 results it touched.
 - [`research_notes/`](research_notes): also the capacity overflow guard ([`capacity_overflow_guard/`](research_notes/capacity_overflow_guard)), Kit's dome-light orientation ([`dome_light_azimuth/`](research_notes/dome_light_azimuth)) and transparency in the ray-traced sensors with true area lights ([`Render sensor fidelity/`](research_notes/Render%20sensor%20fidelity)).
 
 ## Working rules

@@ -1,0 +1,11 @@
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     ~/Library/Caches/warp/1.18.0.dev20260917
+Module __main__ 9b67492 load on device 'metal:0' took 390.54 ms  (compiled)
+[E0 warp] wait   4.0 s: output correct=True untouched(-1)=False raised=None elapsed 4.02 s
+Metal command buffer failed: Caused GPU Timeout Error (00000002:kIOGPUCommandBufferCallbackErrorTimeout)
+[E0 warp] wait  16.0 s: output correct=False untouched(-1)=True raised=RuntimeError: Metal error on device metal:0: Metal command buffer failed: Caused GPU Timeout Error (00000002:kIOGPUCommandBufferCallbackErrorTimeout) elapsed 16.01 s
