@@ -9,6 +9,13 @@ Two ways to get a zero-copy MPS tensor over a Metal buffer:
 
 And the ordering primitives on PyTorch's command buffer: ``wait_event`` before the first use of
 a producer's output, ``signal_event`` after the last kernel that writes for a consumer.
+
+A wait encoded on PyTorch's command buffer holds that buffer on the GPU, and macOS's GPU watchdog kills a
+command buffer that has been on the GPU for more than about 4-5 s (M4 Max, measured 2026-11-01), waiting included.
+So a consumer must not encode the wait long before a slow producer finishes: wait for a long producer on the host
+first (``PPOWarp.rollout`` does, at the end of the rollout). PyTorch 2.14 never reads a command buffer's error,
+so a killed buffer's outputs keep stale data without an exception; ``check_errors`` raises for the command buffers
+the bridge encoded a wait or signal into, and ``wait_event`` / ``signal_event`` call it first.
 """
 from __future__ import annotations
 
@@ -207,13 +214,40 @@ class _DLPackMetal:
 
 # -- ordering ---------------------------------------------------------------------------------
 
+class MPSCommandBufferError(RuntimeError):
+    """A PyTorch MPS command buffer was aborted by the driver; the kernels in it did not run."""
+
+
+def check_errors() -> None:
+    """Raise ``MPSCommandBufferError`` if a PyTorch command buffer holding a bridge wait or signal failed since the
+    last check (each failure is reported once). Only finished command buffers are inspected: call it after a host
+    synchronization (``torch.mps.synchronize()``, ``.item()``) to cover everything submitted before it.
+
+    PyTorch 2.14 itself ignores command buffer errors. https://github.com/pytorch/pytorch/pull/198883 (in PyTorch
+    2.15.0) raises them for the command buffers MPSStream commits, https://github.com/pytorch/pytorch/pull/200398
+    (after 2.15.0) also for those MPSGraph commits internally."""
+    failure = ext().poll_failures()
+    if failure:
+        timeout = "Timeout" in failure
+        raise MPSCommandBufferError(
+            f"PyTorch MPS command buffer failed: {failure}. Its kernels did not run, so the tensors they write hold "
+            "stale data (PyTorch 2.14 does not raise for this). "
+            + ("A command buffer that waits for another queue counts the wait against the GPU watchdog (about 4-5 s "
+               "on an M4 Max): the producer took longer than that, typically because other processes load the GPU; "
+               "wait for a long producer on the host before encoding the wait." if timeout else ""))
+
+
 def wait_event(event: warp_metal.SharedEvent, value: int) -> None:
-    """PyTorch kernels encoded after this call run after ``event`` reaches ``value``."""
+    """PyTorch kernels encoded after this call run after ``event`` reaches ``value``. The wait holds PyTorch's
+    command buffer on the GPU: if the producer may need more than a few seconds (a whole rollout), wait for it on
+    the host first (see the module docstring)."""
+    check_errors()
     ext().wait_event(event.ptr, int(value))
 
 
 def signal_event(event: warp_metal.SharedEvent, value: int) -> None:
     """Commit PyTorch's pending kernels; ``event`` reaches ``value`` when they complete."""
+    check_errors()
     ext().signal_event(event.ptr, int(value))
 
 
