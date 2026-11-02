@@ -1,0 +1,124 @@
+[ms] 2026-10-31 17:20:00 mujoco_warp 93e5ce18 collision_convex: heightfield comments and constant order
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     ~/Library/Caches/warp/1.18.0.dev20260917
+Traceback (most recent call last):
+  File "~/MetalSim/runs/readme_media/scratch/so101-servo/gpu_feeder_check.py", line 40, in <module>
+    ad = SO101Lift(SimpleNamespace(adapter_kw={"servo": "7v4_real"}), SimpleNamespace(num_envs=E, seed=10_000), None)
+  File "~/MetalSim/metalsim/render/film/so101.py", line 297, in __init__
+    self.feeder = CtrlPlanFeeder(self.sim, self.n_sub)
+                  ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "~/MetalSim/metalsim/physics/actuation.py", line 153, in __init__
+    sim.add_substep_hook(hook)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "~/MetalSim/metalsim/physics/batch.py", line 385, in add_substep_hook
+    self._capture()
+    ~~~~~~~~~~~~~^^
+  File "~/MetalSim/metalsim/physics/batch.py", line 326, in _capture
+    self._capture_graphs()
+    ~~~~~~~~~~~~~~~~~~~~^^
+  File "~/MetalSim/metalsim/physics/batch.py", line 353, in _capture_graphs
+    self._launch_substeps()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "~/MetalSim/metalsim/physics/batch.py", line 366, in _launch_substeps
+    h()
+    ~^^
+  File "~/MetalSim/metalsim/physics/actuation.py", line 151, in hook
+    wp.launch(_inc_kernel(), dim=1, inputs=[self.k])
+              ~~~~~~~~~~~^^
+  File "~/MetalSim/metalsim/physics/actuation.py", line 186, in _inc_kernel
+    @wp.kernel
+     ^^^^^^^^^
+  File "~/MetalSim/upstream/warp-metalsim/warp/_src/context.py", line 2210, in kernel
+    return wrapper(f)
+  File "~/MetalSim/upstream/warp-metalsim/warp/_src/context.py", line 2118, in wrapper
+    k = Kernel(
+        func=f,
+    ...<2 lines>...
+        options=kernel_options,
+    )
+  File "~/MetalSim/upstream/warp-metalsim/warp/_src/context.py", line 1297, in __init__
+    self.adj = warp._src.codegen.Adjoint(func, transformers=code_transformers, source=source)
+               ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/MetalSim/upstream/warp-metalsim/warp/_src/codegen.py", line 2091, in __init__
+    argspec = get_full_arg_spec(func)
+  File "~/MetalSim/upstream/warp-metalsim/warp/_src/codegen.py", line 205, in get_full_arg_spec
+    return spec._replace(annotations=inspect.get_annotations(func, eval_str=True, locals=closure_vars))
+                                     ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/inspect.py", line 292, in get_annotations
+    value if not isinstance(value, str) else eval(value, globals, locals)
+                                             ~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 1, in <module>
+NameError: name 'wp' is not defined. Did you mean: 'np'?
+[ms] 17:20:49 expert 7v4_real
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     ~/Library/Caches/warp/1.18.0.dev20260917
+Traceback (most recent call last):
+  File "~/MetalSim/runs/readme_media/scratch/so101-servo/eval_metalsim.py", line 50, in <module>
+    ad = SO101Lift(SimpleNamespace(adapter_kw={"servo": servo, "servo_over": OVER}), SimpleNamespace(num_envs=E, seed=10_000),
+                   os.path.join(ROOT_MS, "runs/film/so101_lift/policy/so101_lift_ppo.pt") if EXPERT else policy)
+  File "~/MetalSim/metalsim/render/film/so101.py", line 297, in __init__
+    self.feeder = CtrlPlanFeeder(self.sim, self.n_sub)
+                  ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "~/MetalSim/metalsim/physics/actuation.py", line 153, in __init__
+    sim.add_substep_hook(hook)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "~/MetalSim/metalsim/physics/batch.py", line 385, in add_substep_hook
+    self._capture()
+    ~~~~~~~~~~~~~^^
+  File "~/MetalSim/metalsim/physics/batch.py", line 326, in _capture
+    self._capture_graphs()
+    ~~~~~~~~~~~~~~~~~~~~^^
+  File "~/MetalSim/metalsim/physics/batch.py", line 353, in _capture_graphs
+    self._launch_substeps()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "~/MetalSim/metalsim/physics/batch.py", line 366, in _launch_substeps
+    h()
+    ~^^
+  File "~/MetalSim/metalsim/physics/actuation.py", line 151, in hook
+    wp.launch(_inc_kernel(), dim=1, inputs=[self.k])
+              ~~~~~~~~~~~^^
+  File "~/MetalSim/metalsim/physics/actuation.py", line 186, in _inc_kernel
+    @wp.kernel
+     ^^^^^^^^^
+  File "~/MetalSim/upstream/warp-metalsim/warp/_src/context.py", line 2210, in kernel
+    return wrapper(f)
+  File "~/MetalSim/upstream/warp-metalsim/warp/_src/context.py", line 2118, in wrapper
+    k = Kernel(
+        func=f,
+    ...<2 lines>...
+        options=kernel_options,
+    )
+  File "~/MetalSim/upstream/warp-metalsim/warp/_src/context.py", line 1297, in __init__
+    self.adj = warp._src.codegen.Adjoint(func, transformers=code_transformers, source=source)
+               ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "~/MetalSim/upstream/warp-metalsim/warp/_src/codegen.py", line 2091, in __init__
+    argspec = get_full_arg_spec(func)
+  File "~/MetalSim/upstream/warp-metalsim/warp/_src/codegen.py", line 205, in get_full_arg_spec
+    return spec._replace(annotations=inspect.get_annotations(func, eval_str=True, locals=closure_vars))
+                                     ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/inspect.py", line 292, in get_annotations
+    value if not isinstance(value, str) else eval(value, globals, locals)
+                                             ~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 1, in <module>
+NameError: name 'wp' is not defined. Did you mean: 'np'?
+[ms] 17:20:52 expert 7v4
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     ~/Library/Caches/warp/1.18.0.dev20260917
+metalsim expert 7v4          succ  34 up  30 ttl 4.29s | sat%  28.2  69.2  72.5  66.6  52.8  93.8 | da 0.0138 dctrl 0.0205 rad | a@lim 1.1% | vpk 5.16 ep-med 4.33
+cpu agreement: {'same_outcome': 66, 'only_metalsim': [10003, 10006, 10008, 10014, 10017, 10025, 10030, 10032, 10048, 10059, 10070, 10071, 10075, 10080, 10089], 'only_cpu': [10016, 10020, 10022, 10023, 10024, 10029, 10031, 10033, 10038, 10043, 10047, 10056, 10057, 10065, 10072, 10073, 10074, 10084, 10097]} overflow: {'ITERATIONS': 10, 'LS_ITERATIONS': 100}
+[ms] 17:21:02 done

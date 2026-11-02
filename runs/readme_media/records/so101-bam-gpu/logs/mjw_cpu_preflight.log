@@ -1,0 +1,58 @@
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     ~/Library/Caches/warp/1.18.0.dev20260917
+dof_frictionloss (4, 12) <class 'warp._src.types.float32'> efc.type <class 'warp._src.types.int32'> nefc <class 'warp._src.types.int32'>
+Module mujoco_warp._src.smooth 42ba4b9 load on device 'cpu' took 0.97 ms  (cached)
+Module _nxn_broadphase__locals__kernel_1edb6cf5 52155e3 load on device 'cpu' took 0.16 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_10fd85dd 41987dc load on device 'cpu' took 2494.71 ms  (compiled)
+Module ccd_kernel_builder__locals__ccd_kernel_1800e563 b52c333 load on device 'cpu' took 1957.43 ms  (compiled)
+Module _primitive_narrowphase__locals__primitive_narrowphase_2ab6f733 49dd3c6 load on device 'cpu' took 1323.11 ms  (compiled)
+Module mujoco_warp._src.constraint 13140d3 load on device 'cpu' took 0.12 ms  (cached)
+Module _friction_dof__locals__kernel_fd3f7db6 16d0527 load on device 'cpu' took 0.17 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_38eaaafa 644f6dd load on device 'cpu' took 97.97 ms  (compiled)
+Module _efc_contact_init__locals__kernel_e1b448b2 c1aad8b load on device 'cpu' took 0.22 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_b8c0daa1 c8694da load on device 'cpu' took 0.27 ms  (cached)
+Module _efc_contact_update__locals__kernel_f40ca87b e168076 load on device 'cpu' took 0.13 ms  (cached)
+Module mujoco_warp._src.forward f5d7305 load on device 'cpu' took 984.31 ms  (compiled)
+Module mujoco_warp._src.passive 9db4ac8 load on device 'cpu' took 0.20 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_6425e87a a4123c7 load on device 'cpu' took 0.18 ms  (cached)
+Module _qfrc_smooth__locals__kernel_0f27b59a 0580d52 load on device 'cpu' took 0.13 ms  (cached)
+Module mujoco_warp._src.support ceb64d7 load on device 'cpu' took 0.11 ms  (cached)
+Module _small_cholesky_factorize_solve_block__locals__kernel_bb38b985 9b77f9a load on device 'cpu' took 0.12 ms  (cached)
+Module _solve_init_dof__locals__kernel_9f1d4ffd 91365d2 load on device 'cpu' took 0.10 ms  (cached)
+Module _solve_init_efc__locals__kernel_f78b1ff9 738fe4b load on device 'cpu' took 0.10 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_a5e12b3f 35b42c4 load on device 'cpu' took 0.10 ms  (cached)
+Module mul_m_kernel__locals___mul_m_726311b6 b46733a load on device 'cpu' took 0.10 ms  (cached)
+Module _update_constraint_efc__locals__kernel_7c52d464 fe60af1 load on device 'cpu' took 0.12 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_6074ddff 186c639 load on device 'cpu' took 0.10 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_58b5b5fa 872ea0d load on device 'cpu' took 0.10 ms  (cached)
+Module _update_gradient_grad__locals__kernel_f75a78e4 c1f432b load on device 'cpu' took 0.09 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_ff80519b e21ed2d load on device 'cpu' took 182.06 ms  (compiled)
+Module mujoco_warp._src.solver c6f298e load on device 'cpu' took 0.27 ms  (cached)
+Module _update_gradient_JTCJ_dense_world2__locals__kernel_d4b75eae dfccaa2 load on device 'cpu' took 0.15 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_caba0a24 95b8fa4 load on device 'cpu' took 0.12 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_3f496a2d 2293d3a load on device 'cpu' took 319.61 ms  (compiled)
+Module _solve_done__locals__kernel_5fd1d72d db010cc load on device 'cpu' took 0.14 ms  (cached)
+Module metalsim.physics.actuation bb85567 load on device 'cpu' took 0.12 ms  (cached)
+Module mujoco_warp._src.derivative 15edb72 load on device 'cpu' took 520.79 ms  (compiled)
+Module _next_time_builder__locals___next_time_343e3dd4 fb5464b load on device 'cpu' took 57.22 ms  (compiled)
+mjw cpu: 9 s (compile included)
+max |q_mjwcpu - q_cpu| per joint: ['2.8e-08', '6.8e-04', '1.3e-04', '9.4e-05', '3.2e-08', '1.5e-08']
+max |fl_mjwcpu - fl_cpu| per joint: ['6.9e-06', '3.0e-03', '9.5e-04', '9.5e-05', '1.4e-06', '1.1e-06']
+budget range CPU: 0.0534 0.388 ; motion range: [0.0, 0.515, 0.057, 0.012, 0.0, 0.0]
+linesearch iterations limit reached - please increase ls_iterations beyond 20
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.LS_ITERATIONS (or = 0 for all)
+linesearch iterations limit reached - please increase ls_iterations beyond 20
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.LS_ITERATIONS (or = 0 for all)
+linesearch iterations limit reached - please increase ls_iterations beyond 20
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.LS_ITERATIONS (or = 0 for all)
+linesearch iterations limit reached - please increase ls_iterations beyond 20
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.LS_ITERATIONS (or = 0 for all)
+linesearch iterations limit reached - please increase ls_iterations beyond 20
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.LS_ITERATIONS (or = 0 for all)
+linesearch iterations limit reached - please increase ls_iterations beyond 20
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.LS_ITERATIONS (or = 0 for all)

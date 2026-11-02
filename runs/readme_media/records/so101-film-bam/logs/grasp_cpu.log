@@ -1,0 +1,32 @@
+WARNING: Nan, Inf or huge value in QVEL at DOF 7. The simulation is unstable. Time = 2.4150.
+
+7v4_real success 99/100, time to lift median 2.46, retries 11
+  tilt_lift_start_deg: median / p90 / max [5.33, 9.4, 24.19]
+  tilt_3s_deg: median / p90 / max [28.82, 42.58, 90.0]
+  tilt_6s_deg: median / p90 / max [28.61, 42.05, 47.37]
+  slip_3to6_mm: median / p90 / max [2.51, 11.7, 142.72]
+  rot_3to6_deg: median / p90 / max [6.67, 14.91, 85.63]
+  pen_all_mm: median / p90 / max [0.94, 1.58, 1.81]
+  pen_jaw_mm: median / p90 / max [0.94, 1.58, 1.81]
+  jaw_normal_N_median: median / p90 / max [38.71, 51.91, 60.88]
+  grip_force_Nm_median: median / p90 / max [0.99, 0.99, 0.99]
+  grip_q_rad_median: median / p90 / max [0.39, 0.42, 0.44]
+  grip_frictionloss_Nm_median: median / p90 / max [0.05, 0.05, 0.05]
+  hold sag shoulder_lift / elbow_flex mrad, median over seeds: [-32.9, -126.0]
+  geoms touching the box in the hold (seeds): {'moving_jaw_so101_v1#41': 93, 'fixed_jaw_box4': 76, 'fixed_jaw_box6': 72, 'fixed_jaw_sph_tip3': 63, 'fixed_jaw_box5': 52, 'moving_jaw_sph_tip3': 42, 'moving_jaw_box2': 42, 'fixed_jaw_sph_tip1': 35, 'moving_jaw_box3': 31, 'fixed_jaw_box3': 26, 'fixed_jaw_sph_tip2': 16, 'moving_jaw_sph_tip2': 14, 'floor': 10, 'gripper#31': 9, 'moving_jaw_sph_tip1': 3, 'moving_jaw_box1': 2}
+  seed 10051: {'seed': 10051, 'servo': '7v4_real', 'tilt_3s_deg': 35.72, 'success': True, 'time_to_lift_s': 2.46, 'retries': 0, 'hmax': 0.197, 'final_height': 0.166, 'tilt_lift_start_deg': 6.61, 'tilt_6s_deg': 26.57, 'slip_3to6_mm': 7.288, 'rot_3to6_deg': 11.227, 'hold_samples': 150, 'pen_all_mm': 1.269, 'pen_jaw_mm': 1.269, 'jaw_normal_N_median': 46.575, 'grip_force_Nm_median': 0.9857, 'grip_q_rad_median': 0.37, 'grip_frictionloss_Nm_median': 0.0515, 'sag_mrad_median': [-17.0, -121.8]}
+7v4_bam success 100/100, time to lift median 2.18, retries 1
+  tilt_lift_start_deg: median / p90 / max [11.04, 16.16, 19.04]
+  tilt_3s_deg: median / p90 / max [36.58, 47.05, 53.49]
+  tilt_6s_deg: median / p90 / max [39.95, 49.51, 57.32]
+  slip_3to6_mm: median / p90 / max [1.94, 2.91, 111.43]
+  rot_3to6_deg: median / p90 / max [3.41, 8.08, 85.75]
+  pen_all_mm: median / p90 / max [0.94, 1.5, 1.57]
+  pen_jaw_mm: median / p90 / max [0.94, 1.5, 1.57]
+  jaw_normal_N_median: median / p90 / max [41.59, 51.99, 62.49]
+  grip_force_Nm_median: median / p90 / max [1.71, 1.71, 1.71]
+  grip_q_rad_median: median / p90 / max [0.36, 0.4, 0.42]
+  grip_frictionloss_Nm_median: median / p90 / max [0.57, 0.58, 0.82]
+  hold sag shoulder_lift / elbow_flex mrad, median over seeds: [-4.8, -46.3]
+  geoms touching the box in the hold (seeds): {'moving_jaw_so101_v1#41': 95, 'fixed_jaw_box4': 77, 'moving_jaw_box2': 77, 'fixed_jaw_sph_tip3': 73, 'moving_jaw_sph_tip3': 71, 'fixed_jaw_box6': 64, 'fixed_jaw_sph_tip2': 60, 'moving_jaw_box3': 53, 'moving_jaw_sph_tip2': 52, 'fixed_jaw_box5': 50, 'fixed_jaw_sph_tip1': 40, 'fixed_jaw_box3': 29, 'gripper#31': 7, 'moving_jaw_sph_tip1': 3, 'floor': 1}
+  seed 10051: {'seed': 10051, 'servo': '7v4_bam', 'tilt_3s_deg': 42.38, 'success': True, 'time_to_lift_s': 2.26, 'retries': 0, 'hmax': 0.1888, 'final_height': 0.187, 'tilt_lift_start_deg': 14.66, 'tilt_6s_deg': 43.42, 'slip_3to6_mm': 0.898, 'rot_3to6_deg': 1.676, 'hold_samples': 150, 'pen_all_mm': 0.762, 'pen_jaw_mm': 0.762, 'jaw_normal_N_median': 42.0, 'grip_force_Nm_median': 1.7138, 'grip_q_rad_median': 0.3423, 'grip_frictionloss_Nm_median': 0.5743, 'sag_mrad_median': [-0.2, -48.4]}

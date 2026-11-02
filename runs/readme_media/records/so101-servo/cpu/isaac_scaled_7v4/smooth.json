@@ -1,0 +1,178 @@
+{
+ "script": "runs/readme_media/scratch/so101-servo/eval_cpu.py",
+ "controller": {
+  "controller": "policy",
+  "file": "runs/film/so101_lift_smooth/policy/candidates/isaac_scaled.pt",
+  "source": {
+   "model_zip_sha256": "b9091ddbbe9d2f00a7abdf143d813fd12159174f8cfaea1c124ff3f591a2d93c",
+   "vecnorm_pkl_sha256": "e572142455ab794ee89882cf63aa2d4b15d77ad2a34ccc747d6b02be6db900aa",
+   "num_timesteps": 18008064,
+   "progress_last": "steps=9984000 success=0.72 up_end=0.62 ep_rew=1094.8 task_r=4.09 pen=0.442 rate_l2=7.25 vel_l2=10.92 act_rate=0.725 sat_arm=0.910 sat_grip=0.998 peak_v=5.29 w=0.0243 std=[0.7900000214576721, 0.05000000074505806, 0.03999999910593033, 15.899999618530273, 101.26000213623047, 0.05000000074505806] fps=10570",
+   "stable_baselines3": "2.9.0",
+   "torch": "2.11.0",
+   "policy_class": "stable_baselines3.common.policies."
+  },
+  "check": {
+   "samples": 4096,
+   "max_abs_diff": 4.708766937255859e-06,
+   "against": "PPO.predict(deterministic=True)"
+  }
+ },
+ "servo": {
+  "servo": "7v4",
+  "label": "STS3215 C001 7.4 V (SO-101 follower), gripper at LeRobot's 50 % torque limit",
+  "joints": [
+   "shoulder_pan",
+   "shoulder_lift",
+   "elbow_flex",
+   "wrist_flex",
+   "wrist_roll",
+   "gripper"
+  ],
+  "forcerange_Nm": [
+   1.9123,
+   1.9123,
+   1.9123,
+   1.9123,
+   1.9123,
+   0.9561
+  ],
+  "damping_Nms": [
+   0.3512,
+   0.3512,
+   0.3512,
+   0.3512,
+   0.3512,
+   0.3512
+  ],
+  "noload_line_rad_s": [
+   5.445,
+   5.445,
+   5.445,
+   5.445,
+   5.445,
+   2.723
+  ],
+  "kp": [
+   998.22,
+   998.22,
+   998.22,
+   998.22,
+   998.22,
+   998.22
+  ],
+  "kv": [
+   2.731,
+   2.731,
+   2.731,
+   2.731,
+   2.731,
+   2.731
+  ],
+  "armature": [
+   0.028,
+   0.028,
+   0.028,
+   0.028,
+   0.028,
+   0.028
+  ],
+  "frictionloss": [
+   0.052,
+   0.052,
+   0.052,
+   0.052,
+   0.052,
+   0.052
+  ]
+ },
+ "env": "so101Sim rl/native/so101_lift.py SO101LiftEnv (unchanged)",
+ "scene": "mujoco_menagerie/robotstudio_so101/scene_box_rl.xml",
+ "mujoco": "3.10.0",
+ "seeds": [
+  10000,
+  10099
+ ],
+ "wall_s": 4.878880023956299,
+ "over": {},
+ "fresh_kin": false,
+ "summary": {
+  "episodes": 100,
+  "successes": 77,
+  "success_rate": 0.77,
+  "max_height_mean": 0.15709877744235126,
+  "max_height_min": 0.035388908322054206,
+  "time_to_lift_mean_s": 1.5114285714285713,
+  "lifted_at_end": 75,
+  "terminated": 0
+ },
+ "smoothness": {
+  "rms_acc": [
+   56.6579,
+   50.9331,
+   47.7959,
+   36.2785,
+   61.3745,
+   15.664
+  ],
+  "rms_jerk": [
+   10680.1503,
+   9920.3059,
+   9192.6137,
+   6979.5914,
+   10959.3454,
+   2241.7697
+  ],
+  "reversals_per_s": [
+   27.005,
+   25.8533,
+   25.33,
+   7.06,
+   28.985,
+   3.0167
+  ],
+  "osc_rms": [
+   0.5397,
+   0.4484,
+   0.4501,
+   0.3769,
+   0.5623,
+   0.17
+  ],
+  "osc_frac": [
+   0.2625,
+   0.1688,
+   0.1869,
+   0.0829,
+   0.175,
+   0.0291
+  ],
+  "above2hz_frac": [
+   0.4392,
+   0.3419,
+   0.4444,
+   0.2489,
+   0.2985,
+   0.134
+  ],
+  "peak_speed": [
+   5.1207,
+   5.9778,
+   5.7185,
+   5.5113,
+   5.2774,
+   4.0693
+  ],
+  "peak_acc": [
+   887.1565,
+   1087.2482,
+   690.775,
+   956.3057,
+   343.1829,
+   291.9758
+  ],
+  "seconds": 600.0,
+  "f_band_hz": 5.0,
+  "v_hyst": 0.05
+ }
+}

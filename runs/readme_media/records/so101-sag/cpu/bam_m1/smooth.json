@@ -1,0 +1,349 @@
+{
+ "script": "runs/readme_media/scratch/so101-sag/eval_cpu_sag.py",
+ "controller": "metalsim/render/film/so101_expert.py DeployExpert",
+ "ctrl_hz": 30.0,
+ "vmax": [
+  2.723,
+  1.846,
+  1.534,
+  2.261,
+  2.673
+ ],
+ "amax": [
+  21.36,
+  14.25,
+  14.83,
+  28.4,
+  34.92
+ ],
+ "t_settle": 0.31,
+ "servo": {
+  "servo": "7v4_real",
+  "label": "STS3215 C001 7.4 V under LeRobot's registers (P 16, Acceleration 254, gripper 50 %), BAM-identified firmware loop, datasheet torque-speed line, servo + host latency",
+  "joints": [
+   "shoulder_pan",
+   "shoulder_lift",
+   "elbow_flex",
+   "wrist_flex",
+   "wrist_roll",
+   "gripper"
+  ],
+  "forcerange_Nm": [
+   3.4103,
+   3.4103,
+   3.4103,
+   3.4103,
+   3.4103,
+   1.7579
+  ],
+  "damping_Nms": [
+   0.6194,
+   0.6194,
+   0.6194,
+   0.6194,
+   0.6194,
+   0.6194
+  ],
+  "noload_line_rad_s": [
+   5.506,
+   5.506,
+   5.506,
+   5.506,
+   5.506,
+   2.838
+  ],
+  "kp": [
+   9.384,
+   9.384,
+   9.384,
+   9.384,
+   9.384,
+   9.384
+  ],
+  "kv": [
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0
+  ],
+  "armature": [
+   0.0261,
+   0.0261,
+   0.0261,
+   0.0261,
+   0.0261,
+   0.0261
+  ],
+  "frictionloss": [
+   0.0515,
+   0.0515,
+   0.0515,
+   0.0515,
+   0.0515,
+   0.0515
+  ],
+  "overrides": {
+   "stall_Nm": 3.410294952686958,
+   "noload_rad_s": 5.422725351149945,
+   "P": 16.0,
+   "coulomb": 0.05152047758105413,
+   "armature": 0.02608291141307205,
+   "speed_limit": 5.2883481319359,
+   "servo_delay": 0.0010469000118575051
+  },
+  "setpoint": {
+   "cmd_delay": 0.004046900011857505,
+   "servo_delay": 0.0010469000118575051,
+   "host_delay": 0.003,
+   "speed_limit": 5.2883481319359,
+   "accel_limit": 38.963112012295284,
+   "timestep": 0.005
+  },
+  "actuators": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "variant": "bam_m1",
+  "friction_hook": null,
+  "dof_solref": [
+   [
+    0.02,
+    1.0
+   ],
+   [
+    0.02,
+    1.0
+   ],
+   [
+    0.02,
+    1.0
+   ],
+   [
+    0.02,
+    1.0
+   ],
+   [
+    0.02,
+    1.0
+   ],
+   [
+    0.02,
+    1.0
+   ]
+  ]
+ },
+ "env": "so101Sim rl/native/so101_lift.py SO101LiftEnv (reset, scene, success test; unchanged)",
+ "over": {},
+ "mujoco": "3.10.0",
+ "seeds": [
+  10000,
+  10099
+ ],
+ "wall_s": 6.3,
+ "summary": {
+  "episodes": 100,
+  "successes": 100,
+  "up_at_6s": 100,
+  "time_to_lift_mean_s": 2.2664,
+  "time_to_lift_median_s": 2.24,
+  "max_height_mean": 0.187432,
+  "terminated": 0,
+  "retries": 1,
+  "phase_end": {
+   "approach": 0,
+   "descend": 0,
+   "grasp": 0,
+   "lift": 100
+  }
+ },
+ "smoothness": {
+  "rms_acc": [
+   2.1274,
+   4.8889,
+   4.1646,
+   4.4144,
+   3.017,
+   7.6049
+  ],
+  "rms_jerk": [
+   334.1506,
+   308.4639,
+   606.9679,
+   272.63,
+   91.1101,
+   606.2191
+  ],
+  "reversals_per_s": [
+   0.4,
+   0.8433,
+   0.4433,
+   0.53,
+   0.0033,
+   0.6233
+  ],
+  "osc_rms": [
+   0.0187,
+   0.021,
+   0.0246,
+   0.0162,
+   0.0126,
+   0.0838
+  ],
+  "osc_frac": [
+   0.0056,
+   0.0008,
+   0.0018,
+   0.0005,
+   0.0005,
+   0.007
+  ],
+  "above2hz_frac": [
+   0.0512,
+   0.0438,
+   0.0585,
+   0.0328,
+   0.0475,
+   0.0421
+  ],
+  "peak_speed": [
+   1.7969,
+   2.2035,
+   2.2313,
+   2.2514,
+   2.8139,
+   2.7587
+  ],
+  "peak_acc": [
+   72.3289,
+   126.1344,
+   291.3871,
+   158.511,
+   35.1796,
+   194.2953
+  ],
+  "seconds": 600.0,
+  "f_band_hz": 5.0,
+  "v_hyst": 0.05
+ },
+ "sag": {
+  "shoulder_pan": {
+   "free": {
+    "n": 7,
+    "median_mrad": 2.5,
+    "p90_mrad": 2.5,
+    "median_steps": 1.6,
+    "mean_signed_mrad": -2.5
+   },
+   "all": {
+    "n": 70864,
+    "median_mrad": 2.6,
+    "p90_mrad": 4.0,
+    "median_steps": 1.7,
+    "mean_signed_mrad": 1.2
+   },
+   "lift": {
+    "n": 70184,
+    "median_mrad": 2.6,
+    "p90_mrad": 4.0,
+    "median_steps": 1.7,
+    "mean_signed_mrad": 1.2
+   }
+  },
+  "shoulder_lift": {
+   "free": {
+    "n": 7,
+    "median_mrad": 0.1,
+    "p90_mrad": 0.1,
+    "median_steps": 0.1,
+    "mean_signed_mrad": 0.1
+   },
+   "all": {
+    "n": 69900,
+    "median_mrad": 16.4,
+    "p90_mrad": 34.4,
+    "median_steps": 10.7,
+    "mean_signed_mrad": -16.9
+   },
+   "lift": {
+    "n": 69113,
+    "median_mrad": 16.4,
+    "p90_mrad": 34.4,
+    "median_steps": 10.7,
+    "mean_signed_mrad": -16.9
+   }
+  },
+  "elbow_flex": {
+   "free": {
+    "n": 0
+   },
+   "all": {
+    "n": 69672,
+    "median_mrad": 66.6,
+    "p90_mrad": 77.5,
+    "median_steps": 43.4,
+    "mean_signed_mrad": -66.3
+   },
+   "lift": {
+    "n": 68932,
+    "median_mrad": 66.7,
+    "p90_mrad": 77.5,
+    "median_steps": 43.5,
+    "mean_signed_mrad": -66.6
+   }
+  },
+  "wrist_flex": {
+   "free": {
+    "n": 0
+   },
+   "all": {
+    "n": 70783,
+    "median_mrad": 24.8,
+    "p90_mrad": 28.7,
+    "median_steps": 16.1,
+    "mean_signed_mrad": -24.7
+   },
+   "lift": {
+    "n": 70112,
+    "median_mrad": 24.8,
+    "p90_mrad": 28.7,
+    "median_steps": 16.2,
+    "mean_signed_mrad": -24.9
+   }
+  },
+  "wrist_roll": {
+   "free": {
+    "n": 0
+   },
+   "all": {
+    "n": 71176,
+    "median_mrad": 2.4,
+    "p90_mrad": 3.5,
+    "median_steps": 1.6,
+    "mean_signed_mrad": 2.5
+   },
+   "lift": {
+    "n": 70152,
+    "median_mrad": 2.4,
+    "p90_mrad": 3.5,
+    "median_steps": 1.6,
+    "mean_signed_mrad": 2.5
+   }
+  },
+  "gripper": {
+   "free": {
+    "n": 5481,
+    "median_mrad": 3.6,
+    "p90_mrad": 4.6,
+    "median_steps": 2.4,
+    "mean_signed_mrad": -5.0
+   }
+  },
+  "definition": "``steady_error(q, qd, tgt, cmd, phase, dt)``: q, qd, tgt (the servo's target after the command delay and firmware\nprofile), cmd (the streamed command) all (episodes, steps, 6), phase (episodes, steps) int (0 approach, 1 descend,\n2 grasp, 3 lift; -1 none). A sample of joint j is steady when the streamed command of joint j has not changed for\n``HOLD`` = 0.31 s (the 7v4_real settle time), the servo target equals the command (the profile has landed) and\n|qd_j| < 0.05 rad/s. Error e = tgt - q (rad). Per joint: count, median and p90 of |e| in mrad and in encoder steps\n(4096 per turn: 1.534 mrad), mean signed e; overall, and split into \"free\" (approach / descend: no load but the arm)\nand \"lift\" (lift phase: the box in hand). The gripper (index 5) squeezes on purpose in grasp / lift (target -0.15 rad\ninside the cube), so it is reported for approach / descend only."
+ }
+}

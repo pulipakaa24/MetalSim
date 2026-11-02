@@ -52,16 +52,20 @@ Measured on the machine below; one frame = one policy step ([Isaac Lab](https://
 **The policy.** LimX's RL policy for the wheel-foot TRON1 (WF_TRON1A), from LimX's `tron1-rl-deploy-python`
 (<https://github.com/limxdynamics/tron1-rl-deploy-python>, Apache-2.0, commit
 [`035e4c9`](https://github.com/limxdynamics/tron1-rl-deploy-python/commit/035e4c9e2f24e916fa5e8363ac6f0f788a2e1e8c)):
-`controllers/model/WF_TRON1A/policy/isaacgym/encoder.onnx` and `policy.onnx` with `params.yaml`. The copies in
+[`controllers/model/WF_TRON1A/policy/isaacgym/encoder.onnx`](https://github.com/limxdynamics/tron1-rl-deploy-python/blob/035e4c9e2f24e916fa5e8363ac6f0f788a2e1e8c/controllers/model/WF_TRON1A/policy/isaacgym/encoder.onnx)
+and `policy.onnx` with `params.yaml`. The copies in
 `assets/tron1/limx_policy/WF_TRON1A/` are byte-identical to LimX's at that commit (fetched and compared on 2026-10-31;
 sha256 `bfc4617f65cef4b1c952156352dd2fee0deffd68458959a20b4bc0bb0285d85b` for the policy,
 `f79e29d12b670aa9078b4a825f3b30e75018efb15c8108487a0bf2c222e78ba6` for the encoder), and the adapter checks the hashes
 before it runs. That repository is LimX's Python controller for its robots: `main.py` connects through LimX's SDK to
-LimX's MuJoCo simulator by default, or to the robot when given its IP address (`main.py` lines 27-39), and loads
+LimX's MuJoCo simulator by default, or to the robot when given its IP address
+([`main.py`](https://github.com/limxdynamics/tron1-rl-deploy-python/blob/035e4c9e2f24e916fa5e8363ac6f0f788a2e1e8c/main.py#L27-L39) lines 27-39), and loads
 `policy/$RL_TYPE/` with `RL_TYPE` isaacgym or isaaclab (the README's example is isaacgym; the isaaclab export uses
 another joint order, which the port does not handle). It is LimX's open policy, not the closed controller of the robot's
 Remote Control Mode, which is not documented (docs/TRON1.md, "What runs the robot today"). It is played by
-`metalsim/tron1/limx_policy.py`, a port of LimX's `controllers/WheelfootController.py` at the same commit: 28
+`metalsim/tron1/limx_policy.py`, a port of LimX's
+[`controllers/WheelfootController.py`](https://github.com/limxdynamics/tron1-rl-deploy-python/blob/035e4c9e2f24e916fa5e8363ac6f0f788a2e1e8c/controllers/WheelfootController.py) at the
+same commit: 28
 observations (gyro x 0.25, projected gravity, six leg joint angles, eight joint velocities x 0.05, last actions), a
 10-frame history into the encoder (3 outputs), then the policy on [encoder, observation, command x (2, 2, 0.25)] to 8
 actions at 50 Hz; legs to `q = 0.25 a` with Kp 42 and Kd 2.5, wheels to `dq = 0.8 a` through Kd 0.8, with LimX's

@@ -1,0 +1,308 @@
+{
+ "script": "runs/readme_media/scratch/so101-expert/eval_cpu.py",
+ "controller": "metalsim/render/film/so101_expert.py DeployExpert",
+ "ctrl_hz": 30.0,
+ "vmax": [
+  2.723,
+  1.846,
+  1.534,
+  2.261,
+  2.673
+ ],
+ "amax": [
+  21.36,
+  14.25,
+  14.83,
+  28.4,
+  34.92
+ ],
+ "t_settle": 0.31,
+ "servo": {
+  "servo": "7v4",
+  "label": "STS3215 C001 7.4 V (SO-101 follower), gripper at LeRobot's 50 % torque limit",
+  "joints": [
+   "shoulder_pan",
+   "shoulder_lift",
+   "elbow_flex",
+   "wrist_flex",
+   "wrist_roll",
+   "gripper"
+  ],
+  "forcerange_Nm": [
+   1.9123,
+   1.9123,
+   1.9123,
+   1.9123,
+   1.9123,
+   0.9561
+  ],
+  "damping_Nms": [
+   0.3512,
+   0.3512,
+   0.3512,
+   0.3512,
+   0.3512,
+   0.3512
+  ],
+  "noload_line_rad_s": [
+   5.445,
+   5.445,
+   5.445,
+   5.445,
+   5.445,
+   2.723
+  ],
+  "kp": [
+   998.22,
+   998.22,
+   998.22,
+   998.22,
+   998.22,
+   998.22
+  ],
+  "kv": [
+   2.731,
+   2.731,
+   2.731,
+   2.731,
+   2.731,
+   2.731
+  ],
+  "armature": [
+   0.028,
+   0.028,
+   0.028,
+   0.028,
+   0.028,
+   0.028
+  ],
+  "frictionloss": [
+   0.052,
+   0.052,
+   0.052,
+   0.052,
+   0.052,
+   0.052
+  ]
+ },
+ "env": "so101Sim rl/native/so101_lift.py SO101LiftEnv (reset, scene, success test; unchanged)",
+ "over": {},
+ "mujoco": "3.10.0",
+ "seeds": [
+  10000,
+  10099
+ ],
+ "wall_s": 8.7,
+ "summary": {
+  "episodes": 100,
+  "successes": 91,
+  "up_at_6s": 90,
+  "time_to_lift_mean_s": 2.6021978021978023,
+  "time_to_lift_median_s": 2.26,
+  "max_height_mean": 0.17537600000000006,
+  "terminated": 1,
+  "retries": 33,
+  "phase_end": {
+   "approach": 1,
+   "descend": 1,
+   "grasp": 1,
+   "lift": 97
+  }
+ },
+ "smoothness": {
+  "rms_acc": [
+   21.3732,
+   28.1112,
+   27.0545,
+   34.1047,
+   33.5504,
+   11.5
+  ],
+  "rms_jerk": [
+   4368.1475,
+   6162.5426,
+   5728.9327,
+   7356.6269,
+   7081.172,
+   1269.9305
+  ],
+  "reversals_per_s": [
+   10.4593,
+   4.2676,
+   4.3783,
+   6.6933,
+   7.2603,
+   1.9258
+  ],
+  "osc_rms": [
+   0.1635,
+   0.2102,
+   0.2055,
+   0.2415,
+   0.2527,
+   0.1537
+  ],
+  "osc_frac": [
+   0.2717,
+   0.0645,
+   0.097,
+   0.0934,
+   0.1335,
+   0.018
+  ],
+  "above2hz_frac": [
+   0.3403,
+   0.1292,
+   0.1994,
+   0.1423,
+   0.2097,
+   0.0741
+  ],
+  "peak_speed": [
+   3.5798,
+   3.273,
+   3.2778,
+   3.8419,
+   3.7639,
+   2.8636
+  ],
+  "peak_acc": [
+   199.0966,
+   510.5774,
+   531.335,
+   224.5392,
+   231.1178,
+   197.9423
+  ],
+  "seconds": 596.12,
+  "f_band_hz": 5.0,
+  "v_hyst": 0.05
+ },
+ "sag": {
+  "shoulder_pan": {
+   "free": {
+    "n": 264,
+    "median_mrad": 0.0,
+    "p90_mrad": 0.0,
+    "median_steps": 0.0,
+    "mean_signed_mrad": -0.0
+   },
+   "all": {
+    "n": 56956,
+    "median_mrad": 0.0,
+    "p90_mrad": 0.0,
+    "median_steps": 0.0,
+    "mean_signed_mrad": -0.0
+   },
+   "lift": {
+    "n": 55102,
+    "median_mrad": 0.0,
+    "p90_mrad": 0.0,
+    "median_steps": 0.0,
+    "mean_signed_mrad": -0.0
+   }
+  },
+  "shoulder_lift": {
+   "free": {
+    "n": 252,
+    "median_mrad": 0.1,
+    "p90_mrad": 0.4,
+    "median_steps": 0.1,
+    "mean_signed_mrad": -0.1
+   },
+   "all": {
+    "n": 56860,
+    "median_mrad": 0.2,
+    "p90_mrad": 0.3,
+    "median_steps": 0.1,
+    "mean_signed_mrad": -0.2
+   },
+   "lift": {
+    "n": 55097,
+    "median_mrad": 0.2,
+    "p90_mrad": 0.3,
+    "median_steps": 0.1,
+    "mean_signed_mrad": -0.2
+   }
+  },
+  "elbow_flex": {
+   "free": {
+    "n": 257,
+    "median_mrad": 0.4,
+    "p90_mrad": 0.5,
+    "median_steps": 0.3,
+    "mean_signed_mrad": -0.4
+   },
+   "all": {
+    "n": 56768,
+    "median_mrad": 0.6,
+    "p90_mrad": 0.7,
+    "median_steps": 0.4,
+    "mean_signed_mrad": -0.6
+   },
+   "lift": {
+    "n": 55039,
+    "median_mrad": 0.6,
+    "p90_mrad": 0.7,
+    "median_steps": 0.4,
+    "mean_signed_mrad": -0.6
+   }
+  },
+  "wrist_flex": {
+   "free": {
+    "n": 250,
+    "median_mrad": 0.1,
+    "p90_mrad": 0.1,
+    "median_steps": 0.1,
+    "mean_signed_mrad": -0.1
+   },
+   "all": {
+    "n": 56802,
+    "median_mrad": 0.3,
+    "p90_mrad": 0.3,
+    "median_steps": 0.2,
+    "mean_signed_mrad": -0.3
+   },
+   "lift": {
+    "n": 55054,
+    "median_mrad": 0.3,
+    "p90_mrad": 0.3,
+    "median_steps": 0.2,
+    "mean_signed_mrad": -0.3
+   }
+  },
+  "wrist_roll": {
+   "free": {
+    "n": 326,
+    "median_mrad": 0.0,
+    "p90_mrad": 0.0,
+    "median_steps": 0.0,
+    "mean_signed_mrad": 0.0
+   },
+   "all": {
+    "n": 57482,
+    "median_mrad": 0.0,
+    "p90_mrad": 0.0,
+    "median_steps": 0.0,
+    "mean_signed_mrad": 0.0
+   },
+   "lift": {
+    "n": 55085,
+    "median_mrad": 0.0,
+    "p90_mrad": 0.0,
+    "median_steps": 0.0,
+    "mean_signed_mrad": 0.0
+   }
+  },
+  "gripper": {
+   "free": {
+    "n": 5020,
+    "median_mrad": 0.0,
+    "p90_mrad": 0.2,
+    "median_steps": 0.0,
+    "mean_signed_mrad": -0.0
+   }
+  },
+  "definition": "``steady_error(q, qd, tgt, cmd, phase, dt)``: q, qd, tgt (the servo's target after the command delay and firmware\nprofile), cmd (the streamed command) all (episodes, steps, 6), phase (episodes, steps) int (0 approach, 1 descend,\n2 grasp, 3 lift; -1 none). A sample of joint j is steady when the streamed command of joint j has not changed for\n``HOLD`` = 0.31 s (the 7v4_real settle time), the servo target equals the command (the profile has landed) and\n|qd_j| < 0.05 rad/s. Error e = tgt - q (rad). Per joint: count, median and p90 of |e| in mrad and in encoder steps\n(4096 per turn: 1.534 mrad), mean signed e; overall, and split into \"free\" (approach / descend: no load but the arm)\nand \"lift\" (lift phase: the box in hand). The gripper (index 5) squeezes on purpose in grasp / lift (target -0.15 rad\ninside the cube), so it is reported for approach / descend only."
+ }
+}

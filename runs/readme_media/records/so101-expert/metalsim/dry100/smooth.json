@@ -1,0 +1,342 @@
+{
+ "script": "runs/readme_media/scratch/so101-expert/eval_metalsim.py",
+ "backend": "cpu-dry",
+ "controller": "metalsim/render/film/so101_expert.py DeployExpert",
+ "ctrl_hz": 30.0,
+ "servo": {
+  "servo": "7v4_real",
+  "label": "STS3215 C001 7.4 V under LeRobot's registers (P 16, Acceleration 254, gripper 50 %), BAM-identified firmware loop, datasheet torque-speed line, servo + host latency",
+  "joints": [
+   "shoulder_pan",
+   "shoulder_lift",
+   "elbow_flex",
+   "wrist_flex",
+   "wrist_roll",
+   "gripper"
+  ],
+  "forcerange_Nm": [
+   1.9123,
+   1.9123,
+   1.9123,
+   1.9123,
+   1.9123,
+   0.9857
+  ],
+  "damping_Nms": [
+   0.3417,
+   0.3417,
+   0.3417,
+   0.3417,
+   0.3417,
+   0.3417
+  ],
+  "noload_line_rad_s": [
+   5.596,
+   5.596,
+   5.596,
+   5.596,
+   5.596,
+   2.885
+  ],
+  "kp": [
+   5.262,
+   5.262,
+   5.262,
+   5.262,
+   5.262,
+   5.262
+  ],
+  "kv": [
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0
+  ],
+  "armature": [
+   0.0261,
+   0.0261,
+   0.0261,
+   0.0261,
+   0.0261,
+   0.0261
+  ],
+  "frictionloss": [
+   0.0515,
+   0.0515,
+   0.0515,
+   0.0515,
+   0.0515,
+   0.0515
+  ],
+  "setpoint": {
+   "cmd_delay": 0.004046900011857505,
+   "servo_delay": 0.0010469000118575051,
+   "host_delay": 0.003,
+   "speed_limit": 5.2883481319359,
+   "accel_limit": 38.963112012295284,
+   "timestep": 0.005
+  },
+  "actuators": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5
+  ]
+ },
+ "scene": "assets/so101/scene_box_rl.xml",
+ "seeds": [
+  10000,
+  10099
+ ],
+ "start_qpos_max_err": 2.9731374140418154e-08,
+ "wall_s": 3.1,
+ "capacity_overflow": {},
+ "solver_flags": {},
+ "software": {
+  "metalsim": "ed66d8ef3e+dirty",
+  "mujoco": {
+   "version": "3.14.0"
+  },
+  "torch": {
+   "version": "2.14.0"
+  },
+  "numpy": {
+   "version": "2.5.3"
+  }
+ },
+ "hardware": {
+  "machine": "arm64",
+  "python": "3.13.7",
+  "power": {
+   "source": "AC Power",
+   "battery_percent": 75,
+   "battery_state": "charging",
+   "mode": "High Power",
+   "mode_setting": "powermode 2",
+   "at": "2026-10-31T19:20:43-0700"
+  },
+  "model": "Mac16,6",
+  "cpu": "Apple M4 Max",
+  "memory_gb": 64,
+  "macos": "27.0.1",
+  "macos_build": "26A434",
+  "gpu": "Apple M4 Max",
+  "gpu_cores": "40"
+ },
+ "summary": {
+  "episodes": 100,
+  "successes": 97,
+  "up_at_6s": 97,
+  "time_to_lift_mean_s": 2.6367010309278354,
+  "time_to_lift_median_s": 2.46,
+  "max_height_mean": 0.18486689921468497,
+  "terminated": 1,
+  "retries": 10,
+  "phase_end": {
+   "approach": 0,
+   "descend": 1,
+   "grasp": 0,
+   "lift": 99
+  }
+ },
+ "smoothness": {
+  "rms_acc": [
+   2.1277,
+   7.0263,
+   5.7877,
+   6.2586,
+   3.6701,
+   7.7484
+  ],
+  "rms_jerk": [
+   334.5542,
+   1261.9495,
+   1199.7342,
+   1041.0233,
+   272.5508,
+   613.165
+  ],
+  "reversals_per_s": [
+   0.389,
+   0.8049,
+   0.5366,
+   0.5819,
+   0.3052,
+   0.6204
+  ],
+  "osc_rms": [
+   0.0185,
+   0.0447,
+   0.0376,
+   0.0394,
+   0.0151,
+   0.0922
+  ],
+  "osc_frac": [
+   0.0049,
+   0.0031,
+   0.0038,
+   0.0028,
+   0.0006,
+   0.0078
+  ],
+  "above2hz_frac": [
+   0.0489,
+   0.0456,
+   0.0559,
+   0.0539,
+   0.0438,
+   0.0457
+  ],
+  "peak_speed": [
+   2.0357,
+   2.5557,
+   2.4489,
+   2.5706,
+   3.2783,
+   2.7381
+  ],
+  "peak_acc": [
+   78.3224,
+   409.1347,
+   376.6056,
+   312.1375,
+   171.6437,
+   402.6766
+  ],
+  "seconds": 596.36,
+  "f_band_hz": 5.0,
+  "v_hyst": 0.05
+ },
+ "sag": {
+  "shoulder_pan": {
+   "free": {
+    "n": 182,
+    "median_mrad": 1.9,
+    "p90_mrad": 7.9,
+    "median_steps": 1.3,
+    "mean_signed_mrad": -0.1
+   },
+   "all": {
+    "n": 62858,
+    "median_mrad": 5.4,
+    "p90_mrad": 7.7,
+    "median_steps": 3.5,
+    "mean_signed_mrad": 4.7
+   },
+   "lift": {
+    "n": 61785,
+    "median_mrad": 5.4,
+    "p90_mrad": 7.7,
+    "median_steps": 3.5,
+    "mean_signed_mrad": 4.7
+   }
+  },
+  "shoulder_lift": {
+   "free": {
+    "n": 54,
+    "median_mrad": 48.7,
+    "p90_mrad": 51.0,
+    "median_steps": 31.8,
+    "mean_signed_mrad": -31.8
+   },
+   "all": {
+    "n": 58716,
+    "median_mrad": 32.7,
+    "p90_mrad": 62.9,
+    "median_steps": 21.3,
+    "mean_signed_mrad": -34.4
+   },
+   "lift": {
+    "n": 58201,
+    "median_mrad": 32.7,
+    "p90_mrad": 62.9,
+    "median_steps": 21.3,
+    "mean_signed_mrad": -34.3
+   }
+  },
+  "elbow_flex": {
+   "free": {
+    "n": 57,
+    "median_mrad": 82.1,
+    "p90_mrad": 84.5,
+    "median_steps": 53.5,
+    "mean_signed_mrad": -81.7
+   },
+   "all": {
+    "n": 58729,
+    "median_mrad": 125.8,
+    "p90_mrad": 142.8,
+    "median_steps": 82.0,
+    "mean_signed_mrad": -124.3
+   },
+   "lift": {
+    "n": 58218,
+    "median_mrad": 126.0,
+    "p90_mrad": 142.9,
+    "median_steps": 82.1,
+    "mean_signed_mrad": -124.7
+   }
+  },
+  "wrist_flex": {
+   "free": {
+    "n": 110,
+    "median_mrad": 28.3,
+    "p90_mrad": 31.7,
+    "median_steps": 18.4,
+    "mean_signed_mrad": -20.1
+   },
+   "all": {
+    "n": 62593,
+    "median_mrad": 45.5,
+    "p90_mrad": 52.0,
+    "median_steps": 29.7,
+    "mean_signed_mrad": -45.4
+   },
+   "lift": {
+    "n": 61730,
+    "median_mrad": 45.6,
+    "p90_mrad": 52.1,
+    "median_steps": 29.7,
+    "mean_signed_mrad": -45.9
+   }
+  },
+  "wrist_roll": {
+   "free": {
+    "n": 80,
+    "median_mrad": 8.1,
+    "p90_mrad": 8.8,
+    "median_steps": 5.3,
+    "mean_signed_mrad": 8.0
+   },
+   "all": {
+    "n": 62824,
+    "median_mrad": 9.0,
+    "p90_mrad": 11.4,
+    "median_steps": 5.9,
+    "mean_signed_mrad": 9.0
+   },
+   "lift": {
+    "n": 61727,
+    "median_mrad": 9.1,
+    "p90_mrad": 11.4,
+    "median_steps": 5.9,
+    "mean_signed_mrad": 9.1
+   }
+  },
+  "gripper": {
+   "free": {
+    "n": 5301,
+    "median_mrad": 0.8,
+    "p90_mrad": 0.9,
+    "median_steps": 0.6,
+    "mean_signed_mrad": -1.5
+   }
+  },
+  "definition": "``steady_error(q, qd, tgt, cmd, phase, dt)``: q, qd, tgt (the servo's target after the command delay and firmware\nprofile), cmd (the streamed command) all (episodes, steps, 6), phase (episodes, steps) int (0 approach, 1 descend,\n2 grasp, 3 lift; -1 none). A sample of joint j is steady when the streamed command of joint j has not changed for\n``HOLD`` = 0.31 s (the 7v4_real settle time), the servo target equals the command (the profile has landed) and\n|qd_j| < 0.05 rad/s. Error e = tgt - q (rad). Per joint: count, median and p90 of |e| in mrad and in encoder steps\n(4096 per turn: 1.534 mrad), mean signed e; overall, and split into \"free\" (approach / descend: no load but the arm)\nand \"lift\" (lift phase: the box in hand). The gripper (index 5) squeezes on purpose in grasp / lift (target -0.15 rad\ninside the cube), so it is reported for approach / descend only."
+ }
+}

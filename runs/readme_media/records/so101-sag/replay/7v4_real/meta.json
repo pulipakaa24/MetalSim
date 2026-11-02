@@ -1,0 +1,132 @@
+{
+ "variant": "7v4_real",
+ "servo": {
+  "servo": "7v4_real",
+  "label": "STS3215 C001 7.4 V under LeRobot's registers (P 16, Acceleration 254, gripper 50 %), BAM-identified firmware loop, datasheet torque-speed line, servo + host latency",
+  "joints": [
+   "shoulder_pan",
+   "shoulder_lift",
+   "elbow_flex",
+   "wrist_flex",
+   "wrist_roll",
+   "gripper"
+  ],
+  "forcerange_Nm": [
+   1.9123,
+   1.9123,
+   1.9123,
+   1.9123,
+   1.9123,
+   0.9857
+  ],
+  "damping_Nms": [
+   0.3417,
+   0.3417,
+   0.3417,
+   0.3417,
+   0.3417,
+   0.3417
+  ],
+  "noload_line_rad_s": [
+   5.596,
+   5.596,
+   5.596,
+   5.596,
+   5.596,
+   2.885
+  ],
+  "kp": [
+   5.262,
+   5.262,
+   5.262,
+   5.262,
+   5.262,
+   5.262
+  ],
+  "kv": [
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0
+  ],
+  "armature": [
+   0.0261,
+   0.0261,
+   0.0261,
+   0.0261,
+   0.0261,
+   0.0261
+  ],
+  "frictionloss": [
+   0.0515,
+   0.0515,
+   0.0515,
+   0.0515,
+   0.0515,
+   0.0515
+  ],
+  "setpoint": {
+   "cmd_delay": 0.004046900011857505,
+   "servo_delay": 0.0010469000118575051,
+   "host_delay": 0.003,
+   "speed_limit": 5.2883481319359,
+   "accel_limit": 38.963112012295284,
+   "timestep": 0.005
+  },
+  "actuators": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "variant": "7v4_real",
+  "friction_hook": null,
+  "dof_solref": [
+   [
+    0.02,
+    1.0
+   ],
+   [
+    0.02,
+    1.0
+   ],
+   [
+    0.02,
+    1.0
+   ],
+   [
+    0.02,
+    1.0
+   ],
+   [
+    0.02,
+    1.0
+   ],
+   [
+    0.02,
+    1.0
+   ]
+  ]
+ },
+ "mujoco": "3.10.0",
+ "datasets": {
+  "hungho77": {
+   "path": "<scratch>/hfdata/hungho77/file-000.parquet",
+   "fps": 30.0,
+   "frames": 37536,
+   "episodes": 50,
+   "wall_s": 6.7
+  },
+  "IlyaGusev": {
+   "path": "<scratch>/hfdata/ilya/file-000.parquet",
+   "fps": 20.0,
+   "frames": 15585,
+   "episodes": 104,
+   "wall_s": 4.2
+  }
+ }
+}

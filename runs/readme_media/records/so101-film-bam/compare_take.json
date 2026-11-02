@@ -1,0 +1,240 @@
+{
+ "take": {
+  "summary": {
+   "successes": 100,
+   "up_at_6s": 100,
+   "time_to_lift_median_s": 2.18,
+   "time_to_lift_mean_s": 2.229,
+   "p10_p90": [
+    2.06,
+    2.36
+   ],
+   "retries": 1,
+   "retry_seeds": [
+    10024
+   ],
+   "failures": [],
+   "not_up_at_6s": []
+  },
+  "filmed_envs": [
+   51
+  ],
+  "episodes_filmed": {
+   "51": {
+    "seed": 10051,
+    "success": true,
+    "time_to_lift_s": 2.26,
+    "hmax": 0.1898,
+    "final_height": 0.1878,
+    "up_at_end": true,
+    "retries": 0,
+    "events": [
+     [
+      0.8,
+      "approach",
+      "descend",
+      "measured"
+     ],
+     [
+      1.165,
+      "descend",
+      "grasp",
+      "measured"
+     ],
+     [
+      1.735,
+      "grasp",
+      "lift",
+      "jaws stopped"
+     ]
+    ]
+   }
+  },
+  "capacity_overflow": {
+   "ITERATIONS": 2,
+   "LS_ITERATIONS": 100
+  },
+  "mujoco_warp": {
+   "version": "3.14.0",
+   "git": "787a5b3a37",
+   "checkout": "upstream/mujoco_warp"
+  },
+  "warp": {
+   "version": "1.18.0.dev20260917",
+   "git": "52c09cdd82",
+   "checkout": "upstream/warp-metalsim"
+  },
+  "metalsim": "ed66d8ef3e+dirty",
+  "power": {
+   "source": "AC Power",
+   "battery_percent": 79,
+   "battery_state": "charging",
+   "mode": "High Power",
+   "mode_setting": "powermode 2",
+   "at": "2026-10-31T21:51:30-0700"
+  }
+ },
+ "refs": {
+  "cpu": {
+   "successes": 100,
+   "up_at_6s": 100,
+   "time_to_lift_median_s": 2.1900000000000004,
+   "time_to_lift_mean_s": 2.233,
+   "p10_p90": [
+    2.06,
+    2.36
+   ],
+   "retries": 1,
+   "retry_seeds": [
+    10024
+   ],
+   "failures": [],
+   "not_up_at_6s": []
+  },
+  "ms_eval": {
+   "successes": 100,
+   "up_at_6s": 100,
+   "time_to_lift_median_s": 2.18,
+   "time_to_lift_mean_s": 2.229,
+   "p10_p90": [
+    2.06,
+    2.36
+   ],
+   "retries": 1,
+   "retry_seeds": [
+    10024
+   ],
+   "failures": [],
+   "not_up_at_6s": []
+  },
+  "cpu314": {
+   "successes": 100,
+   "up_at_6s": 100,
+   "time_to_lift_median_s": 2.18,
+   "time_to_lift_mean_s": 2.226,
+   "p10_p90": [
+    2.06,
+    2.36
+   ],
+   "retries": 1,
+   "retry_seeds": [
+    10024
+   ],
+   "failures": [],
+   "not_up_at_6s": []
+  }
+ },
+ "vs": {
+  "cpu": {
+   "same_success": 100,
+   "differ": [],
+   "both_lift": 100,
+   "time_to_lift_within_0p1s": 100,
+   "time_to_lift_equal": 71,
+   "abs_dt_median_s": 0.0,
+   "abs_dt_max_s": 0.040000000000000036,
+   "same_retry_count": 100,
+   "phase_events_identical": 77,
+   "filmed": {
+    "10051": {
+     "time_to_lift_s": 2.26,
+     "retries": 0,
+     "events": [
+      [
+       0.8,
+       "approach",
+       "descend",
+       "measured"
+      ],
+      [
+       1.165,
+       "descend",
+       "grasp",
+       "measured"
+      ],
+      [
+       1.735,
+       "grasp",
+       "lift",
+       "jaws stopped"
+      ]
+     ]
+    }
+   }
+  },
+  "ms_eval": {
+   "same_success": 100,
+   "differ": [],
+   "both_lift": 100,
+   "time_to_lift_within_0p1s": 100,
+   "time_to_lift_equal": 100,
+   "abs_dt_median_s": 0.0,
+   "abs_dt_max_s": 0.0,
+   "same_retry_count": 100,
+   "phase_events_identical": 100,
+   "filmed": {
+    "10051": {
+     "time_to_lift_s": 2.26,
+     "retries": 0,
+     "events": [
+      [
+       0.8,
+       "approach",
+       "descend",
+       "measured"
+      ],
+      [
+       1.165,
+       "descend",
+       "grasp",
+       "measured"
+      ],
+      [
+       1.735,
+       "grasp",
+       "lift",
+       "jaws stopped"
+      ]
+     ]
+    }
+   }
+  },
+  "cpu314": {
+   "same_success": 100,
+   "differ": [],
+   "both_lift": 100,
+   "time_to_lift_within_0p1s": 100,
+   "time_to_lift_equal": 86,
+   "abs_dt_median_s": 0.0,
+   "abs_dt_max_s": 0.040000000000000036,
+   "same_retry_count": 100,
+   "phase_events_identical": 93,
+   "filmed": {
+    "10051": {
+     "time_to_lift_s": 2.26,
+     "retries": 0,
+     "events": [
+      [
+       0.8,
+       "approach",
+       "descend",
+       "measured"
+      ],
+      [
+       1.165,
+       "descend",
+       "grasp",
+       "measured"
+      ],
+      [
+       1.735,
+       "grasp",
+       "lift",
+       "jaws stopped"
+      ]
+     ]
+    }
+   }
+  }
+ }
+}

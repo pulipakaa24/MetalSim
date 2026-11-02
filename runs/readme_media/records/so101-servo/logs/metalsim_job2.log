@@ -1,0 +1,22 @@
+[ms] 2026-10-31 17:21:49 mujoco_warp 93e5ce18 collision_convex: heightfield comments and constant order
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     ~/Library/Caches/warp/1.18.0.dev20260917
+max |q_gpu - q_cpu| per joint (rad): [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+motion range per joint (rad): [0.09, 1.1, 0.16, 1.338, 0.102, 1.323]
+box z (GPU, CPU): [0.03, 0.03, 0.03, 0.03]
+[ms] 17:21:54 expert 7v4_real
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     ~/Library/Caches/warp/1.18.0.dev20260917
+metalsim expert 7v4_real     succ   0 up   0 ttl nans | sat%   0.0   0.0   0.0   0.0   0.0   8.6 | da 0.0024 dctrl 0.0045 rad | a@lim 5.1% | vpk 2.73 ep-med 2.72
+cpu agreement: {'same_outcome': 100, 'only_metalsim': [], 'only_cpu': []} overflow: {'ITERATIONS': 15, 'LS_ITERATIONS': 100}
+[ms] 17:22:01 done

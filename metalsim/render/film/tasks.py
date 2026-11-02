@@ -81,10 +81,11 @@ films the best-ranked: successful episodes that start before the grasp first (ap
 take), then successful ones that start with the cup in hand.
 
 **How Isaac Lab presents the task** (research on Isaac Lab at
-[`ae37b028`](https://github.com/isaac-sim/IsaacLab/commit/ae37b028ea415c91ea2bc32609efcd759ed2b974), cloned as
-`upstream/IsaacLab3`). `pour_env_cfg.py` sets a default viewer at eye (1.4, 1.4, 0.9) looking at (0.5, 0, 0.1) in env
-0's frame, and its play mode (one env) a closer camera at eye (0.9, 0.65, 0.5) with the Newton RTX visualizer drawing
-the media as particles of the media's `visual_color` (0.85, 0.72, 0.45). Videos come from `VideoRecorderCfg` at
+[`ae37b028`](https://github.com/isaac-sim/IsaacLab/commit/ae37b028ea415c91ea2bc32609efcd759ed2b974)).
+[`pour_env_cfg.py`](https://github.com/isaac-sim/IsaacLab/blob/ae37b028ea415c91ea2bc32609efcd759ed2b974/source/isaaclab_tasks/isaaclab_tasks/contrib/franka_pour/pour_env_cfg.py)
+sets a default viewer at eye (1.4, 1.4, 0.9) looking at (0.5, 0, 0.1) in env 0's frame, and its play mode (one env) a
+closer camera at eye (0.9, 0.65, 0.5) with the Newton RTX visualizer drawing the media as particles of the media's
+`visual_color` (0.85, 0.72, 0.45). Videos come from `VideoRecorderCfg` at
 `render_fps` = 1 / step_dt = 30 fps. The scene is lit by a grey dome light (colour 0.75, intensity 3000). The hero shot
 here uses the play-mode camera, the grid shot the default viewer, both with Kit's default perspective lens (36 deg
 vertical at 16:9) and one frame per policy step (30 fps).
@@ -193,10 +194,12 @@ looking at (0, 0, -0.05) m, 3.55 m away. `readme` (640x480, 4:3, for the README 
 look-at at 0.75 times the distance (eye (1.95, -1.5, 0.98) m, 2.66 m), so the robot fills about three quarters of the
 frame height, plus a slow orbit of 10 deg/s about the vertical through the look-at point, symmetric about the middle
 of the film: -30 deg at 0 s, 0 at 3 s (the hero's direction), +30 deg at 6 s, counter-clockwise seen from above, as
-MuJoCo's azimuth grows. The orbit copies MuJoCo Warp's README clips: `mujoco_warp/record.py` (upstream MuJoCo Warp at
+MuJoCo's azimuth grows. The orbit copies MuJoCo Warp's README clips:
+[`mujoco_warp/record.py`](https://github.com/google-deepmind/mujoco_warp/blob/d41a47c0837fc71abb44d7d4799bf85ca19ff7ab/mujoco_warp/record.py) (upstream MuJoCo Warp at
 [`d41a47c0`](https://github.com/google-deepmind/mujoco_warp/commit/d41a47c0837fc71abb44d7d4799bf85ca19ff7ab), lines 43
 and 142) sets `cam.azimuth = 90 + (step - nstep / 2) * cam_azimuth_speed` with 0.05 deg per physics step, and its G1
-scenes step at 5 ms (`benchmarks/unitree_g1/unitree_g1_mjlab.xml`, line 14), so 10 deg/s.
+scenes step at 5 ms ([`benchmarks/unitree_g1/unitree_g1_mjlab.xml`](https://github.com/google-deepmind/mujoco_warp/blob/d41a47c0837fc71abb44d7d4799bf85ca19ff7ab/benchmarks/unitree_g1/unitree_g1_mjlab.xml#L14),
+line 14), so 10 deg/s.
 """
 
 
@@ -302,8 +305,9 @@ G1_FLAT = FilmTask(
 [Isaac Sim](https://github.com/isaac-sim/IsaacSim) with PhysX. MetalSim plays it as published, without retraining or
 fine-tuning. Source:
 <https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.1/Isaac/IsaacLab/PretrainedCheckpoints/rsl_rl/Isaac-Velocity-Flat-G1-v0/checkpoint.pt>
-(the path Isaac Lab's `--use_pretrained_checkpoint` resolves, `isaaclab_rl/utils/pretrained_checkpoint.py`, under
-the Isaac 5.1 asset root), sha256 `fdf0f242bb8f3bcfc1aa9b7ff2761af4c014cf1cdc7e49242c9b92f3581720e7`, 2,027,170
+(the path Isaac Lab's `--use_pretrained_checkpoint` resolves,
+[`isaaclab_rl/utils/pretrained_checkpoint.py`](https://github.com/isaac-sim/IsaacLab/blob/v2.3.2/source/isaaclab_rl/isaaclab_rl/utils/pretrained_checkpoint.py),
+under the Isaac 5.1 asset root), sha256 `fdf0f242bb8f3bcfc1aa9b7ff2761af4c014cf1cdc7e49242c9b92f3581720e7`, 2,027,170
 bytes. It is NVIDIA's file under NVIDIA's asset terms: `scripts/fetch_isaac_assets.sh` downloads it to
 `assets/isaac/pretrained/rsl_rl/Isaac-Velocity-Flat-G1-v0/checkpoint.pt` and checks the hash; `.gitignore` (`*.pt`)
 keeps it out of the repository. The record stage refuses a file whose sha256 is not the published one and writes the
@@ -378,8 +382,9 @@ G1_ROUGH = FilmTask(
 published, without retraining or fine-tuning.
 Source:
 <https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.1/Isaac/IsaacLab/PretrainedCheckpoints/rsl_rl/Isaac-Velocity-Rough-G1-v0/checkpoint.pt>
-(the path Isaac Lab's `--use_pretrained_checkpoint` resolves, `isaaclab_rl/utils/pretrained_checkpoint.py`, under
-the Isaac 5.1 asset root), sha256 `d85a9adea70e5476675f130cbc70f41bdef7a28d52f443fae902afc0e2358851`, 7,842,530
+(the path Isaac Lab's `--use_pretrained_checkpoint` resolves,
+[`isaaclab_rl/utils/pretrained_checkpoint.py`](https://github.com/isaac-sim/IsaacLab/blob/v2.3.2/source/isaaclab_rl/isaaclab_rl/utils/pretrained_checkpoint.py),
+under the Isaac 5.1 asset root), sha256 `d85a9adea70e5476675f130cbc70f41bdef7a28d52f443fae902afc0e2358851`, 7,842,530
 bytes. It is NVIDIA's file under NVIDIA's asset terms: `scripts/fetch_isaac_assets.sh` downloads it to
 `assets/isaac/pretrained/rsl_rl/Isaac-Velocity-Rough-G1-v0/checkpoint.pt` and checks the hash; `.gitignore` (`*.pt`)
 keeps it out of the repository. The record stage refuses a file whose sha256 is not the published one and writes the
@@ -464,27 +469,31 @@ G1_UNITREE_STORY = f"""
 **The policy.** Unitree's own pretrained G1 walking policy from Unitree's `unitree_rl_gym`
 (<{UNITREE_REPO}>, BSD-3-Clause, commit
 [`{UNITREE_COMMIT[:7]}`]({UNITREE_REPO}/commit/{UNITREE_COMMIT})):
-`deploy/pre_train/g1/motion.pt`, the file both of Unitree's playback scripts load, the MuJoCo sim2sim one
-(`deploy/deploy_mujoco/configs/g1.yaml`, `policy_path`) and the one for the real robot
-(`deploy/deploy_real/configs/g1.yaml`, line 10). sha256
-`{UNITREE_RL_GYM['policy_sha256']}`, 145,745 bytes, as fetched. It is a TorchScript
-module: an LSTM (47 inputs, 64 hidden) and an ELU MLP 64 -> 32 -> 12, loaded with `torch.jit.load` and played as
-published. Unitree trained it with `legged_gym` on [Isaac Gym](https://developer.nvidia.com/isaac-gym)
-(`legged_gym/envs/g1/g1_config.py`, `G1RoughCfg` / `G1RoughCfgPPO`: `ActorCriticRecurrent`, plane terrain, friction and
-added-mass randomization, pushes every 5 s; physics 5 ms x decimation 4, so 50 Hz). Its gait is set by the training
-task, not left to the policy: `g1_env.py` feeds a fixed gait clock (period 0.8 s, so 1.25 gait cycles per second; the
-right leg half a cycle behind the left) to the policy as sin / cos of the phase, and rewards foot contact in the stance
-part of each leg's cycle (phase < 0.55, `_reward_contact`) and an 8 cm swing height of the ankle-roll link
-(`_reward_feet_swing_height`). `scripts/fetch_unitree_rl_gym.sh` fetches the repository at that commit into
-`assets/unitree_rl_gym/` (git-ignored, not committed); the record stage checks the policy's sha256 and writes the
+[`deploy/pre_train/g1/motion.pt`]({UNITREE_BLOB}/deploy/pre_train/g1/motion.pt), the file both of Unitree's playback
+scripts load, the MuJoCo sim2sim one
+([`deploy/deploy_mujoco/configs/g1.yaml`]({UNITREE_BLOB}/deploy/deploy_mujoco/configs/g1.yaml), `policy_path`) and the
+one for the real robot ([`deploy/deploy_real/configs/g1.yaml`]({UNITREE_BLOB}/deploy/deploy_real/configs/g1.yaml#L10),
+line 10). sha256 `{UNITREE_RL_GYM['policy_sha256']}`, 145,745 bytes, as fetched. It is a
+TorchScript module: an LSTM (47 inputs, 64 hidden) and an ELU MLP 64 -> 32 -> 12, loaded with `torch.jit.load` and
+played as published. Unitree trained it with `legged_gym` on [Isaac Gym](https://developer.nvidia.com/isaac-gym)
+([`legged_gym/envs/g1/g1_config.py`]({UNITREE_BLOB}/legged_gym/envs/g1/g1_config.py), `G1RoughCfg` / `G1RoughCfgPPO`:
+`ActorCriticRecurrent`, plane terrain, friction and added-mass randomization, pushes every 5 s; physics 5 ms x
+decimation 4, so 50 Hz). Its gait is set by the training task, not left to the policy:
+[`g1_env.py`]({UNITREE_BLOB}/legged_gym/envs/g1/g1_env.py) feeds a fixed gait clock (period 0.8 s, so 1.25 gait cycles
+per second; the right leg half a cycle behind the left) to the policy as sin / cos of the phase, and rewards foot
+contact in the stance part of each leg's cycle (phase < 0.55, `_reward_contact`) and an 8 cm swing height of the
+ankle-roll link (`_reward_feet_swing_height`). `scripts/fetch_unitree_rl_gym.sh` fetches the repository at that commit
+into `assets/unitree_rl_gym/` (git-ignored, not committed); the record stage checks the policy's sha256 and writes the
 repository, commit, file, licence and hash into `rec.json` `checkpoint` and `adapter`.
 
-**Unitree's loop, on MuJoCo Warp.** Unitree plays the policy in MuJoCo with `deploy/deploy_mujoco/deploy_mujoco.py`
-and `configs/g1.yaml`: physics step 2 ms, a policy step every 10 physics steps (50 Hz), PD gains kp (100, 100, 100,
+**Unitree's loop, on MuJoCo Warp.** Unitree plays the policy in MuJoCo with
+[`deploy/deploy_mujoco/deploy_mujoco.py`]({UNITREE_BLOB}/deploy/deploy_mujoco/deploy_mujoco.py) and
+[`configs/g1.yaml`]({UNITREE_BLOB}/deploy/deploy_mujoco/configs/g1.yaml): physics step 2 ms, a policy step every 10 physics steps (50 Hz), PD gains kp (100, 100, 100,
 150, 40, 40) and kd (2, 2, 2, 4, 2, 2) per leg (hip pitch, roll, yaw, knee, ankle pitch, roll), default angles
 (-0.1, 0, 0, 0.3, -0.2, 0) per leg, scales: angular velocity 0.25, joint position 1, joint velocity 0.05, action 0.25,
 command (2, 2, 0.25); 12 actions, 47 observations, command (0.5, 0, 0) m/s, m/s, rad/s. The model is Unitree's
-`resources/robots/g1_description/scene.xml` (`g1_12dof.xml`: the 12 leg joints; Euler integrator, pyramidal cones,
+[`resources/robots/g1_description/scene.xml`]({UNITREE_BLOB}/resources/robots/g1_description/scene.xml)
+(`g1_12dof.xml`: the 12 leg joints; Euler integrator, pyramidal cones,
 Newton solver, MuJoCo's defaults; four 5 mm collision spheres under each foot; `<motor>` actuators whose torque the
 joints' `actuatorfrcrange` clamps). The film runs the same loop on MetalSim's MuJoCo Warp (`metalsim.physics.batch.BatchSim`,
 4 worlds of that model; `metalsim/render/film/unitree.py`, `UnitreeG1`): Unitree computes the PD torque from
@@ -595,9 +604,12 @@ G1_UNITREE = FilmTask(
     adapter_kw={"cmd": (0.5, 0.0, 0.0)},          # configs/g1.yaml cmd_init
     title="G1 walk, Unitree's policy",
     summary=("Unitree G1 walking on flat ground with Unitree's own pretrained walking policy "
-             "([unitree_rl_gym](https://github.com/unitreerobotics/unitree_rl_gym), `deploy/pre_train/g1/motion.pt`, "
+             "([unitree_rl_gym](https://github.com/unitreerobotics/unitree_rl_gym), "
+             f"[`deploy/pre_train/g1/motion.pt`]({UNITREE_BLOB}/deploy/pre_train/g1/motion.pt), "
              "BSD-3-Clause), played by Unitree's [MuJoCo](https://github.com/google-deepmind/mujoco) sim2sim loop "
-             "(`deploy_mujoco.py`, `configs/g1.yaml`) ported to [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) on Metal, "
+             f"([`deploy_mujoco.py`]({UNITREE_BLOB}/deploy/deploy_mujoco/deploy_mujoco.py), "
+             f"[`configs/g1.yaml`]({UNITREE_BLOB}/deploy/deploy_mujoco/configs/g1.yaml)) "
+             "ported to [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) on Metal, "
              "on Unitree's own G1 model and meshes. Rendered on the 14-inch MacBook Pro (Mac16,6), not in a timing run, so its "
              "Performance table is not a timing figure."),
     notes=_g1_unitree_notes,
@@ -645,25 +657,30 @@ G1_BUMPS_MJW = "787a5b3"      # the MuJoCo Warp fork commit the measurements bel
 G1_BUMPS_CHECKED_RECORD = "2026-10-31T23:37:22-0700"
 G1_BUMPS_STORY = f"""
 **What this film is.** The policy of the G1 flat film ([G1_UNITREE.md](G1_UNITREE.md)): Unitree's own pretrained G1
-walking policy, `deploy/pre_train/g1/motion.pt` from `unitree_rl_gym`
+walking policy, [`deploy/pre_train/g1/motion.pt`]({UNITREE_BLOB}/deploy/pre_train/g1/motion.pt) from `unitree_rl_gym`
 (<{UNITREE_REPO}>, BSD-3-Clause, commit
 [`{UNITREE_COMMIT[:7]}`]({UNITREE_REPO}/commit/{UNITREE_COMMIT}), sha256
 `{UNITREE_RL_GYM['policy_sha256']}`), played by Unitree's MuJoCo sim2sim loop
-(`deploy/deploy_mujoco/deploy_mujoco.py`, `configs/g1.yaml`, command (0.5, 0, 0)) ported to [my fork of MuJoCo
-Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim), as in the G1 flat film, with one change: Unitree's
-floor plane is Isaac Lab's random rough ground. The policy is blind (47 observations: body rates, gravity, command,
-joint state, last action, gait clock; no height scan) and Unitree trained it on flat ground only (`legged_gym`,
-`legged_robot_config.py` line 15 `mesh_type = 'plane'`, not overridden by `g1_config.py`), with pushes, friction and
-mass randomization. Nothing is tuned, and the robot falls: this page shows what happens.
+([`deploy/deploy_mujoco/deploy_mujoco.py`]({UNITREE_BLOB}/deploy/deploy_mujoco/deploy_mujoco.py),
+[`configs/g1.yaml`]({UNITREE_BLOB}/deploy/deploy_mujoco/configs/g1.yaml), command (0.5, 0, 0)) ported to [my fork of
+MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim), as in the G1 flat film, with one change:
+Unitree's floor plane is Isaac Lab's random rough ground. The policy is blind (47 observations: body rates, gravity,
+command, joint state, last action, gait clock; no height scan) and Unitree trained it on flat ground only
+(`legged_gym`, [`legged_robot_config.py`]({UNITREE_BLOB}/legged_gym/envs/base/legged_robot_config.py#L15) line 15
+`mesh_type = 'plane'`, not overridden by [`g1_config.py`]({UNITREE_BLOB}/legged_gym/envs/g1/g1_config.py)), with
+pushes, friction and mass randomization. Nothing is tuned, and the robot falls: this page shows what happens.
 
-**Terrain.** Isaac Lab 2.3.2's `ROUGH_TERRAINS_CFG["random_rough"]` (`isaaclab/terrains/config/rough.py`):
+**Terrain.** Isaac Lab 2.3.2's `ROUGH_TERRAINS_CFG["random_rough"]`
+([`isaaclab/terrains/config/rough.py`](https://github.com/isaac-sim/IsaacLab/blob/v2.3.2/source/isaaclab/isaaclab/terrains/config/rough.py)):
 `HfRandomUniformTerrainCfg(proportion=0.2, noise_range=(0.02, 0.10), noise_step=0.02, border_width=0.25)`, on one 8 x 8
 m tile at the generator's horizontal scale 0.1 m and vertical scale 5 mm (slope threshold 0.75), with the generator's 20
 m flat border around it, built by MetalSim's port of Isaac's terrain generator (`metalsim.learn.isaac_terrain`, the
 generator of the G1 rough film) for env seed 0 (`unitree.random_rough_tile`). Isaac's `random_uniform_terrain`
-ignores its difficulty (`height_field/hf_terrains.py`, its docstring: "The difficulty parameter is ignored for this
-terrain"): at every curriculum level every 0.1 m grid point is an independent uniform draw from 2, 4, 6, 8 or 10 cm
-(`downsampled_scale` defaults to the horizontal scale, so the spline interpolation changes nothing). So Isaac Lab has
+ignores its difficulty
+([`height_field/hf_terrains.py`](https://github.com/isaac-sim/IsaacLab/blob/v2.3.2/source/isaaclab/isaaclab/terrains/height_field/hf_terrains.py),
+its docstring: "The difficulty parameter is ignored for this terrain"): at every curriculum level every 0.1 m grid
+point is an independent uniform draw from 2, 4, 6, 8 or 10 cm (`downsampled_scale` defaults to the horizontal scale,
+so the spline interpolation changes nothing). So Isaac Lab has
 one random rough terrain, not a range of levels: bumps 2 to 10 cm high every 0.1 m, up to 8 cm between neighbours, on
 a 0.25 m flat rim (z = 0) around the 7.5 m rough square. This film uses exactly that terrain; the levels in the table
 below with a lower ceiling are variants made here to see how the outcome depends on bump height, not Isaac's. The
@@ -902,8 +919,9 @@ view), as in the G1 films (G1_UNITREE.md), but lower. `hero` (1280x720; the vide
 the README grid): the same direction and elevation at 0.75 times the distance (2.60 m), looking at (0, 0, -0.15) m so
 the standing robot fits the 4:3 frame, plus MuJoCo Warp's README orbit of 10 deg/s about the vertical through the
 look-at point, symmetric about the middle of the 8 s film: -40 deg at 0 s, 0 at 4 s (the hero's direction), +40 deg at
-8 s, counter-clockwise seen from above (`mujoco_warp/record.py` in upstream MuJoCo Warp at
-[`d41a47c0`](https://github.com/google-deepmind/mujoco_warp/commit/d41a47c0837fc71abb44d7d4799bf85ca19ff7ab), lines 43
+8 s, counter-clockwise seen from above
+([`mujoco_warp/record.py`](https://github.com/google-deepmind/mujoco_warp/blob/d41a47c0837fc71abb44d7d4799bf85ca19ff7ab/mujoco_warp/record.py)
+in upstream MuJoCo Warp at [`d41a47c0`](https://github.com/google-deepmind/mujoco_warp/commit/d41a47c0837fc71abb44d7d4799bf85ca19ff7ab), lines 43
 and 142: 0.05 deg per 5 ms physics step). When the robot falls the tracked pelvis drops with it, and so does the camera.
 
 **Rendering.** Tier 2 (the path tracer), 64 samples per pixel (16 passes x 4), 3 bounces, [Open Image
@@ -932,7 +950,8 @@ G1_BUMPS = FilmTask(
     summary=("Unitree G1 walking onto [Isaac Lab](https://github.com/isaac-sim/IsaacLab)'s random rough ground (the "
              "`random_rough` sub-terrain of `ROUGH_TERRAINS_CFG`: bumps of 2 to 10 cm every 0.1 m) with Unitree's own "
              "pretrained walking policy, which is blind and was trained on flat ground "
-             "([unitree_rl_gym](https://github.com/unitreerobotics/unitree_rl_gym), `deploy/pre_train/g1/motion.pt`, "
+             "([unitree_rl_gym](https://github.com/unitreerobotics/unitree_rl_gym), "
+             f"[`deploy/pre_train/g1/motion.pt`]({UNITREE_BLOB}/deploy/pre_train/g1/motion.pt), "
              "BSD-3-Clause), played by Unitree's [MuJoCo](https://github.com/google-deepmind/mujoco) sim2sim loop ported to "
              "[my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) on Metal (whose heightfield contacts match the "
              "exact geometry), on Unitree's own G1 model, and rendered by metalsim's path "

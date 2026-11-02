@@ -1,0 +1,152 @@
+{
+ "script": "runs/readme_media/scratch/so101-servo/eval_cpu.py",
+ "controller": {
+  "controller": "so101Sim rl/native/scripted_expert.py Expert (defaults)",
+  "DQ_MAX": 0.06,
+  "GRIP_OPEN": 1.4,
+  "GRIP_CLOSE": -0.15
+ },
+ "servo": {
+  "servo": "7v4_real",
+  "label": "STS3215 C001 7.4 V under LeRobot's registers (P 16, Acceleration 254, gripper 50 %), BAM-identified firmware loop, datasheet torque-speed line, servo + host latency",
+  "joints": [
+   "shoulder_pan",
+   "shoulder_lift",
+   "elbow_flex",
+   "wrist_flex",
+   "wrist_roll",
+   "gripper"
+  ],
+  "forcerange_Nm": [
+   1.9123,
+   1.9123,
+   1.9123,
+   1.9123,
+   1.9123,
+   0.9857
+  ],
+  "damping_Nms": [
+   0.3417,
+   0.3417,
+   0.3417,
+   0.3417,
+   0.3417,
+   0.3417
+  ],
+  "noload_line_rad_s": [
+   5.596,
+   5.596,
+   5.596,
+   5.596,
+   5.596,
+   2.885
+  ],
+  "kp": [
+   5.262,
+   5.262,
+   5.262,
+   5.262,
+   5.262,
+   5.262
+  ],
+  "kv": [
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0
+  ],
+  "armature": [
+   0.0261,
+   0.0261,
+   0.0261,
+   0.0261,
+   0.0261,
+   0.0261
+  ],
+  "frictionloss": [
+   0.0515,
+   0.0515,
+   0.0515,
+   0.0515,
+   0.0515,
+   0.0515
+  ],
+  "overrides": {
+   "accel_limit": Infinity
+  },
+  "setpoint": {
+   "cmd_delay": 0.004046900011857505,
+   "servo_delay": 0.0010469000118575051,
+   "host_delay": 0.003,
+   "speed_limit": 5.2883481319359,
+   "accel_limit": Infinity,
+   "timestep": 0.005
+  },
+  "actuators": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5
+  ]
+ },
+ "env": "so101Sim rl/native/so101_lift.py SO101LiftEnv (unchanged)",
+ "scene": "mujoco_menagerie/robotstudio_so101/scene_box_rl.xml",
+ "mujoco": "3.10.0",
+ "seeds": [
+  10000,
+  10099
+ ],
+ "wall_s": 5.736820220947266,
+ "metrics": {
+  "episodes": 100,
+  "success": 0,
+  "up_at_end": 0,
+  "time_to_lift_mean_s": null,
+  "time_to_lift_median_s": null,
+  "max_height_mean_m": 0.03473368094947333,
+  "torque_sat_frac": {
+   "shoulder_pan": 0.0,
+   "shoulder_lift": 0.0,
+   "elbow_flex": 0.0,
+   "wrist_flex": 0.0,
+   "wrist_roll": 0.0,
+   "gripper": 0.09996666666666666
+  },
+  "torque_sat_frac_arm5_mean": 0.0,
+  "action_rate": 0.002524235285818577,
+  "action_rate_per_joint": {
+   "shoulder_pan": 0.0013000000035390258,
+   "shoulder_lift": 0.003700000001117587,
+   "elbow_flex": 0.0027000000700354576,
+   "wrist_flex": 0.0038999998942017555,
+   "wrist_roll": 0.002400000113993883,
+   "gripper": 0.0010999999940395355
+  },
+  "ctrl_rate_rad_per_step": 0.005322416359115407,
+  "ctrl_rate_rad_per_step_median": 0.0010188509738520146,
+  "action_at_limit_frac": 0.06032222222222222,
+  "action_at_limit_frac_per_joint": {
+   "shoulder_pan": 0.003,
+   "shoulder_lift": 0.2626,
+   "elbow_flex": 0.0,
+   "wrist_flex": 0.0957,
+   "wrist_roll": 0.0007,
+   "gripper": 0.0
+  },
+  "peak_speed_rad_s": {
+   "shoulder_pan": 0.975,
+   "shoulder_lift": 1.03,
+   "elbow_flex": 1.734,
+   "wrist_flex": 1.156,
+   "wrist_roll": 1.541,
+   "gripper": 2.729
+  },
+  "peak_speed_max_rad_s": 2.728631053425043,
+  "peak_speed_episode_median_rad_s": 2.7188819948298777,
+  "speed_p99_rad_s": 2.542286650522951
+ }
+}

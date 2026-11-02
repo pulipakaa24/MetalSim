@@ -1,0 +1,50 @@
+{
+ "substeps": 4,
+ "calls": 50,
+ "rounds": 7,
+ "note": "ratios only; this Mac is not a timing machine",
+ "n100": {
+  "bam_over_real": 0.9875658817748771,
+  "frozen_over_real": 0.9727468620653665,
+  "bam_over_frozen": 1.0152341994484015,
+  "relative_spread": {
+   "real": 0.13620990180247353,
+   "bam": 0.06133217598644144,
+   "frozen": 0.1122337180553454
+  },
+  "overflow": {
+   "real": {
+    "LS_ITERATIONS": 63
+   },
+   "bam": {
+    "ITERATIONS": 13,
+    "LS_ITERATIONS": 100
+   },
+   "frozen": {
+    "LS_ITERATIONS": 93
+   }
+  }
+ },
+ "n1024": {
+  "bam_over_real": 0.9836765200566999,
+  "frozen_over_real": 0.9880794394977291,
+  "bam_over_frozen": 0.9955439620894577,
+  "relative_spread": {
+   "real": 0.21610753085996098,
+   "bam": 0.1015219383696454,
+   "frozen": 0.14122138136949747
+  },
+  "overflow": {
+   "real": {
+    "LS_ITERATIONS": 690
+   },
+   "bam": {
+    "ITERATIONS": 107,
+    "LS_ITERATIONS": 1021
+   },
+   "frozen": {
+    "LS_ITERATIONS": 990
+   }
+  }
+ }
+}

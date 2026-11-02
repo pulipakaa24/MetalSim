@@ -1,0 +1,163 @@
+{
+ "script": "runs/readme_media/scratch/so101-servo/eval_metalsim.py",
+ "servo": {
+  "servo": "7v4_real",
+  "label": "STS3215 C001 7.4 V under LeRobot's registers (P 16, Acceleration 254, gripper 50 %), BAM-identified firmware loop, datasheet torque-speed line, servo + host latency",
+  "joints": [
+   "shoulder_pan",
+   "shoulder_lift",
+   "elbow_flex",
+   "wrist_flex",
+   "wrist_roll",
+   "gripper"
+  ],
+  "forcerange_Nm": [
+   1.9123,
+   1.9123,
+   1.9123,
+   1.9123,
+   1.9123,
+   0.9857
+  ],
+  "damping_Nms": [
+   0.3417,
+   0.3417,
+   0.3417,
+   0.3417,
+   0.3417,
+   0.3417
+  ],
+  "noload_line_rad_s": [
+   5.596,
+   5.596,
+   5.596,
+   5.596,
+   5.596,
+   2.885
+  ],
+  "kp": [
+   5.262,
+   5.262,
+   5.262,
+   5.262,
+   5.262,
+   5.262
+  ],
+  "kv": [
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0
+  ],
+  "armature": [
+   0.0261,
+   0.0261,
+   0.0261,
+   0.0261,
+   0.0261,
+   0.0261
+  ],
+  "frictionloss": [
+   0.0515,
+   0.0515,
+   0.0515,
+   0.0515,
+   0.0515,
+   0.0515
+  ],
+  "setpoint": {
+   "cmd_delay": 0.004046900011857505,
+   "servo_delay": 0.0010469000118575051,
+   "host_delay": 0.003,
+   "speed_limit": 5.2883481319359,
+   "accel_limit": 38.963112012295284,
+   "timestep": 0.005
+  },
+  "actuators": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5
+  ]
+ },
+ "over": {},
+ "smoothness": {
+  "rms_acc": [
+   4.9131,
+   8.5797,
+   11.3556,
+   8.5425,
+   2.8196,
+   4.0515
+  ],
+  "rms_jerk": [
+   1434.8977,
+   2516.1785,
+   3324.2346,
+   2489.8359,
+   436.5085,
+   156.9663
+  ],
+  "reversals_per_s": [
+   0.2067,
+   0.265,
+   0.3267,
+   0.8417,
+   0.1967,
+   0.1733
+  ],
+  "osc_rms": [
+   0.0273,
+   0.0503,
+   0.0643,
+   0.0481,
+   0.025,
+   0.0309
+  ],
+  "osc_frac": [
+   0.0253,
+   0.0286,
+   0.0332,
+   0.0207,
+   0.004,
+   0.0017
+  ],
+  "above2hz_frac": [
+   0.0724,
+   0.0627,
+   0.0714,
+   0.0439,
+   0.0567,
+   0.0358
+  ],
+  "peak_speed": [
+   0.8655,
+   0.9232,
+   1.4869,
+   0.8804,
+   1.3098,
+   2.7279
+  ],
+  "peak_acc": [
+   133.2987,
+   240.1423,
+   308.8869,
+   156.8187,
+   76.4287,
+   139.8773
+  ],
+  "seconds": 600.0,
+  "f_band_hz": 5.0,
+  "v_hyst": 0.05
+ },
+ "successes": 0,
+ "cpu_agreement": {
+  "same_outcome": 100,
+  "only_metalsim": [],
+  "only_cpu": []
+ }
+}

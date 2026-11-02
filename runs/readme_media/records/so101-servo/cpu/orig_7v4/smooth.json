@@ -1,0 +1,178 @@
+{
+ "script": "runs/readme_media/scratch/so101-servo/eval_cpu.py",
+ "controller": {
+  "controller": "policy",
+  "file": "runs/film/so101_lift/policy/so101_lift_ppo.pt",
+  "source": {
+   "model_zip_sha256": "1ddf1bc34c06d8fa131be7135fbee51fdd1881bbc0bb4831093ebcd0b44d4c62",
+   "vecnorm_pkl_sha256": "ce78ad440c178b86282283264f8fe9dea16ba9839ddca9bf35d69ec2bf10e69d",
+   "num_timesteps": 8005632,
+   "progress_last": "steps=7996416 success=0.95 ep_rew=2204.7 fps=16292",
+   "stable_baselines3": "2.9.0",
+   "torch": "2.11.0",
+   "policy_class": "stable_baselines3.common.policies."
+  },
+  "check": {
+   "samples": 4096,
+   "max_abs_diff": 2.0265579223632812e-06,
+   "against": "PPO.predict(deterministic=True)"
+  }
+ },
+ "servo": {
+  "servo": "7v4",
+  "label": "STS3215 C001 7.4 V (SO-101 follower), gripper at LeRobot's 50 % torque limit",
+  "joints": [
+   "shoulder_pan",
+   "shoulder_lift",
+   "elbow_flex",
+   "wrist_flex",
+   "wrist_roll",
+   "gripper"
+  ],
+  "forcerange_Nm": [
+   1.9123,
+   1.9123,
+   1.9123,
+   1.9123,
+   1.9123,
+   0.9561
+  ],
+  "damping_Nms": [
+   0.3512,
+   0.3512,
+   0.3512,
+   0.3512,
+   0.3512,
+   0.3512
+  ],
+  "noload_line_rad_s": [
+   5.445,
+   5.445,
+   5.445,
+   5.445,
+   5.445,
+   2.723
+  ],
+  "kp": [
+   998.22,
+   998.22,
+   998.22,
+   998.22,
+   998.22,
+   998.22
+  ],
+  "kv": [
+   2.731,
+   2.731,
+   2.731,
+   2.731,
+   2.731,
+   2.731
+  ],
+  "armature": [
+   0.028,
+   0.028,
+   0.028,
+   0.028,
+   0.028,
+   0.028
+  ],
+  "frictionloss": [
+   0.052,
+   0.052,
+   0.052,
+   0.052,
+   0.052,
+   0.052
+  ]
+ },
+ "env": "so101Sim rl/native/so101_lift.py SO101LiftEnv (unchanged)",
+ "scene": "mujoco_menagerie/robotstudio_so101/scene_box_rl.xml",
+ "mujoco": "3.10.0",
+ "seeds": [
+  10000,
+  10099
+ ],
+ "wall_s": 4.574643850326538,
+ "over": {},
+ "fresh_kin": false,
+ "summary": {
+  "episodes": 100,
+  "successes": 77,
+  "success_rate": 0.77,
+  "max_height_mean": 0.1478854303498086,
+  "max_height_min": 0.0359408038923798,
+  "time_to_lift_mean_s": 1.6171428571428572,
+  "lifted_at_end": 70,
+  "terminated": 1
+ },
+ "smoothness": {
+  "rms_acc": [
+   53.9863,
+   54.5231,
+   48.9269,
+   44.8452,
+   59.9751,
+   16.2328
+  ],
+  "rms_jerk": [
+   10280.9645,
+   10447.5275,
+   9072.1482,
+   8400.9329,
+   10715.1705,
+   2120.1507
+  ],
+  "reversals_per_s": [
+   26.5173,
+   26.0621,
+   22.0905,
+   10.8777,
+   27.0808,
+   2.5343
+  ],
+  "osc_rms": [
+   0.4877,
+   0.5042,
+   0.4923,
+   0.4757,
+   0.546,
+   0.1883
+  ],
+  "osc_frac": [
+   0.1827,
+   0.1634,
+   0.169,
+   0.1033,
+   0.1116,
+   0.0284
+  ],
+  "above2hz_frac": [
+   0.3855,
+   0.3689,
+   0.4688,
+   0.3089,
+   0.2351,
+   0.1259
+  ],
+  "peak_speed": [
+   5.3357,
+   5.8735,
+   5.7275,
+   5.6267,
+   5.6851,
+   3.53
+  ],
+  "peak_acc": [
+   862.6573,
+   1015.5475,
+   698.0807,
+   1001.3231,
+   456.9615,
+   509.2733
+  ],
+  "seconds": 599.76,
+  "f_band_hz": 5.0,
+  "v_hyst": 0.05
+ }
+}

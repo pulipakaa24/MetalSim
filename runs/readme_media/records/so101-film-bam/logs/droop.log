@@ -1,0 +1,17 @@
+real sag (cmd - q) median in the hold, mrad {'pan': 6.0, 'lift': -17.8, 'elbow': -123.0, 'wflex': -47.7, 'wroll': 9.7, 'grip': -523.0}
+   cmd {'pan': 0.1298, 'lift': -1.4956, 'elbow': 0.5636, 'wflex': 1.2486, 'wroll': -1.8383, 'grip': -0.15} 
+   q   {'pan': 0.1238, 'lift': -1.4778, 'elbow': 0.6866, 'wflex': 1.2963, 'wroll': -1.848, 'grip': 0.373}
+bam sag (cmd - q) median in the hold, mrad {'pan': 4.2, 'lift': -0.3, 'elbow': -45.3, 'wflex': -12.0, 'wroll': 0.7, 'grip': -492.4}
+   cmd {'pan': 0.1092, 'lift': -1.49, 'elbow': 0.5676, 'wflex': 1.2393, 'wroll': -1.8303, 'grip': -0.15} 
+   q   {'pan': 0.105, 'lift': -1.4897, 'elbow': 0.6129, 'wflex': 1.2513, 'wroll': -1.8309, 'grip': 0.3424}
+q bam - real in the hold, mrad {'pan': -18.8, 'lift': -11.9, 'elbow': -73.7, 'wflex': -45.0, 'wroll': 17.1, 'grip': -30.6}
+cmd bam - real in the hold, mrad {'pan': -20.6, 'lift': 5.6, 'elbow': 4.0, 'wflex': -9.3, 'wroll': 8.0, 'grip': 0.0}
+real take vs eval, max |dq| over arm joints at frames {60: 3e-05, 110: 5e-05, 149: 4e-05, 199: 3e-05, 249: 5e-05, 299: 5e-05}
+bam take vs eval, max |dq| over arm joints at frames {60: 2e-05, 110: 8e-05, 149: 4e-05, 199: 4e-05, 249: 5e-05, 299: 5e-05}
+take q bam - real at frames (mrad, lift / elbow / wflex):
+  frame 60: [-17.1, -36.2, 11.1]  tilt real 0.0 bam 0.0  box z real 0.0299 bam 0.0299
+  frame 110: [-89.5, -137.5, -5.9]  tilt real 26.99 bam 36.47  box z real 0.1364 bam 0.1692
+  frame 149: [-12.3, -75.2, -43.8]  tilt real 37.97 bam 42.52  box z real 0.1739 bam 0.1882
+  frame 199: [-12.0, -74.2, -44.6]  tilt real 37.07 bam 42.9  box z real 0.1731 bam 0.1881
+  frame 249: [-11.8, -73.2, -45.3]  tilt real 36.26 bam 43.24  box z real 0.1723 bam 0.1879
+  frame 299: [-11.6, -72.4, -45.7]  tilt real 35.48 bam 43.55  box z real 0.1716 bam 0.1878

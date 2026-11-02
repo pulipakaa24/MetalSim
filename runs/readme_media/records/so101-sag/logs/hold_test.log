@@ -1,0 +1,25 @@
+== 7v4_real: kp 5.262 forcerange 1.9123 damping 0.3417 armature 0.0261 setpoint {'cmd_delay': 0.004046900011857505, 'servo_delay': 0.0010469000118575051, 'host_delay': 0.003, 'speed_limit': 5.2883481319359, 'accel_limit': 38.963112012295284, 'timestep': 0.005}
+   shoulder |g|~0.6   |g| 0.804  with gravity: {'0.5s': 195.7, '1.0s': 138.0, '3.0s': 140.2, 'qd_end': 0.00083}   against: {'0.5s': 100.7, '1.0s': 156.7, '3.0s': 154.5, 'qd_end': -0.00084}
+   shoulder |g|~0.4   |g| 0.610  with gravity: {'0.5s': 151.1, '1.0s': 109.6, '3.0s': 110.8, 'qd_end': 0.00048}   against: {'0.5s': 80.3, '1.0s': 121.6, '3.0s': 120.2, 'qd_end': -0.00054}
+   elbow |g|~0.4      |g| 0.440  with gravity: {'0.5s': 107.3, '1.0s': 82.8, '3.0s': 83.0, 'qd_end': 7e-05}   against: {'0.5s': 60.7, '1.0s': 85.3, '3.0s': 84.9, 'qd_end': -0.00017}
+   wrist |g|~0.1      |g| 0.128  with gravity: {'0.5s': 36.0, '1.0s': 25.9, '3.0s': 25.3, 'qd_end': -0.00021}   against: {'0.5s': 11.8, '1.0s': 21.9, '3.0s': 22.6, 'qd_end': 0.00023}
+== bam_m1: kp 9.384 forcerange 3.4103 damping 0.6194 armature 0.0261 setpoint {'cmd_delay': 0.004046900011857505, 'servo_delay': 0.0010469000118575051, 'host_delay': 0.003, 'speed_limit': 5.2883481319359, 'accel_limit': 38.963112012295284, 'timestep': 0.005}
+   shoulder |g|~0.6   |g| 0.804  with gravity: {'0.5s': 92.8, '1.0s': 82.0, '3.0s': 82.8, 'qd_end': 0.00026}   against: {'0.5s': 76.4, '1.0s': 86.7, '3.0s': 85.8, 'qd_end': -0.00029}
+   shoulder |g|~0.4   |g| 0.610  with gravity: {'0.5s': 70.2, '1.0s': 65.3, '3.0s': 65.1, 'qd_end': -5e-05}   against: {'0.5s': 60.0, '1.0s': 64.7, '3.0s': 64.8, 'qd_end': 2e-05}
+   elbow |g|~0.4      |g| 0.440  with gravity: {'0.5s': 52.0, '1.0s': 49.4, '3.0s': 48.4, 'qd_end': -0.00028}   against: {'0.5s': 42.6, '1.0s': 44.9, '3.0s': 45.8, 'qd_end': 0.00027}
+   wrist |g|~0.1      |g| 0.128  with gravity: {'0.5s': 18.0, '1.0s': 17.2, '3.0s': 15.4, 'qd_end': -0.00044}   against: {'0.5s': 9.2, '1.0s': 10.0, '3.0s': 11.8, 'qd_end': 0.00044}
+== bam_m6: kp 10.575 forcerange 3.3247 damping 0.6189 armature 0.0216 setpoint {'cmd_delay': 0.00798075261948165, 'servo_delay': 0.0049807526194816515, 'host_delay': 0.003, 'speed_limit': 5.095754044445978, 'accel_limit': 38.963112012295284, 'timestep': 0.005}
+   shoulder |g|~0.6   |g| 0.804  with gravity: {'0.5s': 99.5, '1.0s': 99.3, '3.0s': 98.7, 'qd_end': -0.0003}   against: {'0.5s': 56.7, '1.0s': 56.8, '3.0s': 57.3, 'qd_end': 0.00022}
+   shoulder |g|~0.4   |g| 0.610  with gravity: {'0.5s': 77.0, '1.0s': 76.8, '3.0s': 76.4, 'qd_end': -0.00023}   against: {'0.5s': 42.4, '1.0s': 42.5, '3.0s': 42.9, 'qd_end': 0.00019}
+   elbow |g|~0.4      |g| 0.440  with gravity: {'0.5s': 55.7, '1.0s': 55.6, '3.0s': 55.2, 'qd_end': -0.0002}   against: {'0.5s': 28.4, '1.0s': 28.5, '3.0s': 28.9, 'qd_end': 0.0002}
+   wrist |g|~0.1      |g| 0.128  with gravity: {'0.5s': 22.8, '1.0s': 22.7, '3.0s': 22.4, 'qd_end': -0.00019}   against: {'0.5s': 2.5, '1.0s': 2.6, '3.0s': 3.0, 'qd_end': 0.00017}
+== bam_m6_nostiff: kp 10.575 forcerange 3.3247 damping 0.6189 armature 0.0216 setpoint {'cmd_delay': 0.00798075261948165, 'servo_delay': 0.0049807526194816515, 'host_delay': 0.003, 'speed_limit': 5.095754044445978, 'accel_limit': 38.963112012295284, 'timestep': 0.005}
+   shoulder |g|~0.6   |g| 0.804  with gravity: {'0.5s': 98.5, '1.0s': 95.6, '3.0s': 87.1, 'qd_end': -0.00248}   against: {'0.5s': 56.1, '1.0s': 58.5, '3.0s': 65.2, 'qd_end': 0.00196}
+   shoulder |g|~0.4   |g| 0.610  with gravity: {'0.5s': 76.3, '1.0s': 74.1, '3.0s': 67.4, 'qd_end': -0.00196}   against: {'0.5s': 42.0, '1.0s': 43.9, '3.0s': 49.5, 'qd_end': 0.00164}
+   elbow |g|~0.4      |g| 0.440  with gravity: {'0.5s': 55.3, '1.0s': 53.3, '3.0s': 47.9, 'qd_end': -0.00142}   against: {'0.5s': 28.2, '1.0s': 30.2, '3.0s': 35.6, 'qd_end': 0.00142}
+   wrist |g|~0.1      |g| 0.128  with gravity: {'0.5s': 22.4, '1.0s': 20.6, '3.0s': 16.1, 'qd_end': -0.00104}   against: {'0.5s': 2.6, '1.0s': 4.3, '3.0s': 8.5, 'qd_end': 0.00095}
+== 7v4_real+m6f: kp 5.262 forcerange 1.9123 damping 0.3417 armature 0.0261 setpoint {'cmd_delay': 0.004046900011857505, 'servo_delay': 0.0010469000118575051, 'host_delay': 0.003, 'speed_limit': 5.2883481319359, 'accel_limit': 38.963112012295284, 'timestep': 0.005}
+   shoulder |g|~0.6   |g| 0.804  with gravity: {'0.5s': 183.4, '1.0s': 183.3, '3.0s': 182.9, 'qd_end': -0.00023}   against: {'0.5s': 138.7, '1.0s': 138.7, '3.0s': 138.8, 'qd_end': 6e-05}
+   shoulder |g|~0.4   |g| 0.610  with gravity: {'0.5s': 155.1, '1.0s': 155.0, '3.0s': 154.5, 'qd_end': -0.00024}   against: {'0.5s': 104.2, '1.0s': 104.2, '3.0s': 104.4, 'qd_end': 8e-05}
+   elbow |g|~0.4      |g| 0.440  with gravity: {'0.5s': 123.5, '1.0s': 123.3, '3.0s': 122.7, 'qd_end': -0.0003}   against: {'0.5s': 65.9, '1.0s': 66.0, '3.0s': 66.3, 'qd_end': 0.00014}
+   wrist |g|~0.1      |g| 0.128  with gravity: {'0.5s': 46.7, '1.0s': 41.5, '3.0s': 41.2, 'qd_end': -0.00016}   against: {'0.5s': 3.6, '1.0s': 7.2, '3.0s': 7.5, 'qd_end': 0.00015}

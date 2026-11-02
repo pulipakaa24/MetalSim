@@ -1,0 +1,298 @@
+{
+ "script": "runs/readme_media/scratch/so101-bam-gpu/eval_metalsim_bam.py",
+ "backend": "cpu-dry",
+ "controller": "metalsim/render/film/so101_expert.py DeployExpert",
+ "ctrl_hz": 30.0,
+ "servo": {
+  "servo": "7v4_bam",
+  "label": "STS3215 7.4 V as Rhoban BAM's m6 identification (motor, firmware gain, load-dependent Stribeck gearbox friction) under LeRobot's registers, servo + host latency",
+  "joints": [
+   "shoulder_pan",
+   "shoulder_lift",
+   "elbow_flex",
+   "wrist_flex",
+   "wrist_roll",
+   "gripper"
+  ],
+  "forcerange_Nm": [
+   3.3247,
+   3.3247,
+   3.3247,
+   3.3247,
+   3.3247,
+   1.7138
+  ],
+  "damping_Nms": [
+   0.6189,
+   0.6189,
+   0.6189,
+   0.6189,
+   0.6189,
+   0.6189
+  ],
+  "noload_line_rad_s": [
+   5.372,
+   5.372,
+   5.372,
+   5.372,
+   5.372,
+   2.769
+  ],
+  "kp": [
+   10.575,
+   10.575,
+   10.575,
+   10.575,
+   10.575,
+   10.575
+  ],
+  "kv": [
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0
+  ],
+  "armature": [
+   0.0216,
+   0.0216,
+   0.0216,
+   0.0216,
+   0.0216,
+   0.0216
+  ],
+  "frictionloss": [
+   0.0534,
+   0.0534,
+   0.0534,
+   0.0534,
+   0.0534,
+   0.0534
+  ],
+  "setpoint": {
+   "cmd_delay": 0.00798075261948165,
+   "servo_delay": 0.0049807526194816515,
+   "host_delay": 0.003,
+   "speed_limit": 5.095754044445978,
+   "accel_limit": 38.963112012295284,
+   "timestep": 0.005
+  },
+  "actuators": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "friction": {
+   "params": {
+    "model": "m6",
+    "kt": 1.2753202369175398,
+    "R": 2.753421214375944,
+    "error_gain_ratio": 1.1616979929275297,
+    "armature": 0.021564290129722483,
+    "max_velocity": 5.095754044445978,
+    "command_delay": 0.0049807526194816515,
+    "friction_base": 0.0533134815909817,
+    "friction_stribeck": 4.257322248151969e-05,
+    "load_friction_motor": 0.044912012282132555,
+    "load_friction_external": 0.24355483356616028,
+    "load_friction_motor_stribeck": 0.00012448975632695385,
+    "load_friction_external_stribeck": 0.1422905635963302,
+    "load_friction_motor_quad": 0.007594943296670792,
+    "load_friction_external_quad": 0.00340408727365082,
+    "dtheta_stribeck": 0.371136775424206,
+    "alpha": 9.93094944677977,
+    "friction_viscous": 0.028160537042911545
+   },
+   "dofs": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+   ],
+   "emf": 0.5906984729396147,
+   "solref": [
+    -50000.0,
+    -200.0
+   ],
+   "solimp": [
+    0.99,
+    0.9999,
+    0.001,
+    0.5,
+    2.0
+   ]
+  }
+ },
+ "scene": "assets/so101/scene_box_rl.xml",
+ "seeds": [
+  10000,
+  10002
+ ],
+ "start_qpos_max_err": 2.515282659931728e-08,
+ "wall_s": 0.3,
+ "over": {},
+ "first_budget_ctrl": "start pose (servos holding)",
+ "capacity_overflow": {},
+ "solver_flags": {},
+ "software": {
+  "metalsim": "ed66d8ef3e+dirty",
+  "warp": {
+   "version": "1.18.0.dev20260917",
+   "git": "52c09cdd82",
+   "checkout": "upstream/warp-metalsim"
+  },
+  "mujoco": {
+   "version": "3.14.0"
+  },
+  "mujoco_warp": {
+   "version": "3.14.0",
+   "git": "93e5ce18e7",
+   "checkout": "upstream/mujoco_warp"
+  },
+  "torch": {
+   "version": "2.14.0"
+  },
+  "numpy": {
+   "version": "2.5.3"
+  }
+ },
+ "hardware": {
+  "machine": "arm64",
+  "python": "3.13.7",
+  "power": {
+   "source": "AC Power",
+   "battery_percent": 81,
+   "battery_state": "charging",
+   "mode": "High Power",
+   "mode_setting": "powermode 2",
+   "at": "2026-10-31T20:41:56-0700"
+  },
+  "model": "Mac16,6",
+  "cpu": "Apple M4 Max",
+  "memory_gb": 64,
+  "macos": "27.0.1",
+  "macos_build": "26A434",
+  "gpu": "Apple M4 Max",
+  "gpu_cores": "40"
+ },
+ "summary": {
+  "episodes": 3,
+  "successes": 3,
+  "up_at_6s": 3,
+  "time_to_lift_mean_s": 2.1666666666666665,
+  "time_to_lift_median_s": 2.18,
+  "max_height_mean": 0.17141068975130716,
+  "terminated": 0,
+  "retries": 0,
+  "phase_end": {
+   "approach": 0,
+   "descend": 0,
+   "grasp": 0,
+   "lift": 3
+  }
+ },
+ "episodes": [
+  {
+   "seed": 10000,
+   "success": true,
+   "success_t": 109,
+   "time_to_lift_s": 2.18,
+   "hmax": 0.1727,
+   "final_height": 0.1707,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "events": [
+    [
+     0.735,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.065,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.635,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10001,
+   "success": true,
+   "success_t": 109,
+   "time_to_lift_s": 2.18,
+   "hmax": 0.1722,
+   "final_height": 0.1708,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "events": [
+    [
+     0.7,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.065,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.635,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10002,
+   "success": true,
+   "success_t": 107,
+   "time_to_lift_s": 2.14,
+   "hmax": 0.1694,
+   "final_height": 0.1675,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "events": [
+    [
+     0.7,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.065,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.6,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  }
+ ]
+}

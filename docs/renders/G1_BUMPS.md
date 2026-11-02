@@ -1,6 +1,6 @@
 # G1 on rough ground, Unitree's policy: a metalsim render
 
-Unitree G1 walking onto [Isaac Lab](https://github.com/isaac-sim/IsaacLab)'s random rough ground (the `random_rough` sub-terrain of `ROUGH_TERRAINS_CFG`: bumps of 2 to 10 cm every 0.1 m) with Unitree's own pretrained walking policy, which is blind and was trained on flat ground ([unitree_rl_gym](https://github.com/unitreerobotics/unitree_rl_gym), `deploy/pre_train/g1/motion.pt`, BSD-3-Clause), played by Unitree's [MuJoCo](https://github.com/google-deepmind/mujoco) sim2sim loop ported to [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) on Metal (whose heightfield contacts match the exact geometry), on Unitree's own G1 model, and rendered by metalsim's path tracer. Rendered on the 14-inch MacBook Pro (Mac16,6), not in a timing run, so its Performance table is not a timing figure.
+Unitree G1 walking onto [Isaac Lab](https://github.com/isaac-sim/IsaacLab)'s random rough ground (the `random_rough` sub-terrain of `ROUGH_TERRAINS_CFG`: bumps of 2 to 10 cm every 0.1 m) with Unitree's own pretrained walking policy, which is blind and was trained on flat ground ([unitree_rl_gym](https://github.com/unitreerobotics/unitree_rl_gym), [`deploy/pre_train/g1/motion.pt`](https://github.com/unitreerobotics/unitree_rl_gym/blob/276801e46c5d433564f24658bac64f254b7d2d4b/deploy/pre_train/g1/motion.pt), BSD-3-Clause), played by Unitree's [MuJoCo](https://github.com/google-deepmind/mujoco) sim2sim loop ported to [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) on Metal (whose heightfield contacts match the exact geometry), on Unitree's own G1 model, and rendered by metalsim's path tracer. Rendered on the 14-inch MacBook Pro (Mac16,6), not in a timing run, so its Performance table is not a timing figure.
 
 **hero** (401 frames, 8.0 s at 50 fps): [video](g1_bumps.mp4) (4.7 MB, H.264)
 
@@ -12,7 +12,7 @@ Unitree G1 walking onto [Isaac Lab](https://github.com/isaac-sim/IsaacLab)'s ran
 
 - 16 envs simulated, filmed: 6 (selection: automatic, the adapter ranking).
   - env 6: terminated True, base_z 0.375, end_frame 266
-- Policy: `assets/unitree_rl_gym/deploy/pre_train/g1/motion.pt` (torchscript); physics: MuJoCo Warp BatchSim (metalsim.physics.batch), Unitree's scene.xml; Unitree's PD torque every physics step (Warp kernel: before the first step of a policy step, then BatchSim.add_substep_hook after each).
+- Policy: `assets/unitree_rl_gym/deploy/pre_train/g1/motion.pt` (torchscript; not in the repository: `scripts/fetch_unitree_rl_gym.sh` fetches it); physics: MuJoCo Warp BatchSim (metalsim.physics.batch), Unitree's scene.xml; Unitree's PD torque every physics step (Warp kernel: before the first step of a policy step, then BatchSim.add_substep_hook after each).
 
 ## Performance
 
@@ -48,25 +48,30 @@ Measured on the machine below; one frame = one policy step ([Isaac Lab](https://
 ## How it was made
 
 **What this film is.** The policy of the G1 flat film ([G1_UNITREE.md](G1_UNITREE.md)): Unitree's own pretrained G1
-walking policy, `deploy/pre_train/g1/motion.pt` from `unitree_rl_gym`
+walking policy, [`deploy/pre_train/g1/motion.pt`](https://github.com/unitreerobotics/unitree_rl_gym/blob/276801e46c5d433564f24658bac64f254b7d2d4b/deploy/pre_train/g1/motion.pt) from `unitree_rl_gym`
 (<https://github.com/unitreerobotics/unitree_rl_gym>, BSD-3-Clause, commit
 [`276801e`](https://github.com/unitreerobotics/unitree_rl_gym/commit/276801e46c5d433564f24658bac64f254b7d2d4b), sha256
 `cf668f75b90d1abf73d2b87612a6e76bccc61ff7e083b63582d3f6aaa3c1759d`), played by Unitree's MuJoCo sim2sim loop
-(`deploy/deploy_mujoco/deploy_mujoco.py`, `configs/g1.yaml`, command (0.5, 0, 0)) ported to [my fork of MuJoCo
-Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim), as in the G1 flat film, with one change: Unitree's
-floor plane is Isaac Lab's random rough ground. The policy is blind (47 observations: body rates, gravity, command,
-joint state, last action, gait clock; no height scan) and Unitree trained it on flat ground only (`legged_gym`,
-`legged_robot_config.py` line 15 `mesh_type = 'plane'`, not overridden by `g1_config.py`), with pushes, friction and
-mass randomization. Nothing is tuned, and the robot falls: this page shows what happens.
+([`deploy/deploy_mujoco/deploy_mujoco.py`](https://github.com/unitreerobotics/unitree_rl_gym/blob/276801e46c5d433564f24658bac64f254b7d2d4b/deploy/deploy_mujoco/deploy_mujoco.py),
+[`configs/g1.yaml`](https://github.com/unitreerobotics/unitree_rl_gym/blob/276801e46c5d433564f24658bac64f254b7d2d4b/deploy/deploy_mujoco/configs/g1.yaml), command (0.5, 0, 0)) ported to [my fork of
+MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim), as in the G1 flat film, with one change:
+Unitree's floor plane is Isaac Lab's random rough ground. The policy is blind (47 observations: body rates, gravity,
+command, joint state, last action, gait clock; no height scan) and Unitree trained it on flat ground only
+(`legged_gym`, [`legged_robot_config.py`](https://github.com/unitreerobotics/unitree_rl_gym/blob/276801e46c5d433564f24658bac64f254b7d2d4b/legged_gym/envs/base/legged_robot_config.py#L15) line 15
+`mesh_type = 'plane'`, not overridden by [`g1_config.py`](https://github.com/unitreerobotics/unitree_rl_gym/blob/276801e46c5d433564f24658bac64f254b7d2d4b/legged_gym/envs/g1/g1_config.py)), with
+pushes, friction and mass randomization. Nothing is tuned, and the robot falls: this page shows what happens.
 
-**Terrain.** Isaac Lab 2.3.2's `ROUGH_TERRAINS_CFG["random_rough"]` (`isaaclab/terrains/config/rough.py`):
+**Terrain.** Isaac Lab 2.3.2's `ROUGH_TERRAINS_CFG["random_rough"]`
+([`isaaclab/terrains/config/rough.py`](https://github.com/isaac-sim/IsaacLab/blob/v2.3.2/source/isaaclab/isaaclab/terrains/config/rough.py)):
 `HfRandomUniformTerrainCfg(proportion=0.2, noise_range=(0.02, 0.10), noise_step=0.02, border_width=0.25)`, on one 8 x 8
 m tile at the generator's horizontal scale 0.1 m and vertical scale 5 mm (slope threshold 0.75), with the generator's 20
 m flat border around it, built by MetalSim's port of Isaac's terrain generator (`metalsim.learn.isaac_terrain`, the
 generator of the G1 rough film) for env seed 0 (`unitree.random_rough_tile`). Isaac's `random_uniform_terrain`
-ignores its difficulty (`height_field/hf_terrains.py`, its docstring: "The difficulty parameter is ignored for this
-terrain"): at every curriculum level every 0.1 m grid point is an independent uniform draw from 2, 4, 6, 8 or 10 cm
-(`downsampled_scale` defaults to the horizontal scale, so the spline interpolation changes nothing). So Isaac Lab has
+ignores its difficulty
+([`height_field/hf_terrains.py`](https://github.com/isaac-sim/IsaacLab/blob/v2.3.2/source/isaaclab/isaaclab/terrains/height_field/hf_terrains.py),
+its docstring: "The difficulty parameter is ignored for this terrain"): at every curriculum level every 0.1 m grid
+point is an independent uniform draw from 2, 4, 6, 8 or 10 cm (`downsampled_scale` defaults to the horizontal scale,
+so the spline interpolation changes nothing). So Isaac Lab has
 one random rough terrain, not a range of levels: bumps 2 to 10 cm high every 0.1 m, up to 8 cm between neighbours, on
 a 0.25 m flat rim (z = 0) around the 7.5 m rough square. This film uses exactly that terrain; the levels in the table
 below with a lower ceiling are variants made here to see how the outcome depends on bump height, not Isaac's. The
@@ -219,8 +224,9 @@ view), as in the G1 films (G1_UNITREE.md), but lower. `hero` (1280x720; the vide
 the README grid): the same direction and elevation at 0.75 times the distance (2.60 m), looking at (0, 0, -0.15) m so
 the standing robot fits the 4:3 frame, plus MuJoCo Warp's README orbit of 10 deg/s about the vertical through the
 look-at point, symmetric about the middle of the 8 s film: -40 deg at 0 s, 0 at 4 s (the hero's direction), +40 deg at
-8 s, counter-clockwise seen from above (`mujoco_warp/record.py` in upstream MuJoCo Warp at
-[`d41a47c0`](https://github.com/google-deepmind/mujoco_warp/commit/d41a47c0837fc71abb44d7d4799bf85ca19ff7ab), lines 43
+8 s, counter-clockwise seen from above
+([`mujoco_warp/record.py`](https://github.com/google-deepmind/mujoco_warp/blob/d41a47c0837fc71abb44d7d4799bf85ca19ff7ab/mujoco_warp/record.py)
+in upstream MuJoCo Warp at [`d41a47c0`](https://github.com/google-deepmind/mujoco_warp/commit/d41a47c0837fc71abb44d7d4799bf85ca19ff7ab), lines 43
 and 142: 0.05 deg per 5 ms physics step). When the robot falls the tracked pelvis drops with it, and so does the camera.
 
 **Rendering.** Tier 2 (the path tracer), 64 samples per pixel (16 passes x 4), 3 bounces, [Open Image

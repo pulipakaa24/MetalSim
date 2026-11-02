@@ -1,0 +1,229 @@
+{
+ "kp": 5.262,
+ "c": 0.0515,
+ "offsets_deg": [
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0
+ ],
+ "datasets": {
+  "hungho77": {
+   "shoulder_pan": {
+    "n": 14937,
+    "g_p10_p90": [
+     0.0,
+     0.0
+    ],
+    "e_median_abs_mrad": 6.9,
+    "pred_median_abs_mrad": 0.0,
+    "slope_rad_per_Nm": 0.0,
+    "kp_eff": null,
+    "intercept_mrad": 4.5,
+    "r": NaN,
+    "resid_model_median_abs_mrad": 5.5
+   },
+   "shoulder_lift": {
+    "n": 6980,
+    "g_p10_p90": [
+     -0.709,
+     0.008
+    ],
+    "e_median_abs_mrad": 11.5,
+    "pred_median_abs_mrad": 73.7,
+    "slope_rad_per_Nm": 0.027,
+    "kp_eff": 37.17,
+    "intercept_mrad": -8.9,
+    "r": 0.523,
+    "resid_model_median_abs_mrad": 57.6
+   },
+   "elbow_flex": {
+    "n": 12107,
+    "g_p10_p90": [
+     -0.446,
+     -0.312
+    ],
+    "e_median_abs_mrad": 51.4,
+    "pred_median_abs_mrad": 72.9,
+    "slope_rad_per_Nm": 0.051,
+    "kp_eff": 19.5,
+    "intercept_mrad": -21.3,
+    "r": 0.109,
+    "resid_model_median_abs_mrad": 41.9
+   },
+   "wrist_flex": {
+    "n": 13206,
+    "g_p10_p90": [
+     -0.097,
+     0.002
+    ],
+    "e_median_abs_mrad": 5.4,
+    "pred_median_abs_mrad": 9.7,
+    "slope_rad_per_Nm": 0.051,
+    "kp_eff": 19.73,
+    "intercept_mrad": -3.1,
+    "r": 0.313,
+    "resid_model_median_abs_mrad": 6.3
+   },
+   "wrist_roll": {
+    "n": 20583,
+    "g_p10_p90": [
+     -0.004,
+     0.0
+    ],
+    "e_median_abs_mrad": 4.6,
+    "pred_median_abs_mrad": 0.6,
+    "slope_rad_per_Nm": -4.036,
+    "kp_eff": null,
+    "intercept_mrad": -15.8,
+    "r": -0.194,
+    "resid_model_median_abs_mrad": 15.8
+   }
+  },
+  "IlyaGusev": {
+   "shoulder_pan": {
+    "n": 3211,
+    "g_p10_p90": [
+     0.0,
+     0.0
+    ],
+    "e_median_abs_mrad": 13.8,
+    "pred_median_abs_mrad": 0.0,
+    "slope_rad_per_Nm": -0.0,
+    "kp_eff": null,
+    "intercept_mrad": -0.2,
+    "r": NaN,
+    "resid_model_median_abs_mrad": 14.1
+   },
+   "shoulder_lift": {
+    "n": 2766,
+    "g_p10_p90": [
+     -0.737,
+     -0.034
+    ],
+    "e_median_abs_mrad": 19.9,
+    "pred_median_abs_mrad": 82.9,
+    "slope_rad_per_Nm": 0.017,
+    "kp_eff": 58.88,
+    "intercept_mrad": -17.4,
+    "r": 0.232,
+    "resid_model_median_abs_mrad": 33.7
+   },
+   "elbow_flex": {
+    "n": 3981,
+    "g_p10_p90": [
+     -0.437,
+     -0.309
+    ],
+    "e_median_abs_mrad": 60.6,
+    "pred_median_abs_mrad": 70.8,
+    "slope_rad_per_Nm": -0.071,
+    "kp_eff": null,
+    "intercept_mrad": -76.3,
+    "r": -0.107,
+    "resid_model_median_abs_mrad": 85.1
+   },
+   "wrist_flex": {
+    "n": 3810,
+    "g_p10_p90": [
+     -0.091,
+     0.023
+    ],
+    "e_median_abs_mrad": 5.4,
+    "pred_median_abs_mrad": 5.0,
+    "slope_rad_per_Nm": 0.367,
+    "kp_eff": 2.73,
+    "intercept_mrad": 14.3,
+    "r": 0.302,
+    "resid_model_median_abs_mrad": 14.2
+   },
+   "wrist_roll": {
+    "n": 6080,
+    "g_p10_p90": [
+     -0.004,
+     0.001
+    ],
+    "e_median_abs_mrad": 7.7,
+    "pred_median_abs_mrad": 0.2,
+    "slope_rad_per_Nm": 1.324,
+    "kp_eff": 0.76,
+    "intercept_mrad": 2.5,
+    "r": 0.244,
+    "resid_model_median_abs_mrad": 6.9
+   }
+  }
+ },
+ "sim_free_phase": {
+  "shoulder_pan": {
+   "n": 159,
+   "g_p10_p90": [
+    0.0,
+    0.0
+   ],
+   "e_median_abs_mrad": 4.2,
+   "pred_median_abs_mrad": 0.0,
+   "slope_rad_per_Nm": -0.0,
+   "kp_eff": null,
+   "intercept_mrad": -0.5,
+   "r": NaN,
+   "resid_model_median_abs_mrad": 4.7
+  },
+  "shoulder_lift": {
+   "n": 44,
+   "g_p10_p90": [
+    -0.232,
+    0.127
+   ],
+   "e_median_abs_mrad": 48.6,
+   "pred_median_abs_mrad": 42.1,
+   "slope_rad_per_Nm": 0.144,
+   "kp_eff": 6.93,
+   "intercept_mrad": -16.3,
+   "r": 0.973,
+   "resid_model_median_abs_mrad": 7.2
+  },
+  "elbow_flex": {
+   "n": 58,
+   "g_p10_p90": [
+    -0.446,
+    -0.367
+   ],
+   "e_median_abs_mrad": 82.2,
+   "pred_median_abs_mrad": 82.7,
+   "slope_rad_per_Nm": 0.077,
+   "kp_eff": 12.96,
+   "intercept_mrad": -49.6,
+   "r": 0.786,
+   "resid_model_median_abs_mrad": 47.9
+  },
+  "wrist_flex": {
+   "n": 71,
+   "g_p10_p90": [
+    -0.116,
+    -0.087
+   ],
+   "e_median_abs_mrad": 25.3,
+   "pred_median_abs_mrad": 17.9,
+   "slope_rad_per_Nm": 0.25,
+   "kp_eff": 4.0,
+   "intercept_mrad": -0.6,
+   "r": 0.961,
+   "resid_model_median_abs_mrad": 5.9
+  },
+  "wrist_roll": {
+   "n": 50,
+   "g_p10_p90": [
+    -0.003,
+    -0.0
+   ],
+   "e_median_abs_mrad": 8.1,
+   "pred_median_abs_mrad": 0.2,
+   "slope_rad_per_Nm": 0.352,
+   "kp_eff": 2.84,
+   "intercept_mrad": 8.2,
+   "r": 0.416,
+   "resid_model_median_abs_mrad": 0.5
+  }
+ }
+}

@@ -284,6 +284,17 @@ class Take:
         return f"{body}, {m}; the encode and doc stages stamp nothing"
 
 
+def policy_fetch(task, rec) -> str:
+    """How a reader gets a policy file this repository does not track (``rec.json`` ``adapter.policy``): the ``fetch``
+    of the task's asset whose ``url`` is the checkpoint's source (``checkpoint.source_url``), else the checkpoint's own
+    ``fetch``; "" when git tracks the file or no fetch is known."""
+    path, ck = (rec.get("adapter") or {}).get("policy"), rec.get("checkpoint") or {}
+    if not path or provenance._run(["git", "ls-files", "--", path], cwd=provenance.ROOT):
+        return ""
+    src = ck.get("source_url")
+    return next((a.fetch for a in task.assets if a.fetch and src and a.url == src), "") or ck.get("fetch") or ""
+
+
 def write_doc(task, rec_dir, shots, doc_path, commands, extra_md=""):
     rec = _load(os.path.join(rec_dir, "rec.json"))
     doc_dir = os.path.dirname(doc_path)
@@ -320,7 +331,10 @@ def write_doc(task, rec_dir, shots, doc_path, commands, extra_md=""):
         ad = rec.get("adapter", {})
         it = ad.get("policy_iteration")
         fmt = ad.get("policy_format")
-        tag = f" (iteration {it})" if it is not None else (f" ({fmt})" if fmt else "")
+        fetch = policy_fetch(task, rec)
+        parts = [p for p in (f"iteration {it}" if it is not None else fmt,
+                             fetch and f"not in the repository: `{fetch}` fetches it") if p]
+        tag = f" ({'; '.join(parts)})" if parts else ""
         L.append(f"- Policy: `{ad.get('policy')}`{tag}; physics: {ad.get('physics')}.")
         if ad.get("note"):
             L.append(f"- Note: {ad['note']}")

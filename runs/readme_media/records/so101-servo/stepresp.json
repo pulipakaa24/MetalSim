@@ -1,0 +1,1816 @@
+{
+ "script": "runs/readme_media/scratch/so101-servo/stepresp.py",
+ "mujoco": "3.10.0",
+ "protocol": "qpos0, targets = positions, 1 s settle, +step on one joint, 1 s at 5 ms",
+ "results": {
+  "12v (old)": {
+   "shoulder_lift@0.06": {
+    "overshoot_pct": 52.06311780629491,
+    "overshoot_cmd_pct": 52.1260848923155,
+    "sag_before_mrad": -0.5704045132957561,
+    "ss_error_mrad": -0.0248451117913287,
+    "crossings": 6,
+    "crossings_cmd": 6,
+    "settle_ms": 190.0,
+    "t90_ms": 40.0,
+    "peak_speed": 2.3118914910004618,
+    "peak_acc": 96.42773335510984,
+    "max_ncon": 4
+   },
+   "elbow_flex@0.06": {
+    "overshoot_pct": 52.19558868035793,
+    "overshoot_cmd_pct": 52.19569781364346,
+    "sag_before_mrad": -0.4807826811527885,
+    "ss_error_mrad": -4.302356716723299e-05,
+    "crossings": 5,
+    "crossings_cmd": 5,
+    "settle_ms": 170.0,
+    "t90_ms": 40.0,
+    "peak_speed": 2.4712715567660912,
+    "peak_acc": 112.73701731442421,
+    "max_ncon": 4
+   },
+   "wrist_flex@0.06": {
+    "overshoot_pct": 32.54298106457477,
+    "overshoot_cmd_pct": 32.54279958804114,
+    "sag_before_mrad": -0.12864736042762326,
+    "ss_error_mrad": 8.215140424872036e-05,
+    "crossings": 5,
+    "crossings_cmd": 5,
+    "settle_ms": 120.0,
+    "t90_ms": 35.0,
+    "peak_speed": 2.494446029485016,
+    "peak_acc": 129.93839790387798,
+    "max_ncon": 4
+   },
+   "shoulder_lift@-0.5": {
+    "overshoot_pct": 12.184062248044814,
+    "overshoot_cmd_pct": 12.246166242159639,
+    "sag_before_mrad": -0.5704045132957561,
+    "ss_error_mrad": 0.27679508510536355,
+    "crossings": 4,
+    "crossings_cmd": 4,
+    "settle_ms": 335.0,
+    "t90_ms": 185.0,
+    "peak_speed": 3.7798088548229334,
+    "peak_acc": 120.88126294079603,
+    "max_ncon": 4
+   },
+   "elbow_flex@-0.5": {
+    "overshoot_pct": 9.948890426564908,
+    "overshoot_cmd_pct": 9.963436792894353,
+    "sag_before_mrad": -0.4807826811527885,
+    "ss_error_mrad": 0.06615058266168372,
+    "crossings": 3,
+    "crossings_cmd": 3,
+    "settle_ms": 295.0,
+    "t90_ms": 170.0,
+    "peak_speed": 3.813547695455414,
+    "peak_acc": 143.7307166892829,
+    "max_ncon": 4
+   },
+   "wrist_flex@-0.5": {
+    "overshoot_pct": 10.434716085987583,
+    "overshoot_cmd_pct": 10.438458930827954,
+    "sag_before_mrad": -0.12864736042762326,
+    "ss_error_mrad": 0.0169459612566758,
+    "crossings": 3,
+    "crossings_cmd": 3,
+    "settle_ms": 250.0,
+    "t90_ms": 145.0,
+    "peak_speed": 4.392508323033806,
+    "peak_acc": 180.3284790464718,
+    "max_ncon": 4
+   },
+   "servo": {
+    "forcerange_Nm": [
+     2.94,
+     2.94,
+     2.94,
+     2.94,
+     2.94,
+     2.94
+    ],
+    "damping_Nms": [
+     0.6,
+     0.6,
+     0.6,
+     0.6,
+     0.6,
+     0.6
+    ],
+    "kp": [
+     998.22,
+     998.22,
+     998.22,
+     998.22,
+     998.22,
+     998.22
+    ],
+    "kv": [
+     2.731,
+     2.731,
+     2.731,
+     2.731,
+     2.731,
+     2.731
+    ],
+    "armature": [
+     0.028,
+     0.028,
+     0.028,
+     0.028,
+     0.028,
+     0.028
+    ],
+    "frictionloss": [
+     0.052,
+     0.052,
+     0.052,
+     0.052,
+     0.052,
+     0.052
+    ]
+   }
+  },
+  "7v4 (old)": {
+   "shoulder_lift@0.06": {
+    "overshoot_pct": 88.53257308713803,
+    "overshoot_cmd_pct": 88.61064163477235,
+    "sag_before_mrad": -0.5704045132957553,
+    "ss_error_mrad": -0.024845111809369824,
+    "crossings": 6,
+    "crossings_cmd": 6,
+    "settle_ms": 315.0,
+    "t90_ms": 50.0,
+    "peak_speed": 2.0862935462116785,
+    "peak_acc": 67.96814470669065,
+    "max_ncon": 4
+   },
+   "elbow_flex@0.06": {
+    "overshoot_pct": 72.25823894931318,
+    "overshoot_cmd_pct": 72.25836246871017,
+    "sag_before_mrad": -0.4807826811527895,
+    "ss_error_mrad": -4.302356661906037e-05,
+    "crossings": 6,
+    "crossings_cmd": 6,
+    "settle_ms": 240.0,
+    "t90_ms": 45.0,
+    "peak_speed": 2.256337823063777,
+    "peak_acc": 78.06283969261945,
+    "max_ncon": 4
+   },
+   "wrist_flex@0.06": {
+    "overshoot_pct": 51.809774177083476,
+    "overshoot_cmd_pct": 51.809566320647946,
+    "sag_before_mrad": -0.12864736042762304,
+    "ss_error_mrad": 8.215140427647594e-05,
+    "crossings": 5,
+    "crossings_cmd": 5,
+    "settle_ms": 190.0,
+    "t90_ms": 45.0,
+    "peak_speed": 2.3189539796173246,
+    "peak_acc": 86.93243864447719,
+    "max_ncon": 4
+   },
+   "shoulder_lift@-0.5": {
+    "overshoot_pct": 17.140938617553644,
+    "overshoot_cmd_pct": 17.20577827619465,
+    "sag_before_mrad": -0.5704045132957553,
+    "ss_error_mrad": 0.2767591732071306,
+    "crossings": 5,
+    "crossings_cmd": 5,
+    "settle_ms": 555.0,
+    "t90_ms": 225.0,
+    "peak_speed": 3.368670044677908,
+    "peak_acc": 76.93817566434475,
+    "max_ncon": 4
+   },
+   "elbow_flex@-0.5": {
+    "overshoot_pct": 14.108209616587484,
+    "overshoot_cmd_pct": 14.123306281422154,
+    "sag_before_mrad": -0.4807826811527895,
+    "ss_error_mrad": 0.06615065158499522,
+    "crossings": 4,
+    "crossings_cmd": 4,
+    "settle_ms": 435.0,
+    "t90_ms": 205.00000000000003,
+    "peak_speed": 3.479788868415934,
+    "peak_acc": 99.44654354731375,
+    "max_ncon": 4
+   },
+   "wrist_flex@-0.5": {
+    "overshoot_pct": 17.787992902784705,
+    "overshoot_cmd_pct": 17.791984964576702,
+    "sag_before_mrad": -0.12864736042762304,
+    "ss_error_mrad": 0.01694596237533652,
+    "crossings": 4,
+    "crossings_cmd": 4,
+    "settle_ms": 380.0,
+    "t90_ms": 165.0,
+    "peak_speed": 4.313836335355501,
+    "peak_acc": 117.43024156808693,
+    "max_ncon": 4
+   },
+   "servo": {
+    "forcerange_Nm": [
+     1.9123,
+     1.9123,
+     1.9123,
+     1.9123,
+     1.9123,
+     0.9561
+    ],
+    "damping_Nms": [
+     0.3512,
+     0.3512,
+     0.3512,
+     0.3512,
+     0.3512,
+     0.3512
+    ],
+    "kp": [
+     998.22,
+     998.22,
+     998.22,
+     998.22,
+     998.22,
+     998.22
+    ],
+    "kv": [
+     2.731,
+     2.731,
+     2.731,
+     2.731,
+     2.731,
+     2.731
+    ],
+    "armature": [
+     0.028,
+     0.028,
+     0.028,
+     0.028,
+     0.028,
+     0.028
+    ],
+    "frictionloss": [
+     0.052,
+     0.052,
+     0.052,
+     0.052,
+     0.052,
+     0.052
+    ]
+   }
+  },
+  "12v_real": {
+   "shoulder_lift@0.06": {
+    "overshoot_pct": 0.12653801096101916,
+    "overshoot_cmd_pct": 0.0,
+    "sag_before_mrad": -78.95306241744693,
+    "ss_error_mrad": 1.977840668597651,
+    "crossings": 0,
+    "crossings_cmd": 0,
+    "settle_ms": 275.0,
+    "t90_ms": 235.00000000000003,
+    "peak_speed": 0.3537756060921927,
+    "peak_acc": 6.247816577400384,
+    "max_ncon": 4
+   },
+   "elbow_flex@0.06": {
+    "overshoot_pct": 0.006307068951822826,
+    "overshoot_cmd_pct": 0.0,
+    "sag_before_mrad": -61.4130055376645,
+    "ss_error_mrad": 3.220720917294903,
+    "crossings": 0,
+    "crossings_cmd": 0,
+    "settle_ms": 250.0,
+    "t90_ms": 215.0,
+    "peak_speed": 0.38186791327113806,
+    "peak_acc": 7.288284175065263,
+    "max_ncon": 4
+   },
+   "wrist_flex@0.06": {
+    "overshoot_pct": 0.03929969515106436,
+    "overshoot_cmd_pct": 2.0955180156059448,
+    "sag_before_mrad": -12.595727778390971,
+    "ss_error_mrad": -1.2332463302246883,
+    "crossings": 0,
+    "crossings_cmd": 1,
+    "settle_ms": 240.0,
+    "t90_ms": 200.0,
+    "peak_speed": 0.4490108088446823,
+    "peak_acc": 8.704019816032282,
+    "max_ncon": 4
+   },
+   "shoulder_lift@-0.5": {
+    "overshoot_pct": 9.854844920174495,
+    "overshoot_cmd_pct": 18.283798406428264,
+    "sag_before_mrad": -78.95306241744693,
+    "ss_error_mrad": 38.36404981673147,
+    "crossings": 1,
+    "crossings_cmd": 1,
+    "settle_ms": 595.0,
+    "t90_ms": 290.0,
+    "peak_speed": 3.0439189180417596,
+    "peak_acc": 27.608400386255205,
+    "max_ncon": 4
+   },
+   "elbow_flex@-0.5": {
+    "overshoot_pct": 6.695809164823098,
+    "overshoot_cmd_pct": 8.823782272195313,
+    "sag_before_mrad": -61.4130055376645,
+    "ss_error_mrad": 9.972149440682031,
+    "crossings": 1,
+    "crossings_cmd": 1,
+    "settle_ms": 545.0,
+    "t90_ms": 280.0,
+    "peak_speed": 3.046659851498127,
+    "peak_acc": 28.804289475325227,
+    "max_ncon": 4
+   },
+   "wrist_flex@-0.5": {
+    "overshoot_pct": 3.4319954830170265,
+    "overshoot_cmd_pct": 3.9672459268313087,
+    "sag_before_mrad": -12.595727778390971,
+    "ss_error_mrad": 2.5874510170412757,
+    "crossings": 1,
+    "crossings_cmd": 1,
+    "settle_ms": 450.0,
+    "t90_ms": 275.0,
+    "peak_speed": 3.0880560502482273,
+    "peak_acc": 30.548580772346988,
+    "max_ncon": 4
+   },
+   "servo": {
+    "forcerange_Nm": [
+     2.942,
+     2.942,
+     2.942,
+     2.942,
+     2.942,
+     1.5165
+    ],
+    "damping_Nms": [
+     0.6128,
+     0.6128,
+     0.6128,
+     0.6128,
+     0.6128,
+     0.6128
+    ],
+    "kp": [
+     8.095,
+     8.095,
+     8.095,
+     8.095,
+     8.095,
+     8.095
+    ],
+    "kv": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "armature": [
+     0.0261,
+     0.0261,
+     0.0261,
+     0.0261,
+     0.0261,
+     0.0261
+    ],
+    "frictionloss": [
+     0.0515,
+     0.0515,
+     0.0515,
+     0.0515,
+     0.0515,
+     0.0515
+    ],
+    "setpoint": {
+     "cmd_delay": 0.004046900011857505,
+     "servo_delay": 0.0010469000118575051,
+     "host_delay": 0.003,
+     "speed_limit": 5.2883481319359,
+     "accel_limit": 38.963112012295284,
+     "timestep": 0.005
+    }
+   }
+  },
+  "7v4_real": {
+   "shoulder_lift@0.06": {
+    "overshoot_pct": 0.3512292907193377,
+    "overshoot_cmd_pct": 1.9052925099107694,
+    "sag_before_mrad": -121.22405746384372,
+    "ss_error_mrad": -0.9291743988641826,
+    "crossings": 0,
+    "crossings_cmd": 1,
+    "settle_ms": 310.0,
+    "t90_ms": 275.0,
+    "peak_speed": 0.3131443070995527,
+    "peak_acc": 4.587009662342012,
+    "max_ncon": 4
+   },
+   "elbow_flex@0.06": {
+    "overshoot_pct": 0.28073312858851845,
+    "overshoot_cmd_pct": 0.0,
+    "sag_before_mrad": -96.44829332690472,
+    "ss_error_mrad": 6.3915194903498636,
+    "crossings": 0,
+    "crossings_cmd": 0,
+    "settle_ms": 280.0,
+    "t90_ms": 245.0,
+    "peak_speed": 0.311431089737714,
+    "peak_acc": 5.0641122823246985,
+    "max_ncon": 4
+   },
+   "wrist_flex@0.06": {
+    "overshoot_pct": 0.23454652487068012,
+    "overshoot_cmd_pct": 6.285888663405034,
+    "sag_before_mrad": -21.005031318654776,
+    "ss_error_mrad": -3.6223092825782564,
+    "crossings": 0,
+    "crossings_cmd": 1,
+    "settle_ms": 255.0,
+    "t90_ms": 220.0,
+    "peak_speed": 0.41180781771863073,
+    "peak_acc": 6.856741370451575,
+    "max_ncon": 4
+   },
+   "shoulder_lift@-0.5": {
+    "overshoot_pct": 21.7600888212564,
+    "overshoot_cmd_pct": 31.933199961979074,
+    "sag_before_mrad": -121.22405746384372,
+    "ss_error_mrad": 41.775228809403984,
+    "crossings": 1,
+    "crossings_cmd": 1,
+    "settle_ms": 725.0,
+    "t90_ms": 315.0,
+    "peak_speed": 2.8144976728391735,
+    "peak_acc": 22.24884336906625,
+    "max_ncon": 4
+   },
+   "elbow_flex@-0.5": {
+    "overshoot_pct": 17.600746637755876,
+    "overshoot_cmd_pct": 19.242804553399218,
+    "sag_before_mrad": -96.44829332690472,
+    "ss_error_mrad": 6.9814944317545535,
+    "crossings": 1,
+    "crossings_cmd": 1,
+    "settle_ms": 640.0,
+    "t90_ms": 290.0,
+    "peak_speed": 2.9516937898680617,
+    "peak_acc": 26.38568190641659,
+    "max_ncon": 4
+   },
+   "wrist_flex@-0.5": {
+    "overshoot_pct": 16.01659290941627,
+    "overshoot_cmd_pct": 14.649553290537298,
+    "sag_before_mrad": -21.005031318654776,
+    "ss_error_mrad": -5.891569406568986,
+    "crossings": 1,
+    "crossings_cmd": 2,
+    "settle_ms": 555.0,
+    "t90_ms": 270.0,
+    "peak_speed": 3.235293053811766,
+    "peak_acc": 29.59450049307226,
+    "max_ncon": 4
+   },
+   "servo": {
+    "forcerange_Nm": [
+     1.9123,
+     1.9123,
+     1.9123,
+     1.9123,
+     1.9123,
+     0.9857
+    ],
+    "damping_Nms": [
+     0.3417,
+     0.3417,
+     0.3417,
+     0.3417,
+     0.3417,
+     0.3417
+    ],
+    "kp": [
+     5.262,
+     5.262,
+     5.262,
+     5.262,
+     5.262,
+     5.262
+    ],
+    "kv": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "armature": [
+     0.0261,
+     0.0261,
+     0.0261,
+     0.0261,
+     0.0261,
+     0.0261
+    ],
+    "frictionloss": [
+     0.0515,
+     0.0515,
+     0.0515,
+     0.0515,
+     0.0515,
+     0.0515
+    ],
+    "setpoint": {
+     "cmd_delay": 0.004046900011857505,
+     "servo_delay": 0.0010469000118575051,
+     "host_delay": 0.003,
+     "speed_limit": 5.2883481319359,
+     "accel_limit": 38.963112012295284,
+     "timestep": 0.005
+    }
+   }
+  },
+  "A0 gains+line only": {
+   "shoulder_lift@0.06": {
+    "overshoot_pct": 0.38203845124249614,
+    "overshoot_cmd_pct": 2.016503796486921,
+    "sag_before_mrad": -121.22405746384372,
+    "ss_error_mrad": -0.9769468943619728,
+    "crossings": 0,
+    "crossings_cmd": 1,
+    "settle_ms": 270.0,
+    "t90_ms": 230.0,
+    "peak_speed": 0.31451560435967796,
+    "peak_acc": 5.515439126871101,
+    "max_ncon": 4
+   },
+   "elbow_flex@0.06": {
+    "overshoot_pct": 0.3083731939134639,
+    "overshoot_cmd_pct": 0.0,
+    "sag_before_mrad": -96.44829332690472,
+    "ss_error_mrad": 6.346420717720201,
+    "crossings": 0,
+    "crossings_cmd": 0,
+    "settle_ms": 235.00000000000003,
+    "t90_ms": 205.00000000000003,
+    "peak_speed": 0.31290876028873654,
+    "peak_acc": 6.213026948424774,
+    "max_ncon": 4
+   },
+   "wrist_flex@0.06": {
+    "overshoot_pct": 0.27837987242427426,
+    "overshoot_cmd_pct": 6.558502241905776,
+    "sag_before_mrad": -21.005031318654776,
+    "ss_error_mrad": -3.757612983459349,
+    "crossings": 0,
+    "crossings_cmd": 1,
+    "settle_ms": 215.0,
+    "t90_ms": 185.0,
+    "peak_speed": 0.41807897468922134,
+    "peak_acc": 9.794850209873086,
+    "max_ncon": 4
+   },
+   "shoulder_lift@-0.5": {
+    "overshoot_pct": 21.674626802239537,
+    "overshoot_cmd_pct": 32.04746629295969,
+    "sag_before_mrad": -121.22405746384372,
+    "ss_error_mrad": 42.625318701734585,
+    "crossings": 1,
+    "crossings_cmd": 1,
+    "settle_ms": 650.0,
+    "t90_ms": 245.0,
+    "peak_speed": 2.834147569943787,
+    "peak_acc": 30.033601882656324,
+    "max_ncon": 4
+   },
+   "elbow_flex@-0.5": {
+    "overshoot_pct": 17.774995509423054,
+    "overshoot_cmd_pct": 19.432721687809227,
+    "sag_before_mrad": -96.44829332690472,
+    "ss_error_mrad": 7.0376830464559115,
+    "crossings": 1,
+    "crossings_cmd": 1,
+    "settle_ms": 565.0000000000001,
+    "t90_ms": 210.0,
+    "peak_speed": 2.98760456539816,
+    "peak_acc": 39.88138949220738,
+    "max_ncon": 4
+   },
+   "wrist_flex@-0.5": {
+    "overshoot_pct": 17.906823105304404,
+    "overshoot_cmd_pct": 16.207623400805858,
+    "sag_before_mrad": -21.005031318654776,
+    "ss_error_mrad": -7.2056886096446,
+    "crossings": 1,
+    "crossings_cmd": 2,
+    "settle_ms": 460.0,
+    "t90_ms": 170.0,
+    "peak_speed": 3.53938370153452,
+    "peak_acc": 60.33836577831302,
+    "max_ncon": 4
+   },
+   "servo": {
+    "forcerange_Nm": [
+     1.9123,
+     1.9123,
+     1.9123,
+     1.9123,
+     1.9123,
+     0.9857
+    ],
+    "damping_Nms": [
+     0.3417,
+     0.3417,
+     0.3417,
+     0.3417,
+     0.3417,
+     0.3417
+    ],
+    "kp": [
+     5.262,
+     5.262,
+     5.262,
+     5.262,
+     5.262,
+     5.262
+    ],
+    "kv": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "armature": [
+     0.0261,
+     0.0261,
+     0.0261,
+     0.0261,
+     0.0261,
+     0.0261
+    ],
+    "frictionloss": [
+     0.0515,
+     0.0515,
+     0.0515,
+     0.0515,
+     0.0515,
+     0.0515
+    ],
+    "overrides": {
+     "servo_delay": 0.0,
+     "host_delay": 0.0,
+     "speed_limit": Infinity,
+     "accel_limit": Infinity
+    },
+    "setpoint": {
+     "cmd_delay": 0.0,
+     "servo_delay": 0.0,
+     "host_delay": 0.0,
+     "speed_limit": Infinity,
+     "accel_limit": Infinity,
+     "timestep": 0.005
+    }
+   }
+  },
+  "A1 +(a) servo delay 1.05 ms": {
+   "shoulder_lift@0.06": {
+    "overshoot_pct": 0.3811277043243112,
+    "overshoot_cmd_pct": 2.0129851391902793,
+    "sag_before_mrad": -121.22405746384372,
+    "ss_error_mrad": -0.975396952904925,
+    "crossings": 0,
+    "crossings_cmd": 1,
+    "settle_ms": 270.0,
+    "t90_ms": 235.00000000000003,
+    "peak_speed": 0.3145258256925959,
+    "peak_acc": 5.464476928849614,
+    "max_ncon": 4
+   },
+   "elbow_flex@0.06": {
+    "overshoot_pct": 0.3077272688443513,
+    "overshoot_cmd_pct": 0.0,
+    "sag_before_mrad": -96.44829332690472,
+    "ss_error_mrad": 6.347500500362514,
+    "crossings": 0,
+    "crossings_cmd": 0,
+    "settle_ms": 240.0,
+    "t90_ms": 205.00000000000003,
+    "peak_speed": 0.31291500823512575,
+    "peak_acc": 6.185285204926305,
+    "max_ncon": 4
+   },
+   "wrist_flex@0.06": {
+    "overshoot_pct": 0.2764009865981256,
+    "overshoot_cmd_pct": 6.543688235424727,
+    "sag_before_mrad": -21.005031318654776,
+    "ss_error_mrad": -3.750007292142976,
+    "crossings": 0,
+    "crossings_cmd": 1,
+    "settle_ms": 220.0,
+    "t90_ms": 185.0,
+    "peak_speed": 0.4178426401490895,
+    "peak_acc": 9.209775714841035,
+    "max_ncon": 4
+   },
+   "shoulder_lift@-0.5": {
+    "overshoot_pct": 21.674626802239537,
+    "overshoot_cmd_pct": 32.04746629295969,
+    "sag_before_mrad": -121.22405746384372,
+    "ss_error_mrad": 42.625318701734585,
+    "crossings": 1,
+    "crossings_cmd": 1,
+    "settle_ms": 650.0,
+    "t90_ms": 245.0,
+    "peak_speed": 2.834147569943787,
+    "peak_acc": 30.033601882656324,
+    "max_ncon": 4
+   },
+   "elbow_flex@-0.5": {
+    "overshoot_pct": 17.774995509423054,
+    "overshoot_cmd_pct": 19.432721687809227,
+    "sag_before_mrad": -96.44829332690472,
+    "ss_error_mrad": 7.0376830464559115,
+    "crossings": 1,
+    "crossings_cmd": 1,
+    "settle_ms": 565.0000000000001,
+    "t90_ms": 210.0,
+    "peak_speed": 2.98760456539816,
+    "peak_acc": 39.88138949220738,
+    "max_ncon": 4
+   },
+   "wrist_flex@-0.5": {
+    "overshoot_pct": 17.906823105304404,
+    "overshoot_cmd_pct": 16.207623400805858,
+    "sag_before_mrad": -21.005031318654776,
+    "ss_error_mrad": -7.2056886096446,
+    "crossings": 1,
+    "crossings_cmd": 2,
+    "settle_ms": 460.0,
+    "t90_ms": 170.0,
+    "peak_speed": 3.53938370153452,
+    "peak_acc": 60.33836577831302,
+    "max_ncon": 4
+   },
+   "servo": {
+    "forcerange_Nm": [
+     1.9123,
+     1.9123,
+     1.9123,
+     1.9123,
+     1.9123,
+     0.9857
+    ],
+    "damping_Nms": [
+     0.3417,
+     0.3417,
+     0.3417,
+     0.3417,
+     0.3417,
+     0.3417
+    ],
+    "kp": [
+     5.262,
+     5.262,
+     5.262,
+     5.262,
+     5.262,
+     5.262
+    ],
+    "kv": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "armature": [
+     0.0261,
+     0.0261,
+     0.0261,
+     0.0261,
+     0.0261,
+     0.0261
+    ],
+    "frictionloss": [
+     0.0515,
+     0.0515,
+     0.0515,
+     0.0515,
+     0.0515,
+     0.0515
+    ],
+    "overrides": {
+     "servo_delay": 0.0010469000118575051,
+     "host_delay": 0.0,
+     "speed_limit": Infinity,
+     "accel_limit": Infinity
+    },
+    "setpoint": {
+     "cmd_delay": 0.0010469000118575051,
+     "servo_delay": 0.0010469000118575051,
+     "host_delay": 0.0,
+     "speed_limit": Infinity,
+     "accel_limit": Infinity,
+     "timestep": 0.005
+    }
+   }
+  },
+  "A2 +(b) speed+accel profile": {
+   "shoulder_lift@0.06": {
+    "overshoot_pct": 0.3512292907193377,
+    "overshoot_cmd_pct": 1.9052925099107694,
+    "sag_before_mrad": -121.22405746384372,
+    "ss_error_mrad": -0.9291743988641826,
+    "crossings": 0,
+    "crossings_cmd": 1,
+    "settle_ms": 310.0,
+    "t90_ms": 275.0,
+    "peak_speed": 0.3131443070995527,
+    "peak_acc": 4.587009662342012,
+    "max_ncon": 4
+   },
+   "elbow_flex@0.06": {
+    "overshoot_pct": 0.28073312858851845,
+    "overshoot_cmd_pct": 0.0,
+    "sag_before_mrad": -96.44829332690472,
+    "ss_error_mrad": 6.3915194903498636,
+    "crossings": 0,
+    "crossings_cmd": 0,
+    "settle_ms": 280.0,
+    "t90_ms": 245.0,
+    "peak_speed": 0.311431089737714,
+    "peak_acc": 5.0641122823246985,
+    "max_ncon": 4
+   },
+   "wrist_flex@0.06": {
+    "overshoot_pct": 0.23454652487068012,
+    "overshoot_cmd_pct": 6.285888663405034,
+    "sag_before_mrad": -21.005031318654776,
+    "ss_error_mrad": -3.6223092825782564,
+    "crossings": 0,
+    "crossings_cmd": 1,
+    "settle_ms": 255.0,
+    "t90_ms": 220.0,
+    "peak_speed": 0.41180781771863073,
+    "peak_acc": 6.856741370451575,
+    "max_ncon": 4
+   },
+   "shoulder_lift@-0.5": {
+    "overshoot_pct": 21.7600888212564,
+    "overshoot_cmd_pct": 31.933199961979074,
+    "sag_before_mrad": -121.22405746384372,
+    "ss_error_mrad": 41.775228809403984,
+    "crossings": 1,
+    "crossings_cmd": 1,
+    "settle_ms": 725.0,
+    "t90_ms": 315.0,
+    "peak_speed": 2.8144976728391735,
+    "peak_acc": 22.24884336906625,
+    "max_ncon": 4
+   },
+   "elbow_flex@-0.5": {
+    "overshoot_pct": 17.600746637755876,
+    "overshoot_cmd_pct": 19.242804553399218,
+    "sag_before_mrad": -96.44829332690472,
+    "ss_error_mrad": 6.9814944317545535,
+    "crossings": 1,
+    "crossings_cmd": 1,
+    "settle_ms": 640.0,
+    "t90_ms": 290.0,
+    "peak_speed": 2.9516937898680617,
+    "peak_acc": 26.38568190641659,
+    "max_ncon": 4
+   },
+   "wrist_flex@-0.5": {
+    "overshoot_pct": 16.01659290941627,
+    "overshoot_cmd_pct": 14.649553290537298,
+    "sag_before_mrad": -21.005031318654776,
+    "ss_error_mrad": -5.891569406568986,
+    "crossings": 1,
+    "crossings_cmd": 2,
+    "settle_ms": 555.0,
+    "t90_ms": 270.0,
+    "peak_speed": 3.235293053811766,
+    "peak_acc": 29.59450049307226,
+    "max_ncon": 4
+   },
+   "servo": {
+    "forcerange_Nm": [
+     1.9123,
+     1.9123,
+     1.9123,
+     1.9123,
+     1.9123,
+     0.9857
+    ],
+    "damping_Nms": [
+     0.3417,
+     0.3417,
+     0.3417,
+     0.3417,
+     0.3417,
+     0.3417
+    ],
+    "kp": [
+     5.262,
+     5.262,
+     5.262,
+     5.262,
+     5.262,
+     5.262
+    ],
+    "kv": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "armature": [
+     0.0261,
+     0.0261,
+     0.0261,
+     0.0261,
+     0.0261,
+     0.0261
+    ],
+    "frictionloss": [
+     0.0515,
+     0.0515,
+     0.0515,
+     0.0515,
+     0.0515,
+     0.0515
+    ],
+    "overrides": {
+     "host_delay": 0.0
+    },
+    "setpoint": {
+     "cmd_delay": 0.0010469000118575051,
+     "servo_delay": 0.0010469000118575051,
+     "host_delay": 0.0,
+     "speed_limit": 5.2883481319359,
+     "accel_limit": 38.963112012295284,
+     "timestep": 0.005
+    }
+   }
+  },
+  "A3 +(c) host latency 3 ms (= 7v4_real)": {
+   "shoulder_lift@0.06": {
+    "overshoot_pct": 0.3512292907193377,
+    "overshoot_cmd_pct": 1.9052925099107694,
+    "sag_before_mrad": -121.22405746384372,
+    "ss_error_mrad": -0.9291743988641826,
+    "crossings": 0,
+    "crossings_cmd": 1,
+    "settle_ms": 310.0,
+    "t90_ms": 275.0,
+    "peak_speed": 0.3131443070995527,
+    "peak_acc": 4.587009662342012,
+    "max_ncon": 4
+   },
+   "elbow_flex@0.06": {
+    "overshoot_pct": 0.28073312858851845,
+    "overshoot_cmd_pct": 0.0,
+    "sag_before_mrad": -96.44829332690472,
+    "ss_error_mrad": 6.3915194903498636,
+    "crossings": 0,
+    "crossings_cmd": 0,
+    "settle_ms": 280.0,
+    "t90_ms": 245.0,
+    "peak_speed": 0.311431089737714,
+    "peak_acc": 5.0641122823246985,
+    "max_ncon": 4
+   },
+   "wrist_flex@0.06": {
+    "overshoot_pct": 0.23454652487068012,
+    "overshoot_cmd_pct": 6.285888663405034,
+    "sag_before_mrad": -21.005031318654776,
+    "ss_error_mrad": -3.6223092825782564,
+    "crossings": 0,
+    "crossings_cmd": 1,
+    "settle_ms": 255.0,
+    "t90_ms": 220.0,
+    "peak_speed": 0.41180781771863073,
+    "peak_acc": 6.856741370451575,
+    "max_ncon": 4
+   },
+   "shoulder_lift@-0.5": {
+    "overshoot_pct": 21.7600888212564,
+    "overshoot_cmd_pct": 31.933199961979074,
+    "sag_before_mrad": -121.22405746384372,
+    "ss_error_mrad": 41.775228809403984,
+    "crossings": 1,
+    "crossings_cmd": 1,
+    "settle_ms": 725.0,
+    "t90_ms": 315.0,
+    "peak_speed": 2.8144976728391735,
+    "peak_acc": 22.24884336906625,
+    "max_ncon": 4
+   },
+   "elbow_flex@-0.5": {
+    "overshoot_pct": 17.600746637755876,
+    "overshoot_cmd_pct": 19.242804553399218,
+    "sag_before_mrad": -96.44829332690472,
+    "ss_error_mrad": 6.9814944317545535,
+    "crossings": 1,
+    "crossings_cmd": 1,
+    "settle_ms": 640.0,
+    "t90_ms": 290.0,
+    "peak_speed": 2.9516937898680617,
+    "peak_acc": 26.38568190641659,
+    "max_ncon": 4
+   },
+   "wrist_flex@-0.5": {
+    "overshoot_pct": 16.01659290941627,
+    "overshoot_cmd_pct": 14.649553290537298,
+    "sag_before_mrad": -21.005031318654776,
+    "ss_error_mrad": -5.891569406568986,
+    "crossings": 1,
+    "crossings_cmd": 2,
+    "settle_ms": 555.0,
+    "t90_ms": 270.0,
+    "peak_speed": 3.235293053811766,
+    "peak_acc": 29.59450049307226,
+    "max_ncon": 4
+   },
+   "servo": {
+    "forcerange_Nm": [
+     1.9123,
+     1.9123,
+     1.9123,
+     1.9123,
+     1.9123,
+     0.9857
+    ],
+    "damping_Nms": [
+     0.3417,
+     0.3417,
+     0.3417,
+     0.3417,
+     0.3417,
+     0.3417
+    ],
+    "kp": [
+     5.262,
+     5.262,
+     5.262,
+     5.262,
+     5.262,
+     5.262
+    ],
+    "kv": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "armature": [
+     0.0261,
+     0.0261,
+     0.0261,
+     0.0261,
+     0.0261,
+     0.0261
+    ],
+    "frictionloss": [
+     0.0515,
+     0.0515,
+     0.0515,
+     0.0515,
+     0.0515,
+     0.0515
+    ],
+    "setpoint": {
+     "cmd_delay": 0.004046900011857505,
+     "servo_delay": 0.0010469000118575051,
+     "host_delay": 0.003,
+     "speed_limit": 5.2883481319359,
+     "accel_limit": 38.963112012295284,
+     "timestep": 0.005
+    }
+   }
+  },
+  "full -(d) no back-EMF line": {
+   "shoulder_lift@0.06": {
+    "overshoot_pct": 33.07007707474023,
+    "overshoot_cmd_pct": 6.2067343993118165,
+    "sag_before_mrad": -134.48154274443976,
+    "ss_error_mrad": 12.11241923021071,
+    "crossings": 1,
+    "crossings_cmd": 2,
+    "settle_ms": 580.0,
+    "t90_ms": 225.0,
+    "peak_speed": 0.353348306417991,
+    "peak_acc": 12.007671924630536,
+    "max_ncon": 4
+   },
+   "elbow_flex@0.06": {
+    "overshoot_pct": 43.996307083923135,
+    "overshoot_cmd_pct": 27.809572055701704,
+    "sag_before_mrad": -94.69103463974703,
+    "ss_error_mrad": 6.744645896559376,
+    "crossings": 1,
+    "crossings_cmd": 2,
+    "settle_ms": 510.0,
+    "t90_ms": 180.0,
+    "peak_speed": 0.48420625903881687,
+    "peak_acc": 6.572004817325183,
+    "max_ncon": 4
+   },
+   "wrist_flex@0.06": {
+    "overshoot_pct": 48.858161970152985,
+    "overshoot_cmd_pct": 31.895965565154732,
+    "sag_before_mrad": -28.73386655542058,
+    "ss_error_mrad": 6.836922952897652,
+    "crossings": 1,
+    "crossings_cmd": 2,
+    "settle_ms": 460.0,
+    "t90_ms": 165.0,
+    "peak_speed": 0.5496772309249723,
+    "peak_acc": 7.877619868093732,
+    "max_ncon": 4
+   },
+   "shoulder_lift@-0.5": {
+    "overshoot_pct": 52.67356846046403,
+    "overshoot_cmd_pct": 80.83230709297327,
+    "sag_before_mrad": -134.48154274443976,
+    "ss_error_mrad": 92.21877406959655,
+    "crossings": 3,
+    "crossings_cmd": 3,
+    "settle_ms": 1000.0,
+    "t90_ms": 265.0,
+    "peak_speed": 4.413267789227941,
+    "peak_acc": 38.97763030716681,
+    "max_ncon": 4
+   },
+   "elbow_flex@-0.5": {
+    "overshoot_pct": 65.80954917742064,
+    "overshoot_cmd_pct": 61.51044961432692,
+    "sag_before_mrad": -94.69103463974703,
+    "ss_error_mrad": -12.963968554348948,
+    "crossings": 4,
+    "crossings_cmd": 4,
+    "settle_ms": 1000.0,
+    "t90_ms": 230.0,
+    "peak_speed": 4.655088009579705,
+    "peak_acc": 50.915102501960604,
+    "max_ncon": 4
+   },
+   "wrist_flex@-0.5": {
+    "overshoot_pct": 77.68651423954745,
+    "overshoot_cmd_pct": 62.54095527455756,
+    "sag_before_mrad": -28.73386655542058,
+    "ss_error_mrad": -42.61876324663405,
+    "crossings": 4,
+    "crossings_cmd": 4,
+    "settle_ms": 1000.0,
+    "t90_ms": 215.0,
+    "peak_speed": 5.038578623785918,
+    "peak_acc": 61.81239237165607,
+    "max_ncon": 4
+   },
+   "servo": {
+    "forcerange_Nm": [
+     1.9123,
+     1.9123,
+     1.9123,
+     1.9123,
+     1.9123,
+     0.9857
+    ],
+    "damping_Nms": [
+     0.0599,
+     0.0599,
+     0.0599,
+     0.0599,
+     0.0599,
+     0.0599
+    ],
+    "kp": [
+     5.262,
+     5.262,
+     5.262,
+     5.262,
+     5.262,
+     5.262
+    ],
+    "kv": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "armature": [
+     0.0261,
+     0.0261,
+     0.0261,
+     0.0261,
+     0.0261,
+     0.0261
+    ],
+    "frictionloss": [
+     0.0515,
+     0.0515,
+     0.0515,
+     0.0515,
+     0.0515,
+     0.0515
+    ],
+    "overrides": {
+     "line": 0.0
+    },
+    "setpoint": {
+     "cmd_delay": 0.004046900011857505,
+     "servo_delay": 0.0010469000118575051,
+     "host_delay": 0.003,
+     "speed_limit": 5.2883481319359,
+     "accel_limit": 38.963112012295284,
+     "timestep": 0.005
+    }
+   }
+  },
+  "full -(b) accel only off": {
+   "shoulder_lift@0.06": {
+    "overshoot_pct": 0.3779017914185172,
+    "overshoot_cmd_pct": 2.018375662105956,
+    "sag_before_mrad": -121.22405746384372,
+    "ss_error_mrad": -0.9805786979466546,
+    "crossings": 0,
+    "crossings_cmd": 1,
+    "settle_ms": 275.0,
+    "t90_ms": 240.0,
+    "peak_speed": 0.3145548072194677,
+    "peak_acc": 5.5172701388212175,
+    "max_ncon": 4
+   },
+   "elbow_flex@0.06": {
+    "overshoot_pct": 0.3060589368197248,
+    "overshoot_cmd_pct": 0.0,
+    "sag_before_mrad": -96.44829332690472,
+    "ss_error_mrad": 6.341463252259559,
+    "crossings": 0,
+    "crossings_cmd": 0,
+    "settle_ms": 245.0,
+    "t90_ms": 215.0,
+    "peak_speed": 0.3129684569113034,
+    "peak_acc": 6.258483965304542,
+    "max_ncon": 4
+   },
+   "wrist_flex@0.06": {
+    "overshoot_pct": 0.2734591865117857,
+    "overshoot_cmd_pct": 6.536795883903037,
+    "sag_before_mrad": -21.005031318654776,
+    "ss_error_mrad": -3.7477534423588086,
+    "crossings": 0,
+    "crossings_cmd": 1,
+    "settle_ms": 225.0,
+    "t90_ms": 190.0,
+    "peak_speed": 0.41756903318173827,
+    "peak_acc": 9.270134732070531,
+    "max_ncon": 4
+   },
+   "shoulder_lift@-0.5": {
+    "overshoot_pct": 21.719943752345248,
+    "overshoot_cmd_pct": 32.03567388963802,
+    "sag_before_mrad": -121.22405746384372,
+    "ss_error_mrad": 42.37485583414924,
+    "crossings": 1,
+    "crossings_cmd": 1,
+    "settle_ms": 670.0,
+    "t90_ms": 265.0,
+    "peak_speed": 2.8294353620021564,
+    "peak_acc": 24.563135721814632,
+    "max_ncon": 4
+   },
+   "elbow_flex@-0.5": {
+    "overshoot_pct": 17.751739349286545,
+    "overshoot_cmd_pct": 19.397728037140283,
+    "sag_before_mrad": -96.44829332690472,
+    "ss_error_mrad": 6.98923301239418,
+    "crossings": 1,
+    "crossings_cmd": 1,
+    "settle_ms": 590.0,
+    "t90_ms": 235.00000000000003,
+    "peak_speed": 2.979626597621714,
+    "peak_acc": 30.58398207512214,
+    "max_ncon": 4
+   },
+   "wrist_flex@-0.5": {
+    "overshoot_pct": 17.586662252382038,
+    "overshoot_cmd_pct": 15.934824515376489,
+    "sag_before_mrad": -21.005031318654776,
+    "ss_error_mrad": -7.023916256165719,
+    "crossings": 1,
+    "crossings_cmd": 2,
+    "settle_ms": 490.0,
+    "t90_ms": 205.00000000000003,
+    "peak_speed": 3.484231581207056,
+    "peak_acc": 39.60104169834122,
+    "max_ncon": 4
+   },
+   "servo": {
+    "forcerange_Nm": [
+     1.9123,
+     1.9123,
+     1.9123,
+     1.9123,
+     1.9123,
+     0.9857
+    ],
+    "damping_Nms": [
+     0.3417,
+     0.3417,
+     0.3417,
+     0.3417,
+     0.3417,
+     0.3417
+    ],
+    "kp": [
+     5.262,
+     5.262,
+     5.262,
+     5.262,
+     5.262,
+     5.262
+    ],
+    "kv": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "armature": [
+     0.0261,
+     0.0261,
+     0.0261,
+     0.0261,
+     0.0261,
+     0.0261
+    ],
+    "frictionloss": [
+     0.0515,
+     0.0515,
+     0.0515,
+     0.0515,
+     0.0515,
+     0.0515
+    ],
+    "overrides": {
+     "accel_limit": Infinity
+    },
+    "setpoint": {
+     "cmd_delay": 0.004046900011857505,
+     "servo_delay": 0.0010469000118575051,
+     "host_delay": 0.003,
+     "speed_limit": 5.2883481319359,
+     "accel_limit": Infinity,
+     "timestep": 0.005
+    }
+   }
+  },
+  "full, D=32 @ 10 ms loop": {
+   "shoulder_lift@0.06": {
+    "overshoot_pct": 0.001711890785122337,
+    "overshoot_cmd_pct": 0.0,
+    "sag_before_mrad": -123.65904813761422,
+    "ss_error_mrad": 4.580241612184712,
+    "crossings": 0,
+    "crossings_cmd": 0,
+    "settle_ms": 320.0,
+    "t90_ms": 280.0,
+    "peak_speed": 0.28026421349764646,
+    "peak_acc": 4.290658043641052,
+    "max_ncon": 4
+   },
+   "elbow_flex@0.06": {
+    "overshoot_pct": 0.016378627076228117,
+    "overshoot_cmd_pct": 0.0,
+    "sag_before_mrad": -97.92783059602904,
+    "ss_error_mrad": 10.40976035954197,
+    "crossings": 0,
+    "crossings_cmd": 0,
+    "settle_ms": 285.00000000000006,
+    "t90_ms": 250.0,
+    "peak_speed": 0.2828869301805586,
+    "peak_acc": 4.799944776613413,
+    "max_ncon": 4
+   },
+   "wrist_flex@0.06": {
+    "overshoot_pct": 0.01878167913231819,
+    "overshoot_cmd_pct": 3.4687361617205075,
+    "sag_before_mrad": -20.095097623032586,
+    "ss_error_mrad": -2.0695839869291146,
+    "crossings": 0,
+    "crossings_cmd": 1,
+    "settle_ms": 265.0,
+    "t90_ms": 230.0,
+    "peak_speed": 0.39165518806115013,
+    "peak_acc": 6.6772318313503165,
+    "max_ncon": 4
+   },
+   "shoulder_lift@-0.5": {
+    "overshoot_pct": 16.101685878141748,
+    "overshoot_cmd_pct": 28.282224795813814,
+    "sag_before_mrad": -123.65904813761422,
+    "ss_error_mrad": 52.45633956795659,
+    "crossings": 1,
+    "crossings_cmd": 1,
+    "settle_ms": 725.0,
+    "t90_ms": 325.0,
+    "peak_speed": 2.7367324096697843,
+    "peak_acc": 21.652942743019743,
+    "max_ncon": 4
+   },
+   "elbow_flex@-0.5": {
+    "overshoot_pct": 12.875665523302775,
+    "overshoot_cmd_pct": 15.848864756671976,
+    "sag_before_mrad": -97.92783059602904,
+    "ss_error_mrad": 13.170240102617136,
+    "crossings": 1,
+    "crossings_cmd": 1,
+    "settle_ms": 645.0,
+    "t90_ms": 295.0,
+    "peak_speed": 2.8629938250513653,
+    "peak_acc": 25.479665945051575,
+    "max_ncon": 4
+   },
+   "wrist_flex@-0.5": {
+    "overshoot_pct": 9.99713174558537,
+    "overshoot_cmd_pct": 9.957095716804321,
+    "sag_before_mrad": -20.095097623032586,
+    "ss_error_mrad": -0.18198669431512826,
+    "crossings": 1,
+    "crossings_cmd": 1,
+    "settle_ms": 555.0,
+    "t90_ms": 280.0,
+    "peak_speed": 3.033690134756692,
+    "peak_acc": 27.831889625910833,
+    "max_ncon": 4
+   },
+   "servo": {
+    "forcerange_Nm": [
+     1.9123,
+     1.9123,
+     1.9123,
+     1.9123,
+     1.9123,
+     0.9857
+    ],
+    "damping_Nms": [
+     0.3417,
+     0.3417,
+     0.3417,
+     0.3417,
+     0.3417,
+     0.3417
+    ],
+    "kp": [
+     5.262,
+     5.262,
+     5.262,
+     5.262,
+     5.262,
+     5.262
+    ],
+    "kv": [
+     0.0514,
+     0.0514,
+     0.0514,
+     0.0514,
+     0.0514,
+     0.0514
+    ],
+    "armature": [
+     0.0261,
+     0.0261,
+     0.0261,
+     0.0261,
+     0.0261,
+     0.0261
+    ],
+    "frictionloss": [
+     0.0515,
+     0.0515,
+     0.0515,
+     0.0515,
+     0.0515,
+     0.0515
+    ],
+    "overrides": {
+     "d_cycle_s": 0.01
+    },
+    "setpoint": {
+     "cmd_delay": 0.004046900011857505,
+     "servo_delay": 0.0010469000118575051,
+     "host_delay": 0.003,
+     "speed_limit": 5.2883481319359,
+     "accel_limit": 38.963112012295284,
+     "timestep": 0.005
+    }
+   }
+  },
+  "full, BAM kt/R stall 3.41 N.m": {
+   "shoulder_lift@0.06": {
+    "overshoot_pct": 0.664599374835507,
+    "overshoot_cmd_pct": 0.5712441331090039,
+    "sag_before_mrad": -68.23337464764349,
+    "ss_error_mrad": 0.05564333974780039,
+    "crossings": 1,
+    "crossings_cmd": 1,
+    "settle_ms": 250.0,
+    "t90_ms": 220.0,
+    "peak_speed": 0.39766811377380024,
+    "peak_acc": 7.2876757983362515,
+    "max_ncon": 4
+   },
+   "elbow_flex@0.06": {
+    "overshoot_pct": 0.4855723370184541,
+    "overshoot_cmd_pct": 0.0,
+    "sag_before_mrad": -53.89329512000269,
+    "ss_error_mrad": 1.8909490745427706,
+    "crossings": 0,
+    "crossings_cmd": 0,
+    "settle_ms": 230.0,
+    "t90_ms": 200.0,
+    "peak_speed": 0.42672184465181995,
+    "peak_acc": 8.360010477642865,
+    "max_ncon": 4
+   },
+   "wrist_flex@0.06": {
+    "overshoot_pct": 0.0012678898263587003,
+    "overshoot_cmd_pct": 3.6991172450956746,
+    "sag_before_mrad": -11.215563798647086,
+    "ss_error_mrad": -2.218681482724791,
+    "crossings": 0,
+    "crossings_cmd": 1,
+    "settle_ms": 215.0,
+    "t90_ms": 185.0,
+    "peak_speed": 0.4989560625627922,
+    "peak_acc": 9.937509796098038,
+    "max_ncon": 4
+   },
+   "shoulder_lift@-0.5": {
+    "overshoot_pct": 12.754938730712023,
+    "overshoot_cmd_pct": 19.485553416219005,
+    "sag_before_mrad": -68.23337464764349,
+    "ss_error_mrad": 29.846207896850665,
+    "crossings": 1,
+    "crossings_cmd": 1,
+    "settle_ms": 560.0,
+    "t90_ms": 270.0,
+    "peak_speed": 3.3239218632094705,
+    "peak_acc": 30.46449904962647,
+    "max_ncon": 4
+   },
+   "elbow_flex@-0.5": {
+    "overshoot_pct": 8.72531691922898,
+    "overshoot_cmd_pct": 10.449487377326827,
+    "sag_before_mrad": -53.89329512000269,
+    "ss_error_mrad": 7.929020153506272,
+    "crossings": 1,
+    "crossings_cmd": 1,
+    "settle_ms": 520.0,
+    "t90_ms": 260.0,
+    "peak_speed": 3.2729174662661538,
+    "peak_acc": 31.703122434081887,
+    "max_ncon": 4
+   },
+   "wrist_flex@-0.5": {
+    "overshoot_pct": 5.31789427909921,
+    "overshoot_cmd_pct": 5.6173398184697465,
+    "sag_before_mrad": -11.215563798647086,
+    "ss_error_mrad": 1.421627072114573,
+    "crossings": 1,
+    "crossings_cmd": 1,
+    "settle_ms": 445.0,
+    "t90_ms": 255.0,
+    "peak_speed": 3.31103450939795,
+    "peak_acc": 33.464716177626826,
+    "max_ncon": 4
+   },
+   "servo": {
+    "forcerange_Nm": [
+     3.4103,
+     3.4103,
+     3.4103,
+     3.4103,
+     3.4103,
+     1.7579
+    ],
+    "damping_Nms": [
+     0.6194,
+     0.6194,
+     0.6194,
+     0.6194,
+     0.6194,
+     0.6194
+    ],
+    "kp": [
+     9.384,
+     9.384,
+     9.384,
+     9.384,
+     9.384,
+     9.384
+    ],
+    "kv": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "armature": [
+     0.0261,
+     0.0261,
+     0.0261,
+     0.0261,
+     0.0261,
+     0.0261
+    ],
+    "frictionloss": [
+     0.0515,
+     0.0515,
+     0.0515,
+     0.0515,
+     0.0515,
+     0.0515
+    ],
+    "overrides": {
+     "stall_Nm": 3.4103,
+     "noload_rad_s": 5.4225
+    },
+    "setpoint": {
+     "cmd_delay": 0.004046900011857505,
+     "servo_delay": 0.0010469000118575051,
+     "host_delay": 0.003,
+     "speed_limit": 5.2883481319359,
+     "accel_limit": 38.963112012295284,
+     "timestep": 0.005
+    }
+   }
+  },
+  "full, host latency 10 ms": {
+   "shoulder_lift@0.06": {
+    "overshoot_pct": 0.3455526474349127,
+    "overshoot_cmd_pct": 1.909697050135953,
+    "sag_before_mrad": -121.22405746384372,
+    "ss_error_mrad": -0.9352548437477903,
+    "crossings": 0,
+    "crossings_cmd": 1,
+    "settle_ms": 320.0,
+    "t90_ms": 285.00000000000006,
+    "peak_speed": 0.31319855794604845,
+    "peak_acc": 4.5873573832850845,
+    "max_ncon": 4
+   },
+   "elbow_flex@0.06": {
+    "overshoot_pct": 0.2767971838764723,
+    "overshoot_cmd_pct": 0.0,
+    "sag_before_mrad": -96.44829332690472,
+    "ss_error_mrad": 6.386293676123679,
+    "crossings": 0,
+    "crossings_cmd": 0,
+    "settle_ms": 290.0,
+    "t90_ms": 255.0,
+    "peak_speed": 0.3115155620263303,
+    "peak_acc": 5.065009880833732,
+    "max_ncon": 4
+   },
+   "wrist_flex@0.06": {
+    "overshoot_pct": 0.23084195160846047,
+    "overshoot_cmd_pct": 6.28435371186592,
+    "sag_before_mrad": -21.005031318654776,
+    "ss_error_mrad": -3.623741939539987,
+    "crossings": 0,
+    "crossings_cmd": 1,
+    "settle_ms": 265.0,
+    "t90_ms": 230.0,
+    "peak_speed": 0.4117696432775816,
+    "peak_acc": 6.856152687230771,
+    "max_ncon": 4
+   },
+   "shoulder_lift@-0.5": {
+    "overshoot_pct": 21.786771232486018,
+    "overshoot_cmd_pct": 31.932965539448354,
+    "sag_before_mrad": -121.22405746384372,
+    "ss_error_mrad": 41.65556818808203,
+    "crossings": 1,
+    "crossings_cmd": 1,
+    "settle_ms": 735.0,
+    "t90_ms": 325.0,
+    "peak_speed": 2.8144747803864734,
+    "peak_acc": 22.248794353637845,
+    "max_ncon": 4
+   },
+   "elbow_flex@-0.5": {
+    "overshoot_pct": 17.601441433796907,
+    "overshoot_cmd_pct": 19.24249976674737,
+    "sag_before_mrad": -96.44829332690472,
+    "ss_error_mrad": 6.977203310362001,
+    "crossings": 1,
+    "crossings_cmd": 1,
+    "settle_ms": 650.0,
+    "t90_ms": 300.0,
+    "peak_speed": 2.951667236418717,
+    "peak_acc": 26.385784578641314,
+    "max_ncon": 4
+   },
+   "wrist_flex@-0.5": {
+    "overshoot_pct": 16.018404396385826,
+    "overshoot_cmd_pct": 14.649704119069495,
+    "sag_before_mrad": -21.005031318654776,
+    "ss_error_mrad": -5.898634291849336,
+    "crossings": 1,
+    "crossings_cmd": 2,
+    "settle_ms": 565.0000000000001,
+    "t90_ms": 280.0,
+    "peak_speed": 3.235308767866932,
+    "peak_acc": 29.594388257157654,
+    "max_ncon": 4
+   },
+   "servo": {
+    "forcerange_Nm": [
+     1.9123,
+     1.9123,
+     1.9123,
+     1.9123,
+     1.9123,
+     0.9857
+    ],
+    "damping_Nms": [
+     0.3417,
+     0.3417,
+     0.3417,
+     0.3417,
+     0.3417,
+     0.3417
+    ],
+    "kp": [
+     5.262,
+     5.262,
+     5.262,
+     5.262,
+     5.262,
+     5.262
+    ],
+    "kv": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "armature": [
+     0.0261,
+     0.0261,
+     0.0261,
+     0.0261,
+     0.0261,
+     0.0261
+    ],
+    "frictionloss": [
+     0.0515,
+     0.0515,
+     0.0515,
+     0.0515,
+     0.0515,
+     0.0515
+    ],
+    "overrides": {
+     "host_delay": 0.01
+    },
+    "setpoint": {
+     "cmd_delay": 0.011046900011857505,
+     "servo_delay": 0.0010469000118575051,
+     "host_delay": 0.01,
+     "speed_limit": 5.2883481319359,
+     "accel_limit": 38.963112012295284,
+     "timestep": 0.005
+    }
+   }
+  }
+ }
+}

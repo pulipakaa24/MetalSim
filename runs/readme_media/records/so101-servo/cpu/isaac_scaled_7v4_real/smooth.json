@@ -1,0 +1,194 @@
+{
+ "script": "runs/readme_media/scratch/so101-servo/eval_cpu.py",
+ "controller": {
+  "controller": "policy",
+  "file": "runs/film/so101_lift_smooth/policy/candidates/isaac_scaled.pt",
+  "source": {
+   "model_zip_sha256": "b9091ddbbe9d2f00a7abdf143d813fd12159174f8cfaea1c124ff3f591a2d93c",
+   "vecnorm_pkl_sha256": "e572142455ab794ee89882cf63aa2d4b15d77ad2a34ccc747d6b02be6db900aa",
+   "num_timesteps": 18008064,
+   "progress_last": "steps=9984000 success=0.72 up_end=0.62 ep_rew=1094.8 task_r=4.09 pen=0.442 rate_l2=7.25 vel_l2=10.92 act_rate=0.725 sat_arm=0.910 sat_grip=0.998 peak_v=5.29 w=0.0243 std=[0.7900000214576721, 0.05000000074505806, 0.03999999910593033, 15.899999618530273, 101.26000213623047, 0.05000000074505806] fps=10570",
+   "stable_baselines3": "2.9.0",
+   "torch": "2.11.0",
+   "policy_class": "stable_baselines3.common.policies."
+  },
+  "check": {
+   "samples": 4096,
+   "max_abs_diff": 4.708766937255859e-06,
+   "against": "PPO.predict(deterministic=True)"
+  }
+ },
+ "servo": {
+  "servo": "7v4_real",
+  "label": "STS3215 C001 7.4 V under LeRobot's registers (P 16, Acceleration 254, gripper 50 %), BAM-identified firmware loop, datasheet torque-speed line, servo + host latency",
+  "joints": [
+   "shoulder_pan",
+   "shoulder_lift",
+   "elbow_flex",
+   "wrist_flex",
+   "wrist_roll",
+   "gripper"
+  ],
+  "forcerange_Nm": [
+   1.9123,
+   1.9123,
+   1.9123,
+   1.9123,
+   1.9123,
+   0.9857
+  ],
+  "damping_Nms": [
+   0.3417,
+   0.3417,
+   0.3417,
+   0.3417,
+   0.3417,
+   0.3417
+  ],
+  "noload_line_rad_s": [
+   5.596,
+   5.596,
+   5.596,
+   5.596,
+   5.596,
+   2.885
+  ],
+  "kp": [
+   5.262,
+   5.262,
+   5.262,
+   5.262,
+   5.262,
+   5.262
+  ],
+  "kv": [
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0
+  ],
+  "armature": [
+   0.0261,
+   0.0261,
+   0.0261,
+   0.0261,
+   0.0261,
+   0.0261
+  ],
+  "frictionloss": [
+   0.0515,
+   0.0515,
+   0.0515,
+   0.0515,
+   0.0515,
+   0.0515
+  ],
+  "setpoint": {
+   "cmd_delay": 0.004046900011857505,
+   "servo_delay": 0.0010469000118575051,
+   "host_delay": 0.003,
+   "speed_limit": 5.2883481319359,
+   "accel_limit": 38.963112012295284,
+   "timestep": 0.005
+  },
+  "actuators": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5
+  ]
+ },
+ "env": "so101Sim rl/native/so101_lift.py SO101LiftEnv (unchanged)",
+ "scene": "mujoco_menagerie/robotstudio_so101/scene_box_rl.xml",
+ "mujoco": "3.10.0",
+ "seeds": [
+  10000,
+  10099
+ ],
+ "wall_s": 5.617888927459717,
+ "over": {},
+ "fresh_kin": false,
+ "summary": {
+  "episodes": 100,
+  "successes": 15,
+  "success_rate": 0.15,
+  "max_height_mean": 0.10145694680343936,
+  "max_height_min": 0.03600013039783009,
+  "time_to_lift_mean_s": 3.108,
+  "lifted_at_end": 3,
+  "terminated": 11
+ },
+ "smoothness": {
+  "rms_acc": [
+   54.1061,
+   71.5235,
+   67.1515,
+   56.9698,
+   36.6353,
+   21.535
+  ],
+  "rms_jerk": [
+   14057.673,
+   19322.7246,
+   18421.5153,
+   14581.3411,
+   6079.1553,
+   3782.8476
+  ],
+  "reversals_per_s": [
+   3.4263,
+   5.221,
+   5.8134,
+   4.8354,
+   2.4747,
+   2.0646
+  ],
+  "osc_rms": [
+   0.3875,
+   0.5075,
+   0.4713,
+   0.4349,
+   0.2704,
+   0.2052
+  ],
+  "osc_frac": [
+   0.0197,
+   0.0406,
+   0.0405,
+   0.0266,
+   0.0058,
+   0.0104
+  ],
+  "above2hz_frac": [
+   0.098,
+   0.1617,
+   0.155,
+   0.1258,
+   0.0662,
+   0.0756
+  ],
+  "peak_speed": [
+   6.4008,
+   7.5345,
+   8.3259,
+   7.9017,
+   7.1778,
+   5.6629
+  ],
+  "peak_acc": [
+   1255.0214,
+   2030.7667,
+   1629.4273,
+   1240.73,
+   1073.0092,
+   925.3728
+  ],
+  "seconds": 570.58,
+  "f_band_hz": 5.0,
+  "v_hyst": 0.05
+ }
+}

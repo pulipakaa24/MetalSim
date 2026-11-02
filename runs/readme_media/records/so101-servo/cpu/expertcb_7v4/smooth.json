@@ -1,0 +1,167 @@
+{
+ "script": "runs/readme_media/scratch/so101-servo/eval_cpu.py",
+ "controller": {
+  "controller": "so101Sim rl/native/scripted_expert.py Expert (defaults) as expert_variants.CmdBaseExpert (diagnostic: targets built on the previous command)",
+  "DQ_MAX": 0.06,
+  "GRIP_OPEN": 1.4,
+  "GRIP_CLOSE": -0.15
+ },
+ "servo": {
+  "servo": "7v4",
+  "label": "STS3215 C001 7.4 V (SO-101 follower), gripper at LeRobot's 50 % torque limit",
+  "joints": [
+   "shoulder_pan",
+   "shoulder_lift",
+   "elbow_flex",
+   "wrist_flex",
+   "wrist_roll",
+   "gripper"
+  ],
+  "forcerange_Nm": [
+   1.9123,
+   1.9123,
+   1.9123,
+   1.9123,
+   1.9123,
+   0.9561
+  ],
+  "damping_Nms": [
+   0.3512,
+   0.3512,
+   0.3512,
+   0.3512,
+   0.3512,
+   0.3512
+  ],
+  "noload_line_rad_s": [
+   5.445,
+   5.445,
+   5.445,
+   5.445,
+   5.445,
+   2.723
+  ],
+  "kp": [
+   998.22,
+   998.22,
+   998.22,
+   998.22,
+   998.22,
+   998.22
+  ],
+  "kv": [
+   2.731,
+   2.731,
+   2.731,
+   2.731,
+   2.731,
+   2.731
+  ],
+  "armature": [
+   0.028,
+   0.028,
+   0.028,
+   0.028,
+   0.028,
+   0.028
+  ],
+  "frictionloss": [
+   0.052,
+   0.052,
+   0.052,
+   0.052,
+   0.052,
+   0.052
+  ]
+ },
+ "env": "so101Sim rl/native/so101_lift.py SO101LiftEnv (unchanged)",
+ "scene": "mujoco_menagerie/robotstudio_so101/scene_box_rl.xml",
+ "mujoco": "3.10.0",
+ "seeds": [
+  10000,
+  10099
+ ],
+ "wall_s": 2.621424913406372,
+ "over": {},
+ "fresh_kin": false,
+ "cmdbase": true,
+ "summary": {
+  "episodes": 100,
+  "successes": 2,
+  "success_rate": 0.02,
+  "max_height_mean": 0.04377483542065889,
+  "max_height_min": 0.02992483568602726,
+  "time_to_lift_mean_s": 3.72,
+  "lifted_at_end": 0,
+  "terminated": 18
+ },
+ "smoothness": {
+  "rms_acc": [
+   54.1636,
+   60.7207,
+   65.703,
+   65.3148,
+   57.4347,
+   12.1392
+  ],
+  "rms_jerk": [
+   8518.3089,
+   11084.8798,
+   13685.9064,
+   11442.4209,
+   7333.7519,
+   1746.9591
+  ],
+  "reversals_per_s": [
+   4.8181,
+   5.3899,
+   5.0915,
+   7.3504,
+   7.8562,
+   1.8532
+  ],
+  "osc_rms": [
+   0.505,
+   0.6197,
+   0.581,
+   0.6525,
+   0.6962,
+   0.1702
+  ],
+  "osc_frac": [
+   0.0347,
+   0.0542,
+   0.0496,
+   0.0632,
+   0.0756,
+   0.0247
+  ],
+  "above2hz_frac": [
+   0.8343,
+   0.6048,
+   0.6968,
+   0.6864,
+   0.633,
+   0.0927
+  ],
+  "peak_speed": [
+   5.2242,
+   6.9087,
+   5.6029,
+   6.0905,
+   5.3049,
+   5.293
+  ],
+  "peak_acc": [
+   886.7306,
+   1250.4773,
+   1337.8558,
+   1031.0089,
+   904.6991,
+   371.5751
+  ],
+  "seconds": 559.56,
+  "f_band_hz": 5.0,
+  "v_hyst": 0.05
+ }
+}

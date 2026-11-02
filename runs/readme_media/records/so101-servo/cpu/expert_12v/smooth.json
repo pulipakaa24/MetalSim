@@ -1,0 +1,166 @@
+{
+ "script": "runs/readme_media/scratch/so101-servo/eval_cpu.py",
+ "controller": {
+  "controller": "so101Sim rl/native/scripted_expert.py Expert (defaults)",
+  "DQ_MAX": 0.06,
+  "GRIP_OPEN": 1.4,
+  "GRIP_CLOSE": -0.15
+ },
+ "servo": {
+  "servo": "12v",
+  "label": "STS3215 12 V (the scene as it is: Menagerie / SO-ARM100 PR #141)",
+  "joints": [
+   "shoulder_pan",
+   "shoulder_lift",
+   "elbow_flex",
+   "wrist_flex",
+   "wrist_roll",
+   "gripper"
+  ],
+  "forcerange_Nm": [
+   2.94,
+   2.94,
+   2.94,
+   2.94,
+   2.94,
+   2.94
+  ],
+  "damping_Nms": [
+   0.6,
+   0.6,
+   0.6,
+   0.6,
+   0.6,
+   0.6
+  ],
+  "noload_line_rad_s": [
+   4.9,
+   4.9,
+   4.9,
+   4.9,
+   4.9,
+   4.9
+  ],
+  "kp": [
+   998.22,
+   998.22,
+   998.22,
+   998.22,
+   998.22,
+   998.22
+  ],
+  "kv": [
+   2.731,
+   2.731,
+   2.731,
+   2.731,
+   2.731,
+   2.731
+  ],
+  "armature": [
+   0.028,
+   0.028,
+   0.028,
+   0.028,
+   0.028,
+   0.028
+  ],
+  "frictionloss": [
+   0.052,
+   0.052,
+   0.052,
+   0.052,
+   0.052,
+   0.052
+  ]
+ },
+ "env": "so101Sim rl/native/so101_lift.py SO101LiftEnv (unchanged)",
+ "scene": "mujoco_menagerie/robotstudio_so101/scene_box_rl.xml",
+ "mujoco": "3.10.0",
+ "seeds": [
+  10000,
+  10099
+ ],
+ "wall_s": 4.47164511680603,
+ "over": {},
+ "fresh_kin": false,
+ "summary": {
+  "episodes": 100,
+  "successes": 95,
+  "success_rate": 0.95,
+  "max_height_mean": 0.19533851572922703,
+  "max_height_min": 0.03961304339153068,
+  "time_to_lift_mean_s": 1.6006315789473684,
+  "lifted_at_end": 86,
+  "terminated": 1
+ },
+ "smoothness": {
+  "rms_acc": [
+   25.3558,
+   34.2145,
+   35.5272,
+   41.9258,
+   39.8044,
+   26.6757
+  ],
+  "rms_jerk": [
+   5151.3606,
+   6294.5394,
+   6473.1666,
+   8452.5568,
+   8875.8819,
+   3192.628
+  ],
+  "reversals_per_s": [
+   4.4026,
+   4.5202,
+   4.6328,
+   4.8244,
+   5.9335,
+   1.7997
+  ],
+  "osc_rms": [
+   0.2925,
+   0.4293,
+   0.4536,
+   0.4988,
+   0.4021,
+   0.3504
+  ],
+  "osc_frac": [
+   0.2504,
+   0.1147,
+   0.1429,
+   0.1477,
+   0.1664,
+   0.0474
+  ],
+  "above2hz_frac": [
+   0.5091,
+   0.3606,
+   0.4739,
+   0.3826,
+   0.5243,
+   0.1708
+  ],
+  "peak_speed": [
+   3.6856,
+   4.8399,
+   4.4059,
+   4.4538,
+   4.7713,
+   5.3906
+  ],
+  "peak_acc": [
+   503.7826,
+   612.0054,
+   613.8451,
+   694.1803,
+   303.3447,
+   504.6826
+  ],
+  "seconds": 595.1,
+  "f_band_hz": 5.0,
+  "v_hyst": 0.05
+ }
+}

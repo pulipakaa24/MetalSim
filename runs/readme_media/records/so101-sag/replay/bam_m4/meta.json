@@ -1,0 +1,141 @@
+{
+ "variant": "bam_m4",
+ "servo": {
+  "servo": "7v4_real",
+  "label": "STS3215 C001 7.4 V under LeRobot's registers (P 16, Acceleration 254, gripper 50 %), BAM-identified firmware loop, datasheet torque-speed line, servo + host latency",
+  "joints": [
+   "shoulder_pan",
+   "shoulder_lift",
+   "elbow_flex",
+   "wrist_flex",
+   "wrist_roll",
+   "gripper"
+  ],
+  "forcerange_Nm": [
+   3.6734,
+   3.6734,
+   3.6734,
+   3.6734,
+   3.6734,
+   1.8935
+  ],
+  "damping_Nms": [
+   0.6813,
+   0.6813,
+   0.6813,
+   0.6813,
+   0.6813,
+   0.6813
+  ],
+  "noload_line_rad_s": [
+   5.391,
+   5.391,
+   5.391,
+   5.391,
+   5.391,
+   2.779
+  ],
+  "kp": [
+   11.868,
+   11.868,
+   11.868,
+   11.868,
+   11.868,
+   11.868
+  ],
+  "kv": [
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0
+  ],
+  "armature": [
+   0.0234,
+   0.0234,
+   0.0234,
+   0.0234,
+   0.0234,
+   0.0234
+  ],
+  "frictionloss": [
+   0.0519,
+   0.0519,
+   0.0519,
+   0.0519,
+   0.0519,
+   0.0519
+  ],
+  "overrides": {
+   "stall_Nm": 3.6734039565553256,
+   "noload_rad_s": 5.315359459291357,
+   "P": 18.78593331088948,
+   "coulomb": 0.05185523033166987,
+   "armature": 0.02335771893803744,
+   "speed_limit": 5.071148781184456,
+   "servo_delay": 0.004944939195123091
+  },
+  "setpoint": {
+   "cmd_delay": 0.007944939195123091,
+   "servo_delay": 0.004944939195123091,
+   "host_delay": 0.003,
+   "speed_limit": 5.071148781184456,
+   "accel_limit": 38.963112012295284,
+   "timestep": 0.005
+  },
+  "actuators": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "variant": "bam_m4",
+  "friction_hook": "bam m6 budget per physics step",
+  "dof_solref": [
+   [
+    -50000.0,
+    -200.0
+   ],
+   [
+    -50000.0,
+    -200.0
+   ],
+   [
+    -50000.0,
+    -200.0
+   ],
+   [
+    -50000.0,
+    -200.0
+   ],
+   [
+    -50000.0,
+    -200.0
+   ],
+   [
+    -50000.0,
+    -200.0
+   ]
+  ]
+ },
+ "mujoco": "3.10.0",
+ "datasets": {
+  "hungho77": {
+   "path": "<scratch>/hfdata/hungho77/file-000.parquet",
+   "fps": 30.0,
+   "frames": 37536,
+   "episodes": 50,
+   "wall_s": 10.2
+  },
+  "IlyaGusev": {
+   "path": "<scratch>/hfdata/ilya/file-000.parquet",
+   "fps": 20.0,
+   "frames": 15585,
+   "episodes": 104,
+   "wall_s": 6.5
+  }
+ }
+}

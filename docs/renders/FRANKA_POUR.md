@@ -70,10 +70,11 @@ films the best-ranked: successful episodes that start before the grasp first (ap
 take), then successful ones that start with the cup in hand.
 
 **How Isaac Lab presents the task** (research on Isaac Lab at
-[`ae37b028`](https://github.com/isaac-sim/IsaacLab/commit/ae37b028ea415c91ea2bc32609efcd759ed2b974), cloned as
-`upstream/IsaacLab3`). `pour_env_cfg.py` sets a default viewer at eye (1.4, 1.4, 0.9) looking at (0.5, 0, 0.1) in env
-0's frame, and its play mode (one env) a closer camera at eye (0.9, 0.65, 0.5) with the Newton RTX visualizer drawing
-the media as particles of the media's `visual_color` (0.85, 0.72, 0.45). Videos come from `VideoRecorderCfg` at
+[`ae37b028`](https://github.com/isaac-sim/IsaacLab/commit/ae37b028ea415c91ea2bc32609efcd759ed2b974)).
+[`pour_env_cfg.py`](https://github.com/isaac-sim/IsaacLab/blob/ae37b028ea415c91ea2bc32609efcd759ed2b974/source/isaaclab_tasks/isaaclab_tasks/contrib/franka_pour/pour_env_cfg.py)
+sets a default viewer at eye (1.4, 1.4, 0.9) looking at (0.5, 0, 0.1) in env 0's frame, and its play mode (one env) a
+closer camera at eye (0.9, 0.65, 0.5) with the Newton RTX visualizer drawing the media as particles of the media's
+`visual_color` (0.85, 0.72, 0.45). Videos come from `VideoRecorderCfg` at
 `render_fps` = 1 / step_dt = 30 fps. The scene is lit by a grey dome light (colour 0.75, intensity 3000). The hero shot
 here uses the play-mode camera, the grid shot the default viewer, both with Kit's default perspective lens (36 deg
 vertical at 16:9) and one frame per policy step (30 fps).

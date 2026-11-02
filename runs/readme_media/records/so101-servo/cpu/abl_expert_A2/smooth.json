@@ -1,0 +1,188 @@
+{
+ "script": "runs/readme_media/scratch/so101-servo/eval_cpu.py",
+ "controller": {
+  "controller": "so101Sim rl/native/scripted_expert.py Expert (defaults)",
+  "DQ_MAX": 0.06,
+  "GRIP_OPEN": 1.4,
+  "GRIP_CLOSE": -0.15
+ },
+ "servo": {
+  "servo": "7v4_real",
+  "label": "STS3215 C001 7.4 V under LeRobot's registers (P 16, Acceleration 254, gripper 50 %), BAM-identified firmware loop, datasheet torque-speed line, servo + host latency",
+  "joints": [
+   "shoulder_pan",
+   "shoulder_lift",
+   "elbow_flex",
+   "wrist_flex",
+   "wrist_roll",
+   "gripper"
+  ],
+  "forcerange_Nm": [
+   1.9123,
+   1.9123,
+   1.9123,
+   1.9123,
+   1.9123,
+   0.9857
+  ],
+  "damping_Nms": [
+   0.3417,
+   0.3417,
+   0.3417,
+   0.3417,
+   0.3417,
+   0.3417
+  ],
+  "noload_line_rad_s": [
+   5.596,
+   5.596,
+   5.596,
+   5.596,
+   5.596,
+   2.885
+  ],
+  "kp": [
+   5.262,
+   5.262,
+   5.262,
+   5.262,
+   5.262,
+   5.262
+  ],
+  "kv": [
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0
+  ],
+  "armature": [
+   0.0261,
+   0.0261,
+   0.0261,
+   0.0261,
+   0.0261,
+   0.0261
+  ],
+  "frictionloss": [
+   0.0515,
+   0.0515,
+   0.0515,
+   0.0515,
+   0.0515,
+   0.0515
+  ],
+  "overrides": {
+   "host_delay": 0.0
+  },
+  "setpoint": {
+   "cmd_delay": 0.0010469000118575051,
+   "servo_delay": 0.0010469000118575051,
+   "host_delay": 0.0,
+   "speed_limit": 5.2883481319359,
+   "accel_limit": 38.963112012295284,
+   "timestep": 0.005
+  },
+  "actuators": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5
+  ]
+ },
+ "env": "so101Sim rl/native/so101_lift.py SO101LiftEnv (unchanged)",
+ "scene": "mujoco_menagerie/robotstudio_so101/scene_box_rl.xml",
+ "mujoco": "3.10.0",
+ "seeds": [
+  10000,
+  10099
+ ],
+ "wall_s": 7.07374382019043,
+ "over": {
+  "host_delay": 0
+ },
+ "fresh_kin": true,
+ "cmdbase": false,
+ "summary": {
+  "episodes": 100,
+  "successes": 0,
+  "success_rate": 0.0,
+  "max_height_mean": 0.0347753051458099,
+  "max_height_min": 0.029919362408655305,
+  "time_to_lift_mean_s": null,
+  "lifted_at_end": 0,
+  "terminated": 0
+ },
+ "smoothness": {
+  "rms_acc": [
+   4.911,
+   8.6199,
+   11.574,
+   8.5783,
+   2.8633,
+   4.1453
+  ],
+  "rms_jerk": [
+   1432.4363,
+   2515.312,
+   3358.6112,
+   2482.3307,
+   433.097,
+   223.5098
+  ],
+  "reversals_per_s": [
+   0.2033,
+   0.2883,
+   0.3483,
+   0.8717,
+   0.2233,
+   0.1817
+  ],
+  "osc_rms": [
+   0.0274,
+   0.0513,
+   0.067,
+   0.0495,
+   0.0245,
+   0.0286
+  ],
+  "osc_frac": [
+   0.0252,
+   0.0292,
+   0.034,
+   0.0207,
+   0.0035,
+   0.0015
+  ],
+  "above2hz_frac": [
+   0.0688,
+   0.0651,
+   0.0759,
+   0.0444,
+   0.0533,
+   0.0347
+  ],
+  "peak_speed": [
+   0.9095,
+   0.9451,
+   1.5208,
+   0.9864,
+   1.3317,
+   2.7206
+  ],
+  "peak_acc": [
+   131.5135,
+   240.509,
+   301.5612,
+   164.4059,
+   125.4197,
+   106.7403
+  ],
+  "seconds": 600.0,
+  "f_band_hz": 5.0,
+  "v_hyst": 0.05
+ }
+}

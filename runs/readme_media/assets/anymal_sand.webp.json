@@ -1,0 +1,67 @@
+{
+ "output": "runs/readme_media/assets/anymal_sand.webp",
+ "bytes": 3342500,
+ "fits": true,
+ "max_bytes": null,
+ "width": 320,
+ "height": 240,
+ "frames": 150,
+ "frames_in": 150,
+ "fps": 30.0,
+ "frame_ms": 33,
+ "duration_s": 4.95,
+ "quality": 70,
+ "loop": 0,
+ "encoder": "Pillow 12.3.0 (libwebp, lossy; Pillow defaults: method 0, kmin 3, kmax 5)",
+ "recipe": "mujoco_warp/record.py: save_all, duration=int ms, loop=0, quality=70, 320x240, 30 fps",
+ "scaler": "ffmpeg crop + lanczos (RGB)",
+ "crop": {
+  "x": 240,
+  "y": 0,
+  "w": 1440,
+  "h": 1080,
+  "spare_px": 480
+ },
+ "source": {
+  "path": "~/metalsim-fresh/runs_render/sand25m/demo/frames",
+  "kind": "frames",
+  "fps": 30.0,
+  "width": 1920,
+  "height": 1080,
+  "frames": 240,
+  "window_start_s": 3.0,
+  "window_s": 5.0,
+  "first_frame": 90,
+  "frames_used": 150
+ },
+ "colour_check": {
+  "frames": [
+   0,
+   50,
+   99,
+   149
+  ],
+  "mean_rgb_source": [
+   128.07,
+   113.97,
+   97.79
+  ],
+  "mean_rgb_output": [
+   128.17,
+   114.08,
+   97.77
+  ],
+  "psnr_db": 33.21
+ },
+ "tries": [
+  {
+   "width": 320,
+   "height": 240,
+   "fps": 30.0,
+   "quality": 70,
+   "bytes": 3342500
+  }
+ ],
+ "encode_s": 2.44,
+ "command": "python -m metalsim.render.film.encode webp ~/metalsim-fresh/runs_render/sand25m/demo/frames runs/readme_media/assets/anymal_sand.webp --start 3 --seconds 5"
+}

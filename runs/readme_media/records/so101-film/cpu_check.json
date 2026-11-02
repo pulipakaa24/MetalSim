@@ -1,0 +1,134 @@
+{
+ "policy": {
+  "baseline_look_lines_adapted": 1,
+  "tasks": {
+   "so101_lift": {
+    "fields_equal": {
+     "name": true,
+     "adapter": true,
+     "venv": true,
+     "checkpoint": true,
+     "adapter_kw": true,
+     "film": true,
+     "viewer": true,
+     "shots": true,
+     "assets": true,
+     "doc": true,
+     "title": true,
+     "summary": true
+    },
+    "look_diff_other_stream": {},
+    "frames": 60,
+    "worlds": 4,
+    "snapshots_done_info_equal": true,
+    "summary_equal": true,
+    "rank_equal": true,
+    "meta_json_equal_except_env_build_s": true,
+    "max_qpos_diff": 0.0,
+    "moved": 1.7406051978468895
+   },
+   "so101_lift_74v": {
+    "fields_equal": {
+     "name": true,
+     "adapter": true,
+     "venv": true,
+     "checkpoint": true,
+     "adapter_kw": true,
+     "film": true,
+     "viewer": true,
+     "shots": true,
+     "assets": true,
+     "doc": true,
+     "title": true,
+     "summary": true
+    },
+    "look_diff_other_stream": {},
+    "frames": 60,
+    "worlds": 4,
+    "snapshots_done_info_equal": true,
+    "summary_equal": true,
+    "rank_equal": true,
+    "meta_json_equal_except_env_build_s": true,
+    "max_qpos_diff": 0.0,
+    "moved": 1.720532700419426
+   },
+   "so101_lift_smooth": {
+    "fields_equal": {
+     "name": true,
+     "adapter": true,
+     "venv": true,
+     "checkpoint": true,
+     "adapter_kw": true,
+     "film": true,
+     "viewer": true,
+     "shots": true,
+     "assets": true,
+     "doc": true,
+     "title": true,
+     "summary": true
+    },
+    "look_diff_other_stream": {},
+    "frames": 60,
+    "worlds": 4,
+    "snapshots_done_info_equal": true,
+    "summary_equal": true,
+    "rank_equal": true,
+    "meta_json_equal_except_env_build_s": true,
+    "max_qpos_diff": 0.0,
+    "moved": 1.7778641320765018
+   }
+  }
+ },
+ "expert": {
+  "worlds": 100,
+  "frames": 300,
+  "outcome_events_equal": 100,
+  "arm_q_max_abs_diff_rad": 0.0,
+  "film": {
+   "successes": 97,
+   "still_up": 97,
+   "retries": 10
+  },
+  "dry": {
+   "episodes": 100,
+   "successes": 97,
+   "up_at_6s": 97,
+   "time_to_lift_mean_s": 2.6367010309278354,
+   "time_to_lift_median_s": 2.46,
+   "max_height_mean": 0.18486689921468497,
+   "terminated": 1,
+   "retries": 10,
+   "phase_end": {
+    "approach": 0,
+    "descend": 1,
+    "grasp": 0,
+    "lift": 99
+   }
+  },
+  "mismatches": [],
+  "seed10051": {
+   "film": 2.46,
+   "retries": 0,
+   "events": [
+    [
+     0.8,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.165,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.9,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  }
+ }
+}

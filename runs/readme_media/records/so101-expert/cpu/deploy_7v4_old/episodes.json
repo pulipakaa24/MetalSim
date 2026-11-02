@@ -1,0 +1,4170 @@
+{
+ "script": "runs/readme_media/scratch/so101-expert/eval_cpu.py",
+ "controller": "metalsim/render/film/so101_expert.py DeployExpert",
+ "ctrl_hz": 30.0,
+ "vmax": [
+  2.723,
+  1.846,
+  1.534,
+  2.261,
+  2.673
+ ],
+ "amax": [
+  21.36,
+  14.25,
+  14.83,
+  28.4,
+  34.92
+ ],
+ "t_settle": 0.31,
+ "servo": {
+  "servo": "7v4",
+  "label": "STS3215 C001 7.4 V (SO-101 follower), gripper at LeRobot's 50 % torque limit",
+  "joints": [
+   "shoulder_pan",
+   "shoulder_lift",
+   "elbow_flex",
+   "wrist_flex",
+   "wrist_roll",
+   "gripper"
+  ],
+  "forcerange_Nm": [
+   1.9123,
+   1.9123,
+   1.9123,
+   1.9123,
+   1.9123,
+   0.9561
+  ],
+  "damping_Nms": [
+   0.3512,
+   0.3512,
+   0.3512,
+   0.3512,
+   0.3512,
+   0.3512
+  ],
+  "noload_line_rad_s": [
+   5.445,
+   5.445,
+   5.445,
+   5.445,
+   5.445,
+   2.723
+  ],
+  "kp": [
+   998.22,
+   998.22,
+   998.22,
+   998.22,
+   998.22,
+   998.22
+  ],
+  "kv": [
+   2.731,
+   2.731,
+   2.731,
+   2.731,
+   2.731,
+   2.731
+  ],
+  "armature": [
+   0.028,
+   0.028,
+   0.028,
+   0.028,
+   0.028,
+   0.028
+  ],
+  "frictionloss": [
+   0.052,
+   0.052,
+   0.052,
+   0.052,
+   0.052,
+   0.052
+  ]
+ },
+ "env": "so101Sim rl/native/so101_lift.py SO101LiftEnv (reset, scene, success test; unchanged)",
+ "over": {},
+ "mujoco": "3.10.0",
+ "seeds": [
+  10000,
+  10099
+ ],
+ "wall_s": 8.7,
+ "summary": {
+  "episodes": 100,
+  "successes": 91,
+  "up_at_6s": 90,
+  "time_to_lift_mean_s": 2.6021978021978023,
+  "time_to_lift_median_s": 2.26,
+  "max_height_mean": 0.17537600000000006,
+  "terminated": 1,
+  "retries": 33,
+  "phase_end": {
+   "approach": 1,
+   "descend": 1,
+   "grasp": 1,
+   "lift": 97
+  }
+ },
+ "episodes": [
+  {
+   "seed": 10000,
+   "success": true,
+   "success_t": 109,
+   "time_to_lift_s": 2.18,
+   "hmax": 0.1799,
+   "final_height": 0.1757,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 40.4,
+   "events": [
+    [
+     0.735,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.065,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.765,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10001,
+   "success": true,
+   "success_t": 113,
+   "time_to_lift_s": 2.26,
+   "hmax": 0.1782,
+   "final_height": 0.1769,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 41.3,
+   "events": [
+    [
+     0.7,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.065,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.835,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10002,
+   "success": true,
+   "success_t": 105,
+   "time_to_lift_s": 2.1,
+   "hmax": 0.1792,
+   "final_height": 0.1744,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 41.0,
+   "events": [
+    [
+     0.7,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.035,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.665,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10003,
+   "success": true,
+   "success_t": 201,
+   "time_to_lift_s": 4.02,
+   "hmax": 0.199,
+   "final_height": 0.1983,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 1,
+   "box_tilt_end_deg": 110.2,
+   "events": [
+    [
+     0.665,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.0,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.565,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ],
+    [
+     2.3,
+     "lift",
+     "approach",
+     "cube low: retry"
+    ],
+    [
+     2.6,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     2.965,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     3.565,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10004,
+   "success": true,
+   "success_t": 112,
+   "time_to_lift_s": 2.24,
+   "hmax": 0.1816,
+   "final_height": 0.1791,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 33.1,
+   "events": [
+    [
+     0.635,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.0,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.835,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10005,
+   "success": true,
+   "success_t": 117,
+   "time_to_lift_s": 2.34,
+   "hmax": 0.1847,
+   "final_height": 0.1834,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 46.7,
+   "events": [
+    [
+     0.835,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.165,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.935,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10006,
+   "success": true,
+   "success_t": 125,
+   "time_to_lift_s": 2.5,
+   "hmax": 0.1827,
+   "final_height": 0.1796,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 51.2,
+   "events": [
+    [
+     0.9,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.265,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     2.065,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10007,
+   "success": true,
+   "success_t": 107,
+   "time_to_lift_s": 2.14,
+   "hmax": 0.1824,
+   "final_height": 0.1796,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 35.5,
+   "events": [
+    [
+     0.565,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     0.935,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.735,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10008,
+   "success": true,
+   "success_t": 111,
+   "time_to_lift_s": 2.22,
+   "hmax": 0.1976,
+   "final_height": 0.1976,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 45.1,
+   "events": [
+    [
+     0.8,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.135,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.835,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10009,
+   "success": true,
+   "success_t": 108,
+   "time_to_lift_s": 2.16,
+   "hmax": 0.1803,
+   "final_height": 0.1775,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 43.1,
+   "events": [
+    [
+     0.735,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.065,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.735,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10010,
+   "success": true,
+   "success_t": 118,
+   "time_to_lift_s": 2.36,
+   "hmax": 0.1818,
+   "final_height": 0.1797,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 50.8,
+   "events": [
+    [
+     0.865,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.2,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.935,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10011,
+   "success": true,
+   "success_t": 105,
+   "time_to_lift_s": 2.1,
+   "hmax": 0.1961,
+   "final_height": 0.1924,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 27.6,
+   "events": [
+    [
+     0.665,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.0,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.735,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10012,
+   "success": true,
+   "success_t": 213,
+   "time_to_lift_s": 4.26,
+   "hmax": 0.1958,
+   "final_height": 0.1949,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 1,
+   "box_tilt_end_deg": 51.7,
+   "events": [
+    [
+     0.835,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.2,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.765,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ],
+    [
+     2.565,
+     "lift",
+     "approach",
+     "cube low: retry"
+    ],
+    [
+     2.835,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     3.165,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     3.835,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10013,
+   "success": true,
+   "success_t": 111,
+   "time_to_lift_s": 2.22,
+   "hmax": 0.1981,
+   "final_height": 0.1981,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 44.9,
+   "events": [
+    [
+     0.8,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.135,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.835,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10014,
+   "success": true,
+   "success_t": 110,
+   "time_to_lift_s": 2.2,
+   "hmax": 0.1906,
+   "final_height": 0.1892,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 48.7,
+   "events": [
+    [
+     0.835,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.165,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.8,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10015,
+   "success": true,
+   "success_t": 114,
+   "time_to_lift_s": 2.28,
+   "hmax": 0.1804,
+   "final_height": 0.1779,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 35.9,
+   "events": [
+    [
+     0.735,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.065,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.865,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10016,
+   "success": true,
+   "success_t": 122,
+   "time_to_lift_s": 2.44,
+   "hmax": 0.1875,
+   "final_height": 0.186,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 48.9,
+   "events": [
+    [
+     0.9,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.265,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     2.035,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10017,
+   "success": true,
+   "success_t": 225,
+   "time_to_lift_s": 4.5,
+   "hmax": 0.1901,
+   "final_height": 0.1858,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 1,
+   "box_tilt_end_deg": 18.2,
+   "events": [
+    [
+     0.7,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.035,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.6,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ],
+    [
+     2.335,
+     "lift",
+     "approach",
+     "cube low: retry"
+    ],
+    [
+     3.1,
+     "approach",
+     "descend",
+     "settle timeout"
+    ],
+    [
+     3.465,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     4.1,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10018,
+   "success": false,
+   "success_t": null,
+   "time_to_lift_s": null,
+   "hmax": 0.0758,
+   "final_height": 0.0199,
+   "up_at_end": false,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 1,
+   "box_tilt_end_deg": 90.0,
+   "events": [
+    [
+     0.835,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.935,
+     "descend",
+     "grasp",
+     "settle timeout"
+    ],
+    [
+     2.835,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ],
+    [
+     3.6,
+     "lift",
+     "approach",
+     "cube low: retry"
+    ],
+    [
+     4.365,
+     "approach",
+     "descend",
+     "settle timeout"
+    ],
+    [
+     4.735,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     5.335,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10019,
+   "success": true,
+   "success_t": 211,
+   "time_to_lift_s": 4.22,
+   "hmax": 0.1901,
+   "final_height": 0.1858,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 1,
+   "box_tilt_end_deg": 41.1,
+   "events": [
+    [
+     0.635,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     0.965,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.535,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ],
+    [
+     2.3,
+     "lift",
+     "approach",
+     "cube low: retry"
+    ],
+    [
+     2.7,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     3.065,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     3.835,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10020,
+   "success": true,
+   "success_t": 117,
+   "time_to_lift_s": 2.34,
+   "hmax": 0.1868,
+   "final_height": 0.1842,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 43.3,
+   "events": [
+    [
+     0.835,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.165,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.935,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10021,
+   "success": true,
+   "success_t": 125,
+   "time_to_lift_s": 2.5,
+   "hmax": 0.1809,
+   "final_height": 0.1795,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 56.1,
+   "events": [
+    [
+     0.9,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.235,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     2.065,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10022,
+   "success": true,
+   "success_t": 104,
+   "time_to_lift_s": 2.08,
+   "hmax": 0.1921,
+   "final_height": 0.1914,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 15.6,
+   "events": [
+    [
+     0.6,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     0.935,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.665,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10023,
+   "success": true,
+   "success_t": 95,
+   "time_to_lift_s": 1.9,
+   "hmax": 0.153,
+   "final_height": 0.0199,
+   "up_at_end": false,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 2,
+   "box_tilt_end_deg": 90.0,
+   "events": [
+    [
+     0.665,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.0,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.535,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ],
+    [
+     2.3,
+     "lift",
+     "approach",
+     "cube low: retry"
+    ],
+    [
+     2.9,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     3.265,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     3.8,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ],
+    [
+     4.565,
+     "lift",
+     "approach",
+     "cube low: retry"
+    ],
+    [
+     4.865,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     5.2,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     5.7,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10024,
+   "success": true,
+   "success_t": 273,
+   "time_to_lift_s": 5.46,
+   "hmax": 0.2026,
+   "final_height": 0.2022,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 1,
+   "box_tilt_end_deg": 56.1,
+   "events": [
+    [
+     1.065,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.765,
+     "descend",
+     "grasp",
+     "settle timeout"
+    ],
+    [
+     2.635,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ],
+    [
+     3.465,
+     "lift",
+     "approach",
+     "cube low: retry"
+    ],
+    [
+     3.965,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     4.335,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     5.065,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10025,
+   "success": true,
+   "success_t": 97,
+   "time_to_lift_s": 1.94,
+   "hmax": 0.1904,
+   "final_height": 0.1897,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 39.4,
+   "events": [
+    [
+     0.7,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.035,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.565,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10026,
+   "success": true,
+   "success_t": 96,
+   "time_to_lift_s": 1.92,
+   "hmax": 0.1918,
+   "final_height": 0.1892,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 30.9,
+   "events": [
+    [
+     0.565,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     0.9,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.535,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10027,
+   "success": true,
+   "success_t": 113,
+   "time_to_lift_s": 2.26,
+   "hmax": 0.1881,
+   "final_height": 0.1862,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 37.9,
+   "events": [
+    [
+     0.8,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.135,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.865,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10028,
+   "success": true,
+   "success_t": 119,
+   "time_to_lift_s": 2.38,
+   "hmax": 0.1816,
+   "final_height": 0.1787,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 50.5,
+   "events": [
+    [
+     0.835,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.165,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.965,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10029,
+   "success": true,
+   "success_t": 123,
+   "time_to_lift_s": 2.46,
+   "hmax": 0.182,
+   "final_height": 0.1799,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 50.8,
+   "events": [
+    [
+     0.935,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.3,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     2.035,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10030,
+   "success": true,
+   "success_t": 107,
+   "time_to_lift_s": 2.14,
+   "hmax": 0.1928,
+   "final_height": 0.1928,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 42.3,
+   "events": [
+    [
+     0.8,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.135,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.735,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10031,
+   "success": true,
+   "success_t": 229,
+   "time_to_lift_s": 4.58,
+   "hmax": 0.197,
+   "final_height": 0.1965,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 1,
+   "box_tilt_end_deg": 46.7,
+   "events": [
+    [
+     0.9,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.265,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     2.035,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ],
+    [
+     2.865,
+     "lift",
+     "approach",
+     "cube low: retry"
+    ],
+    [
+     3.165,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     3.5,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     4.165,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10032,
+   "success": true,
+   "success_t": 108,
+   "time_to_lift_s": 2.16,
+   "hmax": 0.1745,
+   "final_height": 0.1734,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 38.6,
+   "events": [
+    [
+     0.535,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     0.9,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.735,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10033,
+   "success": true,
+   "success_t": 119,
+   "time_to_lift_s": 2.38,
+   "hmax": 0.1868,
+   "final_height": 0.1858,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 47.4,
+   "events": [
+    [
+     0.835,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.2,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.965,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10034,
+   "success": true,
+   "success_t": 108,
+   "time_to_lift_s": 2.16,
+   "hmax": 0.1789,
+   "final_height": 0.1775,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 43.6,
+   "events": [
+    [
+     0.7,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.035,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.735,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10035,
+   "success": true,
+   "success_t": 116,
+   "time_to_lift_s": 2.32,
+   "hmax": 0.188,
+   "final_height": 0.1869,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 42.8,
+   "events": [
+    [
+     0.9,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.265,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.9,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10036,
+   "success": true,
+   "success_t": 127,
+   "time_to_lift_s": 2.54,
+   "hmax": 0.1823,
+   "final_height": 0.1812,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 57.6,
+   "events": [
+    [
+     1.035,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.4,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     2.1,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10037,
+   "success": true,
+   "success_t": 101,
+   "time_to_lift_s": 2.02,
+   "hmax": 0.1893,
+   "final_height": 0.187,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 37.0,
+   "events": [
+    [
+     0.665,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.0,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.635,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10038,
+   "success": true,
+   "success_t": 103,
+   "time_to_lift_s": 2.06,
+   "hmax": 0.1766,
+   "final_height": 0.1737,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 39.8,
+   "events": [
+    [
+     0.6,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     0.965,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.665,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10039,
+   "success": true,
+   "success_t": 115,
+   "time_to_lift_s": 2.3,
+   "hmax": 0.1879,
+   "final_height": 0.1869,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 41.0,
+   "events": [
+    [
+     0.9,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.265,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.9,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10040,
+   "success": true,
+   "success_t": 225,
+   "time_to_lift_s": 4.5,
+   "hmax": 0.1902,
+   "final_height": 0.1871,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 1,
+   "box_tilt_end_deg": 34.3,
+   "events": [
+    [
+     0.735,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.065,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.865,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ],
+    [
+     2.635,
+     "lift",
+     "approach",
+     "cube low: retry"
+    ],
+    [
+     2.935,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     3.265,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     4.1,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10041,
+   "success": true,
+   "success_t": 103,
+   "time_to_lift_s": 2.06,
+   "hmax": 0.196,
+   "final_height": 0.1936,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 20.2,
+   "events": [
+    [
+     0.635,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     0.965,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.7,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10042,
+   "success": true,
+   "success_t": 212,
+   "time_to_lift_s": 4.24,
+   "hmax": 0.1754,
+   "final_height": 0.1741,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 1,
+   "box_tilt_end_deg": 42.6,
+   "events": [
+    [
+     0.7,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.265,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.865,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ],
+    [
+     2.635,
+     "lift",
+     "approach",
+     "cube low: retry"
+    ],
+    [
+     2.865,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     3.235,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     3.835,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10043,
+   "success": true,
+   "success_t": 114,
+   "time_to_lift_s": 2.28,
+   "hmax": 0.1798,
+   "final_height": 0.1777,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 38.7,
+   "events": [
+    [
+     0.635,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.0,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.865,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10044,
+   "success": true,
+   "success_t": 102,
+   "time_to_lift_s": 2.04,
+   "hmax": 0.1829,
+   "final_height": 0.175,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 43.3,
+   "events": [
+    [
+     0.7,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.035,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.635,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10045,
+   "success": false,
+   "success_t": null,
+   "time_to_lift_s": null,
+   "hmax": 0.0794,
+   "final_height": 0.02,
+   "up_at_end": false,
+   "terminated": false,
+   "phase_end": "descend",
+   "retries": 2,
+   "box_tilt_end_deg": 90.0,
+   "events": [
+    [
+     0.6,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     0.935,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.5,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ],
+    [
+     2.235,
+     "lift",
+     "approach",
+     "cube low: retry"
+    ],
+    [
+     2.535,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     2.865,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     3.465,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ],
+    [
+     4.2,
+     "lift",
+     "approach",
+     "cube low: retry"
+    ],
+    [
+     5.565,
+     "approach",
+     "descend",
+     "measured"
+    ]
+   ]
+  },
+  {
+   "seed": 10046,
+   "success": true,
+   "success_t": 108,
+   "time_to_lift_s": 2.16,
+   "hmax": 0.1797,
+   "final_height": 0.1758,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 39.9,
+   "events": [
+    [
+     0.735,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.065,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.735,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10047,
+   "success": true,
+   "success_t": 106,
+   "time_to_lift_s": 2.12,
+   "hmax": 0.1766,
+   "final_height": 0.174,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 41.3,
+   "events": [
+    [
+     0.665,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.0,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.7,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10048,
+   "success": true,
+   "success_t": 111,
+   "time_to_lift_s": 2.22,
+   "hmax": 0.1775,
+   "final_height": 0.1773,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 43.7,
+   "events": [
+    [
+     0.7,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.035,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.8,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10049,
+   "success": true,
+   "success_t": 111,
+   "time_to_lift_s": 2.22,
+   "hmax": 0.1831,
+   "final_height": 0.1772,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 39.8,
+   "events": [
+    [
+     0.735,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.065,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.8,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10050,
+   "success": true,
+   "success_t": 114,
+   "time_to_lift_s": 2.28,
+   "hmax": 0.1836,
+   "final_height": 0.1809,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 43.5,
+   "events": [
+    [
+     0.8,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.135,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.865,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10051,
+   "success": true,
+   "success_t": 114,
+   "time_to_lift_s": 2.28,
+   "hmax": 0.1871,
+   "final_height": 0.1832,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 41.0,
+   "events": [
+    [
+     0.8,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.135,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.865,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10052,
+   "success": true,
+   "success_t": 109,
+   "time_to_lift_s": 2.18,
+   "hmax": 0.1791,
+   "final_height": 0.1755,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 40.2,
+   "events": [
+    [
+     0.735,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.065,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.765,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10053,
+   "success": false,
+   "success_t": null,
+   "time_to_lift_s": null,
+   "hmax": 0.0978,
+   "final_height": 0.0978,
+   "up_at_end": false,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 2,
+   "box_tilt_end_deg": 76.0,
+   "events": [
+    [
+     0.735,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.065,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.765,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ],
+    [
+     2.535,
+     "lift",
+     "approach",
+     "cube low: retry"
+    ],
+    [
+     3.0,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     3.4,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     3.835,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ],
+    [
+     4.635,
+     "lift",
+     "approach",
+     "cube low: retry"
+    ],
+    [
+     4.935,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     5.3,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     5.765,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10054,
+   "success": true,
+   "success_t": 101,
+   "time_to_lift_s": 2.02,
+   "hmax": 0.1764,
+   "final_height": 0.1741,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 39.2,
+   "events": [
+    [
+     0.635,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     0.965,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.6,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10055,
+   "success": true,
+   "success_t": 123,
+   "time_to_lift_s": 2.46,
+   "hmax": 0.1805,
+   "final_height": 0.1785,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 46.3,
+   "events": [
+    [
+     0.835,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.165,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     2.035,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10056,
+   "success": true,
+   "success_t": 113,
+   "time_to_lift_s": 2.26,
+   "hmax": 0.1799,
+   "final_height": 0.1783,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 48.1,
+   "events": [
+    [
+     0.8,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.135,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.835,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10057,
+   "success": true,
+   "success_t": 235,
+   "time_to_lift_s": 4.7,
+   "hmax": 0.1941,
+   "final_height": 0.1935,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 1,
+   "box_tilt_end_deg": 29.3,
+   "events": [
+    [
+     0.765,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.1,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.865,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ],
+    [
+     2.635,
+     "lift",
+     "approach",
+     "cube low: retry"
+    ],
+    [
+     3.2,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     3.565,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     4.265,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10058,
+   "success": true,
+   "success_t": 113,
+   "time_to_lift_s": 2.26,
+   "hmax": 0.1858,
+   "final_height": 0.1833,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 37.8,
+   "events": [
+    [
+     0.765,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.1,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.865,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10059,
+   "success": true,
+   "success_t": 119,
+   "time_to_lift_s": 2.38,
+   "hmax": 0.1808,
+   "final_height": 0.1796,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 43.9,
+   "events": [
+    [
+     0.8,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.135,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.965,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10060,
+   "success": true,
+   "success_t": 107,
+   "time_to_lift_s": 2.14,
+   "hmax": 0.1953,
+   "final_height": 0.1933,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 24.8,
+   "events": [
+    [
+     0.7,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.035,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.765,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10061,
+   "success": true,
+   "success_t": 115,
+   "time_to_lift_s": 2.3,
+   "hmax": 0.1819,
+   "final_height": 0.1784,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 37.2,
+   "events": [
+    [
+     0.735,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.065,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.9,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10062,
+   "success": false,
+   "success_t": null,
+   "time_to_lift_s": null,
+   "hmax": 0.113,
+   "final_height": 0.0199,
+   "up_at_end": false,
+   "terminated": false,
+   "phase_end": "approach",
+   "retries": 3,
+   "box_tilt_end_deg": 90.0,
+   "events": [
+    [
+     0.635,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     0.965,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.535,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ],
+    [
+     2.265,
+     "lift",
+     "approach",
+     "cube low: retry"
+    ],
+    [
+     2.8,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     3.135,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     3.435,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ],
+    [
+     4.2,
+     "lift",
+     "approach",
+     "cube low: retry"
+    ],
+    [
+     4.435,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     4.765,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     5.065,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ],
+    [
+     5.835,
+     "lift",
+     "approach",
+     "cube low: retry"
+    ]
+   ]
+  },
+  {
+   "seed": 10063,
+   "success": true,
+   "success_t": 120,
+   "time_to_lift_s": 2.4,
+   "hmax": 0.1847,
+   "final_height": 0.1822,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 44.9,
+   "events": [
+    [
+     0.835,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.165,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     2.0,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10064,
+   "success": true,
+   "success_t": 108,
+   "time_to_lift_s": 2.16,
+   "hmax": 0.1828,
+   "final_height": 0.1791,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 35.9,
+   "events": [
+    [
+     0.6,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     0.965,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.765,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10065,
+   "success": true,
+   "success_t": 124,
+   "time_to_lift_s": 2.48,
+   "hmax": 0.1838,
+   "final_height": 0.1793,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 52.8,
+   "events": [
+    [
+     0.865,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.2,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     2.065,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10066,
+   "success": true,
+   "success_t": 114,
+   "time_to_lift_s": 2.28,
+   "hmax": 0.1868,
+   "final_height": 0.1836,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 44.7,
+   "events": [
+    [
+     0.8,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.135,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.865,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10067,
+   "success": true,
+   "success_t": 105,
+   "time_to_lift_s": 2.1,
+   "hmax": 0.1943,
+   "final_height": 0.1907,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 28.7,
+   "events": [
+    [
+     0.665,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.0,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.7,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10068,
+   "success": false,
+   "success_t": null,
+   "time_to_lift_s": null,
+   "hmax": 0.036,
+   "final_height": 0.0205,
+   "up_at_end": false,
+   "terminated": true,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 89.7,
+   "events": [
+    [
+     0.635,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.2,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     2.1,
+     "grasp",
+     "lift",
+     "grasp timeout"
+    ]
+   ]
+  },
+  {
+   "seed": 10069,
+   "success": true,
+   "success_t": 100,
+   "time_to_lift_s": 2.0,
+   "hmax": 0.1771,
+   "final_height": 0.173,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 33.2,
+   "events": [
+    [
+     0.6,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     0.965,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.6,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10070,
+   "success": true,
+   "success_t": 211,
+   "time_to_lift_s": 4.22,
+   "hmax": 0.1945,
+   "final_height": 0.194,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 1,
+   "box_tilt_end_deg": 55.6,
+   "events": [
+    [
+     0.8,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.135,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.7,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ],
+    [
+     2.5,
+     "lift",
+     "approach",
+     "cube low: retry"
+    ],
+    [
+     2.835,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     3.2,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     3.8,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10071,
+   "success": true,
+   "success_t": 102,
+   "time_to_lift_s": 2.04,
+   "hmax": 0.1854,
+   "final_height": 0.1839,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 46.0,
+   "events": [
+    [
+     0.735,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.065,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.635,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10072,
+   "success": false,
+   "success_t": null,
+   "time_to_lift_s": null,
+   "hmax": 0.0405,
+   "final_height": 0.0365,
+   "up_at_end": false,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 1,
+   "box_tilt_end_deg": 150.1,
+   "events": [
+    [
+     0.865,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     2.265,
+     "descend",
+     "grasp",
+     "descend cap"
+    ],
+    [
+     3.135,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ],
+    [
+     3.935,
+     "lift",
+     "approach",
+     "cube low: retry"
+    ],
+    [
+     4.9,
+     "approach",
+     "descend",
+     "settle timeout"
+    ],
+    [
+     5.335,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     5.935,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10073,
+   "success": true,
+   "success_t": 100,
+   "time_to_lift_s": 2.0,
+   "hmax": 0.1963,
+   "final_height": 0.1959,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 37.0,
+   "events": [
+    [
+     0.7,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.035,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.635,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10074,
+   "success": true,
+   "success_t": 109,
+   "time_to_lift_s": 2.18,
+   "hmax": 0.1778,
+   "final_height": 0.1756,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 36.6,
+   "events": [
+    [
+     0.635,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.0,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.765,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10075,
+   "success": true,
+   "success_t": 112,
+   "time_to_lift_s": 2.24,
+   "hmax": 0.1861,
+   "final_height": 0.1815,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 44.5,
+   "events": [
+    [
+     0.8,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.135,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.835,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10076,
+   "success": true,
+   "success_t": 112,
+   "time_to_lift_s": 2.24,
+   "hmax": 0.182,
+   "final_height": 0.1777,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 33.0,
+   "events": [
+    [
+     0.7,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.035,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.835,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10077,
+   "success": true,
+   "success_t": 199,
+   "time_to_lift_s": 3.98,
+   "hmax": 0.196,
+   "final_height": 0.1937,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 1,
+   "box_tilt_end_deg": 61.3,
+   "events": [
+    [
+     0.7,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.035,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.565,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ],
+    [
+     2.335,
+     "lift",
+     "approach",
+     "cube low: retry"
+    ],
+    [
+     2.565,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     2.935,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     3.565,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10078,
+   "success": true,
+   "success_t": 108,
+   "time_to_lift_s": 2.16,
+   "hmax": 0.1904,
+   "final_height": 0.188,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 34.9,
+   "events": [
+    [
+     0.665,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.0,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.765,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10079,
+   "success": true,
+   "success_t": 114,
+   "time_to_lift_s": 2.28,
+   "hmax": 0.1872,
+   "final_height": 0.1842,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 44.9,
+   "events": [
+    [
+     0.865,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.2,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.865,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10080,
+   "success": true,
+   "success_t": 107,
+   "time_to_lift_s": 2.14,
+   "hmax": 0.1887,
+   "final_height": 0.1841,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 35.9,
+   "events": [
+    [
+     0.8,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.135,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.735,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10081,
+   "success": true,
+   "success_t": 205,
+   "time_to_lift_s": 4.1,
+   "hmax": 0.202,
+   "final_height": 0.202,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 1,
+   "box_tilt_end_deg": 118.6,
+   "events": [
+    [
+     0.6,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     0.965,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.665,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ],
+    [
+     2.4,
+     "lift",
+     "approach",
+     "cube low: retry"
+    ],
+    [
+     2.735,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     3.1,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     3.765,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10082,
+   "success": true,
+   "success_t": 223,
+   "time_to_lift_s": 4.46,
+   "hmax": 0.1801,
+   "final_height": 0.1782,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 1,
+   "box_tilt_end_deg": 35.0,
+   "events": [
+    [
+     0.735,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.065,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.735,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ],
+    [
+     2.5,
+     "lift",
+     "approach",
+     "cube low: retry"
+    ],
+    [
+     2.865,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     3.2,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     4.065,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10083,
+   "success": true,
+   "success_t": 114,
+   "time_to_lift_s": 2.28,
+   "hmax": 0.1793,
+   "final_height": 0.1763,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 44.7,
+   "events": [
+    [
+     0.8,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.135,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.865,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10084,
+   "success": true,
+   "success_t": 201,
+   "time_to_lift_s": 4.02,
+   "hmax": 0.1964,
+   "final_height": 0.195,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 1,
+   "box_tilt_end_deg": 50.8,
+   "events": [
+    [
+     0.835,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.2,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.735,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ],
+    [
+     2.565,
+     "lift",
+     "approach",
+     "cube low: retry"
+    ],
+    [
+     2.835,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     3.165,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     3.6,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10085,
+   "success": true,
+   "success_t": 114,
+   "time_to_lift_s": 2.28,
+   "hmax": 0.1793,
+   "final_height": 0.1777,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 39.7,
+   "events": [
+    [
+     0.765,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.1,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.865,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10086,
+   "success": true,
+   "success_t": 105,
+   "time_to_lift_s": 2.1,
+   "hmax": 0.1889,
+   "final_height": 0.1861,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 44.9,
+   "events": [
+    [
+     0.7,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.035,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.7,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10087,
+   "success": true,
+   "success_t": 113,
+   "time_to_lift_s": 2.26,
+   "hmax": 0.1844,
+   "final_height": 0.1819,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 51.1,
+   "events": [
+    [
+     0.835,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.165,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.865,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10088,
+   "success": true,
+   "success_t": 258,
+   "time_to_lift_s": 5.16,
+   "hmax": 0.1966,
+   "final_height": 0.1963,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 1,
+   "box_tilt_end_deg": 38.7,
+   "events": [
+    [
+     0.735,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.635,
+     "descend",
+     "grasp",
+     "settle timeout"
+    ],
+    [
+     2.5,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ],
+    [
+     3.235,
+     "lift",
+     "approach",
+     "cube low: retry"
+    ],
+    [
+     3.8,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     4.135,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     4.765,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10089,
+   "success": false,
+   "success_t": null,
+   "time_to_lift_s": null,
+   "hmax": 0.0912,
+   "final_height": 0.0199,
+   "up_at_end": false,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 2,
+   "box_tilt_end_deg": 90.0,
+   "events": [
+    [
+     0.635,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     0.965,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.535,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ],
+    [
+     2.3,
+     "lift",
+     "approach",
+     "cube low: retry"
+    ],
+    [
+     2.735,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     3.135,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     3.465,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ],
+    [
+     4.235,
+     "lift",
+     "approach",
+     "cube low: retry"
+    ],
+    [
+     4.8,
+     "approach",
+     "descend",
+     "settle timeout"
+    ],
+    [
+     5.135,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     5.465,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10090,
+   "success": true,
+   "success_t": 106,
+   "time_to_lift_s": 2.12,
+   "hmax": 0.1924,
+   "final_height": 0.1924,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 39.6,
+   "events": [
+    [
+     0.765,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.1,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.735,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10091,
+   "success": true,
+   "success_t": 210,
+   "time_to_lift_s": 4.2,
+   "hmax": 0.2006,
+   "final_height": 0.2006,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 1,
+   "box_tilt_end_deg": 47.6,
+   "events": [
+    [
+     0.735,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.065,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.8,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ],
+    [
+     2.565,
+     "lift",
+     "approach",
+     "cube low: retry"
+    ],
+    [
+     2.8,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     3.135,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     3.8,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10092,
+   "success": false,
+   "success_t": null,
+   "time_to_lift_s": null,
+   "hmax": 0.0358,
+   "final_height": 0.0299,
+   "up_at_end": false,
+   "terminated": false,
+   "phase_end": "grasp",
+   "retries": 2,
+   "box_tilt_end_deg": 0.0,
+   "events": [
+    [
+     0.835,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.2,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     2.0,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ],
+    [
+     2.8,
+     "lift",
+     "approach",
+     "cube low: retry"
+    ],
+    [
+     3.1,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     3.465,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     4.1,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ],
+    [
+     4.9,
+     "lift",
+     "approach",
+     "cube low: retry"
+    ],
+    [
+     5.3,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     5.665,
+     "descend",
+     "grasp",
+     "measured"
+    ]
+   ]
+  },
+  {
+   "seed": 10093,
+   "success": true,
+   "success_t": 101,
+   "time_to_lift_s": 2.02,
+   "hmax": 0.1744,
+   "final_height": 0.1718,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 44.2,
+   "events": [
+    [
+     0.635,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     0.965,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.6,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10094,
+   "success": true,
+   "success_t": 124,
+   "time_to_lift_s": 2.48,
+   "hmax": 0.1839,
+   "final_height": 0.1821,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 46.5,
+   "events": [
+    [
+     0.865,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.235,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     2.065,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10095,
+   "success": true,
+   "success_t": 116,
+   "time_to_lift_s": 2.32,
+   "hmax": 0.1778,
+   "final_height": 0.1765,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 36.7,
+   "events": [
+    [
+     0.7,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.035,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.9,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10096,
+   "success": true,
+   "success_t": 109,
+   "time_to_lift_s": 2.18,
+   "hmax": 0.1829,
+   "final_height": 0.1776,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 38.2,
+   "events": [
+    [
+     0.735,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.065,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.765,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10097,
+   "success": true,
+   "success_t": 108,
+   "time_to_lift_s": 2.16,
+   "hmax": 0.1781,
+   "final_height": 0.1749,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 44.2,
+   "events": [
+    [
+     0.735,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.065,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.735,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10098,
+   "success": false,
+   "success_t": null,
+   "time_to_lift_s": null,
+   "hmax": 0.0755,
+   "final_height": 0.035,
+   "up_at_end": false,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 2,
+   "box_tilt_end_deg": 23.7,
+   "events": [
+    [
+     0.665,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.0,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.665,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ],
+    [
+     2.435,
+     "lift",
+     "approach",
+     "cube low: retry"
+    ],
+    [
+     2.735,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     3.1,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     3.9,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ],
+    [
+     4.635,
+     "lift",
+     "approach",
+     "cube low: retry"
+    ],
+    [
+     4.935,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     5.3,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     5.965,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  },
+  {
+   "seed": 10099,
+   "success": true,
+   "success_t": 101,
+   "time_to_lift_s": 2.02,
+   "hmax": 0.1764,
+   "final_height": 0.1731,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "box_tilt_end_deg": 43.7,
+   "events": [
+    [
+     0.665,
+     "approach",
+     "descend",
+     "measured"
+    ],
+    [
+     1.0,
+     "descend",
+     "grasp",
+     "measured"
+    ],
+    [
+     1.6,
+     "grasp",
+     "lift",
+     "jaws stopped"
+    ]
+   ]
+  }
+ ]
+}

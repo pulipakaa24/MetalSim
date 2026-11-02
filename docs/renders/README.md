@@ -8,25 +8,26 @@ which machine, every asset with its source and licence, and the commands to repr
 | Franka-Pour | trained policy pours granular MPM media between two cups ([Isaac Lab](https://github.com/isaac-sim/IsaacLab) 3.0-EA task); one env and a 2 x 2 grid | [FRANKA_POUR.md](FRANKA_POUR.md) |
 | G1 flat walk | Isaac Lab's G1 flat velocity task with NVIDIA's published Isaac Lab 2.3 policy ([rsl_rl](https://github.com/leggedrobotics/rsl_rl), iteration 1499, trained in [PhysX](https://github.com/NVIDIA-Omniverse/PhysX); fetched by `scripts/fetch_isaac_assets.sh`); 6 s, 1280x720 hero and a 640x480 orbiting shot for the README, 64 spp | [G1_FLAT.md](G1_FLAT.md) |
 | G1 rough walk | Isaac Lab's G1 rough velocity task (stairs, slopes, boxes) with NVIDIA's published policy (iteration 2999); the G1 climbs out of a pit of inverted stairs; same two shots | [G1_ROUGH.md](G1_ROUGH.md) |
-| G1 walk, Unitree's policy | Unitree's own pretrained G1 walking policy ([unitree_rl_gym](https://github.com/unitreerobotics/unitree_rl_gym) `deploy/pre_train/g1/motion.pt`, BSD-3-Clause; the file Unitree's MuJoCo and real-robot deploy configs both load), played by Unitree's [MuJoCo](https://github.com/google-deepmind/mujoco) sim2sim loop ported to [MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp) on Unitree's G1 model; 0.8 s gait clock, 1.25 gait cycles per second; fetched by `scripts/fetch_unitree_rl_gym.sh`; same two shots | [G1_UNITREE.md](G1_UNITREE.md) |
+| G1 walk, Unitree's policy | Unitree's own pretrained G1 walking policy ([unitree_rl_gym](https://github.com/unitreerobotics/unitree_rl_gym) [`deploy/pre_train/g1/motion.pt`](https://github.com/unitreerobotics/unitree_rl_gym/blob/276801e46c5d433564f24658bac64f254b7d2d4b/deploy/pre_train/g1/motion.pt), BSD-3-Clause; the file Unitree's MuJoCo and real-robot deploy configs both load), played by Unitree's [MuJoCo](https://github.com/google-deepmind/mujoco) sim2sim loop ported to [MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp) on Unitree's G1 model; 0.8 s gait clock, 1.25 gait cycles per second; fetched by `scripts/fetch_unitree_rl_gym.sh`; same two shots | [G1_UNITREE.md](G1_UNITREE.md) |
 | G1 on rough ground, Unitree's policy | the same blind, flat-trained policy on Isaac Lab's random rough terrain (`ROUGH_TERRAINS_CFG["random_rough"]`, one 8 x 8 m tile: bumps of 2 to 10 cm every 0.1 m; Isaac's only setting, difficulty does not change it), played by Unitree's loop on [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) (with the heightfield contact fixes); 10 to 12 of 16 robots fall within 8 s on the film's tile (CPU MuJoCo also 10 to 12), 75 % over five tiles (CPU MuJoCo 68 %), and the film shows a typical one, down at 5.3 s; outdoor HDRI (goegap) and CC0 ground texture (`scripts/fetch_polyhaven_assets.sh demo`); 8 s, same two shots, lower camera | [G1_BUMPS.md](G1_BUMPS.md) |
 | SO-101 cube lift | [so101Sim](https://github.com/pulipakaa24/so101Sim)'s SO-101 cube lift (the owner's project) on MuJoCo Warp, four films: its state-based PPO lift teacher (97-98/100 on MuJoCo Warp against 100/100 on so101Sim's CPU MuJoCo; the realism check finds the motion beyond the standard 7.4 V follower's servos), the same policy on a 7.4 V servo model (`so101_lift_74v`), a smoothness retrain (`so101_lift_smooth`), and so101Sim's scripted IK plan streamed at [LeRobot](https://github.com/huggingface/lerobot)'s 30 Hz to Rhoban [BAM](https://github.com/Rhoban/bam)'s identified 7.4 V servo model with load-dependent gearbox friction (`so101_lift_deploy`, 100/100 on MuJoCo Warp and on CPU MuJoCo); wooden table top at its real size; 6 s, 1280x720 hero and a 640x480 shot for the README, 64 spp | [SO101_LIFT.md](SO101_LIFT.md) |
 | TRON1 wheel-legged drive, LimX's policy | LimX's TRON1 (WF_TRON1A) driven by LimX's own RL policy (the isaacgym ONNX export in LimX's [`tron1-rl-deploy-python`](https://github.com/limxdynamics/tron1-rl-deploy-python) at [`035e4c9`](https://github.com/limxdynamics/tron1-rl-deploy-python/commit/035e4c9e2f24e916fa5e8363ac6f0f788a2e1e8c), Apache-2.0, in `assets/tron1/`) in MetalSim's TRON1 simulation (`Tron1Sim`, CPU MuJoCo) at its nominal realism settings (latency, drive model, sensor noise, joint friction, sensor pack), unchanged; stood up for 3 s, then drive, turn, slow down, stop, each command change ramped over 0.5 s; 0 of 16 robots fell; industrial HDRI and concrete floor ([Poly Haven](https://polyhaven.com), `fetch_polyhaven_assets.sh heldout`); same two shots | [TRON1.md](TRON1.md) |
 
 ## The README's media
 
-The animations at the top of the repository's `README.md` are in this directory, linked by relative path, as MuJoCo
-Warp does. Every cell is a lossy animated WebP, 320x240, looping, written by
-[Pillow](https://github.com/python-pillow/Pillow) at quality 70 in one call (MuJoCo Warp's `mujoco_warp/record.py`
+The animations at the top of the repository's `README.md` are in this directory, linked by relative path, as MuJoCo Warp
+does. Every cell is a lossy animated WebP, 320x240, looping, written by
+[Pillow](https://github.com/python-pillow/Pillow) at quality 70 in one call (MuJoCo Warp's
+[`mujoco_warp/record.py`](https://github.com/google-deepmind/mujoco_warp/blob/d41a47c0837fc71abb44d7d4799bf85ca19ff7ab/mujoco_warp/record.py)
 recipe), through `python -m metalsim.render.film.encode webp`: a 4:3 crop of the source, Lanczos downscale, one `.json`
 beside the output with the crop, window, frame count, PSNR against the source and the exact command. Those `.json`
-files, the frame directories and the scratch work are in `runs/readme_media/`, which stays local (gitignored); the
-commands are copied below. On 2026-10-31 every encode command below, and the chart's, was re-run from its source and
-gave a byte-identical file (for the cells made before that day, `runs/readme_media/handoff/provenance-docs.md`); the
-commands that record or render were not re-run. On 2026-11-01 the TRON1 and SO-101 cells were rendered again from their
-recordings, after a film-tool fix: a look's colours (the ground texture's tint, `LookCfg.materials`) now replace a
-geom's own `rgba`, which MuJoCo otherwise draws instead. Their encode commands were then run twice, with byte-identical
-output. Paths are from the repository root.
+files, the frame directories and the scratch work are in `runs/readme_media/`, which stays local (gitignored), apart
+from the records the cells below cite; the commands are copied below. On 2026-10-31 every encode command below, and the
+chart's, was re-run from its source and gave a byte-identical file (for the cells made before that day,
+`runs/readme_media/handoff/provenance-docs.md`); the commands that record or render were not re-run. On 2026-11-01 the
+TRON1 and SO-101 cells were rendered again from their recordings, after a film-tool fix: a look's colours (the ground
+texture's tint, `LookCfg.materials`) now replace a geom's own `rgba`, which MuJoCo otherwise draws instead. Their encode
+commands were then run twice, with byte-identical output. Paths are from the repository root.
 
 No timing figure comes from these media. The G1, TRON1 and SO-101 films were recorded and rendered on the 14-inch
 MacBook Pro (Mac16,6), not in timing runs (MetalSim's timing runs are made on the 16-inch MacBook Pro through
@@ -48,11 +49,11 @@ Earlier cells, kept with their media in this directory but no longer on the fron
 ### G1 walk, Unitree's policy (`g1_unitree.webp`)
 
 - **Shows:** Unitree G1 walking on flat ground with Unitree's own pretrained walking policy (`unitree_rl_gym`'s
-  `deploy/pre_train/g1/motion.pt`, BSD-3-Clause, the file Unitree's MuJoCo and real-robot deploy configs both load),
-  played by Unitree's MuJoCo sim2sim loop ported to MuJoCo Warp, unchanged; 1.25 gait cycles per second (Unitree's
-  0.8 s gait clock), feet landing flat. Path traced at tier 2 on a laminate floor at its real size (1.70 m per image,
-  21 cm planks, about one G1 foot long); the camera tracks the pelvis and orbits at 10 deg/s. 0.5-5.5 s of a 6 s take,
-  150 frames at 33 ms, 0.63 MB.
+  [`deploy/pre_train/g1/motion.pt`](https://github.com/unitreerobotics/unitree_rl_gym/blob/276801e46c5d433564f24658bac64f254b7d2d4b/deploy/pre_train/g1/motion.pt),
+  BSD-3-Clause, the file Unitree's MuJoCo and real-robot deploy configs both load), played by Unitree's MuJoCo sim2sim
+  loop ported to MuJoCo Warp, unchanged; 1.25 gait cycles per second (Unitree's 0.8 s gait clock), feet landing flat.
+  Path traced at tier 2 on a laminate floor at its real size (1.70 m per image, 21 cm planks, about one G1 foot long);
+  the camera tracks the pelvis and orbits at 10 deg/s. 0.5-5.5 s of a 6 s take, 150 frames at 33 ms, 0.63 MB.
 - **Source:** the `readme` shot of `runs/film/g1_unitree/` (`readme/frames`, local; `rec/rec.json` and
   `readme/render.json` tracked). The recording is the 15:52 re-take on [my fork of MuJoCo
   Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) at
@@ -208,8 +209,8 @@ Earlier cells, kept with their media in this directory but no longer on the fron
   frames: libwebp merges identical ones).
 - **Source:** `scripts/readme_media/lidar_glass.py` (its docstring has the scene and every sensor setting); frames in
   `runs/readme_media/assets/lidar_glass_{rgb,depth,lidar}_frames/` (640x480, 150 at 30 fps, local) and its json,
-  `runs/readme_media/scratch/lidar-glass/lidar_glass.json` (settings, exposure, per-frame timings, software and
-  hardware; local).
+  `runs/readme_media/records/lidar-glass/lidar_glass.json` (settings, exposure, per-frame timings, software and
+  hardware).
 - **Reproduce:**
   `scripts/gpu_run.sh lidar-glass render 10 -- .venv/bin/python scripts/readme_media/lidar_glass.py --compare 75`, then
   per view `python -m metalsim.render.film.encode webp runs/readme_media/assets/lidar_glass_rgb_frames docs/renders/lidar_glass_rgb.webp --start 0 --seconds 5 --src-fps 30`
@@ -294,8 +295,7 @@ No longer on the front page; the files stay in this directory.
   panels), made by `metalsim.parity.side_by_side` (`scripts/gallery/g1_stage_videos.sh`; re-rendered with the RTX-parity
   preset on 2026-09-25,
   [`a14b6a87`](https://github.com/pulipakaa24/MetalSim/commit/a14b6a8736baf4030960f195810063bb4ed2eb03)). The Isaac
-  recording and checkpoint (`runs/parity/isaac/parity_out/play/isaac_it1499`,
-  `runs/parity/isaac/ckpt_out/model_1499.pt`) are not in the repository, so the video is the source.
+  recording and the iteration-1499 checkpoint it played are not in the repository, so the video is the source.
 - **Reproduce:** a 540x405 crop at (340, 166) of the left panel and at (1364, 166), the same place in the right
   panel (ffmpeg rounds the height to 404 for yuv420p), then the encoder:
   ```

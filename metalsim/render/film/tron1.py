@@ -420,16 +420,20 @@ TRON1_STORY = f"""
 **The policy.** LimX's RL policy for the wheel-foot TRON1 (WF_TRON1A), from LimX's `tron1-rl-deploy-python`
 (<{LIMX_DEPLOY}>, Apache-2.0, commit
 [`{LIMX_COMMIT[:7]}`]({LIMX_DEPLOY}/commit/{LIMX_COMMIT})):
-`controllers/model/WF_TRON1A/policy/isaacgym/encoder.onnx` and `policy.onnx` with `params.yaml`. The copies in
+[`controllers/model/WF_TRON1A/policy/isaacgym/encoder.onnx`]({LIMX_DEPLOY}/blob/{LIMX_COMMIT}/controllers/model/WF_TRON1A/policy/isaacgym/encoder.onnx)
+and `policy.onnx` with `params.yaml`. The copies in
 `assets/tron1/limx_policy/WF_TRON1A/` are byte-identical to LimX's at that commit (fetched and compared on 2026-10-31;
 sha256 `{LIMX_SHA['policy/isaacgym/policy.onnx']}` for the policy,
 `{LIMX_SHA['policy/isaacgym/encoder.onnx']}` for the encoder), and the adapter checks the hashes
 before it runs. That repository is LimX's Python controller for its robots: `main.py` connects through LimX's SDK to
-LimX's MuJoCo simulator by default, or to the robot when given its IP address (`main.py` lines 27-39), and loads
+LimX's MuJoCo simulator by default, or to the robot when given its IP address
+([`main.py`]({LIMX_DEPLOY}/blob/{LIMX_COMMIT}/main.py#L27-L39) lines 27-39), and loads
 `policy/$RL_TYPE/` with `RL_TYPE` isaacgym or isaaclab (the README's example is isaacgym; the isaaclab export uses
 another joint order, which the port does not handle). It is LimX's open policy, not the closed controller of the robot's
 Remote Control Mode, which is not documented (docs/TRON1.md, "What runs the robot today"). It is played by
-`metalsim/tron1/limx_policy.py`, a port of LimX's `controllers/WheelfootController.py` at the same commit: 28
+`metalsim/tron1/limx_policy.py`, a port of LimX's
+[`controllers/WheelfootController.py`]({LIMX_DEPLOY}/blob/{LIMX_COMMIT}/controllers/WheelfootController.py) at the
+same commit: 28
 observations (gyro x 0.25, projected gravity, six leg joint angles, eight joint velocities x 0.05, last actions), a
 10-frame history into the encoder (3 outputs), then the policy on [encoder, observation, command x (2, 2, 0.25)] to 8
 actions at 50 Hz; legs to `q = 0.25 a` with Kp 42 and Kd 2.5, wheels to `dq = 0.8 a` through Kd 0.8, with LimX's

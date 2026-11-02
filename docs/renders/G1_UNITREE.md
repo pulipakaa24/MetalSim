@@ -1,6 +1,6 @@
 # G1 walk, Unitree's policy: a metalsim render
 
-Unitree G1 walking on flat ground with Unitree's own pretrained walking policy ([unitree_rl_gym](https://github.com/unitreerobotics/unitree_rl_gym), `deploy/pre_train/g1/motion.pt`, BSD-3-Clause), played by Unitree's [MuJoCo](https://github.com/google-deepmind/mujoco) sim2sim loop (`deploy_mujoco.py`, `configs/g1.yaml`) ported to [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) on Metal, on Unitree's own G1 model and meshes. Rendered on the 14-inch MacBook Pro (Mac16,6), not in a timing run, so its Performance table is not a timing figure.
+Unitree G1 walking on flat ground with Unitree's own pretrained walking policy ([unitree_rl_gym](https://github.com/unitreerobotics/unitree_rl_gym), [`deploy/pre_train/g1/motion.pt`](https://github.com/unitreerobotics/unitree_rl_gym/blob/276801e46c5d433564f24658bac64f254b7d2d4b/deploy/pre_train/g1/motion.pt), BSD-3-Clause), played by Unitree's [MuJoCo](https://github.com/google-deepmind/mujoco) sim2sim loop ([`deploy_mujoco.py`](https://github.com/unitreerobotics/unitree_rl_gym/blob/276801e46c5d433564f24658bac64f254b7d2d4b/deploy/deploy_mujoco/deploy_mujoco.py), [`configs/g1.yaml`](https://github.com/unitreerobotics/unitree_rl_gym/blob/276801e46c5d433564f24658bac64f254b7d2d4b/deploy/deploy_mujoco/configs/g1.yaml)) ported to [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) on Metal, on Unitree's own G1 model and meshes. Rendered on the 14-inch MacBook Pro (Mac16,6), not in a timing run, so its Performance table is not a timing figure.
 
 **hero** (301 frames, 6.0 s at 50 fps): [video](g1_unitree.mp4) (1.5 MB, H.264)
 
@@ -15,7 +15,7 @@ Unitree G1 walking on flat ground with Unitree's own pretrained walking policy (
   - env 1: terminated False, base_z 0.000, end_frame -1
   - env 3: terminated False, base_z 0.000, end_frame -1
   - env 0: terminated False, base_z 0.000, end_frame -1
-- Policy: `assets/unitree_rl_gym/deploy/pre_train/g1/motion.pt` (torchscript); physics: MuJoCo Warp BatchSim (metalsim.physics.batch), Unitree's scene.xml; Unitree's PD torque every physics step (Warp kernel: before the first step of a policy step, then BatchSim.add_substep_hook after each).
+- Policy: `assets/unitree_rl_gym/deploy/pre_train/g1/motion.pt` (torchscript; not in the repository: `scripts/fetch_unitree_rl_gym.sh` fetches it); physics: MuJoCo Warp BatchSim (metalsim.physics.batch), Unitree's scene.xml; Unitree's PD torque every physics step (Warp kernel: before the first step of a policy step, then BatchSim.add_substep_hook after each).
 
 ## Performance
 
@@ -52,27 +52,31 @@ Measured on the machine below; one frame = one policy step ([Isaac Lab](https://
 **The policy.** Unitree's own pretrained G1 walking policy from Unitree's `unitree_rl_gym`
 (<https://github.com/unitreerobotics/unitree_rl_gym>, BSD-3-Clause, commit
 [`276801e`](https://github.com/unitreerobotics/unitree_rl_gym/commit/276801e46c5d433564f24658bac64f254b7d2d4b)):
-`deploy/pre_train/g1/motion.pt`, the file both of Unitree's playback scripts load, the MuJoCo sim2sim one
-(`deploy/deploy_mujoco/configs/g1.yaml`, `policy_path`) and the one for the real robot
-(`deploy/deploy_real/configs/g1.yaml`, line 10). sha256
-`cf668f75b90d1abf73d2b87612a6e76bccc61ff7e083b63582d3f6aaa3c1759d`, 145,745 bytes, as fetched. It is a TorchScript
-module: an LSTM (47 inputs, 64 hidden) and an ELU MLP 64 -> 32 -> 12, loaded with `torch.jit.load` and played as
-published. Unitree trained it with `legged_gym` on [Isaac Gym](https://developer.nvidia.com/isaac-gym)
-(`legged_gym/envs/g1/g1_config.py`, `G1RoughCfg` / `G1RoughCfgPPO`: `ActorCriticRecurrent`, plane terrain, friction and
-added-mass randomization, pushes every 5 s; physics 5 ms x decimation 4, so 50 Hz). Its gait is set by the training
-task, not left to the policy: `g1_env.py` feeds a fixed gait clock (period 0.8 s, so 1.25 gait cycles per second; the
-right leg half a cycle behind the left) to the policy as sin / cos of the phase, and rewards foot contact in the stance
-part of each leg's cycle (phase < 0.55, `_reward_contact`) and an 8 cm swing height of the ankle-roll link
-(`_reward_feet_swing_height`). `scripts/fetch_unitree_rl_gym.sh` fetches the repository at that commit into
-`assets/unitree_rl_gym/` (git-ignored, not committed); the record stage checks the policy's sha256 and writes the
+[`deploy/pre_train/g1/motion.pt`](https://github.com/unitreerobotics/unitree_rl_gym/blob/276801e46c5d433564f24658bac64f254b7d2d4b/deploy/pre_train/g1/motion.pt), the file both of Unitree's playback
+scripts load, the MuJoCo sim2sim one
+([`deploy/deploy_mujoco/configs/g1.yaml`](https://github.com/unitreerobotics/unitree_rl_gym/blob/276801e46c5d433564f24658bac64f254b7d2d4b/deploy/deploy_mujoco/configs/g1.yaml), `policy_path`) and the
+one for the real robot ([`deploy/deploy_real/configs/g1.yaml`](https://github.com/unitreerobotics/unitree_rl_gym/blob/276801e46c5d433564f24658bac64f254b7d2d4b/deploy/deploy_real/configs/g1.yaml#L10),
+line 10). sha256 `cf668f75b90d1abf73d2b87612a6e76bccc61ff7e083b63582d3f6aaa3c1759d`, 145,745 bytes, as fetched. It is a
+TorchScript module: an LSTM (47 inputs, 64 hidden) and an ELU MLP 64 -> 32 -> 12, loaded with `torch.jit.load` and
+played as published. Unitree trained it with `legged_gym` on [Isaac Gym](https://developer.nvidia.com/isaac-gym)
+([`legged_gym/envs/g1/g1_config.py`](https://github.com/unitreerobotics/unitree_rl_gym/blob/276801e46c5d433564f24658bac64f254b7d2d4b/legged_gym/envs/g1/g1_config.py), `G1RoughCfg` / `G1RoughCfgPPO`:
+`ActorCriticRecurrent`, plane terrain, friction and added-mass randomization, pushes every 5 s; physics 5 ms x
+decimation 4, so 50 Hz). Its gait is set by the training task, not left to the policy:
+[`g1_env.py`](https://github.com/unitreerobotics/unitree_rl_gym/blob/276801e46c5d433564f24658bac64f254b7d2d4b/legged_gym/envs/g1/g1_env.py) feeds a fixed gait clock (period 0.8 s, so 1.25 gait cycles
+per second; the right leg half a cycle behind the left) to the policy as sin / cos of the phase, and rewards foot
+contact in the stance part of each leg's cycle (phase < 0.55, `_reward_contact`) and an 8 cm swing height of the
+ankle-roll link (`_reward_feet_swing_height`). `scripts/fetch_unitree_rl_gym.sh` fetches the repository at that commit
+into `assets/unitree_rl_gym/` (git-ignored, not committed); the record stage checks the policy's sha256 and writes the
 repository, commit, file, licence and hash into `rec.json` `checkpoint` and `adapter`.
 
-**Unitree's loop, on MuJoCo Warp.** Unitree plays the policy in MuJoCo with `deploy/deploy_mujoco/deploy_mujoco.py`
-and `configs/g1.yaml`: physics step 2 ms, a policy step every 10 physics steps (50 Hz), PD gains kp (100, 100, 100,
+**Unitree's loop, on MuJoCo Warp.** Unitree plays the policy in MuJoCo with
+[`deploy/deploy_mujoco/deploy_mujoco.py`](https://github.com/unitreerobotics/unitree_rl_gym/blob/276801e46c5d433564f24658bac64f254b7d2d4b/deploy/deploy_mujoco/deploy_mujoco.py) and
+[`configs/g1.yaml`](https://github.com/unitreerobotics/unitree_rl_gym/blob/276801e46c5d433564f24658bac64f254b7d2d4b/deploy/deploy_mujoco/configs/g1.yaml): physics step 2 ms, a policy step every 10 physics steps (50 Hz), PD gains kp (100, 100, 100,
 150, 40, 40) and kd (2, 2, 2, 4, 2, 2) per leg (hip pitch, roll, yaw, knee, ankle pitch, roll), default angles
 (-0.1, 0, 0, 0.3, -0.2, 0) per leg, scales: angular velocity 0.25, joint position 1, joint velocity 0.05, action 0.25,
 command (2, 2, 0.25); 12 actions, 47 observations, command (0.5, 0, 0) m/s, m/s, rad/s. The model is Unitree's
-`resources/robots/g1_description/scene.xml` (`g1_12dof.xml`: the 12 leg joints; Euler integrator, pyramidal cones,
+[`resources/robots/g1_description/scene.xml`](https://github.com/unitreerobotics/unitree_rl_gym/blob/276801e46c5d433564f24658bac64f254b7d2d4b/resources/robots/g1_description/scene.xml)
+(`g1_12dof.xml`: the 12 leg joints; Euler integrator, pyramidal cones,
 Newton solver, MuJoCo's defaults; four 5 mm collision spheres under each foot; `<motor>` actuators whose torque the
 joints' `actuatorfrcrange` clamps). The film runs the same loop on MetalSim's MuJoCo Warp (`metalsim.physics.batch.BatchSim`,
 4 worlds of that model; `metalsim/render/film/unitree.py`, `UnitreeG1`): Unitree computes the PD torque from
@@ -129,10 +133,12 @@ looking at (0, 0, -0.05) m, 3.55 m away. `readme` (640x480, 4:3, for the README 
 look-at at 0.75 times the distance (eye (1.95, -1.5, 0.98) m, 2.66 m), so the robot fills about three quarters of the
 frame height, plus a slow orbit of 10 deg/s about the vertical through the look-at point, symmetric about the middle
 of the film: -30 deg at 0 s, 0 at 3 s (the hero's direction), +30 deg at 6 s, counter-clockwise seen from above, as
-MuJoCo's azimuth grows. The orbit copies MuJoCo Warp's README clips: `mujoco_warp/record.py` (upstream MuJoCo Warp at
+MuJoCo's azimuth grows. The orbit copies MuJoCo Warp's README clips:
+[`mujoco_warp/record.py`](https://github.com/google-deepmind/mujoco_warp/blob/d41a47c0837fc71abb44d7d4799bf85ca19ff7ab/mujoco_warp/record.py) (upstream MuJoCo Warp at
 [`d41a47c0`](https://github.com/google-deepmind/mujoco_warp/commit/d41a47c0837fc71abb44d7d4799bf85ca19ff7ab), lines 43
 and 142) sets `cam.azimuth = 90 + (step - nstep / 2) * cam_azimuth_speed` with 0.05 deg per physics step, and its G1
-scenes step at 5 ms (`benchmarks/unitree_g1/unitree_g1_mjlab.xml`, line 14), so 10 deg/s.
+scenes step at 5 ms ([`benchmarks/unitree_g1/unitree_g1_mjlab.xml`](https://github.com/google-deepmind/mujoco_warp/blob/d41a47c0837fc71abb44d7d4799bf85ca19ff7ab/benchmarks/unitree_g1/unitree_g1_mjlab.xml#L14),
+line 14), so 10 deg/s.
 
 **Rendering.** Tier 2 (the path tracer), 64 samples per pixel (16 passes x 4), 3 bounces,
 [Open Image Denoise](https://www.openimagedenoise.org), ACES tone map, sRGB; lit by the Poly Haven studio HDRI as an

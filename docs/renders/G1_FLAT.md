@@ -15,7 +15,7 @@ Unitree G1 walking on flat ground: [Isaac Lab](https://github.com/isaac-sim/Isaa
   - env 1: terminated False, time_out False, base_z 0.000, level 0, col 0, end_frame -1
   - env 6: terminated False, time_out False, base_z 0.000, level 0, col 0, end_frame -1
   - env 2: terminated False, time_out False, base_z 0.000, level 0, col 0, end_frame -1
-- Policy: `assets/isaac/pretrained/rsl_rl/Isaac-Velocity-Flat-G1-v0/checkpoint.pt` (iteration 1499); physics: MuJoCo Warp BatchSim (metalsim.learn.g1_velocity).
+- Policy: `assets/isaac/pretrained/rsl_rl/Isaac-Velocity-Flat-G1-v0/checkpoint.pt` (iteration 1499; not in the repository: `scripts/fetch_isaac_assets.sh` fetches it); physics: MuJoCo Warp BatchSim (metalsim.learn.g1_velocity).
 
 ## Performance
 
@@ -53,8 +53,9 @@ Measured on the machine below; one frame = one policy step ([Isaac Lab](https://
 [Isaac Sim](https://github.com/isaac-sim/IsaacSim) with PhysX. MetalSim plays it as published, without retraining or
 fine-tuning. Source:
 <https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.1/Isaac/IsaacLab/PretrainedCheckpoints/rsl_rl/Isaac-Velocity-Flat-G1-v0/checkpoint.pt>
-(the path Isaac Lab's `--use_pretrained_checkpoint` resolves, `isaaclab_rl/utils/pretrained_checkpoint.py`, under
-the Isaac 5.1 asset root), sha256 `fdf0f242bb8f3bcfc1aa9b7ff2761af4c014cf1cdc7e49242c9b92f3581720e7`, 2,027,170
+(the path Isaac Lab's `--use_pretrained_checkpoint` resolves,
+[`isaaclab_rl/utils/pretrained_checkpoint.py`](https://github.com/isaac-sim/IsaacLab/blob/v2.3.2/source/isaaclab_rl/isaaclab_rl/utils/pretrained_checkpoint.py),
+under the Isaac 5.1 asset root), sha256 `fdf0f242bb8f3bcfc1aa9b7ff2761af4c014cf1cdc7e49242c9b92f3581720e7`, 2,027,170
 bytes. It is NVIDIA's file under NVIDIA's asset terms: `scripts/fetch_isaac_assets.sh` downloads it to
 `assets/isaac/pretrained/rsl_rl/Isaac-Velocity-Flat-G1-v0/checkpoint.pt` and checks the hash; `.gitignore` (`*.pt`)
 keeps it out of the repository. The record stage refuses a file whose sha256 is not the published one and writes the
@@ -116,10 +117,12 @@ looking at (0, 0, -0.05) m, 3.55 m away. `readme` (640x480, 4:3, for the README 
 look-at at 0.75 times the distance (eye (1.95, -1.5, 0.98) m, 2.66 m), so the robot fills about three quarters of the
 frame height, plus a slow orbit of 10 deg/s about the vertical through the look-at point, symmetric about the middle
 of the film: -30 deg at 0 s, 0 at 3 s (the hero's direction), +30 deg at 6 s, counter-clockwise seen from above, as
-MuJoCo's azimuth grows. The orbit copies MuJoCo Warp's README clips: `mujoco_warp/record.py` (upstream MuJoCo Warp at
+MuJoCo's azimuth grows. The orbit copies MuJoCo Warp's README clips:
+[`mujoco_warp/record.py`](https://github.com/google-deepmind/mujoco_warp/blob/d41a47c0837fc71abb44d7d4799bf85ca19ff7ab/mujoco_warp/record.py) (upstream MuJoCo Warp at
 [`d41a47c0`](https://github.com/google-deepmind/mujoco_warp/commit/d41a47c0837fc71abb44d7d4799bf85ca19ff7ab), lines 43
 and 142) sets `cam.azimuth = 90 + (step - nstep / 2) * cam_azimuth_speed` with 0.05 deg per physics step, and its G1
-scenes step at 5 ms (`benchmarks/unitree_g1/unitree_g1_mjlab.xml`, line 14), so 10 deg/s.
+scenes step at 5 ms ([`benchmarks/unitree_g1/unitree_g1_mjlab.xml`](https://github.com/google-deepmind/mujoco_warp/blob/d41a47c0837fc71abb44d7d4799bf85ca19ff7ab/benchmarks/unitree_g1/unitree_g1_mjlab.xml#L14),
+line 14), so 10 deg/s.
 
 **Rendering.** Tier 2 (the path tracer), 64 samples per pixel (16 passes x 4), 3 bounces,
 [Open Image Denoise](https://www.openimagedenoise.org), ACES tone map, sRGB; lit by a Poly Haven studio HDRI as an

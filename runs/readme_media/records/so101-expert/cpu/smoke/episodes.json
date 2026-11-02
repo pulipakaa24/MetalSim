@@ -1,0 +1,275 @@
+{
+ "script": "runs/readme_media/scratch/so101-expert/eval_cpu.py",
+ "controller": "metalsim/render/film/so101_expert.py DeployExpert",
+ "ctrl_hz": 30.0,
+ "vmax": [
+  2.723,
+  1.846,
+  1.534,
+  2.261,
+  2.673
+ ],
+ "amax": [
+  21.36,
+  14.25,
+  14.83,
+  28.4,
+  34.92
+ ],
+ "t_settle": 0.31,
+ "servo": {
+  "servo": "7v4_real",
+  "label": "STS3215 C001 7.4 V under LeRobot's registers (P 16, Acceleration 254, gripper 50 %), BAM-identified firmware loop, datasheet torque-speed line, servo + host latency",
+  "joints": [
+   "shoulder_pan",
+   "shoulder_lift",
+   "elbow_flex",
+   "wrist_flex",
+   "wrist_roll",
+   "gripper"
+  ],
+  "forcerange_Nm": [
+   1.9123,
+   1.9123,
+   1.9123,
+   1.9123,
+   1.9123,
+   0.9857
+  ],
+  "damping_Nms": [
+   0.3417,
+   0.3417,
+   0.3417,
+   0.3417,
+   0.3417,
+   0.3417
+  ],
+  "noload_line_rad_s": [
+   5.596,
+   5.596,
+   5.596,
+   5.596,
+   5.596,
+   2.885
+  ],
+  "kp": [
+   5.262,
+   5.262,
+   5.262,
+   5.262,
+   5.262,
+   5.262
+  ],
+  "kv": [
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0
+  ],
+  "armature": [
+   0.0261,
+   0.0261,
+   0.0261,
+   0.0261,
+   0.0261,
+   0.0261
+  ],
+  "frictionloss": [
+   0.0515,
+   0.0515,
+   0.0515,
+   0.0515,
+   0.0515,
+   0.0515
+  ],
+  "setpoint": {
+   "cmd_delay": 0.004046900011857505,
+   "servo_delay": 0.0010469000118575051,
+   "host_delay": 0.003,
+   "speed_limit": 5.2883481319359,
+   "accel_limit": 38.963112012295284,
+   "timestep": 0.005
+  },
+  "actuators": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5
+  ]
+ },
+ "env": "so101Sim rl/native/so101_lift.py SO101LiftEnv (reset, scene, success test; unchanged)",
+ "mujoco": "3.10.0",
+ "seeds": [
+  10000,
+  10004
+ ],
+ "wall_s": 0.7,
+ "summary": {
+  "episodes": 5,
+  "successes": 5,
+  "up_at_6s": 5,
+  "time_to_lift_mean_s": 2.996,
+  "time_to_lift_median_s": 2.62,
+  "max_height_mean": 0.16695999999999997,
+  "terminated": 0,
+  "retries": 1,
+  "phase_end": {
+   "approach": 0,
+   "descend": 0,
+   "grasp": 0,
+   "lift": 5
+  }
+ },
+ "episodes": [
+  {
+   "seed": 10000,
+   "success": true,
+   "success_t": 134,
+   "time_to_lift_s": 2.68,
+   "hmax": 0.1627,
+   "final_height": 0.1367,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "transitions": [
+    [
+     1.065,
+     "descend"
+    ],
+    [
+     1.4,
+     "grasp"
+    ],
+    [
+     2.065,
+     "lift"
+    ]
+   ]
+  },
+  {
+   "seed": 10001,
+   "success": true,
+   "success_t": 243,
+   "time_to_lift_s": 4.86,
+   "hmax": 0.1551,
+   "final_height": 0.1272,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 1,
+   "transitions": [
+    [
+     1.035,
+     "descend"
+    ],
+    [
+     1.4,
+     "grasp"
+    ],
+    [
+     2.065,
+     "lift"
+    ],
+    [
+     2.835,
+     "approach"
+    ],
+    [
+     3.165,
+     "descend"
+    ],
+    [
+     3.535,
+     "grasp"
+    ],
+    [
+     4.235,
+     "lift"
+    ]
+   ]
+  },
+  {
+   "seed": 10002,
+   "success": true,
+   "success_t": 131,
+   "time_to_lift_s": 2.62,
+   "hmax": 0.1596,
+   "final_height": 0.1353,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "transitions": [
+    [
+     1.035,
+     "descend"
+    ],
+    [
+     1.4,
+     "grasp"
+    ],
+    [
+     2.0,
+     "lift"
+    ]
+   ]
+  },
+  {
+   "seed": 10003,
+   "success": true,
+   "success_t": 111,
+   "time_to_lift_s": 2.22,
+   "hmax": 0.2011,
+   "final_height": 0.1694,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "transitions": [
+    [
+     0.665,
+     "descend"
+    ],
+    [
+     1.0,
+     "grasp"
+    ],
+    [
+     1.665,
+     "lift"
+    ]
+   ]
+  },
+  {
+   "seed": 10004,
+   "success": true,
+   "success_t": 130,
+   "time_to_lift_s": 2.6,
+   "hmax": 0.1563,
+   "final_height": 0.1262,
+   "up_at_end": true,
+   "terminated": false,
+   "phase_end": "lift",
+   "retries": 0,
+   "transitions": [
+    [
+     0.965,
+     "descend"
+    ],
+    [
+     1.335,
+     "grasp"
+    ],
+    [
+     2.0,
+     "lift"
+    ]
+   ]
+  }
+ ]
+}

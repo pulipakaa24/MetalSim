@@ -1,0 +1,13 @@
+deploy 7v4_real seed 10010: {'success': True, 'time_to_lift_s': 2.7800000000000002, 'final_height': 0.16202978161223283, 'phase': 'lift', 'retries': 0, 'oob': False}
+   eval_cpu.py: success True at 2.78 s -> same
+deploy 7v4_real seed 10000: {'success': True, 'time_to_lift_s': 2.68, 'final_height': 0.13674968356185713, 'phase': 'lift', 'retries': 0, 'oob': False}
+   eval_cpu.py: success True at 2.68 s -> same
+deploy 7v4_real seed 10051: {'success': True, 'time_to_lift_s': 2.46, 'final_height': 0.16964388086749638, 'phase': 'lift', 'retries': 0, 'oob': False}
+   eval_cpu.py: success True at 2.46 s -> same
+frame period from d.time: 0.0200 s -> 50.0 fps (real time), 300 frames = 6.0 s
+wrote expert_deploy_7v4_real.mp4
+old 7v4_real seed 10010: {'success': False, 'time_to_lift_s': None, 'final_height': 0.029942263103880328, 'phase': 'approach'}
+deploy 7v4_real seed 10010: {'success': True, 'time_to_lift_s': 2.7800000000000002, 'final_height': 0.16202978161223283, 'phase': 'lift', 'retries': 0, 'oob': False}
+   eval_cpu.py: success True at 2.78 s -> same
+frame period from d.time: 0.0200 s -> 50.0 fps (real time), 300 frames = 6.0 s
+wrote expert_old_vs_deploy_7v4_real.mp4

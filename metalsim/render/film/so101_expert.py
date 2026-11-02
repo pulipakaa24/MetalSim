@@ -36,7 +36,7 @@ retry if the cube stays low). What changes is the command:
 Inputs every tick: an MjData holding the measured state with fresh kinematics (``mj_forward`` of qpos / qvel). The
 cube pose is read from it, as the original reads it (a real script would get it from a camera).
 
-``python -m``-free: pure numpy + mujoco; used by runs/readme_media/scratch/so101-expert/ (CPU and MetalSim evals).
+``python -m``-free: pure numpy + mujoco; used by runs/readme_media/records/so101-expert/ (CPU and MetalSim evals).
 """
 
 import numpy as np
@@ -57,18 +57,18 @@ GRASP_MIN = 15 * EXPERT_TICK            # s: the original's whole grasp phase
 LIFT_CHECK, CUBE_LOW = 25 * EXPERT_TICK, 0.07   # s, m: "empty-handed? -> retry"
 # The TCP (point between the jaws) and the jaw-opening axis in the gripperframe site's frame, as Expert.__init__
 # calibrates them from so101Sim's 'pickup' keyframe (scene_box_rl.xml in so101Sim's menagerie clone; MuJoCo 3.10.0).
-# Stored because MetalSim's copy of the scene has no keyframe; check: scratch/so101-expert/check_port.py.
+# Stored because MetalSim's copy of the scene has no keyframe; check: records/so101-expert/check_port.py.
 TCP_LOCAL = np.array([-0.007388469181794655, -0.01061171842330552, 0.012775475294526169])
 JAW_LOCAL = np.array([-5.851083600530068e-01, -4.196739854641918e-16, 8.109551202107791e-01])
 
 # -- deployment ---------------------------------------------------------------------------------------------------
 CTRL_HZ = 30.0              # LeRobot: lerobot-record --dataset.fps default 30, lerobot-rollout --fps default 30
 T_SETTLE = 0.310            # s: 7v4_real step response, 2 % settle time, shoulder_lift (so101-servo step_tables.md)
-V_MOVING = 0.05             # rad/s: "moving" threshold (scratch/so101-servo/smoothness.py V_HYST)
+V_MOVING = 0.05             # rad/s: "moving" threshold (records/so101-servo/smoothness.py V_HYST)
 ARRIVED = 2 * np.pi / 4096  # rad: command within one encoder step of the goal counts as arrived
 # Per-joint planning limits (shoulder_pan .. wrist_roll), from the 7v4_real servo (forcerange 1.912 N.m, Coulomb
 # 0.0515 N.m, back-EMF + viscous damping 0.3417 N.m.s/rad) and the arm's gravity load and inertia at the task's
-# waypoints (scratch/so101-expert/limits.py, 100 seeds): R = 1.912 - 0.0515 - g_max is the torque left over gravity;
+# waypoints (records/so101-expert/limits.py, 100 seeds): R = 1.912 - 0.0515 - g_max is the torque left over gravity;
 # half of it goes to speed (VMAX = R / 2b), half to acceleration (AMAX = R / 2M_max), so at the trapezoid's corner the
 # servo just reaches its duty limit and elsewhere it has headroom. That split is the time-optimal trapezoid for a move
 # of D = M R / b^2 (0.4-0.6 rad here, the size of the task's moves). Capped by the firmware profile (5.29 rad/s,
@@ -138,7 +138,7 @@ class DeployExpert:
         vmax = VMAX if vmax is None else vmax
         amax = AMAX if amax is None else amax
         if vmax is None or amax is None:
-            raise ValueError("planning limits not set: pass vmax / amax (scratch/so101-expert/limits.py)")
+            raise ValueError("planning limits not set: pass vmax / amax (runs/readme_media/records/so101-expert/limits.py)")
         self.dt = 1.0 / float(hz)
         self.plan = LinePlanner(vmax, amax, self.dt)
         self.pd = mujoco.MjData(model)          # planning model: commanded configuration + perceived cube

@@ -1,0 +1,1546 @@
+{
+ "offsets_deg": [
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0
+ ],
+ "datasets": {
+  "hungho77": {
+   "path": "file-000.parquet",
+   "fps": 30.0,
+   "summary": {
+    "episodes": 50,
+    "used": 50,
+    "skipped": {},
+    "rise_cm_p10_50_90": [
+     13.1,
+     14.9,
+     18.0
+    ],
+    "hand_tilt_grasp_p10_50_90": [
+     1.2,
+     4.2,
+     9.8
+    ],
+    "hand_tilt_lift_p10_50_90": [
+     33.1,
+     40.9,
+     50.4
+    ],
+    "dpitch_p10_50_90": [
+     -53.9,
+     -44.6,
+     -31.6
+    ],
+    "abs_dpitch_p10_50_90": [
+     31.6,
+     44.6,
+     53.9
+    ],
+    "frac_abs_dpitch_ge_30": 0.92
+   },
+   "episodes": [
+    {
+     "ep": 0,
+     "t_grasp": 6.9,
+     "t_lift": 8.1,
+     "rise_cm": 19.2,
+     "hand_tilt_grasp": 1.6,
+     "hand_tilt_lift": 56.1,
+     "dpitch": -54.5,
+     "grip_pct": 14.8
+    },
+    {
+     "ep": 1,
+     "t_grasp": 5.6,
+     "t_lift": 6.87,
+     "rise_cm": 16.9,
+     "hand_tilt_grasp": 9.8,
+     "hand_tilt_lift": 34.6,
+     "dpitch": -24.8,
+     "grip_pct": 14.5
+    },
+    {
+     "ep": 2,
+     "t_grasp": 4.7,
+     "t_lift": 6.23,
+     "rise_cm": 16.8,
+     "hand_tilt_grasp": 3.5,
+     "hand_tilt_lift": 43.4,
+     "dpitch": -46.9,
+     "grip_pct": 39.8
+    },
+    {
+     "ep": 3,
+     "t_grasp": 9.6,
+     "t_lift": 10.9,
+     "rise_cm": 14.3,
+     "hand_tilt_grasp": 7.4,
+     "hand_tilt_lift": 38.7,
+     "dpitch": -46.2,
+     "grip_pct": 15.0
+    },
+    {
+     "ep": 4,
+     "t_grasp": 5.8,
+     "t_lift": 7.7,
+     "rise_cm": 13.7,
+     "hand_tilt_grasp": 2.6,
+     "hand_tilt_lift": 44.3,
+     "dpitch": -46.9,
+     "grip_pct": 42.5
+    },
+    {
+     "ep": 5,
+     "t_grasp": 6.6,
+     "t_lift": 7.8,
+     "rise_cm": 13.6,
+     "hand_tilt_grasp": 3.0,
+     "hand_tilt_lift": 38.6,
+     "dpitch": -35.6,
+     "grip_pct": 15.0
+    },
+    {
+     "ep": 6,
+     "t_grasp": 5.57,
+     "t_lift": 6.9,
+     "rise_cm": 16.2,
+     "hand_tilt_grasp": 4.6,
+     "hand_tilt_lift": 49.0,
+     "dpitch": -53.6,
+     "grip_pct": 15.4
+    },
+    {
+     "ep": 7,
+     "t_grasp": 5.73,
+     "t_lift": 7.03,
+     "rise_cm": 13.5,
+     "hand_tilt_grasp": 6.8,
+     "hand_tilt_lift": 53.4,
+     "dpitch": -46.6,
+     "grip_pct": 17.8
+    },
+    {
+     "ep": 8,
+     "t_grasp": 6.23,
+     "t_lift": 7.6,
+     "rise_cm": 19.2,
+     "hand_tilt_grasp": 2.0,
+     "hand_tilt_lift": 46.9,
+     "dpitch": -49.0,
+     "grip_pct": 17.9
+    },
+    {
+     "ep": 9,
+     "t_grasp": 6.03,
+     "t_lift": 7.97,
+     "rise_cm": 18.5,
+     "hand_tilt_grasp": 14.9,
+     "hand_tilt_lift": 46.0,
+     "dpitch": -31.1,
+     "grip_pct": 17.2
+    },
+    {
+     "ep": 10,
+     "t_grasp": 4.7,
+     "t_lift": 6.37,
+     "rise_cm": 19.3,
+     "hand_tilt_grasp": 4.3,
+     "hand_tilt_lift": 44.5,
+     "dpitch": -40.3,
+     "grip_pct": 14.6
+    },
+    {
+     "ep": 11,
+     "t_grasp": 4.83,
+     "t_lift": 6.33,
+     "rise_cm": 13.4,
+     "hand_tilt_grasp": 9.2,
+     "hand_tilt_lift": 40.4,
+     "dpitch": -49.6,
+     "grip_pct": 15.6
+    },
+    {
+     "ep": 12,
+     "t_grasp": 5.33,
+     "t_lift": 6.83,
+     "rise_cm": 18.0,
+     "hand_tilt_grasp": 1.6,
+     "hand_tilt_lift": 50.5,
+     "dpitch": -49.0,
+     "grip_pct": 14.9
+    },
+    {
+     "ep": 13,
+     "t_grasp": 4.33,
+     "t_lift": 5.33,
+     "rise_cm": 15.6,
+     "hand_tilt_grasp": 1.1,
+     "hand_tilt_lift": 32.7,
+     "dpitch": -31.6,
+     "grip_pct": 14.8
+    },
+    {
+     "ep": 14,
+     "t_grasp": 5.0,
+     "t_lift": 6.33,
+     "rise_cm": 17.7,
+     "hand_tilt_grasp": 1.8,
+     "hand_tilt_lift": 48.8,
+     "dpitch": -46.9,
+     "grip_pct": 15.5
+    },
+    {
+     "ep": 15,
+     "t_grasp": 7.0,
+     "t_lift": 8.6,
+     "rise_cm": 15.7,
+     "hand_tilt_grasp": 7.1,
+     "hand_tilt_lift": 47.5,
+     "dpitch": -54.6,
+     "grip_pct": 23.7
+    },
+    {
+     "ep": 16,
+     "t_grasp": 3.63,
+     "t_lift": 4.9,
+     "rise_cm": 15.0,
+     "hand_tilt_grasp": 2.1,
+     "hand_tilt_lift": 35.7,
+     "dpitch": -37.8,
+     "grip_pct": 14.4
+    },
+    {
+     "ep": 17,
+     "t_grasp": 5.67,
+     "t_lift": 7.03,
+     "rise_cm": 16.1,
+     "hand_tilt_grasp": 7.3,
+     "hand_tilt_lift": 38.7,
+     "dpitch": -46.0,
+     "grip_pct": 15.0
+    },
+    {
+     "ep": 18,
+     "t_grasp": 4.13,
+     "t_lift": 5.73,
+     "rise_cm": 12.6,
+     "hand_tilt_grasp": 1.8,
+     "hand_tilt_lift": 45.3,
+     "dpitch": -43.4,
+     "grip_pct": 14.5
+    },
+    {
+     "ep": 19,
+     "t_grasp": 4.9,
+     "t_lift": 6.23,
+     "rise_cm": 13.7,
+     "hand_tilt_grasp": 4.2,
+     "hand_tilt_lift": 41.4,
+     "dpitch": -45.5,
+     "grip_pct": 14.4
+    },
+    {
+     "ep": 20,
+     "t_grasp": 4.13,
+     "t_lift": 5.27,
+     "rise_cm": 15.6,
+     "hand_tilt_grasp": 6.8,
+     "hand_tilt_lift": 41.9,
+     "dpitch": -35.1,
+     "grip_pct": 14.7
+    },
+    {
+     "ep": 21,
+     "t_grasp": 6.7,
+     "t_lift": 8.13,
+     "rise_cm": 12.6,
+     "hand_tilt_grasp": 3.5,
+     "hand_tilt_lift": 48.0,
+     "dpitch": -44.5,
+     "grip_pct": 17.7
+    },
+    {
+     "ep": 22,
+     "t_grasp": 6.03,
+     "t_lift": 7.93,
+     "rise_cm": 14.1,
+     "hand_tilt_grasp": 2.0,
+     "hand_tilt_lift": 40.0,
+     "dpitch": -42.0,
+     "grip_pct": 30.6
+    },
+    {
+     "ep": 23,
+     "t_grasp": 5.1,
+     "t_lift": 6.47,
+     "rise_cm": 15.8,
+     "hand_tilt_grasp": 3.3,
+     "hand_tilt_lift": 38.6,
+     "dpitch": -41.8,
+     "grip_pct": 14.4
+    },
+    {
+     "ep": 24,
+     "t_grasp": 5.77,
+     "t_lift": 7.37,
+     "rise_cm": 15.2,
+     "hand_tilt_grasp": 8.5,
+     "hand_tilt_lift": 48.5,
+     "dpitch": -57.1,
+     "grip_pct": 17.9
+    },
+    {
+     "ep": 25,
+     "t_grasp": 4.47,
+     "t_lift": 5.43,
+     "rise_cm": 15.2,
+     "hand_tilt_grasp": 5.6,
+     "hand_tilt_lift": 43.3,
+     "dpitch": -48.9,
+     "grip_pct": 15.0
+    },
+    {
+     "ep": 26,
+     "t_grasp": 4.4,
+     "t_lift": 5.57,
+     "rise_cm": 13.5,
+     "hand_tilt_grasp": 4.5,
+     "hand_tilt_lift": 38.7,
+     "dpitch": -34.2,
+     "grip_pct": 17.8
+    },
+    {
+     "ep": 27,
+     "t_grasp": 4.5,
+     "t_lift": 5.93,
+     "rise_cm": 13.4,
+     "hand_tilt_grasp": 5.4,
+     "hand_tilt_lift": 53.9,
+     "dpitch": -59.3,
+     "grip_pct": 15.4
+    },
+    {
+     "ep": 28,
+     "t_grasp": 4.4,
+     "t_lift": 5.87,
+     "rise_cm": 15.1,
+     "hand_tilt_grasp": 2.4,
+     "hand_tilt_lift": 50.4,
+     "dpitch": -48.1,
+     "grip_pct": 14.6
+    },
+    {
+     "ep": 29,
+     "t_grasp": 5.93,
+     "t_lift": 7.93,
+     "rise_cm": 9.4,
+     "hand_tilt_grasp": 14.5,
+     "hand_tilt_lift": 28.5,
+     "dpitch": -43.1,
+     "grip_pct": 26.8
+    },
+    {
+     "ep": 30,
+     "t_grasp": 4.53,
+     "t_lift": 5.57,
+     "rise_cm": 13.5,
+     "hand_tilt_grasp": 2.7,
+     "hand_tilt_lift": 34.5,
+     "dpitch": -37.3,
+     "grip_pct": 14.6
+    },
+    {
+     "ep": 31,
+     "t_grasp": 5.33,
+     "t_lift": 6.77,
+     "rise_cm": 13.0,
+     "hand_tilt_grasp": 4.1,
+     "hand_tilt_lift": 33.8,
+     "dpitch": -29.7,
+     "grip_pct": 14.7
+    },
+    {
+     "ep": 32,
+     "t_grasp": 5.87,
+     "t_lift": 7.87,
+     "rise_cm": 15.6,
+     "hand_tilt_grasp": 4.0,
+     "hand_tilt_lift": 40.7,
+     "dpitch": -44.7,
+     "grip_pct": 34.6
+    },
+    {
+     "ep": 33,
+     "t_grasp": 3.93,
+     "t_lift": 5.67,
+     "rise_cm": 14.9,
+     "hand_tilt_grasp": 2.2,
+     "hand_tilt_lift": 41.6,
+     "dpitch": -39.4,
+     "grip_pct": 45.2
+    },
+    {
+     "ep": 34,
+     "t_grasp": 4.2,
+     "t_lift": 5.73,
+     "rise_cm": 14.1,
+     "hand_tilt_grasp": 0.5,
+     "hand_tilt_lift": 29.7,
+     "dpitch": -29.2,
+     "grip_pct": 30.4
+    },
+    {
+     "ep": 35,
+     "t_grasp": 4.9,
+     "t_lift": 6.53,
+     "rise_cm": 15.5,
+     "hand_tilt_grasp": 9.5,
+     "hand_tilt_lift": 35.8,
+     "dpitch": -45.4,
+     "grip_pct": 38.2
+    },
+    {
+     "ep": 36,
+     "t_grasp": 5.93,
+     "t_lift": 7.2,
+     "rise_cm": 15.8,
+     "hand_tilt_grasp": 10.2,
+     "hand_tilt_lift": 31.3,
+     "dpitch": -21.1,
+     "grip_pct": 16.4
+    },
+    {
+     "ep": 37,
+     "t_grasp": 4.93,
+     "t_lift": 6.5,
+     "rise_cm": 13.5,
+     "hand_tilt_grasp": 16.1,
+     "hand_tilt_lift": 37.8,
+     "dpitch": -53.9,
+     "grip_pct": 15.0
+    },
+    {
+     "ep": 38,
+     "t_grasp": 7.4,
+     "t_lift": 8.5,
+     "rise_cm": 17.9,
+     "hand_tilt_grasp": 0.9,
+     "hand_tilt_lift": 54.1,
+     "dpitch": -53.3,
+     "grip_pct": 17.3
+    },
+    {
+     "ep": 39,
+     "t_grasp": 4.3,
+     "t_lift": 5.7,
+     "rise_cm": 13.7,
+     "hand_tilt_grasp": 0.5,
+     "hand_tilt_lift": 33.6,
+     "dpitch": -33.1,
+     "grip_pct": 34.1
+    },
+    {
+     "ep": 40,
+     "t_grasp": 10.63,
+     "t_lift": 12.33,
+     "rise_cm": 14.3,
+     "hand_tilt_grasp": 5.2,
+     "hand_tilt_lift": 40.9,
+     "dpitch": -46.1,
+     "grip_pct": 38.9
+    },
+    {
+     "ep": 41,
+     "t_grasp": 4.67,
+     "t_lift": 5.87,
+     "rise_cm": 13.4,
+     "hand_tilt_grasp": 4.7,
+     "hand_tilt_lift": 33.1,
+     "dpitch": -37.8,
+     "grip_pct": 25.4
+    },
+    {
+     "ep": 42,
+     "t_grasp": 4.57,
+     "t_lift": 5.97,
+     "rise_cm": 16.1,
+     "hand_tilt_grasp": 14.0,
+     "hand_tilt_lift": 48.9,
+     "dpitch": -34.9,
+     "grip_pct": 35.3
+    },
+    {
+     "ep": 43,
+     "t_grasp": 4.9,
+     "t_lift": 6.1,
+     "rise_cm": 13.9,
+     "hand_tilt_grasp": 1.2,
+     "hand_tilt_lift": 35.8,
+     "dpitch": -37.0,
+     "grip_pct": 15.8
+    },
+    {
+     "ep": 44,
+     "t_grasp": 5.27,
+     "t_lift": 6.5,
+     "rise_cm": 12.9,
+     "hand_tilt_grasp": 5.0,
+     "hand_tilt_lift": 30.4,
+     "dpitch": -35.4,
+     "grip_pct": 16.2
+    },
+    {
+     "ep": 45,
+     "t_grasp": 6.33,
+     "t_lift": 7.57,
+     "rise_cm": 14.8,
+     "hand_tilt_grasp": 1.2,
+     "hand_tilt_lift": 35.6,
+     "dpitch": -34.4,
+     "grip_pct": 14.4
+    },
+    {
+     "ep": 46,
+     "t_grasp": 4.2,
+     "t_lift": 5.7,
+     "rise_cm": 14.4,
+     "hand_tilt_grasp": 2.5,
+     "hand_tilt_lift": 37.7,
+     "dpitch": -35.2,
+     "grip_pct": 14.7
+    },
+    {
+     "ep": 47,
+     "t_grasp": 4.6,
+     "t_lift": 6.27,
+     "rise_cm": 16.0,
+     "hand_tilt_grasp": 6.3,
+     "hand_tilt_lift": 43.2,
+     "dpitch": -49.5,
+     "grip_pct": 34.4
+    },
+    {
+     "ep": 48,
+     "t_grasp": 6.13,
+     "t_lift": 8.0,
+     "rise_cm": 13.1,
+     "hand_tilt_grasp": 6.7,
+     "hand_tilt_lift": 47.5,
+     "dpitch": -54.2,
+     "grip_pct": 14.5
+    },
+    {
+     "ep": 49,
+     "t_grasp": 4.1,
+     "t_lift": 5.37,
+     "rise_cm": 18.4,
+     "hand_tilt_grasp": 4.1,
+     "hand_tilt_lift": 40.9,
+     "dpitch": -45.0,
+     "grip_pct": 14.5
+    }
+   ]
+  },
+  "ilya": {
+   "path": "file-000.parquet",
+   "fps": 20.0,
+   "summary": {
+    "episodes": 104,
+    "used": 88,
+    "skipped": {
+     "7": "no squeeze",
+     "37": "rose 0.7 cm",
+     "45": "rose 0.0 cm",
+     "49": "no squeeze",
+     "52": "rose 0.0 cm",
+     "63": "rose 0.6 cm",
+     "77": "no squeeze",
+     "78": "rose 0.7 cm",
+     "82": "rose 0.3 cm",
+     "84": "rose 0.4 cm",
+     "85": "no squeeze",
+     "89": "no squeeze",
+     "90": "no squeeze",
+     "94": "no squeeze",
+     "95": "rose 0.1 cm",
+     "101": "no squeeze"
+    },
+    "rise_cm_p10_50_90": [
+     5.6,
+     8.4,
+     11.5
+    ],
+    "hand_tilt_grasp_p10_50_90": [
+     1.0,
+     7.2,
+     17.2
+    ],
+    "hand_tilt_lift_p10_50_90": [
+     5.4,
+     13.1,
+     20.7
+    ],
+    "dpitch_p10_50_90": [
+     -30.0,
+     -17.2,
+     -9.2
+    ],
+    "abs_dpitch_p10_50_90": [
+     9.4,
+     17.2,
+     30.0
+    ],
+    "frac_abs_dpitch_ge_30": 0.102
+   },
+   "episodes": [
+    {
+     "ep": 0,
+     "t_grasp": 9.25,
+     "t_lift": 10.45,
+     "rise_cm": 4.7,
+     "hand_tilt_grasp": 24.5,
+     "hand_tilt_lift": 7.4,
+     "dpitch": -17.1,
+     "grip_pct": 23.5
+    },
+    {
+     "ep": 1,
+     "t_grasp": 5.7,
+     "t_lift": 7.0,
+     "rise_cm": 11.5,
+     "hand_tilt_grasp": 6.0,
+     "hand_tilt_lift": 20.6,
+     "dpitch": -14.7,
+     "grip_pct": 8.4
+    },
+    {
+     "ep": 2,
+     "t_grasp": 5.6,
+     "t_lift": 6.7,
+     "rise_cm": 4.7,
+     "hand_tilt_grasp": 13.7,
+     "hand_tilt_lift": 6.0,
+     "dpitch": -19.8,
+     "grip_pct": 15.3
+    },
+    {
+     "ep": 3,
+     "t_grasp": 3.75,
+     "t_lift": 5.75,
+     "rise_cm": 6.4,
+     "hand_tilt_grasp": 10.3,
+     "hand_tilt_lift": 1.9,
+     "dpitch": -12.2,
+     "grip_pct": 6.8
+    },
+    {
+     "ep": 4,
+     "t_grasp": 6.05,
+     "t_lift": 7.7,
+     "rise_cm": 8.3,
+     "hand_tilt_grasp": 0.6,
+     "hand_tilt_lift": 8.9,
+     "dpitch": -9.5,
+     "grip_pct": 7.5
+    },
+    {
+     "ep": 5,
+     "t_grasp": 6.05,
+     "t_lift": 7.1,
+     "rise_cm": 11.2,
+     "hand_tilt_grasp": 2.3,
+     "hand_tilt_lift": 11.3,
+     "dpitch": -13.6,
+     "grip_pct": 18.4
+    },
+    {
+     "ep": 6,
+     "t_grasp": 4.35,
+     "t_lift": 6.1,
+     "rise_cm": 7.0,
+     "hand_tilt_grasp": 4.4,
+     "hand_tilt_lift": 5.7,
+     "dpitch": -1.3,
+     "grip_pct": 18.0
+    },
+    {
+     "ep": 7,
+     "skip": "no squeeze"
+    },
+    {
+     "ep": 8,
+     "t_grasp": 5.65,
+     "t_lift": 7.1,
+     "rise_cm": 8.3,
+     "hand_tilt_grasp": 5.3,
+     "hand_tilt_lift": 7.2,
+     "dpitch": -12.5,
+     "grip_pct": 16.0
+    },
+    {
+     "ep": 9,
+     "t_grasp": 4.1,
+     "t_lift": 5.75,
+     "rise_cm": 5.7,
+     "hand_tilt_grasp": 17.1,
+     "hand_tilt_lift": 0.8,
+     "dpitch": -17.8,
+     "grip_pct": 29.3
+    },
+    {
+     "ep": 10,
+     "t_grasp": 6.6,
+     "t_lift": 8.55,
+     "rise_cm": 7.9,
+     "hand_tilt_grasp": 0.1,
+     "hand_tilt_lift": 10.3,
+     "dpitch": -10.4,
+     "grip_pct": 25.4
+    },
+    {
+     "ep": 11,
+     "t_grasp": 6.95,
+     "t_lift": 8.05,
+     "rise_cm": 9.4,
+     "hand_tilt_grasp": 7.0,
+     "hand_tilt_lift": 12.2,
+     "dpitch": -19.2,
+     "grip_pct": 7.2
+    },
+    {
+     "ep": 12,
+     "t_grasp": 4.4,
+     "t_lift": 5.4,
+     "rise_cm": 8.3,
+     "hand_tilt_grasp": 5.3,
+     "hand_tilt_lift": 7.6,
+     "dpitch": -12.9,
+     "grip_pct": 18.0
+    },
+    {
+     "ep": 13,
+     "t_grasp": 4.0,
+     "t_lift": 5.05,
+     "rise_cm": 9.2,
+     "hand_tilt_grasp": 1.2,
+     "hand_tilt_lift": 13.5,
+     "dpitch": -14.7,
+     "grip_pct": 8.5
+    },
+    {
+     "ep": 14,
+     "t_grasp": 11.55,
+     "t_lift": 12.6,
+     "rise_cm": 8.9,
+     "hand_tilt_grasp": 16.3,
+     "hand_tilt_lift": 18.0,
+     "dpitch": -34.3,
+     "grip_pct": 11.1
+    },
+    {
+     "ep": 15,
+     "t_grasp": 4.7,
+     "t_lift": 5.75,
+     "rise_cm": 7.4,
+     "hand_tilt_grasp": 6.1,
+     "hand_tilt_lift": 13.6,
+     "dpitch": -7.5,
+     "grip_pct": 9.3
+    },
+    {
+     "ep": 16,
+     "t_grasp": 3.7,
+     "t_lift": 5.15,
+     "rise_cm": 11.9,
+     "hand_tilt_grasp": 1.4,
+     "hand_tilt_lift": 33.3,
+     "dpitch": -31.9,
+     "grip_pct": 5.0
+    },
+    {
+     "ep": 17,
+     "t_grasp": 3.65,
+     "t_lift": 5.15,
+     "rise_cm": 9.5,
+     "hand_tilt_grasp": 8.9,
+     "hand_tilt_lift": 26.8,
+     "dpitch": -17.8,
+     "grip_pct": 5.3
+    },
+    {
+     "ep": 18,
+     "t_grasp": 3.8,
+     "t_lift": 4.8,
+     "rise_cm": 10.1,
+     "hand_tilt_grasp": 4.5,
+     "hand_tilt_lift": 16.8,
+     "dpitch": -12.2,
+     "grip_pct": 7.3
+    },
+    {
+     "ep": 19,
+     "t_grasp": 6.4,
+     "t_lift": 8.1,
+     "rise_cm": 9.9,
+     "hand_tilt_grasp": 8.4,
+     "hand_tilt_lift": 7.5,
+     "dpitch": -15.8,
+     "grip_pct": 38.2
+    },
+    {
+     "ep": 20,
+     "t_grasp": 2.8,
+     "t_lift": 4.05,
+     "rise_cm": 8.9,
+     "hand_tilt_grasp": 10.9,
+     "hand_tilt_lift": 7.5,
+     "dpitch": -18.4,
+     "grip_pct": 18.7
+    },
+    {
+     "ep": 21,
+     "t_grasp": 3.95,
+     "t_lift": 5.4,
+     "rise_cm": 9.0,
+     "hand_tilt_grasp": 9.3,
+     "hand_tilt_lift": 12.4,
+     "dpitch": -21.7,
+     "grip_pct": 24.9
+    },
+    {
+     "ep": 22,
+     "t_grasp": 2.75,
+     "t_lift": 3.95,
+     "rise_cm": 9.6,
+     "hand_tilt_grasp": 11.5,
+     "hand_tilt_lift": 10.4,
+     "dpitch": -22.0,
+     "grip_pct": 30.9
+    },
+    {
+     "ep": 23,
+     "t_grasp": 5.8,
+     "t_lift": 6.15,
+     "rise_cm": 3.9,
+     "hand_tilt_grasp": 0.3,
+     "hand_tilt_lift": 6.6,
+     "dpitch": -6.9,
+     "grip_pct": 6.2
+    },
+    {
+     "ep": 24,
+     "t_grasp": 4.3,
+     "t_lift": 5.2,
+     "rise_cm": 6.9,
+     "hand_tilt_grasp": 6.0,
+     "hand_tilt_lift": 20.7,
+     "dpitch": -26.7,
+     "grip_pct": 8.7
+    },
+    {
+     "ep": 25,
+     "t_grasp": 3.3,
+     "t_lift": 4.5,
+     "rise_cm": 7.8,
+     "hand_tilt_grasp": 9.5,
+     "hand_tilt_lift": 15.0,
+     "dpitch": -24.5,
+     "grip_pct": 7.1
+    },
+    {
+     "ep": 26,
+     "t_grasp": 3.4,
+     "t_lift": 4.7,
+     "rise_cm": 8.7,
+     "hand_tilt_grasp": 20.5,
+     "hand_tilt_lift": 16.7,
+     "dpitch": -37.2,
+     "grip_pct": 38.3
+    },
+    {
+     "ep": 27,
+     "t_grasp": 3.25,
+     "t_lift": 4.25,
+     "rise_cm": 7.6,
+     "hand_tilt_grasp": 9.4,
+     "hand_tilt_lift": 15.7,
+     "dpitch": -25.1,
+     "grip_pct": 5.7
+    },
+    {
+     "ep": 28,
+     "t_grasp": 2.95,
+     "t_lift": 3.6,
+     "rise_cm": 11.0,
+     "hand_tilt_grasp": 5.2,
+     "hand_tilt_lift": 11.8,
+     "dpitch": -17.0,
+     "grip_pct": 8.0
+    },
+    {
+     "ep": 29,
+     "t_grasp": 3.8,
+     "t_lift": 4.7,
+     "rise_cm": 12.1,
+     "hand_tilt_grasp": 6.9,
+     "hand_tilt_lift": 19.8,
+     "dpitch": -12.8,
+     "grip_pct": 7.3
+    },
+    {
+     "ep": 30,
+     "t_grasp": 5.9,
+     "t_lift": 7.55,
+     "rise_cm": 5.9,
+     "hand_tilt_grasp": 46.7,
+     "hand_tilt_lift": 30.0,
+     "dpitch": 16.6,
+     "grip_pct": 18.0
+    },
+    {
+     "ep": 31,
+     "t_grasp": 5.25,
+     "t_lift": 6.15,
+     "rise_cm": 10.4,
+     "hand_tilt_grasp": 11.9,
+     "hand_tilt_lift": 13.3,
+     "dpitch": -25.2,
+     "grip_pct": 17.7
+    },
+    {
+     "ep": 32,
+     "t_grasp": 3.95,
+     "t_lift": 4.85,
+     "rise_cm": 11.4,
+     "hand_tilt_grasp": 1.5,
+     "hand_tilt_lift": 16.5,
+     "dpitch": -18.0,
+     "grip_pct": 7.8
+    },
+    {
+     "ep": 33,
+     "t_grasp": 3.45,
+     "t_lift": 4.25,
+     "rise_cm": 10.1,
+     "hand_tilt_grasp": 10.0,
+     "hand_tilt_lift": 14.8,
+     "dpitch": -24.8,
+     "grip_pct": 14.1
+    },
+    {
+     "ep": 34,
+     "t_grasp": 4.35,
+     "t_lift": 4.85,
+     "rise_cm": 5.0,
+     "hand_tilt_grasp": 0.3,
+     "hand_tilt_lift": 16.9,
+     "dpitch": -17.1,
+     "grip_pct": 8.6
+    },
+    {
+     "ep": 35,
+     "t_grasp": 2.45,
+     "t_lift": 3.4,
+     "rise_cm": 14.9,
+     "hand_tilt_grasp": 10.0,
+     "hand_tilt_lift": 26.6,
+     "dpitch": -36.7,
+     "grip_pct": 25.4
+    },
+    {
+     "ep": 36,
+     "t_grasp": 9.9,
+     "t_lift": 10.65,
+     "rise_cm": 10.8,
+     "hand_tilt_grasp": 12.2,
+     "hand_tilt_lift": 27.6,
+     "dpitch": -15.4,
+     "grip_pct": 7.6
+    },
+    {
+     "ep": 37,
+     "skip": "rose 0.7 cm"
+    },
+    {
+     "ep": 38,
+     "t_grasp": 2.45,
+     "t_lift": 3.5,
+     "rise_cm": 10.2,
+     "hand_tilt_grasp": 9.2,
+     "hand_tilt_lift": 24.2,
+     "dpitch": -33.4,
+     "grip_pct": 30.9
+    },
+    {
+     "ep": 39,
+     "t_grasp": 3.4,
+     "t_lift": 4.3,
+     "rise_cm": 14.3,
+     "hand_tilt_grasp": 7.8,
+     "hand_tilt_lift": 20.8,
+     "dpitch": -28.6,
+     "grip_pct": 15.5
+    },
+    {
+     "ep": 40,
+     "t_grasp": 2.5,
+     "t_lift": 3.2,
+     "rise_cm": 5.2,
+     "hand_tilt_grasp": 7.1,
+     "hand_tilt_lift": 2.8,
+     "dpitch": -9.9,
+     "grip_pct": 26.2
+    },
+    {
+     "ep": 41,
+     "t_grasp": 3.55,
+     "t_lift": 4.75,
+     "rise_cm": 12.3,
+     "hand_tilt_grasp": 2.8,
+     "hand_tilt_lift": 15.9,
+     "dpitch": -18.7,
+     "grip_pct": 36.5
+    },
+    {
+     "ep": 42,
+     "t_grasp": 5.5,
+     "t_lift": 7.2,
+     "rise_cm": 6.3,
+     "hand_tilt_grasp": 4.4,
+     "hand_tilt_lift": 8.3,
+     "dpitch": -12.7,
+     "grip_pct": 10.2
+    },
+    {
+     "ep": 43,
+     "t_grasp": 3.4,
+     "t_lift": 4.1,
+     "rise_cm": 10.6,
+     "hand_tilt_grasp": 7.6,
+     "hand_tilt_lift": 18.3,
+     "dpitch": -25.8,
+     "grip_pct": 12.9
+    },
+    {
+     "ep": 44,
+     "t_grasp": 2.3,
+     "t_lift": 3.45,
+     "rise_cm": 11.0,
+     "hand_tilt_grasp": 13.0,
+     "hand_tilt_lift": 15.9,
+     "dpitch": -28.9,
+     "grip_pct": 40.9
+    },
+    {
+     "ep": 45,
+     "skip": "rose 0.0 cm"
+    },
+    {
+     "ep": 46,
+     "t_grasp": 3.45,
+     "t_lift": 4.2,
+     "rise_cm": 4.7,
+     "hand_tilt_grasp": 4.8,
+     "hand_tilt_lift": 6.6,
+     "dpitch": -11.3,
+     "grip_pct": 4.6
+    },
+    {
+     "ep": 47,
+     "t_grasp": 4.2,
+     "t_lift": 4.95,
+     "rise_cm": 14.1,
+     "hand_tilt_grasp": 15.5,
+     "hand_tilt_lift": 22.0,
+     "dpitch": -6.5,
+     "grip_pct": 6.8
+    },
+    {
+     "ep": 48,
+     "t_grasp": 3.15,
+     "t_lift": 4.25,
+     "rise_cm": 12.4,
+     "hand_tilt_grasp": 4.3,
+     "hand_tilt_lift": 12.4,
+     "dpitch": -16.7,
+     "grip_pct": 32.2
+    },
+    {
+     "ep": 49,
+     "skip": "no squeeze"
+    },
+    {
+     "ep": 50,
+     "t_grasp": 3.5,
+     "t_lift": 4.25,
+     "rise_cm": 8.1,
+     "hand_tilt_grasp": 5.1,
+     "hand_tilt_lift": 6.7,
+     "dpitch": -11.9,
+     "grip_pct": 6.4
+    },
+    {
+     "ep": 51,
+     "t_grasp": 3.75,
+     "t_lift": 4.5,
+     "rise_cm": 11.5,
+     "hand_tilt_grasp": 0.3,
+     "hand_tilt_lift": 12.8,
+     "dpitch": -13.1,
+     "grip_pct": 7.3
+    },
+    {
+     "ep": 52,
+     "skip": "rose 0.0 cm"
+    },
+    {
+     "ep": 53,
+     "t_grasp": 3.25,
+     "t_lift": 3.95,
+     "rise_cm": 14.8,
+     "hand_tilt_grasp": 1.5,
+     "hand_tilt_lift": 20.6,
+     "dpitch": -22.2,
+     "grip_pct": 13.8
+    },
+    {
+     "ep": 54,
+     "t_grasp": 3.75,
+     "t_lift": 4.45,
+     "rise_cm": 9.3,
+     "hand_tilt_grasp": 2.7,
+     "hand_tilt_lift": 8.1,
+     "dpitch": -10.7,
+     "grip_pct": 8.4
+    },
+    {
+     "ep": 55,
+     "t_grasp": 2.85,
+     "t_lift": 3.35,
+     "rise_cm": 7.8,
+     "hand_tilt_grasp": 8.8,
+     "hand_tilt_lift": 12.6,
+     "dpitch": -21.5,
+     "grip_pct": 6.9
+    },
+    {
+     "ep": 56,
+     "t_grasp": 2.5,
+     "t_lift": 3.15,
+     "rise_cm": 10.0,
+     "hand_tilt_grasp": 4.1,
+     "hand_tilt_lift": 11.8,
+     "dpitch": -7.7,
+     "grip_pct": 8.0
+    },
+    {
+     "ep": 57,
+     "t_grasp": 2.6,
+     "t_lift": 3.3,
+     "rise_cm": 8.6,
+     "hand_tilt_grasp": 2.7,
+     "hand_tilt_lift": 12.7,
+     "dpitch": -15.5,
+     "grip_pct": 26.5
+    },
+    {
+     "ep": 58,
+     "t_grasp": 1.95,
+     "t_lift": 2.25,
+     "rise_cm": 5.0,
+     "hand_tilt_grasp": 3.2,
+     "hand_tilt_lift": 12.4,
+     "dpitch": -9.1,
+     "grip_pct": 5.5
+    },
+    {
+     "ep": 59,
+     "t_grasp": 2.6,
+     "t_lift": 3.25,
+     "rise_cm": 6.6,
+     "hand_tilt_grasp": 0.5,
+     "hand_tilt_lift": 16.8,
+     "dpitch": -17.3,
+     "grip_pct": 5.9
+    },
+    {
+     "ep": 60,
+     "t_grasp": 3.75,
+     "t_lift": 4.7,
+     "rise_cm": 9.5,
+     "hand_tilt_grasp": 8.4,
+     "hand_tilt_lift": 13.7,
+     "dpitch": -5.3,
+     "grip_pct": 24.2
+    },
+    {
+     "ep": 61,
+     "t_grasp": 2.8,
+     "t_lift": 3.4,
+     "rise_cm": 6.6,
+     "hand_tilt_grasp": 6.6,
+     "hand_tilt_lift": 20.9,
+     "dpitch": -14.3,
+     "grip_pct": 4.8
+    },
+    {
+     "ep": 62,
+     "t_grasp": 4.9,
+     "t_lift": 5.4,
+     "rise_cm": 8.4,
+     "hand_tilt_grasp": 9.4,
+     "hand_tilt_lift": 19.1,
+     "dpitch": -9.7,
+     "grip_pct": 4.9
+    },
+    {
+     "ep": 63,
+     "skip": "rose 0.6 cm"
+    },
+    {
+     "ep": 64,
+     "t_grasp": 2.15,
+     "t_lift": 3.35,
+     "rise_cm": 6.3,
+     "hand_tilt_grasp": 0.4,
+     "hand_tilt_lift": 12.8,
+     "dpitch": -12.4,
+     "grip_pct": 27.0
+    },
+    {
+     "ep": 65,
+     "t_grasp": 2.6,
+     "t_lift": 4.2,
+     "rise_cm": 8.2,
+     "hand_tilt_grasp": 2.4,
+     "hand_tilt_lift": 18.1,
+     "dpitch": -20.5,
+     "grip_pct": 32.6
+    },
+    {
+     "ep": 66,
+     "t_grasp": 2.35,
+     "t_lift": 3.7,
+     "rise_cm": 7.2,
+     "hand_tilt_grasp": 2.4,
+     "hand_tilt_lift": 11.7,
+     "dpitch": -9.2,
+     "grip_pct": 28.1
+    },
+    {
+     "ep": 67,
+     "t_grasp": 3.45,
+     "t_lift": 4.35,
+     "rise_cm": 9.0,
+     "hand_tilt_grasp": 12.9,
+     "hand_tilt_lift": 16.3,
+     "dpitch": -29.2,
+     "grip_pct": 15.1
+    },
+    {
+     "ep": 68,
+     "t_grasp": 4.4,
+     "t_lift": 5.25,
+     "rise_cm": 10.4,
+     "hand_tilt_grasp": 6.5,
+     "hand_tilt_lift": 18.9,
+     "dpitch": -25.4,
+     "grip_pct": 6.6
+    },
+    {
+     "ep": 69,
+     "t_grasp": 3.4,
+     "t_lift": 4.2,
+     "rise_cm": 7.4,
+     "hand_tilt_grasp": 2.4,
+     "hand_tilt_lift": 16.0,
+     "dpitch": -13.6,
+     "grip_pct": 4.8
+    },
+    {
+     "ep": 70,
+     "t_grasp": 2.85,
+     "t_lift": 3.5,
+     "rise_cm": 7.6,
+     "hand_tilt_grasp": 11.4,
+     "hand_tilt_lift": 12.8,
+     "dpitch": -24.2,
+     "grip_pct": 5.6
+    },
+    {
+     "ep": 71,
+     "t_grasp": 2.8,
+     "t_lift": 3.85,
+     "rise_cm": 7.1,
+     "hand_tilt_grasp": 10.1,
+     "hand_tilt_lift": 17.4,
+     "dpitch": -27.5,
+     "grip_pct": 34.0
+    },
+    {
+     "ep": 72,
+     "t_grasp": 3.3,
+     "t_lift": 4.35,
+     "rise_cm": 7.2,
+     "hand_tilt_grasp": 12.9,
+     "hand_tilt_lift": 20.0,
+     "dpitch": -33.0,
+     "grip_pct": 6.3
+    },
+    {
+     "ep": 73,
+     "t_grasp": 3.1,
+     "t_lift": 3.85,
+     "rise_cm": 10.1,
+     "hand_tilt_grasp": 1.6,
+     "hand_tilt_lift": 14.7,
+     "dpitch": -13.2,
+     "grip_pct": 10.2
+    },
+    {
+     "ep": 74,
+     "t_grasp": 2.8,
+     "t_lift": 3.35,
+     "rise_cm": 8.8,
+     "hand_tilt_grasp": 5.9,
+     "hand_tilt_lift": 6.0,
+     "dpitch": -12.0,
+     "grip_pct": 10.6
+    },
+    {
+     "ep": 75,
+     "t_grasp": 2.2,
+     "t_lift": 2.85,
+     "rise_cm": 6.4,
+     "hand_tilt_grasp": 7.7,
+     "hand_tilt_lift": 2.4,
+     "dpitch": -10.1,
+     "grip_pct": 7.3
+    },
+    {
+     "ep": 76,
+     "t_grasp": 1.75,
+     "t_lift": 2.75,
+     "rise_cm": 7.6,
+     "hand_tilt_grasp": 22.2,
+     "hand_tilt_lift": 2.0,
+     "dpitch": -24.2,
+     "grip_pct": 38.5
+    },
+    {
+     "ep": 77,
+     "skip": "no squeeze"
+    },
+    {
+     "ep": 78,
+     "skip": "rose 0.7 cm"
+    },
+    {
+     "ep": 79,
+     "t_grasp": 2.35,
+     "t_lift": 3.65,
+     "rise_cm": 6.3,
+     "hand_tilt_grasp": 18.0,
+     "hand_tilt_lift": 8.2,
+     "dpitch": -26.2,
+     "grip_pct": 38.0
+    },
+    {
+     "ep": 80,
+     "t_grasp": 1.5,
+     "t_lift": 2.55,
+     "rise_cm": 7.3,
+     "hand_tilt_grasp": 18.0,
+     "hand_tilt_lift": 7.1,
+     "dpitch": -25.1,
+     "grip_pct": 35.3
+    },
+    {
+     "ep": 81,
+     "t_grasp": 2.0,
+     "t_lift": 3.3,
+     "rise_cm": 11.3,
+     "hand_tilt_grasp": 0.6,
+     "hand_tilt_lift": 18.8,
+     "dpitch": -19.4,
+     "grip_pct": 37.3
+    },
+    {
+     "ep": 82,
+     "skip": "rose 0.3 cm"
+    },
+    {
+     "ep": 83,
+     "t_grasp": 4.9,
+     "t_lift": 6.1,
+     "rise_cm": 5.4,
+     "hand_tilt_grasp": 17.8,
+     "hand_tilt_lift": 19.0,
+     "dpitch": -36.7,
+     "grip_pct": 9.0
+    },
+    {
+     "ep": 84,
+     "skip": "rose 0.4 cm"
+    },
+    {
+     "ep": 85,
+     "skip": "no squeeze"
+    },
+    {
+     "ep": 86,
+     "t_grasp": 1.65,
+     "t_lift": 2.7,
+     "rise_cm": 7.6,
+     "hand_tilt_grasp": 10.9,
+     "hand_tilt_lift": 13.6,
+     "dpitch": -24.5,
+     "grip_pct": 19.7
+    },
+    {
+     "ep": 87,
+     "t_grasp": 2.25,
+     "t_lift": 3.65,
+     "rise_cm": 9.2,
+     "hand_tilt_grasp": 13.7,
+     "hand_tilt_lift": 11.8,
+     "dpitch": -25.5,
+     "grip_pct": 38.9
+    },
+    {
+     "ep": 88,
+     "t_grasp": 4.9,
+     "t_lift": 6.15,
+     "rise_cm": 10.3,
+     "hand_tilt_grasp": 0.5,
+     "hand_tilt_lift": 16.0,
+     "dpitch": -16.4,
+     "grip_pct": 35.0
+    },
+    {
+     "ep": 89,
+     "skip": "no squeeze"
+    },
+    {
+     "ep": 90,
+     "skip": "no squeeze"
+    },
+    {
+     "ep": 91,
+     "t_grasp": 2.35,
+     "t_lift": 3.2,
+     "rise_cm": 6.7,
+     "hand_tilt_grasp": 15.8,
+     "hand_tilt_lift": 4.2,
+     "dpitch": -20.0,
+     "grip_pct": 4.3
+    },
+    {
+     "ep": 92,
+     "t_grasp": 3.15,
+     "t_lift": 4.2,
+     "rise_cm": 8.5,
+     "hand_tilt_grasp": 11.5,
+     "hand_tilt_lift": 4.6,
+     "dpitch": -16.1,
+     "grip_pct": 15.2
+    },
+    {
+     "ep": 93,
+     "t_grasp": 3.25,
+     "t_lift": 4.3,
+     "rise_cm": 8.8,
+     "hand_tilt_grasp": 15.6,
+     "hand_tilt_lift": 6.5,
+     "dpitch": -22.1,
+     "grip_pct": 9.3
+    },
+    {
+     "ep": 94,
+     "skip": "no squeeze"
+    },
+    {
+     "ep": 95,
+     "skip": "rose 0.1 cm"
+    },
+    {
+     "ep": 96,
+     "t_grasp": 1.95,
+     "t_lift": 3.4,
+     "rise_cm": 7.6,
+     "hand_tilt_grasp": 29.9,
+     "hand_tilt_lift": 8.1,
+     "dpitch": -38.0,
+     "grip_pct": 25.9
+    },
+    {
+     "ep": 97,
+     "t_grasp": 3.3,
+     "t_lift": 4.25,
+     "rise_cm": 6.7,
+     "hand_tilt_grasp": 17.6,
+     "hand_tilt_lift": 18.4,
+     "dpitch": -36.0,
+     "grip_pct": 6.1
+    },
+    {
+     "ep": 98,
+     "t_grasp": 3.75,
+     "t_lift": 4.9,
+     "rise_cm": 7.3,
+     "hand_tilt_grasp": 7.2,
+     "hand_tilt_lift": 19.3,
+     "dpitch": -26.5,
+     "grip_pct": 28.7
+    },
+    {
+     "ep": 99,
+     "t_grasp": 3.1,
+     "t_lift": 3.9,
+     "rise_cm": 5.5,
+     "hand_tilt_grasp": 14.6,
+     "hand_tilt_lift": 2.0,
+     "dpitch": -16.6,
+     "grip_pct": 15.4
+    },
+    {
+     "ep": 100,
+     "t_grasp": 3.35,
+     "t_lift": 4.2,
+     "rise_cm": 8.4,
+     "hand_tilt_grasp": 5.0,
+     "hand_tilt_lift": 14.7,
+     "dpitch": -19.8,
+     "grip_pct": 5.0
+    },
+    {
+     "ep": 101,
+     "skip": "no squeeze"
+    },
+    {
+     "ep": 102,
+     "t_grasp": 2.3,
+     "t_lift": 3.85,
+     "rise_cm": 7.8,
+     "hand_tilt_grasp": 1.5,
+     "hand_tilt_lift": 0.2,
+     "dpitch": -1.8,
+     "grip_pct": 23.9
+    },
+    {
+     "ep": 103,
+     "t_grasp": 2.3,
+     "t_lift": 3.7,
+     "rise_cm": 11.0,
+     "hand_tilt_grasp": 4.9,
+     "hand_tilt_lift": 7.2,
+     "dpitch": -12.0,
+     "grip_pct": 23.7
+    }
+   ]
+  }
+ }
+}
