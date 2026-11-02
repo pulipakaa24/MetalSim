@@ -89,8 +89,8 @@ Earlier cells, kept with their media in this directory but no longer on the fron
   Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim), which has the heightfield contact fixes; on its older
   commit [`8eb51fe`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624) the
   sphere feet lose contacts in the creases between bumps and most robots keep walking (54 of 288 fell).
-- **Reproduce:** `scripts/fetch_unitree_rl_gym.sh` and `scripts/fetch_polyhaven_assets.sh demo`, and my fork of MuJoCo
-  Warp at the commit the top-level `README.md`'s `pip install` line pins. The take, as made on 2026-10-31 (the record
+- **Reproduce:** `scripts/fetch_unitree_rl_gym.sh` and `scripts/fetch_polyhaven_assets.sh demo`, and [my fork of MuJoCo
+  Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) as MetalSim's install sets it up. The take, as made on 2026-10-31 (the record
   and render ran as one GPU-queue job, with a check of the filmed robot against the measurement runs between them;
   G1_BUMPS.md, "The take"):
   ```
