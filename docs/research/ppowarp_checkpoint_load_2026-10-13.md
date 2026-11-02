@@ -32,9 +32,9 @@ up to 94 absolute; `runs/g1regress/test_before_fix.log`) and passes with the fix
 
 | checkpoint | settings | envs, control steps | result | log |
 |---|---|---|---|---|
-| `runs/ellip_default/g1_rough_ellip_default_s0.pt` (2026-09-26, elliptic default) | saved in the checkpoint (= today's defaults) | 1024, 1,200 | 1,019 / 1,024 episodes to the 1,000-step time-out, 8 falls in 1,200 steps; mean level 2.61 → 3.21 | `replay_ellip_s0_fixed.log` |
+| `g1_rough_ellip_default_s0.pt` (2026-09-26, elliptic default; trained by `runs/ellip_default/run.sh`; not kept) | saved in the checkpoint (= today's defaults) | 1024, 1,200 | 1,019 / 1,024 episodes to the 1,000-step time-out, 8 falls in 1,200 steps; mean level 2.61 → 3.21 | `replay_ellip_s0_fixed.log` |
 | same, load without the fix | same | 1024, 480 | ep_len 40.7, 100 % falls, mean level → 0.00 | `eval_ellip_s0_nosync.log` |
-| `g1_rough_ppowarp_fixed_it1500.pt` (2026-09-25, pyramidal era, no saved settings) | its training settings: `reward_cfg=rough_isaac scan_ordering=ij terrain_collision=hfield scan_surface=grid contact_cfg=None base_velocity=origin feet_slide_velocity=origin` | 1024, 1,200 | 1,023 / 1,024 to time-out, 1 fall | `eval_legacy_it1500_contactNone.log` |
+| `g1_rough_ppowarp_fixed_it1500.pt` (2026-09-25, pyramidal era, no saved settings; not published) | its training settings: `reward_cfg=rough_isaac scan_ordering=ij terrain_collision=hfield scan_surface=grid contact_cfg=None base_velocity=origin feet_slide_velocity=origin` | 1024, 1,200 | 1,023 / 1,024 to time-out, 1 fall | `eval_legacy_it1500_contactNone.log` |
 | elliptic checkpoint through the overflow harness: levels 0–9, boxes / heightfield, curriculum on / frozen | today's defaults | 4096, 3,600 | 4,025–4,043 / 4,096 first episodes to time-out in all four runs, no capacity flag | `fixed_g1_rough_policy*.log` |
 
 All logs are under `runs/g1regress/`. Bisecting over commits was not needed: the 2026-09-25 checkpoint walks on today's
@@ -47,8 +47,8 @@ G1 rough, today's main
 [`8b46aca8`](https://github.com/pulipakaa24/MetalSim/commit/8b46aca8ef769a2acbe7a0a9971721c8e53269a7), trained on the
 14-inch MacBook Pro (M4 Max; macOS 27, correctness run; throughput not comparable) with the documented run's exact
 settings (`runs/ellip_default/run.sh`: 4096 envs, physics dt 0.0025, `--reward_cfg rough_isaac`, seed 0; the run header
-is identical to the reference's), 1000 iterations. Log `runs/g1regress/ckpt14/rough_main_s0.log`. Reference:
-`runs/ellip_default/g1_rough_ellip_default_s0.log` (2026-09-26, [PARITY §1.5](../PARITY.md#15-learning-on-the-g1-task)).
+is identical to the reference's), 1000 iterations. Log `runs/g1regress/ckpt14/rough_main_s0.log`. Reference: the
+`g1_rough_ellip_default_s0` run of 2026-09-26 (log not kept; [PARITY §1.5](../PARITY.md#15-learning-on-the-g1-task)).
 Columns are return / episode length / mean terrain level.
 
 | iteration | reference (2026-09-26) | today's main |
@@ -68,7 +68,8 @@ The resulting policy walks when replayed (16-inch MacBook Pro, M4 Max, `runs/g1r
 
 G1 flat, same protocol (`run.sh` flat settings: dt 0.0025, `--reward_cfg flat`, seed 0, identical run header),
 500 iterations on the 14-inch (`runs/g1regress/ckpt14/flat_main_s0.log`). Reference: the three elliptic-default seeds
-`runs/ellip_default/g1_flat_ellip_default_s{0,1,2}.log` (PARITY §1.5). Columns are return / episode length.
+`g1_flat_ellip_default_s{0,1,2}` (`runs/ellip_default/run.sh`, logs not kept; PARITY §1.5). Columns are return /
+episode length.
 
 | iteration | reference s0 / s1 / s2 | today's main (s0) |
 |---|---|---|
@@ -92,7 +93,7 @@ torch module.
 | path | loads into a Warp-bound net? | documented results produced through it | verdict |
 |---|---|---|---|
 | `scripts/diagnostics/overflow_training_check.py g1_rough_policy*` ([`526505da`](https://github.com/pulipakaa24/MetalSim/commit/526505dab2455016b4bcbacc11d652a986c7ce3b), 2026-10-13 02:54) | yes | the two trained-policy rows of `research_notes/capacity_overflow_guard/g1_bound_and_lost_flags.md` (`runs/fixfail/train/g1_rough_policy*`, `runs/fixfail/train14/`) | **invalid**: they ran the untrained weights. Corrected in the note, re-run with the fix (four runs, last two rows). The conclusion is unchanged: no capacity flag, and no default changed |
-| `metalsim/learn/tron1_wf.py train(resume=...)` / `--resume` (since [`840ac1df`](https://github.com/pulipakaa24/MetalSim/commit/840ac1dfd0b80cb3c83210b77181e0f5eb3e257d), 2026-09-24) | yes | none: `runs/tron1_wf/{easy1,v1,v2}/train.log` each have one start header, so none was resumed, and `docs/TRON1.md` documents no resume | would have run the first rollout of a resumed run on the initial weights (the first update then queues behind the copy). Fixed by the hook |
+| `metalsim/learn/tron1_wf.py train(resume=...)` / `--resume` (since [`840ac1df`](https://github.com/pulipakaa24/MetalSim/commit/840ac1dfd0b80cb3c83210b77181e0f5eb3e257d), 2026-09-24) | yes | none: the `easy1`, `v1` and `v2` training logs (not kept) each have one start header, so none was resumed, and `docs/TRON1.md` documents no resume | would have run the first rollout of a resumed run on the initial weights (the first update then queues behind the copy). Fixed by the hook |
 | `scripts/diagnostics/ppo_update_profile.py` ([`e1512a23`](https://github.com/pulipakaa24/MetalSim/commit/e1512a23196bd7f4f205803074e0c86423c499ea), 2026-09-26) | yes, to restore the net between timed repeats | PPO update timings | not affected: the timed work is the torch update, which reads the parameters on the same MPS queue as the copy, and `torch.mps.synchronize()` follows each load inside the timed loop. No Warp rollout reads the restored weights |
 | `scripts/diagnostics/g1_policy_replay.py` (new here) | yes | this note | written after the fix; it prints whether the Warp weights match the checkpoint |
 | G1 evaluators: `g1_reward_terms.py`, `g1_rough_transfer.py` (`runs/g1_rough_transfer*.jsonl`, PARITY §1.5 transfer numbers), `il3_transfer.py`, `newton_transfer.py`, `newton_stance_gap.py`, `g1_swing.py`, `g1_pushoff.py`, `contact_research/air_time_rollout.py`, `competitors/{g1_falls,g1_state_dump,cap_probe_*}.py`, `speculative/overtravel_probe.py`, `runs/il3/{blowup_probe,policy_stats}.py`, `metalsim/parity/side_by_side.py` (stage videos), `docs/gallery/scripts/14_g1_policy_video.py` | no: each builds its own `ActorCriticMLP` / `nn.Sequential` and evaluates it in torch, with no `WarpMLPPolicy` | PARITY §1.5 transfer, reward-term and swing / push-off results; stage videos; gallery video | not affected |

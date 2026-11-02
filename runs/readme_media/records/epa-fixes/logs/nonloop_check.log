@@ -1,0 +1,80 @@
+mujoco_warp ~/MetalSim/runs/readme_media/scratch/epa-fixes/v_base/mujoco_warp/__init__.py
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     ~/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth 42ba4b9 load on device 'cpu' took 0.90 ms  (cached)
+Module _nxn_broadphase__locals__kernel_1edb6cf5 52155e3 load on device 'cpu' took 0.22 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_3a3427da 05ac254 load on device 'cpu' took 0.86 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_8871ddb9 ff50bb1 load on device 'cpu' took 0.28 ms  (cached)
+box 1531   MJW -4.538893700e-05 C -4.538434274e-05 |diff| 4.59e-09 tol 2e-08 nacon 3 overflow bits [] PASS
+box 3635   MJW -7.370859385e-05 C -7.370276431e-05 |diff| 5.83e-09 tol 2e-08 nacon 4 overflow bits [] PASS
+Module ccd_kernel_builder__locals__ccd_kernel_5a02670f 1fe0006 load on device 'cpu' took 1.83 ms  (cached)
+ellip 320  MJW -2.778231647e-05 C -2.755867234e-05 |diff| 2.24e-07 tol 1e-06 nacon 1 overflow bits [] PASS
+mujoco_warp ~/MetalSim/runs/readme_media/scratch/epa-fixes/v_1eb/mujoco_warp/__init__.py
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     ~/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth 42ba4b9 load on device 'cpu' took 1.09 ms  (cached)
+Module _nxn_broadphase__locals__kernel_1edb6cf5 52155e3 load on device 'cpu' took 0.19 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_6a66d659 d053d5d load on device 'cpu' took 0.26 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_8871ddb9 ff50bb1 load on device 'cpu' took 0.19 ms  (cached)
+box 1531   MJW -4.538893700e-05 C -4.538434274e-05 |diff| 4.59e-09 tol 2e-08 nacon 3 overflow bits [] PASS
+box 3635   MJW -7.370859385e-05 C -7.370276431e-05 |diff| 5.83e-09 tol 2e-08 nacon 4 overflow bits [] PASS
+Module ccd_kernel_builder__locals__ccd_kernel_a8630333 38e898a load on device 'cpu' took 0.24 ms  (cached)
+ellip 320  MJW -2.778231647e-05 C -2.755867234e-05 |diff| 2.24e-07 tol 1e-06 nacon 1 overflow bits [] PASS
+mujoco_warp ~/MetalSim/runs/readme_media/scratch/hfield-epa/mjw/mujoco_warp/__init__.py
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     ~/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth 42ba4b9 load on device 'cpu' took 0.81 ms  (cached)
+Module _nxn_broadphase__locals__kernel_1edb6cf5 52155e3 load on device 'cpu' took 0.15 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_baa09ba3 da753a0 load on device 'cpu' took 0.35 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_8871ddb9 ff50bb1 load on device 'cpu' took 0.29 ms  (cached)
+box 1531   MJW -4.538893700e-05 C -4.538434274e-05 |diff| 4.59e-09 tol 2e-08 nacon 3 overflow bits [] PASS
+box 3635   MJW -7.370859385e-05 C -7.370276431e-05 |diff| 5.83e-09 tol 2e-08 nacon 4 overflow bits [] PASS
+Module ccd_kernel_builder__locals__ccd_kernel_9e555495 414475a load on device 'cpu' took 0.31 ms  (cached)
+ellip 320  MJW -2.778231647e-05 C -2.755867234e-05 |diff| 2.24e-07 tol 1e-06 nacon 1 overflow bits [] PASS
+mujoco_warp ~/MetalSim/runs/readme_media/scratch/epa-fixes/mut_nocontact/mujoco_warp/__init__.py
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     ~/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth 42ba4b9 load on device 'cpu' took 0.88 ms  (cached)
+Module _nxn_broadphase__locals__kernel_1edb6cf5 52155e3 load on device 'cpu' took 0.18 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_29641d0e c8103e0 load on device 'cpu' took 2588.58 ms  (compiled)
+Module _primitive_narrowphase__locals__primitive_narrowphase_8871ddb9 ff50bb1 load on device 'cpu' took 0.18 ms  (cached)
+box 1531   MJW  nan C -4.538434274e-05 |diff| nan tol 2e-08 nacon 0 overflow bits [] FAIL
+box 3635   MJW  nan C -7.370276431e-05 |diff| nan tol 2e-08 nacon 0 overflow bits [] FAIL
+Module ccd_kernel_builder__locals__ccd_kernel_5c162f85 6f0d7c4 load on device 'cpu' took 1307.20 ms  (compiled)
+ellip 320  MJW  nan C -2.755867234e-05 |diff| nan tol 1e-06 nacon 0 overflow bits [] FAIL
+mujoco_warp ~/MetalSim/runs/readme_media/scratch/epa-fixes/mut_nonorm2/mujoco_warp/__init__.py
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     ~/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth 42ba4b9 load on device 'cpu' took 0.90 ms  (cached)
+Module _nxn_broadphase__locals__kernel_1edb6cf5 52155e3 load on device 'cpu' took 0.29 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_9c4fe012 70b61cf load on device 'cpu' took 2534.24 ms  (compiled)
+Module _primitive_narrowphase__locals__primitive_narrowphase_8871ddb9 ff50bb1 load on device 'cpu' took 0.30 ms  (cached)
+box 1531   MJW -4.538893700e-05 C -4.538434274e-05 |diff| 4.59e-09 tol 2e-08 nacon 3 overflow bits [] PASS
+box 3635   MJW -7.370859385e-05 C -7.370276431e-05 |diff| 5.83e-09 tol 2e-08 nacon 4 overflow bits [] PASS
+Module ccd_kernel_builder__locals__ccd_kernel_4a07f293 175922d load on device 'cpu' took 1316.06 ms  (compiled)
+ellip 320  MJW -2.778231647e-05 C -2.755867234e-05 |diff| 2.24e-07 tol 1e-06 nacon 1 overflow bits [] PASS

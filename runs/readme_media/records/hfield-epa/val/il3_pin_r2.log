@@ -1,0 +1,38 @@
+G1 rough PPO: N=4096 obs_dim 310 act_dim 37 rollout 24 x 8 iterations, engine mjwarp, physics dt 0.0025 (decimation 8), seed 0, reward_cfg rough_il3, height-scan ray order xy, terrain collision hfield, height scan exact, solver_cfg isaaclab3_every_substep_cap20, contact_cfg recommended_pyramidal, base velocity com, feet-slide velocity com, initial reset True, effort limit on the actuator, Isaac Lab 3.0 events True (backend newton_mjwarp), add_base_mass {'body': 'torso_link', 'scale_min': 0.8000494837760925, 'scale_max': 1.2497823238372803, 'dof_invweight0_ratio_range': [0.9505320191383362, 1.0460337400436401], 'limit_timeconst_ratio_range': [0.9787044773626695, 1.0248058414581651]}
+it    1 steps     98304 sps   45,441 | ep_ret   -5.52 ep_len   23.8 (n=12) | pg 0.071 vf 0.161 kl 0.1930 lr 1.0e-05
+[anomaly] it 1: KL 0.193 > 10x target: stale data or LR too high
+[anomaly] it 1: joint limit violated by 0.32 rad
+terrain it    1 mean_level 2.4844
+terms it    1 {"track_lin_vel_xy_exp": 0.00519, "track_ang_vel_z_exp": 0.00295, "feet_air_time": 2e-05, "feet_slide": -0.00116, "joint_deviation": -0.00526, "flat_orientation_l2": -0.01087, "action_rate_l2": -0.00864, "termination_penalty": -0.2, "lin_vel_z_l2": 0.0, "ang_vel_xy_l2": -0.05077, "dof_torques_l2": -9e-05, "dof_acc_l2": -0.00724, "dof_pos_limits": -0.00012, "episodes": 12, "base_contact": 1.0, "pushes": 0}
+it    2 steps    196608 sps   48,505 | ep_ret   -6.03 ep_len   37.2 (n=3329) | pg 0.002 vf 3.902 kl 0.0091 lr 1.1e-04
+[anomaly] it 2: joint limit violated by 0.30 rad
+[anomaly] it 2: contact penetration 2.1 cm
+terrain it    2 mean_level 1.8569
+terms it    2 {"track_lin_vel_xy_exp": 0.00576, "track_ang_vel_z_exp": 0.00456, "feet_air_time": 3e-05, "feet_slide": -0.00268, "joint_deviation": -0.00857, "flat_orientation_l2": -0.01371, "action_rate_l2": -0.01387, "termination_penalty": -0.20001, "lin_vel_z_l2": 0.0, "ang_vel_xy_l2": -0.05712, "dof_torques_l2": -0.00015, "dof_acc_l2": -0.01544, "dof_pos_limits": -0.00031, "episodes": 3329, "base_contact": 1.0, "pushes": 0}
+it    3 steps    294912 sps   49,766 | ep_ret   -6.21 ep_len   42.1 (n=1830) | pg -0.001 vf 1.728 kl 0.0101 lr 1.7e-04
+[anomaly] it 3: joint limit violated by 0.29 rad
+terrain it    3 mean_level 1.5515
+terms it    3 {"track_lin_vel_xy_exp": 0.00651, "track_ang_vel_z_exp": 0.00501, "feet_air_time": 4e-05, "feet_slide": -0.00316, "joint_deviation": -0.00979, "flat_orientation_l2": -0.01406, "action_rate_l2": -0.01577, "termination_penalty": -0.2, "lin_vel_z_l2": 0.0, "ang_vel_xy_l2": -0.06094, "dof_torques_l2": -0.00017, "dof_acc_l2": -0.01768, "dof_pos_limits": -0.00036, "episodes": 1830, "base_contact": 1.0, "pushes": 0}
+it    4 steps    393216 sps   50,351 | ep_ret   -6.17 ep_len   41.4 (n=2604) | pg -0.005 vf 1.813 kl 0.0106 lr 5.8e-04
+[anomaly] it 4: joint limit violated by 0.34 rad
+terrain it    4 mean_level 1.1589
+terms it    4 {"track_lin_vel_xy_exp": 0.00646, "track_ang_vel_z_exp": 0.00498, "feet_air_time": 3e-05, "feet_slide": -0.00314, "joint_deviation": -0.00963, "flat_orientation_l2": -0.01407, "action_rate_l2": -0.01558, "termination_penalty": -0.20001, "lin_vel_z_l2": 0.0, "ang_vel_xy_l2": -0.05933, "dof_torques_l2": -0.00017, "dof_acc_l2": -0.01757, "dof_pos_limits": -0.00036, "episodes": 2604, "base_contact": 1.0, "pushes": 0}
+it    5 steps    491520 sps   50,825 | ep_ret   -6.11 ep_len   40.2 (n=2360) | pg -0.001 vf 1.489 kl 0.0157 lr 5.8e-04
+[anomaly] it 5: joint limit violated by 0.30 rad
+[anomaly] it 5: contact penetration 2.1 cm
+terrain it    5 mean_level 0.8633
+terms it    5 {"track_lin_vel_xy_exp": 0.00627, "track_ang_vel_z_exp": 0.00487, "feet_air_time": 3e-05, "feet_slide": -0.00297, "joint_deviation": -0.00933, "flat_orientation_l2": -0.01386, "action_rate_l2": -0.0152, "termination_penalty": -0.2, "lin_vel_z_l2": 0.0, "ang_vel_xy_l2": -0.05846, "dof_torques_l2": -0.00016, "dof_acc_l2": -0.01654, "dof_pos_limits": -0.00034, "episodes": 2360, "base_contact": 1.0, "pushes": 0}
+it    6 steps    589824 sps   51,099 | ep_ret   -6.15 ep_len   41.4 (n=2349) | pg -0.003 vf 1.086 kl 0.0138 lr 5.8e-04
+[anomaly] it 6: joint limit violated by 0.31 rad
+terrain it    6 mean_level 0.6101
+terms it    6 {"track_lin_vel_xy_exp": 0.00647, "track_ang_vel_z_exp": 0.00487, "feet_air_time": 3e-05, "feet_slide": -0.00309, "joint_deviation": -0.00962, "flat_orientation_l2": -0.01397, "action_rate_l2": -0.01576, "termination_penalty": -0.2, "lin_vel_z_l2": 0.0, "ang_vel_xy_l2": -0.05885, "dof_torques_l2": -0.00017, "dof_acc_l2": -0.01714, "dof_pos_limits": -0.00036, "episodes": 2349, "base_contact": 1.0, "pushes": 0}
+it    7 steps    688128 sps   51,301 | ep_ret   -6.12 ep_len   41.0 (n=2455) | pg -0.002 vf 0.881 kl 0.0146 lr 5.8e-04
+[anomaly] it 7: joint limit violated by 0.28 rad
+[anomaly] it 7: contact penetration 2.1 cm
+terrain it    7 mean_level 0.3972
+terms it    7 {"track_lin_vel_xy_exp": 0.00651, "track_ang_vel_z_exp": 0.00488, "feet_air_time": 4e-05, "feet_slide": -0.00304, "joint_deviation": -0.00955, "flat_orientation_l2": -0.01388, "action_rate_l2": -0.01565, "termination_penalty": -0.2, "lin_vel_z_l2": 0.0, "ang_vel_xy_l2": -0.05778, "dof_torques_l2": -0.00016, "dof_acc_l2": -0.01692, "dof_pos_limits": -0.00035, "episodes": 2455, "base_contact": 1.0, "pushes": 0}
+it    8 steps    786432 sps   51,422 | ep_ret   -6.12 ep_len   41.4 (n=2369) | pg -0.001 vf 0.685 kl 0.0125 lr 3.8e-04
+[anomaly] it 8: joint limit violated by 0.34 rad
+[anomaly] it 8: contact penetration 2.2 cm
+terrain it    8 mean_level 0.2390
+terms it    8 {"track_lin_vel_xy_exp": 0.00652, "track_ang_vel_z_exp": 0.00503, "feet_air_time": 3e-05, "feet_slide": -0.00309, "joint_deviation": -0.00966, "flat_orientation_l2": -0.01388, "action_rate_l2": -0.01588, "termination_penalty": -0.2, "lin_vel_z_l2": 0.0, "ang_vel_xy_l2": -0.05755, "dof_torques_l2": -0.00016, "dof_acc_l2": -0.0171, "dof_pos_limits": -0.00037, "episodes": 2369, "base_contact": 1.0, "pushes": 0}

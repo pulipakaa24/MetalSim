@@ -1,0 +1,25 @@
+mujoco_warp ~/MetalSim/runs/readme_media/scratch/epa-fixes/v_new/mujoco_warp/__init__.py
+box s12 3681 MJW -7.710978389e-05 C -7.710650427e-05 |diff| 3.28e-09 tol 2e-08 nacon 3 overflow bits [] PASS
+ellip s12 55 MJW -1.746302354e-03 C -1.746300721e-03 |diff| 1.63e-09 tol 1e-06 nacon 1 overflow bits [] PASS
+ellip s14 80 MJW -6.484472578e-06 C -6.761924204e-06 |diff| 2.77e-07 tol 1e-06 nacon 1 overflow bits [] PASS
+cyl s12 1714 MJW -4.524652832e-05 C -4.525713538e-05 |diff| 1.06e-08 tol 1e-06 nacon 1 overflow bits [] PASS
+mujoco_warp ~/MetalSim/runs/readme_media/scratch/epa-fixes/mut_nonorm2/mujoco_warp/__init__.py
+box s12 3681 MJW  nan C -7.710650427e-05 |diff| nan tol 2e-08 nacon 0 overflow bits [] FAIL
+ellip s12 55 MJW  nan C -1.746300721e-03 |diff| nan tol 1e-06 nacon 0 overflow bits [] FAIL
+ellip s14 80 MJW  nan C -6.761924204e-06 |diff| nan tol 1e-06 nacon 0 overflow bits [] FAIL
+cyl s12 1714 MJW  nan C -4.525713538e-05 |diff| nan tol 1e-06 nacon 0 overflow bits [] FAIL
+mujoco_warp ~/MetalSim/runs/readme_media/scratch/epa-fixes/v_base/mujoco_warp/__init__.py
+box s12 3681 MJW -7.710978389e-05 C -7.710650427e-05 |diff| 3.28e-09 tol 2e-08 nacon 3 overflow bits [] PASS
+ellip s12 55 MJW -1.746302354e-03 C -1.746300721e-03 |diff| 1.63e-09 tol 1e-06 nacon 1 overflow bits [] PASS
+ellip s14 80 MJW -6.484472578e-06 C -6.761924204e-06 |diff| 2.77e-07 tol 1e-06 nacon 1 overflow bits [] PASS
+cyl s12 1714 MJW -4.522442032e-05 C -4.525713538e-05 |diff| 3.27e-08 tol 1e-06 nacon 1 overflow bits [] PASS
+mujoco_warp ~/MetalSim/runs/readme_media/scratch/epa-fixes/v_1eb/mujoco_warp/__init__.py
+box s12 3681 MJW -7.710978389e-05 C -7.710650427e-05 |diff| 3.28e-09 tol 2e-08 nacon 3 overflow bits [] PASS
+ellip s12 55 MJW -1.746302354e-03 C -1.746300721e-03 |diff| 1.63e-09 tol 1e-06 nacon 1 overflow bits [] PASS
+ellip s14 80 MJW -6.484472578e-06 C -6.761924204e-06 |diff| 2.77e-07 tol 1e-06 nacon 1 overflow bits [] PASS
+cyl s12 1714 MJW -4.524652832e-05 C -4.525713538e-05 |diff| 1.06e-08 tol 1e-06 nacon 1 overflow bits [] PASS
+mujoco_warp ~/MetalSim/runs/readme_media/scratch/epa-fixes/instr/mujoco_warp/__init__.py
+box s12 3681 MJW -7.710978389e-05 C -7.710650427e-05 |diff| 3.28e-09 tol 2e-08 nacon 3 overflow bits [20, 23, 25] FAIL
+ellip s12 55 MJW -1.746302354e-03 C -1.746300721e-03 |diff| 1.63e-09 tol 1e-06 nacon 1 overflow bits [20, 23, 25] FAIL
+ellip s14 80 MJW -6.484472578e-06 C -6.761924204e-06 |diff| 2.77e-07 tol 1e-06 nacon 1 overflow bits [20, 23, 25] FAIL
+cyl s12 1714 MJW -4.524652832e-05 C -4.525713538e-05 |diff| 1.06e-08 tol 1e-06 nacon 1 overflow bits [20, 23, 25] FAIL

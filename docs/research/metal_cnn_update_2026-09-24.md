@@ -45,8 +45,9 @@ there is no native Metal conv2d training kernel. File:
 - Weight gradient (`mps_convolution_backward_weights`, L926):
   `convolution2DWeightsGradientWithIncomingGradientTensor:sourceTensor:outputShape:forwardConvolutionDescriptor:`
   (L1062), also NCHW (L1059).
-- Native Metal kernels in `aten/src/ATen/native/mps/kernels/Convolution.metal` (v2.14.0): conv3d
-  implicit-GEMM (`conv3d_simd`, `conv3d_mpp`) forward only (PR #188802,
+- Native Metal kernels in
+  [`aten/src/ATen/native/mps/kernels/Convolution.metal`](https://github.com/pytorch/pytorch/blob/v2.14.0/aten/src/ATen/native/mps/kernels/Convolution.metal)
+  (v2.14.0): conv3d implicit-GEMM (`conv3d_simd`, `conv3d_mpp`) forward only (PR #188802,
   https://github.com/pytorch/pytorch/pull/188802, "4–12× faster than MPSGraph" on an M5 Pro), and a
   forward-only `conv2d` kernel used only for filters with a spatial dimension ≥ 256 (PR #188359,
   https://github.com/pytorch/pytorch/pull/188359, a correctness fix). `Im2Col.metal`/`Col2Im.metal`
@@ -317,8 +318,10 @@ estimated hardware floor (1.7–2.0 s) and the rollout unchanged, the same pipel
 - **MLX 0.32.2 steel conv** (`mlx/backend/metal/kernels/steel/conv/kernels/steel_conv.h`,
   https://raw.githubusercontent.com/ml-explore/mlx/v0.32.2/mlx/backend/metal/kernels/steel/conv/kernels/steel_conv.h):
   same structure (BM/BN ∈ {32, 64}, BK 16, WM×WN = 2×2 or 4×2 simdgroups, tile sizes chosen by
-  `implicit_M`/`C` in `mlx/backend/metal/conv.cpp` L341–349, L544–545); its weight gradient is
-  im2col + GEMM (§2). MPSGraph / MPSCNN convolution-gradient algorithms are not documented by Apple.
+  `implicit_M`/`C` in [`mlx/backend/metal/conv.cpp`](https://github.com/ml-explore/mlx/blob/v0.32.2/mlx/backend/metal/conv.cpp)
+  [L341–349](https://github.com/ml-explore/mlx/blob/v0.32.2/mlx/backend/metal/conv.cpp#L341-L349), [L544–545](https://github.com/ml-explore/mlx/blob/v0.32.2/mlx/backend/metal/conv.cpp#L544-L545));
+  its weight gradient is im2col + GEMM (§2). MPSGraph / MPSCNN convolution-gradient algorithms are not
+  documented by Apple.
 - What this means for our kernels: the threadgroup-staged implicit GEMM that PyTorch and MLX use was my
   first conv1-wgrad attempt and measured 1.4–1.7 TFLOP/s on this shape (§6, "tg" variant); the kernels
   that won read 8×8 tiles straight from device memory with strided / transposed `simdgroup_load` and use

@@ -1,0 +1,155 @@
+{
+ "mode": "cpu",
+ "tag": "pert_r3",
+ "ceiling": 0.1,
+ "robots": 16,
+ "seconds": 8.0,
+ "seeds": {
+  "0": {
+   "falls": 10,
+   "fall_s_first": 2.58,
+   "fall_s_median": 4.16,
+   "forward_m_median": 2.0135,
+   "nonfoot": 15,
+   "fell": [
+    true,
+    false,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    false,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "info": {
+    "engine": "CPU MuJoCo 3.14.0 (Unitree's loop per robot)",
+    "rollout_s": 2.7
+   }
+  },
+  "1": {
+   "falls": 11,
+   "fall_s_first": 1.74,
+   "fall_s_median": 3.98,
+   "forward_m_median": 1.461,
+   "nonfoot": 14,
+   "fell": [
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "info": {
+    "engine": "CPU MuJoCo 3.14.0 (Unitree's loop per robot)",
+    "rollout_s": 2.8
+   }
+  },
+  "2": {
+   "falls": 11,
+   "fall_s_first": 2.64,
+   "fall_s_median": 4.72,
+   "forward_m_median": 2.362,
+   "nonfoot": 16,
+   "fell": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    false,
+    true,
+    true,
+    false,
+    false,
+    true,
+    false,
+    false
+   ],
+   "info": {
+    "engine": "CPU MuJoCo 3.14.0 (Unitree's loop per robot)",
+    "rollout_s": 2.6
+   }
+  },
+  "3": {
+   "falls": 10,
+   "fall_s_first": 1.58,
+   "fall_s_median": 4.03,
+   "forward_m_median": 1.9505,
+   "nonfoot": 16,
+   "fell": [
+    true,
+    false,
+    false,
+    true,
+    true,
+    false,
+    false,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    true,
+    true,
+    true
+   ],
+   "info": {
+    "engine": "CPU MuJoCo 3.14.0 (Unitree's loop per robot)",
+    "rollout_s": 2.7
+   }
+  },
+  "4": {
+   "falls": 5,
+   "fall_s_first": 3.38,
+   "fall_s_median": 3.6,
+   "forward_m_median": 2.2595,
+   "nonfoot": 15,
+   "fell": [
+    false,
+    true,
+    false,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    false,
+    false,
+    false,
+    true,
+    true,
+    false
+   ],
+   "info": {
+    "engine": "CPU MuJoCo 3.14.0 (Unitree's loop per robot)",
+    "rollout_s": 2.5
+   }
+  }
+ },
+ "cpu_perturb": "1e-6:3"
+}

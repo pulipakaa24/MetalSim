@@ -1,0 +1,23 @@
+[gpu_run] hfield-batch-c start: device utilisation 0% (16:46:02)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.8 s:
+[gpu_run] gpu_top:   pid    181 WindowServer                       1.8 %
+== random actions fix + C(32) power  -InternalBattery-0 (id=8257635)	35%; discharging; 0:50 remaining pres |  powermode 2 | 16:46:05
+mujoco_warp ~/MetalSim/runs/readme_media/scratch/hfield-contacts/mjw/mujoco_warp/__init__.py
+MJW 400 steps x 1024 envs: max |qvel| 124.1, worlds with non-finite qvel 0; heightfield contacts sampled 26966: normal z min -0.000 p1 0.014 share < 0.3 0.0363; depth p99 12.0 mm max 42.3 mm
+C   400 steps x 32 envs (same starts and actions): max |qvel| 134657.1, worlds with non-finite qvel 0; heightfield contacts sampled 3766: normal z min -0.775 p1 -0.021 share < 0.3 0.3067; depth p99 45.4 mm max 67.8 mm
+== random actions fix, mesh plane path power  -InternalBattery-0 (id=8257635)	35%; discharging; 0:46 remaining pres |  powermode 2 | 16:46:32
+set collision_convex.HFIELD_PLANE_CONTACTS True
+MJW 400 steps x 1024 envs: max |qvel| 49.2, worlds with non-finite qvel 0; heightfield contacts sampled 21348: normal z min 0.662 p1 0.735 share < 0.3 0.0000; depth p99 13.0 mm max 37.6 mm
+== timing fix+plane rep 1 power  -InternalBattery-0 (id=8257635)	34%; discharging; 0:42 remaining pres |  powermode 2 | 16:46:58
+set collision_convex.HFIELD_PLANE_CONTACTS True
+N=4096: 62,279 env-steps/s (110 steps, synchronized); per-call mean 32.31 ms -> 126,786 env-steps/s is queue-absorbed and not comparable
+== timing fix rep 1 power  -InternalBattery-0 (id=8257635)	34%; discharging; 0:42 remaining pres |  powermode 2 | 16:47:17
+N=4096: 53,234 env-steps/s (110 steps, synchronized); per-call mean 36.33 ms -> 112,740 env-steps/s is queue-absorbed and not comparable
+== timing fix+plane rep 2 power  -InternalBattery-0 (id=8257635)	33%; discharging; 0:38 remaining pres |  powermode 2 | 16:47:39
+set collision_convex.HFIELD_PLANE_CONTACTS True
+N=4096: 62,407 env-steps/s (110 steps, synchronized); per-call mean 32.23 ms -> 127,079 env-steps/s is queue-absorbed and not comparable
+== timing fix rep 2 power  -InternalBattery-0 (id=8257635)	32%; discharging; 0:35 remaining pres |  powermode 2 | 16:47:58
+N=4096: 53,499 env-steps/s (110 steps, synchronized); per-call mean 36.21 ms -> 113,109 env-steps/s is queue-absorbed and not comparable
+== done power  -InternalBattery-0 (id=8257635)	32%; discharging; 0:35 remaining pres |  powermode 2 | 16:48:20
+[gpu_run] hfield-batch-c end: device utilisation 100% (16:48:20), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.8 s: none >= 1 %

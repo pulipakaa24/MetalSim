@@ -1,0 +1,5 @@
+all: worlds 40000 contacts 144701 / 144199 contact sets differ 33188 overflow differs 0
+  world 0: n 4 -> 4; dists [np.float32(-0.020270243), np.float32(-0.0200089), np.float32(-0.0089686625), np.float32(0.001087496)] -> [np.float32(-0.020270243), np.float32(-0.0200089), np.float32(-0.0089686625), np.float32(0.0010874495)]
+  world 2: n 4 -> 4; dists [np.float32(-0.040343024), np.float32(-0.018934194), np.float32(-0.018300653), np.float32(0.012023528)] -> [np.float32(-0.040343024), np.float32(-0.018934194), np.float32(-0.018300653), np.float32(0.012023212)]
+all: worlds 40000 contacts 144199 / 144199 contact sets differ 1 overflow differs 0
+  world 3413: n 4 -> 4; dists [np.float32(-0.009813851), np.float32(-0.0019039828), np.float32(0.015131297), np.float32(0.019982861)] -> [np.float32(-0.00981385), np.float32(-0.0019039828), np.float32(0.015131297), np.float32(0.019982861)]

@@ -1,0 +1,10 @@
+epa_fixes_check start 20:31:42; tree 787a5b3a37acc2551ffc8a2c1af1e9781d76723f
+power: Now drawing from 'AC Power'  -InternalBattery-0 (id=8257635)	79%; charging; 3:40 remaining present: true ;  powermode 2
+== fork collision suites on Metal (default device)
+~/MetalSim/runs/readme_media/scratch/epa-fixes/v_new/mujoco_warp/__init__.py device metal:0
+127 passed, 2 skipped, 7 warnings in 224.66s (0:03:44)
+== MetalSim tests/test_terrain.py (Metal)
+~/MetalSim/runs/readme_media/scratch/epa-fixes/v_new/mujoco_warp/__init__.py
+hfield contacts over 0.5 s: min normal z 0.912, max penetration 0.0052 m (MuJoCo C: 0.0046); pelvis z ours [0.709 0.709 0.709 0.673] vs C [0.709 0.709 0.71  0.673]
+21 passed, 5 warnings in 70.31s (0:01:10)
+epa_fixes_check end 20:36:40

@@ -58,8 +58,9 @@ Log: `runs/competitors/cone.log`.
 
 **Out of the box, the Go2 comparison is not like for like.** Genesis ignores an MJCF's
 `cone="elliptic"` unless `RigidOptions(friction_cone=gs.friction_cone.elliptic)` is set (it only warns,
-`genesis/utils/mjcf.py:267`). The first matrix therefore showed Genesis 4.3× ahead on the Go2
-(1,118,506 vs 262,226; `results_*.jsonl`). That run was Genesis-pyramidal against MetalSim-elliptic.
+[`genesis/utils/mjcf.py:267`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/a4b45ff15242c349bbc8fb988d25545666134b19/genesis/utils/mjcf.py#L267)).
+The first matrix therefore showed Genesis 4.3× ahead on the Go2 (1,118,506 vs 262,226; `results_*.jsonl`).
+That run was Genesis-pyramidal against MetalSim-elliptic.
 
 **Contact load**, contacts per world after 200 steps at 256 envs (`*_contacts.py`,
 `runs/competitors/contacts_per_world.log`):
@@ -80,7 +81,8 @@ The physics agrees across engines: the final mean base height is Go2 0.189 vs 0.
 0.092. The G1 falls under these random targets in both engines.
 
 **End-to-end RL:**
-- **Genesis's own `examples/locomotion/go2_train.py`** at 4096 envs on Metal/MPS,
+- **Genesis's own [`examples/locomotion/go2_train.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/a4b45ff15242c349bbc8fb988d25545666134b19/examples/locomotion/go2_train.py)** at
+  4096 envs on Metal/MPS,
   [rsl-rl](https://github.com/leggedrobotics/rsl_rl) 5.5.1: 170–171K env-steps/s for the full PPO loop
   (collection 0.30 s + learning 0.27 s per iteration), steady over 30 iterations, reward rising. Log:
   `runs/competitors/genesis_go2_4096.log`.
@@ -146,7 +148,8 @@ Logs: `runs/competitors/mlx_only.log`, `metalsim_mlxprotocol.log`.
   solvers for Metal. Limits:
   - no float64 on Metal;
   - some compiler optimisations forced off on macOS (NaNs);
-  - a Metal-only BVH workaround in the raycaster (`genesis/engine/bvh.py`).
+  - a Metal-only BVH workaround in the raycaster
+    ([`genesis/engine/bvh.py`](https://github.com/Genesis-Embodied-AI/genesis-world/blob/a4b45ff15242c349bbc8fb988d25545666134b19/genesis/engine/bvh.py)).
 - CUDA only:
   - the [Madrona](https://github.com/shacklettbp/madrona) batch renderer, which is its fast camera-RL path;
   - Nyx, its photoreal renderer (x86-64 Linux/Windows with an NVIDIA GPU);
@@ -157,8 +160,10 @@ Logs: `runs/competitors/mlx_only.log`, `metalsim_mlxprotocol.log`.
   [#925](https://github.com/Genesis-Embodied-AI/quadrants/issues/925) (atomics in branches, filed
   2026-09-24) and [#835](https://github.com/Genesis-Embodied-AI/quadrants/issues/835) (a local vector
   read returning 0.0). Its CI skips the FEM implicit test and one IK test on Mac GPU.
-- USD import: yes (`genesis/utils/usd/`). Isaac Lab task parity: none. Replicator-style output: none.
-  Lidar on Metal: yes, but as a compute BVH rather than ray-tracing hardware.
+- USD import: yes
+  ([`genesis/utils/usd/`](https://github.com/Genesis-Embodied-AI/genesis-world/tree/a4b45ff15242c349bbc8fb988d25545666134b19/genesis/utils/usd)).
+  Isaac Lab task parity: none. Replicator-style output: none. Lidar on Metal: yes, but as a compute BVH
+  rather than ray-tracing hardware.
 - Speed claims are all on NVIDIA and **published**:
   - "43M FPS" (Franka, RTX 4090). Stone Tao's re-benchmark measured about 0.29M
     ([blog](https://stoneztao.substack.com/p/the-new-hyped-genesis-simulator-is),

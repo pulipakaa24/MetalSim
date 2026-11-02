@@ -4,9 +4,9 @@ Standing task: find and land throughput improvements anywhere in the stack that 
 within the measured run-to-run floor, rewards / observations / renders bit-identical, learning untouched); anything
 that changes a result is reported as an option, not landed. Every number is labelled measured / estimated with its
 scope. GPU numbers go through the timing queue (`scripts/gpu_run.sh ... timing`, idle GPU logged at both ends);
-logs in `runs/tp26/`. Fork work in the worktrees `upstream/mujoco_warp-tp` and `upstream/warp-innate-tp` (branches
-`metalsim-tp` of [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-tp) and
-[my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim-tp)), imported through `PYTHONPATH` inside the jobs
+logs in `runs/tp26/`. Fork work in worktrees of the branches `metalsim-tp` of
+[my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-tp) and
+[my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim-tp), imported through `PYTHONPATH` inside the jobs
 (the import path is printed in every log); the shared checkouts are untouched. Starting point: MetalSim
 [`7e90a62`](https://github.com/pulipakaa24/MetalSim/commit/7e90a62785b5137ea5ea889646ac3bf891c014d2), my fork of MuJoCo
 Warp at [`fe6fe71`](https://github.com/pulipakaa24/mujoco_warp/commit/fe6fe711edf70de2449e30fa62d54c430f6a6e7e), my fork
@@ -36,7 +36,8 @@ iteration; the preset raises those from 1.41 to 1.93 per world-substep and the m
 so reusing a stored factor ("solve only") has no case to serve. (Scope: 64 worlds from the init pose; the 4096-env
 random-action state on the GPU has more contacts, nefc mean 14.3 vs 9.8 here.)
 
-Precedent: [MuJoCo](https://github.com/google-deepmind/mujoco) C 3.14 `engine_solver.c` `HessianIncremental` maintains
+Precedent: [MuJoCo](https://github.com/google-deepmind/mujoco) C 3.14
+[`engine_solver.c`](https://github.com/google-deepmind/mujoco/blob/3.14.0/src/engine/engine_solver.c) `HessianIncremental` maintains
 the factor with rank-1 Cholesky updates / downdates (`mju_cholUpdate`) per changed constraint and refactorizes only when
 an update loses rank.
 Numerics of the same scheme in float32 on the real H sequence (`scripts/diagnostics/g1_chol_update_numerics.py`,
@@ -55,7 +56,8 @@ is irrelevant), so the rank-1 path is **not a free-fidelity change at the source
 `tile_cholesky_solve` with a vector right-hand side ran Warp's cooperative scalar path on Metal: two threadgroup
 barriers per row per sweep (172 barriers for the G1's 43 dofs) with the factor and the vector in threadgroup
 memory. The register Cholesky of [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) already keeps the
-factor's columns in the 32 lanes' registers; the new `metal_register_cholesky_solve` (`warp/native/tile_solve.h`) uses
+factor's columns in the 32 lanes' registers; the new `metal_register_cholesky_solve`
+([`warp/native/tile_solve.h`](https://github.com/pulipakaa24/warp/blob/metalsim-tp/warp/native/tile_solve.h)) uses
 the same layout: forward substitution reduces each
 row's dot product with `simd_sum`, back substitution broadcasts `x_i` with `simd_shuffle`, no barriers inside the
 sweeps. It applies to every `tile_cholesky_solve` of size <= `metal_register_cholesky_max` (48) in a block of <= 32
@@ -241,7 +243,8 @@ a SIMD-group sum of per-lane partials instead of atomic adds in arbitrary order 
 6.24 -> 5.92 ms (iterations 6-10 now 0.15-0.23 ms each, from 0.18-0.26). Landed in
 [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) as
 [`dd42c23`](https://github.com/pulipakaa24/mujoco_warp/commit/dd42c23b14287ebdc05fdb6a2c762e9aa3422bc5).
-State-difference protocol: `runs/tp26/check*.wrapper.log`.
+State-difference protocol: `runs/tp26/check2.wrapper.log` and the §5b check (log not kept; `runs/tp26/job_check.sh`
+reruns it).
 
 ## 7. The learning loop outside physics (measured, `runs/tp26/loop.wrapper.log`, `loop2.wrapper.log`, 4096 envs)
 
@@ -267,7 +270,7 @@ the loop. Removing the adaptive-KL `.item()` per minibatch (a host sync) saves 1
 results (the lr schedule, the clipping), so they are options (each ~1 % of the loop), not changes; the
 forward/backward is compute (torch.compile changes numerics; not tried).
 
-## 5b. Physics identity evidence for the landed fork changes (measured, `runs/tp26/check.wrapper.log`, `check_base.npz` / `check_wt.npz`)
+## 5b. Physics identity evidence for the landed fork changes (measured; log and `check_base.npz` / `check_wt.npz` not kept, `runs/tp26/job_check.sh` reruns them)
 
 `scripts/diagnostics/g1_tp_check.py` (512 envs, 50 control steps, deterministic actions, the task default preset,
 bound capacities): installed forks vs the worktree (register solve + fused per-iteration launches), graph replay:
@@ -588,7 +591,7 @@ estimated hardware floor 1.7-2.0 s. Read before profiling:
   Adam, the two Metal gradient kernels); per minibatch one `.item()` for the adaptive-KL schedule (128 host waits
   per update; it changes the lr schedule, so removing it would be an option, not a landing).
 
-Profile first (`scripts/diagnostics/camera_rollout_profile.py`, `runs/tp26/camprof.wrapper.log`): synchronized ms
-per rollout step for the physics step, the render alone, the reset / randomize ops, `env.step()` whole, the NHWC ->
-NCHW copy, `image_mean`, `forward_fast`, the distribution ops, the policy body whole, `collect()` over 64 steps
-(overlap), the interop counters per step, and one `update()`. Landing order follows the payoff.
+Profile first (`scripts/diagnostics/camera_rollout_profile.py`; log not kept, `runs/tp26/job_camprof.sh` reruns it):
+synchronized ms per rollout step for the physics step, the render alone, the reset / randomize ops, `env.step()` whole,
+the NHWC -> NCHW copy, `image_mean`, `forward_fast`, the distribution ops, the policy body whole, `collect()` over 64
+steps (overlap), the interop counters per step, and one `update()`. Landing order follows the payoff.

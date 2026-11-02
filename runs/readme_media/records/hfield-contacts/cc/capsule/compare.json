@@ -1,0 +1,221 @@
+{
+ "shape": "capsule",
+ "size": [
+  0.02,
+  0.05,
+  0
+ ],
+ "placements": 1000,
+ "engines": {
+  "c": {
+   "vs_exact": {
+    "worlds": 1000,
+    "count_equal_min_ref_cap": 0.745,
+    "fewer": 0,
+    "more": 255,
+    "no_contact": 0,
+    "contacts": 1793,
+    "normal_err_deg_p50_p95_p99": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "share_normal_over_10deg": 0.0,
+    "deepest_depth_err_mm_p50_p95_max": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "weighted_normal_err_deg_p95": [
+     0.0
+    ],
+    "coverage_of_ref_mean": 1.0
+   }
+  },
+  "mjw_base": {
+   "vs_exact": {
+    "worlds": 1000,
+    "count_equal_min_ref_cap": 0.826,
+    "fewer": 98,
+    "more": 76,
+    "no_contact": 0,
+    "contacts": 1411,
+    "normal_err_deg_p50_p95_p99": [
+     0.0,
+     0.01,
+     0.05
+    ],
+    "share_normal_over_10deg": 0.0035,
+    "deepest_depth_err_mm_p50_p95_max": [
+     0.0,
+     0.0,
+     38.68
+    ],
+    "weighted_normal_err_deg_p95": [
+     3.47
+    ],
+    "coverage_of_ref_mean": 0.979
+   },
+   "vs_c": {
+    "worlds": 1000,
+    "count_equal_min_ref_cap": 0.826,
+    "fewer": 98,
+    "more": 76,
+    "no_contact": 0,
+    "contacts": 1411,
+    "normal_err_deg_p50_p95_p99": [
+     0.0,
+     0.01,
+     0.05
+    ],
+    "share_normal_over_10deg": 0.0035,
+    "deepest_depth_err_mm_p50_p95_max": [
+     0.0,
+     0.0,
+     38.68
+    ],
+    "weighted_normal_err_deg_p95": [
+     3.47
+    ],
+    "coverage_of_ref_mean": 0.979
+   }
+  },
+  "mjw_final": {
+   "vs_exact": {
+    "worlds": 1000,
+    "count_equal_min_ref_cap": 1.0,
+    "fewer": 0,
+    "more": 0,
+    "no_contact": 0,
+    "contacts": 1437,
+    "normal_err_deg_p50_p95_p99": [
+     0.0,
+     0.01,
+     0.01
+    ],
+    "share_normal_over_10deg": 0.0,
+    "deepest_depth_err_mm_p50_p95_max": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "weighted_normal_err_deg_p95": [
+     0.0
+    ],
+    "coverage_of_ref_mean": 0.9995
+   },
+   "vs_c": {
+    "worlds": 1000,
+    "count_equal_min_ref_cap": 1.0,
+    "fewer": 0,
+    "more": 0,
+    "no_contact": 0,
+    "contacts": 1437,
+    "normal_err_deg_p50_p95_p99": [
+     0.0,
+     0.01,
+     0.01
+    ],
+    "share_normal_over_10deg": 0.0,
+    "deepest_depth_err_mm_p50_p95_max": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "weighted_normal_err_deg_p95": [
+     0.0
+    ],
+    "coverage_of_ref_mean": 0.9995
+   }
+  },
+  "mjw_fix": {
+   "vs_exact": {
+    "worlds": 1000,
+    "count_equal_min_ref_cap": 1.0,
+    "fewer": 0,
+    "more": 0,
+    "no_contact": 0,
+    "contacts": 1437,
+    "normal_err_deg_p50_p95_p99": [
+     0.0,
+     0.01,
+     0.01
+    ],
+    "share_normal_over_10deg": 0.0,
+    "deepest_depth_err_mm_p50_p95_max": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "weighted_normal_err_deg_p95": [
+     0.0
+    ],
+    "coverage_of_ref_mean": 0.9995
+   },
+   "vs_c": {
+    "worlds": 1000,
+    "count_equal_min_ref_cap": 1.0,
+    "fewer": 0,
+    "more": 0,
+    "no_contact": 0,
+    "contacts": 1437,
+    "normal_err_deg_p50_p95_p99": [
+     0.0,
+     0.01,
+     0.01
+    ],
+    "share_normal_over_10deg": 0.0,
+    "deepest_depth_err_mm_p50_p95_max": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "weighted_normal_err_deg_p95": [
+     0.0
+    ],
+    "coverage_of_ref_mean": 0.9995
+   }
+  },
+  "exact": {
+   "vs_c": {
+    "worlds": 1000,
+    "count_equal_min_ref_cap": 0.991,
+    "fewer": 0,
+    "more": 9,
+    "no_contact": 0,
+    "contacts": 1450,
+    "normal_err_deg_p50_p95_p99": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "share_normal_over_10deg": 0.0,
+    "deepest_depth_err_mm_p50_p95_max": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "weighted_normal_err_deg_p95": [
+     0.0
+    ],
+    "coverage_of_ref_mean": 1.0
+   }
+  }
+ },
+ "distinct_contacts_per_world_exact": {
+  "1": 637,
+  "2": 305,
+  "3": 42,
+  "4": 8,
+  "5": 4,
+  "6": 4
+ },
+ "distinct_contacts_per_world_c": {
+  "1": 637,
+  "2": 305,
+  "3": 42,
+  "4": 8,
+  "5": 4,
+  "6": 4
+ }
+}

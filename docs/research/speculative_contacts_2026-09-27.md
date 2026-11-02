@@ -6,15 +6,17 @@ further than in Isaac under it (transfer error 0.117 m vs 0.060 m for the defaul
 over PhysX's bound. Fidelity first; the references are PhysX and the real robot.
 
 All numbers are **measured** on this machine (M4 Max; [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) at [`f824af1`](https://github.com/pulipakaa24/mujoco_warp/commit/f824af1c5f482791cca90c1a6ca6fe5adb19ce63) plus the prototype commits on branch
-[`metalsim-spec-proto`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-spec-proto); every GPU job went through `scripts/gpu_run.sh` and imported a frozen per-job worktree:
-`upstream/mujoco_warp-f824af1`, `-spec-d99186b`, `-spec-27f1fcd`, `-spec-e636feb`). Scope: one asset (Isaac's G1 minimal USD, mesh-box
+[`metalsim-spec-proto`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-spec-proto); every GPU job went through `scripts/gpu_run.sh` and imported a frozen per-job worktree at
+[`f824af1`](https://github.com/pulipakaa24/mujoco_warp/commit/f824af1c5f482791cca90c1a6ca6fe5adb19ce63), [`d99186b`](https://github.com/pulipakaa24/mujoco_warp/commit/d99186b33c04d5eaf8548900a0f877e24d99a25b),
+[`27f1fcd`](https://github.com/pulipakaa24/mujoco_warp/commit/27f1fcd903e450fe70f435cc95a251408eda713c) or [`e636feb`](https://github.com/pulipakaa24/mujoco_warp/commit/e636feb24440e690e73f0c8dfb18aa67468c0c6d)). Scope: one asset (Isaac's G1 minimal USD, mesh-box
 feet), the [PARITY](../PARITY.md) §1.7 protocols, and Isaac's checkpoints 500 / 1000 / 1499.
 
 ## Verdict
 
 1. **The over-travel is not caused by the speculative rule.** It is an existing cadence mismatch that the default contacts
    hide.
-   - Isaac's own play recordings (`runs/parity/isaac/parity_out/play/isaac_it*/traj.npz`) give PhysX's gait: cadence
+   - Isaac's own play recordings (`isaac_it*/traj.npz`, not kept; `metalsim/parity/isaac_side/play_policy.py` records
+     them) give PhysX's gait: cadence
      3.846 / 3.597 / 3.231 Hz and stride 0.108 / 0.110 / 0.123 m.
    - In MuJoCo Warp the cadence is 3.4–5.9 % higher under **every** contact setting measured: default, τ 5 ms, and the
      speculative variants (standard errors 0.004–0.025 Hz).
@@ -36,7 +38,9 @@ feet), the [PARITY](../PARITY.md) §1.7 protocols, and Isaac's checkpoints 500 /
      past inside the gap, although its normal row alone would not act. A box skimming 2 mm above the plane at 1 m/s
      with no gravity gets 119 N, is lifted 9.6 mm and slowed to 0.90 m/s. [MuJoCo](https://github.com/google-deepmind/mujoco) C, stock
      [MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp) and PhysX give 0 N. PhysX bounds friction by the contact's accumulated normal impulse, so a speculative contact that does not push
-     has no friction (`DyTGSContactPrep.cpp:1643–1654`, `solverBlockTGS.cuh:337–338, 421–423`).
+     has no friction (PhysX 5.6.1
+     [`DyTGSContactPrep.cpp:1643–1654`](https://github.com/NVIDIA-Omniverse/PhysX/blob/107.3-physx-5.6.1/physx/source/lowleveldynamics/src/DyTGSContactPrep.cpp#L1643-L1654),
+     [`solverBlockTGS.cuh:337–338, 421–423`](https://github.com/NVIDIA-Omniverse/PhysX/blob/107.3-physx-5.6.1/physx/source/gpusolver/src/CUDA/solverBlockTGS.cuh#L337-L338)).
      Fix: `MJW_SPEC_FRICTION=live`. A speculative contact keeps its friction rows only when its normal row predicts a
      crossing within the step (pos + h v_n < 0); otherwise the friction rows are inert (J = 0).
    - (b) *Inconsistent cone impedance.* The prototype's friction rows kept imp(|pos|), which is dmax beyond `width`,
@@ -149,7 +153,8 @@ Hypothesis by hypothesis:
     For pos ≲ 2.5 mm, jar_n = pos/h² + v_n/h is smaller than that, so the foot is braked and lifted.
   - On the G1 the no-cross normal force averages 3.0–3.7 N per foot (2 % of the foot load; 1.8–2.2 N in swing) and the
     no-cross friction 2.7–3.3 N.
-  - PhysX (5.6.1): friction anchors exist for every contact of the patch (`DyTGSContactPrep.cpp:71–94`), but each
+  - PhysX (5.6.1): friction anchors exist for every contact of the patch
+    ([`DyTGSContactPrep.cpp:71–94`](https://github.com/NVIDIA-Omniverse/PhysX/blob/107.3-physx-5.6.1/physx/source/lowleveldynamics/src/DyTGSContactPrep.cpp#L71-L94)), but each
     friction impulse is clamped by μ × the patch's accumulated normal impulse, solved first (CPU TGS
     `DyTGSContactPrep.cpp:1643–1654, 1748–1750`; GPU `solverBlockTGS.cuh:337–338, 421–423`). So friction never creates
     a normal impulse, and a speculative contact without a normal impulse has no friction.
@@ -322,8 +327,9 @@ same protocol as (b):
 
 ## 6. Fork suite (task 3c)
 
-Frozen worktree `upstream/mujoco_warp-spec-27f1fcd` ([my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-spec-proto)), [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) at
-[`c200d46b`](https://github.com/pulipakaa24/warp/commit/c200d46b31503c51406651ad7528ef7171a1f29f) (`upstream/warp-innate`), Metal, `pytest
+A frozen worktree of [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-spec-proto) at
+[`27f1fcd`](https://github.com/pulipakaa24/mujoco_warp/commit/27f1fcd903e450fe70f435cc95a251408eda713c), [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) at
+[`c200d46b`](https://github.com/pulipakaa24/warp/commit/c200d46b31503c51406651ad7528ef7171a1f29f), Metal, `pytest
 mujoco_warp/_src` (`runs/speculative/suite.wrapper.log`):
 
 | configuration | [`27f1fcd`](https://github.com/pulipakaa24/mujoco_warp/commit/27f1fcd903e450fe70f435cc95a251408eda713c) (`suite.wrapper.log`) | [`e636feb`](https://github.com/pulipakaa24/mujoco_warp/commit/e636feb24440e690e73f0c8dfb18aa67468c0c6d) (`suite2.wrapper.log`) |
@@ -348,7 +354,8 @@ Baseline: 1451 passed, 1 failed (the pre-existing `io_test::test_put_data_nefc_z
 - Scripts in `scripts/diagnostics/speculative/`: `overtravel_probe.py`, `probe_table.py`, `gait_vs_isaac.py`,
   `force_trace.py`, `box_checks.py`, `cpu_traj.py`, `c_traj.py`, `c_oracle.py`.
 - `runs/speculative/`:
-  - `probe/` and `probe2/` (npz per setting × {4, 64} envs), with `probe_table_n64.md`, `gait_n64.md`, `gait_n4.md`;
+  - `probe/` and `probe2/` (npz per setting × {4, 64} envs; not kept, `job_probe.sh` / `job_probe2.sh` rerun them),
+    with `probe_table_n64.md`, `gait_n64.md`, `gait_n4.md`;
   - `protocol_table.md`, `cap_table.md`;
   - `box/`, `cpu/`;
   - job scripts `job_*.sh` and their wrapper logs.

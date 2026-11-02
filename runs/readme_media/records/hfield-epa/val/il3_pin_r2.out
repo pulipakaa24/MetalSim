@@ -1,0 +1,113 @@
+=== job hfe_il3_pin_r2 start 2026-10-31T18:59:42 on Mac16,6 (MacBook Pro (10))
+power: AC Power | battery 60%; charging; 4:38 remaining present: true | powermode 2
+metalsim HEAD ed66d8ef3ecd7f17aa16207231000b1d22ff7812 2026-10-31 14:02 G1 flat README cell: Unitree's own pretrained walking policy, via its sim2sim loop
+metalsim local changes in the training / evaluation path (git status --short, empty = clean):
+    ?? metalsim/physics/actuation.py
+upstream/mujoco_warp HEAD 93e5ce18e76854c430ce669314af00ddceb92147 branch metalsim (pinned-fix expectation 93e5ce18)
+upstream/warp-metalsim HEAD 52c09cdd82f79e8564b5ae17cdcee7b52d10d075 (expected 52c09cdd)
+PYTHONPATH=~/MetalSim/runs/rough_rerun_2026-10-31/code/mjw_8eb51fe
+mujoco_warp loaded from ~/MetalSim/runs/rough_rerun_2026-10-31/code/mjw_8eb51fe/mujoco_warp/__init__.py commit 8eb51fe637437108185f5a4750b7f5f64ef26624 (COMMIT file of a git archive)
+mujoco_warp heightfield flags {'HFIELD_PLANE_CONTACTS': True, 'HFIELD_PLANE_CONTACTS_PRIMITIVES': False}
+warp 1.18.0.dev20260917 from ~/MetalSim/upstream/warp-metalsim/warp/__init__.py; mujoco 3.14.0; torch 2.14.0; metalsim from ~/MetalSim/metalsim/__init__.py
+cmd: .venv/bin/python runs/rough_rerun_2026-10-31/train_wrap.py 4096 rough train 8 runs/readme_media/scratch/hfield-epa/val/il3_pin_r2.log - 0.0025 --seed 0 --reward_cfg rough_il3 --contact_cfg recommended_pyramidal --solver_cfg isaaclab3_every_substep_cap20 --base_velocity com --feet_slide_velocity com --effort_limit actuator --initial_reset 1
+=== output
+[rr-guard] capacity guard: EPA_HORIZON reported, not fatal; all other capacity flags fatal
+~/MetalSim/runs/rough_rerun_2026-10-31/code/mjw_8eb51fe/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+  warnings.warn(
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     ~/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth d82236f load on device 'metal:0' took 60.10 ms  (cached)
+Module _nxn_broadphase__locals__kernel_da6e4d10 da6e4d1 load on device 'metal:0' took 40.54 ms  (cached)
+Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_bb724e6f bb724e6 load on device 'metal:0' took 55.54 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_db3bb438 db3bb43 load on device 'metal:0' took 60.92 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_1a25fcd0 1a25fcd load on device 'metal:0' took 38.57 ms  (cached)
+Module mujoco_warp._src.constraint 5a9ac8b load on device 'metal:0' took 37.53 ms  (cached)
+Module _friction_dof__locals__kernel_1995a4ce 1995a4c load on device 'metal:0' took 39.11 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_77231784 7723178 load on device 'metal:0' took 38.22 ms  (cached)
+Module _efc_contact_init__locals__kernel_afcafe80 afcafe8 load on device 'metal:0' took 36.68 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_c7d2d93d c45a7ea load on device 'metal:0' took 38.60 ms  (cached)
+Module _efc_contact_update__locals__kernel_2c3f8f8a 2c3f8f8 load on device 'metal:0' took 39.24 ms  (cached)
+Module mujoco_warp._src.forward f50e6f5 load on device 'metal:0' took 50.38 ms  (cached)
+Module mujoco_warp._src.passive b076fe0 load on device 'metal:0' took 49.22 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_54b31bb5 54b31bb load on device 'metal:0' took 37.55 ms  (cached)
+Module mujoco_warp._src.forward 5f45167 load on device 'metal:0' took 50.47 ms  (cached)
+Module _qfrc_smooth__locals__kernel_775cdd1e 775cdd1 load on device 'metal:0' took 37.68 ms  (cached)
+Module mujoco_warp._src.support c23ce19 load on device 'metal:0' took 37.24 ms  (cached)
+Module _factor_i_sparse_unrolled__locals__kernel_a8496364 6ffbc2b load on device 'metal:0' took 40.62 ms  (cached)
+Module _solve_LD_sparse_serial__locals__kernel_b34b951d 3485934 load on device 'metal:0' took 39.94 ms  (cached)
+Module _solve_init_dof__locals__kernel_f7fe7ccd f7fe7cc load on device 'metal:0' took 38.12 ms  (cached)
+Module _solve_init_efc__locals__kernel_496de172 496de17 load on device 'metal:0' took 38.40 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_38697a22 38697a2 load on device 'metal:0' took 37.83 ms  (cached)
+Module mul_m_kernel__locals___mul_m_cc4a8159 cc4a815 load on device 'metal:0' took 38.19 ms  (cached)
+Module _update_constraint_efc__locals__kernel_816b370a 816b370 load on device 'metal:0' took 38.74 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_ede08278 ede0827 load on device 'metal:0' took 36.94 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_62bc6e88 62bc6e8 load on device 'metal:0' took 36.36 ms  (cached)
+Module _update_gradient_grad__locals__kernel_68e6ef6f 68e6ef6 load on device 'metal:0' took 38.83 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_f93201a1 09347a5 load on device 'metal:0' took 38.20 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_57ee5bcf 99576e9 load on device 'metal:0' took 37.97 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_9fa0f9db 9c6be14 load on device 'metal:0' took 39.57 ms  (cached)
+Module _update_constraint_gradient_fused__locals__kernel_9d85e70b 43fa1f5 load on device 'metal:0' took 37.34 ms  (cached)
+Module _update_gradient_h_incremental_cholesky__locals__kernel_9e1888bf 8f8e25a load on device 'metal:0' took 36.47 ms  (cached)
+Module _solve_done__locals__kernel_a5b8319b a5b8319 load on device 'metal:0' took 37.06 ms  (cached)
+Module mujoco_warp._src.solver 7d36d0b load on device 'metal:0' took 40.18 ms  (cached)
+Module mujoco_warp._src.sensor 9b332ca load on device 'metal:0' took 60.77 ms  (cached)
+Module mujoco_warp._src.derivative cb91251 load on device 'metal:0' took 43.73 ms  (cached)
+Module _next_time_builder__locals___next_time_9bdc285a 9bdc285 load on device 'metal:0' took 38.30 ms  (cached)
+Module metalsim.physics.batch 74a3c65 load on device 'metal:0' took 36.86 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_753bbeab 753bbea load on device 'metal:0' took 36.62 ms  (cached)
+Module reset_data__locals__reset_M_94b7ab81 94b7ab8 load on device 'metal:0' took 37.47 ms  (cached)
+Module reset_data__locals__reset_mocap_ffcfb2c4 ffcfb2c load on device 'metal:0' took 37.37 ms  (cached)
+Module reset_data__locals__reset_contact_41eafef4 41eafef load on device 'metal:0' took 37.42 ms  (cached)
+Module reset_data__locals__reset_sleep_38f94185 38f9418 load on device 'metal:0' took 36.02 ms  (cached)
+Module reset_data__locals__reset_nworld_5d2d5901 5d2d590 load on device 'metal:0' took 37.39 ms  (cached)
+Module mujoco_warp._src.set_const d6a95d2 load on device 'metal:0' took 49.33 ms  (cached)
+Module metalsim.sensors.contact 5dea6fd load on device 'metal:0' took 41.92 ms  (cached)
+G1 rough PPO: N=4096 obs_dim 310 act_dim 37 rollout 24 x 8 iterations, engine mjwarp, physics dt 0.0025 (decimation 8), seed 0, reward_cfg rough_il3, height-scan ray order xy, terrain collision hfield, height scan exact, solver_cfg isaaclab3_every_substep_cap20, contact_cfg recommended_pyramidal, base velocity com, feet-slide velocity com, initial reset True, effort limit on the actuator, Isaac Lab 3.0 events True (backend newton_mjwarp), add_base_mass {'body': 'torso_link', 'scale_min': 0.8000494837760925, 'scale_max': 1.2497823238372803, 'dof_invweight0_ratio_range': [0.9505320191383362, 1.0460337400436401], 'limit_timeconst_ratio_range': [0.9787044773626695, 1.0248058414581651]}
+Module metalsim.learn.g1_il3 89721ae load on device 'metal:0' took 40.16 ms  (cached)
+Module _solve_init_efc__locals__kernel_81f2525b 81f2525 load on device 'metal:0' took 37.84 ms  (cached)
+Module _solve_done__locals__kernel_eea46921 eea4692 load on device 'metal:0' took 37.66 ms  (cached)
+Module metalsim.learn.terrain d8affdb load on device 'metal:0' took 40.13 ms  (cached)
+Module __main__ b66df99 load on device 'metal:0' took 48.25 ms  (cached)
+Module metalsim.learn.warp_policy 00a83dd load on device 'metal:0' took 39.82 ms  (cached)
+it    1 steps     98304 sps   45,441 | ep_ret   -5.52 ep_len   23.8 (n=12) | pg 0.071 vf 0.161 kl 0.1930 lr 1.0e-05
+[anomaly] it 1: KL 0.193 > 10x target: stale data or LR too high
+[anomaly] it 1: joint limit violated by 0.32 rad
+terrain it    1 mean_level 2.4844
+terms it    1 {"track_lin_vel_xy_exp": 0.00519, "track_ang_vel_z_exp": 0.00295, "feet_air_time": 2e-05, "feet_slide": -0.00116, "joint_deviation": -0.00526, "flat_orientation_l2": -0.01087, "action_rate_l2": -0.00864, "termination_penalty": -0.2, "lin_vel_z_l2": 0.0, "ang_vel_xy_l2": -0.05077, "dof_torques_l2": -9e-05, "dof_acc_l2": -0.00724, "dof_pos_limits": -0.00012, "episodes": 12, "base_contact": 1.0, "pushes": 0}
+it    2 steps    196608 sps   48,505 | ep_ret   -6.03 ep_len   37.2 (n=3329) | pg 0.002 vf 3.902 kl 0.0091 lr 1.1e-04
+[anomaly] it 2: joint limit violated by 0.30 rad
+[anomaly] it 2: contact penetration 2.1 cm
+terrain it    2 mean_level 1.8569
+terms it    2 {"track_lin_vel_xy_exp": 0.00576, "track_ang_vel_z_exp": 0.00456, "feet_air_time": 3e-05, "feet_slide": -0.00268, "joint_deviation": -0.00857, "flat_orientation_l2": -0.01371, "action_rate_l2": -0.01387, "termination_penalty": -0.20001, "lin_vel_z_l2": 0.0, "ang_vel_xy_l2": -0.05712, "dof_torques_l2": -0.00015, "dof_acc_l2": -0.01544, "dof_pos_limits": -0.00031, "episodes": 3329, "base_contact": 1.0, "pushes": 0}
+it    3 steps    294912 sps   49,766 | ep_ret   -6.21 ep_len   42.1 (n=1830) | pg -0.001 vf 1.728 kl 0.0101 lr 1.7e-04
+[anomaly] it 3: joint limit violated by 0.29 rad
+terrain it    3 mean_level 1.5515
+terms it    3 {"track_lin_vel_xy_exp": 0.00651, "track_ang_vel_z_exp": 0.00501, "feet_air_time": 4e-05, "feet_slide": -0.00316, "joint_deviation": -0.00979, "flat_orientation_l2": -0.01406, "action_rate_l2": -0.01577, "termination_penalty": -0.2, "lin_vel_z_l2": 0.0, "ang_vel_xy_l2": -0.06094, "dof_torques_l2": -0.00017, "dof_acc_l2": -0.01768, "dof_pos_limits": -0.00036, "episodes": 1830, "base_contact": 1.0, "pushes": 0}
+it    4 steps    393216 sps   50,351 | ep_ret   -6.17 ep_len   41.4 (n=2604) | pg -0.005 vf 1.813 kl 0.0106 lr 5.8e-04
+[anomaly] it 4: joint limit violated by 0.34 rad
+terrain it    4 mean_level 1.1589
+terms it    4 {"track_lin_vel_xy_exp": 0.00646, "track_ang_vel_z_exp": 0.00498, "feet_air_time": 3e-05, "feet_slide": -0.00314, "joint_deviation": -0.00963, "flat_orientation_l2": -0.01407, "action_rate_l2": -0.01558, "termination_penalty": -0.20001, "lin_vel_z_l2": 0.0, "ang_vel_xy_l2": -0.05933, "dof_torques_l2": -0.00017, "dof_acc_l2": -0.01757, "dof_pos_limits": -0.00036, "episodes": 2604, "base_contact": 1.0, "pushes": 0}
+it    5 steps    491520 sps   50,825 | ep_ret   -6.11 ep_len   40.2 (n=2360) | pg -0.001 vf 1.489 kl 0.0157 lr 5.8e-04
+[anomaly] it 5: joint limit violated by 0.30 rad
+[anomaly] it 5: contact penetration 2.1 cm
+terrain it    5 mean_level 0.8633
+terms it    5 {"track_lin_vel_xy_exp": 0.00627, "track_ang_vel_z_exp": 0.00487, "feet_air_time": 3e-05, "feet_slide": -0.00297, "joint_deviation": -0.00933, "flat_orientation_l2": -0.01386, "action_rate_l2": -0.0152, "termination_penalty": -0.2, "lin_vel_z_l2": 0.0, "ang_vel_xy_l2": -0.05846, "dof_torques_l2": -0.00016, "dof_acc_l2": -0.01654, "dof_pos_limits": -0.00034, "episodes": 2360, "base_contact": 1.0, "pushes": 0}
+it    6 steps    589824 sps   51,099 | ep_ret   -6.15 ep_len   41.4 (n=2349) | pg -0.003 vf 1.086 kl 0.0138 lr 5.8e-04
+[anomaly] it 6: joint limit violated by 0.31 rad
+terrain it    6 mean_level 0.6101
+terms it    6 {"track_lin_vel_xy_exp": 0.00647, "track_ang_vel_z_exp": 0.00487, "feet_air_time": 3e-05, "feet_slide": -0.00309, "joint_deviation": -0.00962, "flat_orientation_l2": -0.01397, "action_rate_l2": -0.01576, "termination_penalty": -0.2, "lin_vel_z_l2": 0.0, "ang_vel_xy_l2": -0.05885, "dof_torques_l2": -0.00017, "dof_acc_l2": -0.01714, "dof_pos_limits": -0.00036, "episodes": 2349, "base_contact": 1.0, "pushes": 0}
+it    7 steps    688128 sps   51,301 | ep_ret   -6.12 ep_len   41.0 (n=2455) | pg -0.002 vf 0.881 kl 0.0146 lr 5.8e-04
+[anomaly] it 7: joint limit violated by 0.28 rad
+[anomaly] it 7: contact penetration 2.1 cm
+terrain it    7 mean_level 0.3972
+terms it    7 {"track_lin_vel_xy_exp": 0.00651, "track_ang_vel_z_exp": 0.00488, "feet_air_time": 4e-05, "feet_slide": -0.00304, "joint_deviation": -0.00955, "flat_orientation_l2": -0.01388, "action_rate_l2": -0.01565, "termination_penalty": -0.2, "lin_vel_z_l2": 0.0, "ang_vel_xy_l2": -0.05778, "dof_torques_l2": -0.00016, "dof_acc_l2": -0.01692, "dof_pos_limits": -0.00035, "episodes": 2455, "base_contact": 1.0, "pushes": 0}
+it    8 steps    786432 sps   51,422 | ep_ret   -6.12 ep_len   41.4 (n=2369) | pg -0.001 vf 0.685 kl 0.0125 lr 3.8e-04
+[anomaly] it 8: joint limit violated by 0.34 rad
+[anomaly] it 8: contact penetration 2.2 cm
+terrain it    8 mean_level 0.2390
+terms it    8 {"track_lin_vel_xy_exp": 0.00652, "track_ang_vel_z_exp": 0.00503, "feet_air_time": 3e-05, "feet_slide": -0.00309, "joint_deviation": -0.00966, "flat_orientation_l2": -0.01388, "action_rate_l2": -0.01588, "termination_penalty": -0.2, "lin_vel_z_l2": 0.0, "ang_vel_xy_l2": -0.05755, "dof_torques_l2": -0.00016, "dof_acc_l2": -0.0171, "dof_pos_limits": -0.00037, "episodes": 2369, "base_contact": 1.0, "pushes": 0}

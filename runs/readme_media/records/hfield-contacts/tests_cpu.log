@@ -1,0 +1,6 @@
+f colliding geom
+To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.HFIELD (or = 0 for all)
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+115 passed, 2 skipped, 4 warnings in 19.88s

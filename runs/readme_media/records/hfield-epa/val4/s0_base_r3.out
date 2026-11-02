@@ -1,0 +1,106 @@
+=== job hfe_s0_base_r3 start 2026-10-31T19:18:35 on Mac16,6 (MacBook Pro (10))
+power: AC Power | battery 74%; charging; 1:37 remaining present: true | powermode 2
+metalsim HEAD ed66d8ef3ecd7f17aa16207231000b1d22ff7812 2026-10-31 14:02 G1 flat README cell: Unitree's own pretrained walking policy, via its sim2sim loop
+metalsim local changes in the training / evaluation path (git status --short, empty = clean):
+    ?? metalsim/physics/actuation.py
+upstream/mujoco_warp HEAD 93e5ce18e76854c430ce669314af00ddceb92147 branch metalsim (pinned-fix expectation 93e5ce18)
+upstream/warp-metalsim HEAD 52c09cdd82f79e8564b5ae17cdcee7b52d10d075 (expected 52c09cdd)
+PYTHONPATH=~/MetalSim/runs/readme_media/scratch/hfield-epa/mjw_base
+mujoco_warp loaded from ~/MetalSim/runs/readme_media/scratch/hfield-epa/mjw_base/mujoco_warp/__init__.py commit 93e5ce18e76854c430ce669314af00ddceb92147 (COMMIT file of a git archive)
+mujoco_warp heightfield flags {'HFIELD_DUP_COS': 0.99999962, 'HFIELD_DUP_DIST': 0.0001, 'HFIELD_LOCAL_ORIGIN': True, 'HFIELD_PLANE_CONTACTS': False, 'HFIELD_PLANE_CONTACTS_PRIMITIVES': False, 'HFIELD_SELECT_DEDUP': True, 'HFIELD_TRUE_DISTANCE': True, 'HFIELD_PRISM_POLYTOPE': True}
+warp 1.18.0.dev20260917 from ~/MetalSim/upstream/warp-metalsim/warp/__init__.py; mujoco 3.14.0; torch 2.14.0; metalsim from ~/MetalSim/metalsim/__init__.py
+cmd: .venv/bin/python runs/rough_rerun_2026-10-31/train_wrap.py 4096 rough train 8 runs/readme_media/scratch/hfield-epa/val4/s0_base_r3.log - 0.0025 --seed 0 --scan_ordering ij --terrain_collision hfield --scan_surface grid --reward_cfg rough_isaac --contact_cfg default --base_velocity origin --feet_slide_velocity origin --effort_limit actuator --initial_reset 1
+=== output
+[rr-guard] capacity guard: EPA_HORIZON reported, not fatal; all other capacity flags fatal
+~/MetalSim/runs/readme_media/scratch/hfield-epa/mjw_base/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+  warnings.warn(
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     ~/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth d82236f load on device 'metal:0' took 57.26 ms  (cached)
+Module _nxn_broadphase__locals__kernel_da6e4d10 da6e4d1 load on device 'metal:0' took 36.94 ms  (cached)
+Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_5bf448ef 5bf448e load on device 'metal:0' took 52.65 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_9055a30f 9055a30 load on device 'metal:0' took 54.35 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_1a25fcd0 1a25fcd load on device 'metal:0' took 37.95 ms  (cached)
+Module mujoco_warp._src.constraint 5a9ac8b load on device 'metal:0' took 34.80 ms  (cached)
+Module _friction_dof__locals__kernel_1995a4ce 1995a4c load on device 'metal:0' took 36.54 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_77231784 7723178 load on device 'metal:0' took 35.53 ms  (cached)
+Module _efc_contact_init__locals__kernel_afcafe80 afcafe8 load on device 'metal:0' took 35.27 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_c7d2d93d c45a7ea load on device 'metal:0' took 35.59 ms  (cached)
+Module _efc_contact_update__locals__kernel_2c3f8f8a 2c3f8f8 load on device 'metal:0' took 35.92 ms  (cached)
+Module mujoco_warp._src.forward f50e6f5 load on device 'metal:0' took 47.22 ms  (cached)
+Module mujoco_warp._src.passive b076fe0 load on device 'metal:0' took 45.71 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_54b31bb5 54b31bb load on device 'metal:0' took 35.65 ms  (cached)
+Module mujoco_warp._src.forward 5f45167 load on device 'metal:0' took 47.23 ms  (cached)
+Module _qfrc_smooth__locals__kernel_775cdd1e 775cdd1 load on device 'metal:0' took 34.94 ms  (cached)
+Module mujoco_warp._src.support c23ce19 load on device 'metal:0' took 35.42 ms  (cached)
+Module _factor_i_sparse_unrolled__locals__kernel_a8496364 6ffbc2b load on device 'metal:0' took 37.09 ms  (cached)
+Module _solve_LD_sparse_serial__locals__kernel_b34b951d 3485934 load on device 'metal:0' took 36.26 ms  (cached)
+Module _solve_init_dof__locals__kernel_f7fe7ccd f7fe7cc load on device 'metal:0' took 34.77 ms  (cached)
+Module _solve_init_efc__locals__kernel_496de172 496de17 load on device 'metal:0' took 34.70 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_38697a22 38697a2 load on device 'metal:0' took 34.78 ms  (cached)
+Module mul_m_kernel__locals___mul_m_cc4a8159 cc4a815 load on device 'metal:0' took 35.29 ms  (cached)
+Module _update_constraint_efc__locals__kernel_816b370a 816b370 load on device 'metal:0' took 35.57 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_ede08278 ede0827 load on device 'metal:0' took 34.78 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_62bc6e88 62bc6e8 load on device 'metal:0' took 34.89 ms  (cached)
+Module _update_gradient_grad__locals__kernel_68e6ef6f 68e6ef6 load on device 'metal:0' took 34.78 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_f93201a1 09347a5 load on device 'metal:0' took 35.29 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_57ee5bcf 99576e9 load on device 'metal:0' took 35.00 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_450d0aa0 072b14d load on device 'metal:0' took 37.51 ms  (cached)
+Module _update_constraint_gradient_fused__locals__kernel_9d85e70b 43fa1f5 load on device 'metal:0' took 35.88 ms  (cached)
+Module _update_gradient_h_incremental_cholesky__locals__kernel_9e1888bf 8f8e25a load on device 'metal:0' took 35.36 ms  (cached)
+Module _solve_done__locals__kernel_a5b8319b a5b8319 load on device 'metal:0' took 35.15 ms  (cached)
+Module mujoco_warp._src.solver 7d36d0b load on device 'metal:0' took 39.09 ms  (cached)
+Module mujoco_warp._src.sensor 9b332ca load on device 'metal:0' took 57.41 ms  (cached)
+Module mujoco_warp._src.derivative cb91251 load on device 'metal:0' took 40.44 ms  (cached)
+Module _next_time_builder__locals___next_time_9bdc285a 9bdc285 load on device 'metal:0' took 34.95 ms  (cached)
+Module metalsim.physics.batch 74a3c65 load on device 'metal:0' took 34.93 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_753bbeab 753bbea load on device 'metal:0' took 34.82 ms  (cached)
+Module reset_data__locals__reset_M_94b7ab81 94b7ab8 load on device 'metal:0' took 34.72 ms  (cached)
+Module reset_data__locals__reset_mocap_ffcfb2c4 ffcfb2c load on device 'metal:0' took 34.82 ms  (cached)
+Module reset_data__locals__reset_contact_41eafef4 41eafef load on device 'metal:0' took 34.91 ms  (cached)
+Module reset_data__locals__reset_sleep_38f94185 38f9418 load on device 'metal:0' took 34.78 ms  (cached)
+Module reset_data__locals__reset_nworld_5d2d5901 5d2d590 load on device 'metal:0' took 35.12 ms  (cached)
+Module metalsim.sensors.contact 5dea6fd load on device 'metal:0' took 40.02 ms  (cached)
+G1 rough PPO: N=4096 obs_dim 310 act_dim 37 rollout 24 x 8 iterations, engine mjwarp, physics dt 0.0025 (decimation 8), seed 0, reward_cfg rough_isaac, height-scan ray order ij, terrain collision hfield, height scan grid, solver_cfg None, contact_cfg default, base velocity origin, feet-slide velocity origin, initial reset True, effort limit on the actuator
+Module __main__ b66df99 load on device 'metal:0' took 45.29 ms  (cached)
+Module _solve_init_efc__locals__kernel_81f2525b 81f2525 load on device 'metal:0' took 35.19 ms  (cached)
+Module _solve_done__locals__kernel_eea46921 eea4692 load on device 'metal:0' took 35.54 ms  (cached)
+Module metalsim.learn.terrain d8affdb load on device 'metal:0' took 37.96 ms  (cached)
+Module metalsim.learn.warp_policy 00a83dd load on device 'metal:0' took 37.30 ms  (cached)
+it    1 steps     98304 sps   37,319 | ep_ret   -5.43 ep_len   23.4 (n=76) | pg 0.081 vf 0.251 kl 0.3278 lr 1.0e-05
+[anomaly] it 1: KL 0.328 > 10x target: stale data or LR too high
+[anomaly] it 1: joint limit violated by 0.30 rad
+[anomaly] it 1: contact penetration 5.2 cm
+terrain it    1 mean_level 2.4714
+it    2 steps    196608 sps   38,513 | ep_ret   -5.81 ep_len   36.1 (n=3303) | pg 0.002 vf 3.483 kl 0.0089 lr 1.1e-04
+[anomaly] it 2: joint limit violated by 0.29 rad
+[anomaly] it 2: contact penetration 5.1 cm
+terrain it    2 mean_level 1.8447
+it    3 steps    294912 sps   39,010 | ep_ret   -5.95 ep_len   40.5 (n=2033) | pg -0.001 vf 1.837 kl 0.0109 lr 2.6e-04
+[anomaly] it 3: joint limit violated by 0.43 rad
+[anomaly] it 3: contact penetration 5.8 cm
+terrain it    3 mean_level 1.5029
+it    4 steps    393216 sps   39,171 | ep_ret   -5.98 ep_len   41.5 (n=2464) | pg -0.004 vf 1.632 kl 0.0121 lr 5.8e-04
+[anomaly] it 4: joint limit violated by 0.31 rad
+terrain it    4 mean_level 1.1350
+it    5 steps    491520 sps   39,273 | ep_ret   -5.93 ep_len   40.5 (n=2449) | pg -0.002 vf 1.332 kl 0.0151 lr 5.8e-04
+[anomaly] it 5: joint limit violated by 0.28 rad
+[anomaly] it 5: contact penetration 5.8 cm
+terrain it    5 mean_level 0.8318
+it    6 steps    589824 sps   39,325 | ep_ret   -5.94 ep_len   41.0 (n=2332) | pg -0.002 vf 0.943 kl 0.0121 lr 2.6e-04
+[anomaly] it 6: joint limit violated by 0.27 rad
+[anomaly] it 6: contact penetration 5.3 cm
+terrain it    6 mean_level 0.5801
+it    7 steps    688128 sps   39,345 | ep_ret   -5.92 ep_len   40.9 (n=2423) | pg -0.006 vf 0.786 kl 0.0107 lr 5.8e-04
+[anomaly] it 7: joint limit violated by 0.26 rad
+[anomaly] it 7: contact penetration 4.8 cm
+terrain it    7 mean_level 0.3806
+it    8 steps    786432 sps   39,322 | ep_ret   -5.91 ep_len   40.8 (n=2417) | pg -0.002 vf 0.610 kl 0.0156 lr 5.8e-04
+[anomaly] it 8: joint limit violated by 0.34 rad
+[anomaly] it 8: contact penetration 4.9 cm
+terrain it    8 mean_level 0.2236

@@ -1,0 +1,46 @@
+== power  -InternalBattery-0 (id=8257635)	52%; discharging; 0:49 rema |  powermode            2 | 16:19:47
+== fork tests on Metal (fix)
+~/MetalSim/runs/readme_media/scratch/hfield-contacts/gpu/batch_a.sh: line 6: .venv/bin/python: No such file or directory
+== fork -k hfield on Metal (base)
+~/MetalSim/runs/readme_media/scratch/hfield-contacts/gpu/batch_a.sh: line 6: .venv/bin/python: No such file or directory
+== test_terrain.py (fix)
+mujoco_warp ~/MetalSim/runs/readme_media/scratch/hfield-contacts/mjw/mujoco_warp/__init__.py
+hfield contacts over 0.5 s: min normal z 0.912, max penetration 0.0052 m (MuJoCo C: 0.0046); pelvis z ours [0.709 0.709 0.709 0.673] vs C [0.709 0.709 0.71  0.673]
+21 passed, 5 warnings in 58.97s
+== test_terrain.py contact tests (base)
+mujoco_warp ~/MetalSim/runs/readme_media/scratch/hfield-contacts/mjw_base/mujoco_warp/__init__.py
+hfield contacts over 0.5 s: min normal z 0.913, max penetration 0.0042 m (MuJoCo C: 0.0046); pelvis z ours [0.709 0.709 0.709 0.67 ] vs C [0.709 0.709 0.71  0.673]
+4 passed, 17 deselected, 4 warnings in 24.63s
+== falls (fix) 16:21:13
+[gpu fix_r1] seed 0: falls 10/16 first 2.68 median 4.82 forward 2.278 {'engine': 'MuJoCo Warp BatchSim (film adapter UnitreeG1)', 'overflow': {}, 'hfield_plane_contacts': False, 'rollout_s': 39.7}
+[gpu fix_r1] seed 1: falls 16/16 first 1.58 median 5.23 forward 1.7075 {'engine': 'MuJoCo Warp BatchSim (film adapter UnitreeG1)', 'overflow': {}, 'hfield_plane_contacts': False, 'rollout_s': 44.2}
+[gpu fix_r1] seed 2: falls 13/16 first 2.58 median 4.2 forward 2.0345 {'engine': 'MuJoCo Warp BatchSim (film adapter UnitreeG1)', 'overflow': {}, 'hfield_plane_contacts': False, 'rollout_s': 43.1}
+[gpu fix_r1] seed 3: falls 12/16 first 1.58 median 3.91 forward 1.942 {'engine': 'MuJoCo Warp BatchSim (film adapter UnitreeG1)', 'overflow': {}, 'hfield_plane_contacts': False, 'rollout_s': 44.9}
+[gpu fix_r1] seed 4: falls 7/16 first 2.32 median 6.0 forward 2.0885 {'engine': 'MuJoCo Warp BatchSim (film adapter UnitreeG1)', 'overflow': {}, 'hfield_plane_contacts': False, 'rollout_s': 39.5}
+[gpu fix_r1] total falls 58/80
+[gpu fix_r2] seed 0: falls 11/16 first 2.76 median 6.06 forward 2.562 {'engine': 'MuJoCo Warp BatchSim (film adapter UnitreeG1)', 'overflow': {}, 'hfield_plane_contacts': False, 'rollout_s': 38.7}
+[gpu fix_r2] seed 1: falls 14/16 first 1.58 median 4.1 forward 1.6145 {'engine': 'MuJoCo Warp BatchSim (film adapter UnitreeG1)', 'overflow': {}, 'hfield_plane_contacts': False, 'rollout_s': 44.4}
+[gpu fix_r2] seed 2: falls 12/16 first 2.58 median 4.31 forward 2.319 {'engine': 'MuJoCo Warp BatchSim (film adapter UnitreeG1)', 'overflow': {}, 'hfield_plane_contacts': False, 'rollout_s': 42.0}
+[gpu fix_r2] seed 3: falls 13/16 first 1.58 median 4.22 forward 1.9345 {'engine': 'MuJoCo Warp BatchSim (film adapter UnitreeG1)', 'overflow': {}, 'hfield_plane_contacts': False, 'rollout_s': 46.0}
+[gpu fix_r2] seed 4: falls 8/16 first 2.32 median 6.1 forward 2.391 {'engine': 'MuJoCo Warp BatchSim (film adapter UnitreeG1)', 'overflow': {}, 'hfield_plane_contacts': False, 'rollout_s': 39.3}
+[gpu fix_r2] total falls 58/80
+[gpu fix_r3] seed 0: falls 13/16 first 2.7 median 5.58 forward 2.2075 {'engine': 'MuJoCo Warp BatchSim (film adapter UnitreeG1)', 'overflow': {}, 'hfield_plane_contacts': False, 'rollout_s': 39.9}
+[gpu fix_r3] seed 1: falls 14/16 first 1.76 median 4.07 forward 1.511 {'engine': 'MuJoCo Warp BatchSim (film adapter UnitreeG1)', 'overflow': {}, 'hfield_plane_contacts': False, 'rollout_s': 43.9}
+[gpu fix_r3] seed 2: falls 14/16 first 2.58 median 4.45 forward 1.887 {'engine': 'MuJoCo Warp BatchSim (film adapter UnitreeG1)', 'overflow': {}, 'hfield_plane_contacts': False, 'rollout_s': 43.4}
+[gpu fix_r3] seed 3: falls 15/16 first 1.58 median 4.22 forward 1.797 {'engine': 'MuJoCo Warp BatchSim (film adapter UnitreeG1)', 'overflow': {}, 'hfield_plane_contacts': False, 'rollout_s': 46.4}
+[gpu fix_r3] seed 4: falls 10/16 first 2.32 median 6.26 forward 2.2645 {'engine': 'MuJoCo Warp BatchSim (film adapter UnitreeG1)', 'overflow': {}, 'hfield_plane_contacts': False, 'rollout_s': 37.9}
+[gpu fix_r3] total falls 66/80
+== falls (base) 16:32:42
+[gpu baseall_r1] seed 0: falls 1/16 first 6.32 median 6.32 forward 2.9025 {'engine': 'MuJoCo Warp BatchSim (film adapter UnitreeG1)', 'overflow': {}, 'hfield_plane_contacts': True, 'rollout_s': 29.0}
+[gpu baseall_r1] seed 1: falls 3/16 first 2.34 median 5.04 forward 2.2485 {'engine': 'MuJoCo Warp BatchSim (film adapter UnitreeG1)', 'overflow': {}, 'hfield_plane_contacts': True, 'rollout_s': 34.1}
+[gpu baseall_r1] seed 2: falls 6/16 first 1.62 median 3.8 forward 3.1555 {'engine': 'MuJoCo Warp BatchSim (film adapter UnitreeG1)', 'overflow': {}, 'hfield_plane_contacts': True, 'rollout_s': 40.9}
+[gpu baseall_r1] seed 3: falls 1/16 first 4.18 median 4.18 forward 2.832 {'engine': 'MuJoCo Warp BatchSim (film adapter UnitreeG1)', 'overflow': {}, 'hfield_plane_contacts': True, 'rollout_s': 30.9}
+[gpu baseall_r1] seed 4: falls 1/16 first 4.74 median 4.74 forward 2.4525 {'engine': 'MuJoCo Warp BatchSim (film adapter UnitreeG1)', 'overflow': {}, 'hfield_plane_contacts': True, 'rollout_s': 29.5}
+[gpu baseall_r1] total falls 12/80
+[gpu baseall_r2] seed 0: falls 3/16 first 6.52 median 6.8 forward 2.7895 {'engine': 'MuJoCo Warp BatchSim (film adapter UnitreeG1)', 'overflow': {}, 'hfield_plane_contacts': True, 'rollout_s': 30.0}
+[gpu baseall_r2] seed 1: falls 6/16 first 1.84 median 4.24 forward 2.4595 {'engine': 'MuJoCo Warp BatchSim (film adapter UnitreeG1)', 'overflow': {}, 'hfield_plane_contacts': True, 'rollout_s': 42.5}
+[gpu baseall_r2] seed 2: falls 5/16 first 2.38 median 4.88 forward 3.0315 {'engine': 'MuJoCo Warp BatchSim (film adapter UnitreeG1)', 'overflow': {}, 'hfield_plane_contacts': True, 'rollout_s': 41.3}
+[gpu baseall_r2] seed 3: falls 4/16 first 4.28 median 5.76 forward 2.919 {'engine': 'MuJoCo Warp BatchSim (film adapter UnitreeG1)', 'overflow': {}, 'hfield_plane_contacts': True, 'rollout_s': 32.2}
+[gpu baseall_r2] seed 4: falls 2/16 first 5.34 median 5.48 forward 2.3785 {'engine': 'MuJoCo Warp BatchSim (film adapter UnitreeG1)', 'overflow': {}, 'hfield_plane_contacts': True, 'rollout_s': 31.1}
+[gpu baseall_r2] total falls 20/80
+== done 16:38:46 power  -InternalBattery-0 (id=8257635)	41%; discharging; 1:13 rema

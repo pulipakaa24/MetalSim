@@ -2,19 +2,21 @@
 
 Scope: can the G1 task's elliptic-cone premium (impratio 10, Newton cap 20) be cut further **without changing the
 converged result**, and what did the implementation work miss? Research only: no code of [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) edited, no GPU work.
-Fork read: `upstream/mujoco_warp` branch `metalsim` at [`0a9de8e`](https://github.com/pulipakaa24/mujoco_warp/commit/0a9de8e5cd098bb9c878dc5f5b98d2b53252aec3) (`mujoco_warp/_src/solver.py`);
+Fork read: my fork's branch `metalsim` at [`0a9de8e`](https://github.com/pulipakaa24/mujoco_warp/commit/0a9de8e5cd098bb9c878dc5f5b98d2b53252aec3)
+([`mujoco_warp/_src/solver.py`](https://github.com/pulipakaa24/mujoco_warp/blob/0a9de8e5cd098bb9c878dc5f5b98d2b53252aec3/mujoco_warp/_src/solver.py));
 [MuJoCo](https://github.com/google-deepmind/mujoco) C reference:
-the installed `mujoco` 3.14.0 wheel for probes and `scratch/deformable/mujoco_main/src/engine/engine_{solver,forward}.c`
-(a MuJoCo main checkout) for source reading. Labels: **measured** (with scope), **published** (cited), **estimated**
-(with the reasoning).
+the installed `mujoco` 3.14.0 wheel for probes and a MuJoCo main checkout
+([`src/engine/engine_solver.c`](https://github.com/google-deepmind/mujoco/blob/3991e5459d28be5846377a1144bdb919ecebd3a5/src/engine/engine_solver.c),
+[`engine_forward.c`](https://github.com/google-deepmind/mujoco/blob/3991e5459d28be5846377a1144bdb919ecebd3a5/src/engine/engine_forward.c)) for source reading.
+Labels: **measured** (with scope), **published** (cited), **estimated** (with the reasoning).
 
 CPU probes (all new, `scripts/diagnostics/competitors/elliptic_review/`, logs `runs/competitors/elliptic_review/`) run
-on the dumped task states `runs/competitors/g1_states/ellip10.{mjb,npz}` (`g1_state_dump.py`: the ellip10-trained
-policy walking on flat ground, 256 worlds x 9 snapshots, each taken at a control-step boundary with the new action
-applied). Each probe runs that control step's 8 substeps of 2.5 ms, so there are 2,304 control steps and 18,432 Newton
-solves per configuration. The Newton cap is 100 unless stated. Engines: MuJoCo C float64 and MuJoCo Warp float32 on
-[Warp](https://github.com/NVIDIA/warp)'s CPU device, imported read-only from the shared checkout. The second state set is
-`g1_states/c_ellip10` (MuJoCo C, 64 worlds standing, falling and lying).
+on the dumped task states `runs/competitors/g1_states/ellip10.npz` (its `.mjb` model not kept; `g1_state_dump.py`: the
+ellip10-trained policy walking on flat ground, 256 worlds x 9 snapshots, each taken at a control-step boundary with the
+new action applied). Each probe runs that control step's 8 substeps of 2.5 ms, so there are 2,304 control steps and
+18,432 Newton solves per configuration. The Newton cap is 100 unless stated. Engines: MuJoCo C float64 and MuJoCo Warp
+float32 on [Warp](https://github.com/NVIDIA/warp)'s CPU device, imported read-only from the shared checkout. The second
+state set is `g1_states/c_ellip10` (MuJoCo C, 64 worlds standing, falling and lying).
 
 ## 0. Summary
 
@@ -43,8 +45,9 @@ Two findings neither line of work had:
 
 Measured anchors:
 
-- `runs/tp26/ellip.wrapper.log`: pyramidal cap 10 physics 43.8 ms, elliptic imp10 cap 20 physics 75.8 ms per control
-  step. Rollout 64.9 vs 113.3 ms per step, loop 57.6 K vs 34.3 K env-steps/s (71.0 vs 119.5 ms per env-step batch).
+- The elliptic-default throughput run (log not kept; measured with `scripts/diagnostics/g1_tp_variants.py 4096`):
+  pyramidal cap 10 physics 43.8 ms, elliptic imp10 cap 20 physics 75.8 ms per control step. Rollout 64.9 vs 113.3 ms
+  per step, loop 57.6 K vs 34.3 K env-steps/s (71.0 vs 119.5 ms per env-step batch).
 - `runs/competitors/e2_loop_cap.log` ([my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) at [`9b4e96a`](https://github.com/pulipakaa24/mujoco_warp/commit/9b4e96af2ddec285e0f58595fbba27c31a64852a)): elliptic physics 64.8 K (cap 10) and 52.2 K (cap 20)
   env-steps/s, i.e. 63.2 and 78.5 ms. **Cap 10 to 20 costs 15.3 ms, 0.19 ms per added iteration-substep.** Pyramidal
   cap 10 to 20: 49.1 to 56.7 ms, 0.094 ms per added (empty) iteration.
@@ -171,8 +174,10 @@ Reading:
 
 ## 4. Settings and exits that cut iterations without changing results (measured on CPU unless stated)
 
-`warp_cpu_lssweep.log`: elliptic imp10, walking states. The reference is `ls_iterations` 100 at cap 100. The floor is
-the 1-ulp qvel nudge (p99 2.6e-4, max 6.6e-4, 0 control steps > 1e-3):
+`warp_cpu_lssweep.log` (not kept; `lssweep_ellip10.log` in `runs/competitors/elliptic_review/` is a run of the same sweep
+by `warp_cpu_lssweep.py`: same rows, but the floor's max and the cap-10 p99 differ): elliptic imp10, walking states.
+The reference is `ls_iterations` 100 at cap 100. The floor is the 1-ulp qvel nudge (p99 2.6e-4, max 6.6e-4, 0 control
+steps > 1e-3):
 
 | setting | mean iterations / max | control steps with an LS at its budget | p99 / max \|Δqvel\| after 8 substeps, steps > 1e-3 of 2,304 |
 |---|---|---|---|
@@ -250,10 +255,12 @@ Recommended next measurements (GPU, owner's queue):
 
 ## Sources
 
-- Code: `upstream/mujoco_warp/mujoco_warp/_src/solver.py` ([`0a9de8e`](https://github.com/pulipakaa24/mujoco_warp/commit/0a9de8e5cd098bb9c878dc5f5b98d2b53252aec3); lines cited above), `io.py:387-390`;
-  `upstream/warp-innate/warp/native/metal.mm:1420-1470`; `scratch/deformable/mujoco_main/src/engine/engine_solver.c`
-  (`mj_solPrimal`, `HessianIncremental`, `HessianCone`), `engine_forward.c` (`warmstart`, lines 1071-1131);
-  `upstream/PhysX-5.6.1/physx/source/lowleveldynamics/src/DyTGSContactPrep.cpp` (~1730-1760).
+- Code: my fork of MuJoCo Warp, [`mujoco_warp/_src/solver.py`](https://github.com/pulipakaa24/mujoco_warp/blob/0a9de8e5cd098bb9c878dc5f5b98d2b53252aec3/mujoco_warp/_src/solver.py)
+  ([`0a9de8e`](https://github.com/pulipakaa24/mujoco_warp/commit/0a9de8e5cd098bb9c878dc5f5b98d2b53252aec3); lines cited above), [`io.py:387-390`](https://github.com/pulipakaa24/mujoco_warp/blob/0a9de8e5cd098bb9c878dc5f5b98d2b53252aec3/mujoco_warp/_src/io.py#L387-L390);
+  my fork of Warp, [`warp/native/metal.mm:1420-1470`](https://github.com/pulipakaa24/warp/blob/9abceff953313e090084ed5950427a5dccf91258/warp/native/metal.mm#L1420-L1470);
+  MuJoCo, [`src/engine/engine_solver.c`](https://github.com/google-deepmind/mujoco/blob/3991e5459d28be5846377a1144bdb919ecebd3a5/src/engine/engine_solver.c)
+  (`mj_solPrimal`, `HessianIncremental`, `HessianCone`), [`engine_forward.c`](https://github.com/google-deepmind/mujoco/blob/3991e5459d28be5846377a1144bdb919ecebd3a5/src/engine/engine_forward.c#L1071-L1131) (`warmstart`, lines 1071-1131);
+  PhysX 5.6.1, [`physx/source/lowleveldynamics/src/DyTGSContactPrep.cpp`](https://github.com/NVIDIA-Omniverse/PhysX/blob/107.3-physx-5.6.1/physx/source/lowleveldynamics/src/DyTGSContactPrep.cpp#L1730-L1760) (~1730-1760).
 - MuJoCo docs, Computation chapter: https://mujoco.readthedocs.io/en/stable/computation/index.html. MJX feature table:
   https://mujoco.readthedocs.io/en/stable/mjx.html
 - E. Todorov, "Convex and analytically-invertible dynamics with contacts and constraints: theory and implementation
@@ -267,6 +274,7 @@ Recommended next measurements (GPU, owner's queue):
 - A. M. Castro et al., "An unconstrained convex formulation of compliant contact", IEEE T-RO 2022 (SAP). J.
   Carpentier et al., "From compliant to rigid contact simulation: a unified and efficient approach", RSS 2024
   ([arXiv 2405.17020](https://arxiv.org/abs/2405.17020)).
-- Project measurements: `runs/tp26/ellip.wrapper.log`, `runs/competitors/e2_loop_cap.log`,
+- Project measurements: the elliptic-default throughput run (log not kept; `scripts/diagnostics/g1_tp_variants.py`),
+  `runs/competitors/e2_loop_cap.log`,
   `runs/competitors/cap_probe/*.json`, `docs/research/elliptic_cones_2026-09-25.md` §8,
   `docs/research/throughput_2026-09-26.md` §2c / §4b / §11.1; new probes in `runs/competitors/elliptic_review/`.

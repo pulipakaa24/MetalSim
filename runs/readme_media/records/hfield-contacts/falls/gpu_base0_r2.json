@@ -1,0 +1,41 @@
+{
+ "mode": "gpu",
+ "tag": "base0_r2",
+ "ceiling": 0.1,
+ "robots": 16,
+ "seconds": 8.0,
+ "seeds": {
+  "0": {
+   "falls": 4,
+   "fall_s_first": 2.44,
+   "fall_s_median": 4.59,
+   "forward_m_median": 2.758,
+   "nonfoot": 16,
+   "fell": [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    false,
+    false,
+    true,
+    false,
+    true,
+    false,
+    false,
+    false
+   ],
+   "info": {
+    "engine": "MuJoCo Warp BatchSim (film adapter UnitreeG1)",
+    "overflow": {},
+    "hfield_plane_contacts": true,
+    "rollout_s": 39.1
+   }
+  }
+ },
+ "mujoco_warp": "~/MetalSim/runs/readme_media/scratch/hfield-contacts/mjw_base/mujoco_warp/__init__.py"
+}

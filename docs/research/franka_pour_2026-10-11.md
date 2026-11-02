@@ -1,14 +1,16 @@
 # Research notes: Isaac Lab 3.0-EA's IsaacContrib-Franka-Pour (2026-10-11/12)
 
 What the port (`metalsim/learn/franka_pour*.py`) reproduces, read from Isaac's source.
-[Isaac Lab](https://github.com/isaac-sim/IsaacLab) = `upstream/IsaacLab3` at
+[Isaac Lab](https://github.com/isaac-sim/IsaacLab) at
 [`ae37b028`](https://github.com/isaac-sim/IsaacLab/commit/ae37b028ea415c91ea2bc32609efcd759ed2b974)
 ("[Backport release/3.0.0] Point README at v3.0.0 EA documentation", the commit installed on the NVIDIA L4 GPU machine);
-`IL` = `source/`, task files relative to `IL/isaaclab_tasks/isaaclab_tasks/contrib/franka_pour/`;
-[Newton](https://github.com/newton-physics/newton) = 1.5.2 (`NW` = `newton/_src/`, the Metal branch `metalsim-1.5.2` of
-[my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim-1.5.2) at
+`IL` = [`source/`](https://github.com/isaac-sim/IsaacLab/tree/ae37b028ea415c91ea2bc32609efcd759ed2b974/source), task files relative to
+[`IL/isaaclab_tasks/isaaclab_tasks/contrib/franka_pour/`](https://github.com/isaac-sim/IsaacLab/tree/ae37b028ea415c91ea2bc32609efcd759ed2b974/source/isaaclab_tasks/isaaclab_tasks/contrib/franka_pour);
+[Newton](https://github.com/newton-physics/newton) = 1.5.2 (`NW` =
+[`newton/_src/`](https://github.com/pulipakaa24/newton/tree/35791a077dbc74d8e5b4cb9d320faa72af2f3492/newton/_src), the Metal branch
+`metalsim-1.5.2` of [my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim-1.5.2) at
 [`35791a07`](https://github.com/pulipakaa24/newton/commit/35791a077dbc74d8e5b4cb9d320faa72af2f3492));
-[rsl_rl](https://github.com/leggedrobotics/rsl_rl) = `rsl-rl-lib` 5.4.1 (Isaac Lab 3.0-EA's pin, `uv.lock:2084-2085`;
+[rsl_rl](https://github.com/leggedrobotics/rsl_rl) = `rsl-rl-lib` 5.4.1 (Isaac Lab 3.0-EA's pin, [`uv.lock:2084-2085`](https://github.com/isaac-sim/IsaacLab/blob/ae37b028ea415c91ea2bc32609efcd759ed2b974/uv.lock#L2084-L2085);
 read from the [5.4.1 wheel, PyPI](https://pypi.org/project/rsl-rl-lib/5.4.1/)).
 
 ## 1. Simulation stack per policy step
@@ -68,7 +70,7 @@ read from the [5.4.1 wheel, PyPI](https://pypi.org/project/rsl-rl-lib/5.4.1/)).
 
 ## 3. Assets
 
-Isaac 6.1 asset root (`apps/isaaclab.python.headless.kit:206`), fetched by `scripts/fetch_isaac_assets.sh`:
+Isaac 6.1 asset root ([`apps/isaaclab.python.headless.kit:206`](https://github.com/isaac-sim/IsaacLab/blob/ae37b028ea415c91ea2bc32609efcd759ed2b974/apps/isaaclab.python.headless.kit#L206)), fetched by `scripts/fetch_isaac_assets.sh`:
 `Robots/FrankaEmika/franka_panda.usda` (+ payloads; "MuJoCo USD Converter v0.2.0" of [Menagerie](https://github.com/google-deepmind/mujoco_menagerie)'s `mjx_panda`),
 `Contrib/MPM/Pour/franka_pour_cups.usda`, `Contrib/MPM/Pour/reset_dataset.pt` (20,000 rows, schema 12, content
 digest `74057f08...`), `Props/Mounts/SeattleLabTable/table_instanceable.usd` + `table.usd`. The 6.2 root serves
@@ -81,33 +83,34 @@ byte-identical Franka and cup files.
 `panda_finger_joint1` exists). Its pinned physics payload hash (`0dc38454...`) does match the published
 `payloads/Physics/physics.usda`. The port composes what the hook intends (`franka_pour_scene.compose_robot_stage`).
 
-Spawner behaviour that matters: `create_prim` + `standardize_xform_ops` (`IL/isaaclab/isaaclab/sim/utils/prims.py`,
+Spawner behaviour that matters: `create_prim` + `standardize_xform_ops`
+([`IL/isaaclab/isaaclab/sim/utils/prims.py`](https://github.com/isaac-sim/IsaacLab/blob/ae37b028ea415c91ea2bc32609efcd759ed2b974/source/isaaclab/isaaclab/sim/utils/prims.py),
 `transforms.py`) override the referenced root's own transform with the init-state pose, so the SeattleLab table's
 authored `xformOp:translate = (0.55, 0, 0)` is replaced by (0.5, 0, 0) and the tabletop spans x in [-0.296, 0.984],
 y in [-0.455, 0.455] at z = -0.003 (0 after the task's 3 mm inset).
 
 ## 4. MDP
 
-Observations (`mdp/observations.py`, groups in `pour_env_cfg.py:396-464`; scale after clip,
-`observation_manager.py:395-410`), actions (`mdp/actions.py`, `binary_joint_actions.py:132-150`,
-`joint_actions.py:170-233`), rewards (`mdp/rewards.py`; reward manager multiplies by weight x dt,
-`reward_manager.py:146-152`), terminations (`mdp/terminations.py`; evaluated in cfg order, the success term sees the
+Observations ([`mdp/observations.py`](https://github.com/isaac-sim/IsaacLab/blob/ae37b028ea415c91ea2bc32609efcd759ed2b974/source/isaaclab_tasks/isaaclab_tasks/contrib/franka_pour/mdp/observations.py), groups in `pour_env_cfg.py:396-464`; scale after clip,
+`observation_manager.py:395-410`), actions ([`mdp/actions.py`](https://github.com/isaac-sim/IsaacLab/blob/ae37b028ea415c91ea2bc32609efcd759ed2b974/source/isaaclab_tasks/isaaclab_tasks/contrib/franka_pour/mdp/actions.py), `binary_joint_actions.py:132-150`,
+`joint_actions.py:170-233`), rewards ([`mdp/rewards.py`](https://github.com/isaac-sim/IsaacLab/blob/ae37b028ea415c91ea2bc32609efcd759ed2b974/source/isaaclab_tasks/isaaclab_tasks/contrib/franka_pour/mdp/rewards.py); reward manager multiplies by weight x dt,
+`reward_manager.py:146-152`), terminations ([`mdp/terminations.py`](https://github.com/isaac-sim/IsaacLab/blob/ae37b028ea415c91ea2bc32609efcd759ed2b974/source/isaaclab_tasks/isaaclab_tasks/contrib/franka_pour/mdp/terminations.py); evaluated in cfg order, the success term sees the
 partial `terminated` buffer, `termination_manager.py:154-181`), reset order (`manager_based_rl_env.py:406-451`:
 curriculum, scene reset, reset events, then observation / action / reward / curriculum / command / event /
 termination managers; the action manager resets after the reset event, so the gripper's `set_reset_position`
-survives and the arm's EMA history is cleared), the curriculum and sampler (`mdp/reset_dataset.py`,
+survives and the arm's EMA history is cleared), the curriculum and sampler ([`mdp/reset_dataset.py`](https://github.com/isaac-sim/IsaacLab/blob/ae37b028ea415c91ea2bc32609efcd759ed2b974/source/isaaclab_tasks/isaaclab_tasks/contrib/franka_pour/mdp/reset_dataset.py),
 `reset_sampler.py`). `scene.reset` writes each env's default particle state (`IL/isaaclab_newton/.../assets/
 mpm_object/mpm_object.py:136-141`), which the reset event then overwrites (positions and velocities), so it has no
 observable effect. The rsl_rl wrapper clips actions to [-1, 1] and passes `time_outs` (`vecenv_wrapper.py:178-187`).
 
 ## 5. rsl_rl 5.4.1
 
-`algorithms/ppo.py`: time-out bootstrap `r += gamma * V(s_t) * time_out` (:150-155), GAE (:163-188) with
+[`algorithms/ppo.py`](https://github.com/leggedrobotics/rsl_rl/blob/v5.4.1/rsl_rl/algorithms/ppo.py): time-out bootstrap `r += gamma * V(s_t) * time_out` (:150-155), GAE (:163-188) with
 whole-batch advantage normalization, one permutation reused across epochs (`storage/rollout_storage.py:225-258`),
 clipped surrogate and value losses, `clip_grad_norm_` separately on actor and critic (:302-303), fixed schedule.
 `modules/distribution.py:241-323` `HeteroscedasticGaussianDistribution`: MLP output `(2, A)`, log-std clamped (hard)
-to `log(std_range)`, std head initialised with zero weights and bias `log(init_std + 1e-7)`. `modules/mlp.py`:
-PyTorch default init. `utils/logger.py`: mean reward / length over the last 100 episodes, `extras["log"]` averaged
+to `log(std_range)`, std head initialised with zero weights and bias `log(init_std + 1e-7)`. [`modules/mlp.py`](https://github.com/leggedrobotics/rsl_rl/blob/v5.4.1/rsl_rl/modules/mlp.py):
+PyTorch default init. [`utils/logger.py`](https://github.com/leggedrobotics/rsl_rl/blob/v5.4.1/rsl_rl/utils/logger.py): mean reward / length over the last 100 episodes, `extras["log"]` averaged
 per iteration.
 
 No training curve is published for this task (README, task source, Isaac Lab docs at this commit); the README gives

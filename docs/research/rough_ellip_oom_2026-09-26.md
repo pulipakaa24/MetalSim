@@ -7,7 +7,8 @@ the step graphs were captured (`BoxWindow.__init__`, terrain.py:451). Pyramidal 
 
 **What the probes missed.** The CLI passes `physics_dt=0.0025` (8 substeps per 20 ms control step); the constructor
 default is 5 ms (4 substeps). `G1VelocityTask(4096, terrain="rough", contact_cfg="recommended", physics_dt=0.0025)`
-fails alone in a fresh process; the same with `recommended_pyramidal` builds (`runs/rough_ellip_oom/probe1.log`).
+fails alone in a fresh process; the same with `recommended_pyramidal` builds (`probe1.log`; this note's probe scripts and
+logs were not kept).
 
 **Cause.** The Metal backend of [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) keeps every buffer allocated inside a graph capture alive for the graph's
 lifetime (`Graph::retained`, metal.mm; the CUDA-graph-allocation contract), and every Warp buffer sits in the queue's
@@ -43,4 +44,5 @@ at it 20).
 after `scripts/fork_sync.sh` brought the shared checkout to [`f824af1`](https://github.com/pulipakaa24/mujoco_warp/commit/f824af1c5f482791cca90c1a6ca6fe5adb19ce63): the test gate passed and it trains on the first
 attempt, 30.8 K env-steps/s at iteration 20.
 
-Probe scripts and logs: `runs/rough_ellip_oom/` (`probe_ctor.py`, `probe_mem.py`, `probe_alloc.py`, `probe_equiv.py`).
+Probe scripts and logs (not kept): `probe_ctor.py`, `probe_mem.py`, `probe_alloc.py`, `probe_equiv.py`, and the logs
+named above.

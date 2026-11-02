@@ -1,0 +1,30 @@
+mujoco_warp ~/MetalSim/runs/readme_media/scratch/epa-fixes/v_new/mujoco_warp/__init__.py
+ccd_iterations 35 ccd_tolerance 1e-06 geom_gap [0.01] geom_margin [0.0] batches [('it0', 4096), ('it1', 4096), ('it2', 4096), ('it3', 4096), ('it4', 4096), ('it5', 4096), ('it6', 4096), ('it7', 4096), ('it8', 4096), ('it9', 4096), ('it10', 4096), ('it11', 4096), ('events', 126)]
+~/MetalSim/runs/readme_media/scratch/epa-fixes/v_new/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+  warnings.warn(
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     ~/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth 42ba4b9 load on device 'cpu' took 0.86 ms  (cached)
+Module _nxn_broadphase__locals__kernel_1edb6cf5 52155e3 load on device 'cpu' took 0.24 ms  (cached)
+Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_37cb15b8 5402575 load on device 'cpu' took 0.29 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_9a4e8a04 473e113 load on device 'cpu' took 0.37 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_8871ddb9 ff50bb1 load on device 'cpu' took 0.27 ms  (cached)
+it0: worlds 4096 contacts 10736 EPA_HORIZON worlds 0 other overflow bits []
+it1: worlds 4096 contacts 16410 EPA_HORIZON worlds 0 other overflow bits []
+it2: worlds 4096 contacts 13101 EPA_HORIZON worlds 0 other overflow bits []
+it3: worlds 4096 contacts 13722 EPA_HORIZON worlds 0 other overflow bits []
+it4: worlds 4096 contacts 14143 EPA_HORIZON worlds 0 other overflow bits []
+it5: worlds 4096 contacts 13710 EPA_HORIZON worlds 0 other overflow bits []
+it6: worlds 4096 contacts 13955 EPA_HORIZON worlds 0 other overflow bits []
+it7: worlds 4096 contacts 13909 EPA_HORIZON worlds 0 other overflow bits []
+it8: worlds 4096 contacts 13960 EPA_HORIZON worlds 0 other overflow bits []
+it9: worlds 4096 contacts 14251 EPA_HORIZON worlds 0 other overflow bits []
+it10: worlds 4096 contacts 14583 EPA_HORIZON worlds 0 other overflow bits []
+it11: worlds 4096 contacts 14171 EPA_HORIZON worlds 0 other overflow bits []
+events: worlds 126 contacts 672 EPA_HORIZON worlds 0 other overflow bits []
+saved ~/MetalSim/runs/readme_media/scratch/epa-fixes/sets/cap/run_new.npz

@@ -13,8 +13,10 @@ workstream ([WS6](../STATUS.md#workstreams)).
 - **[API]** https://docs.omniverse.nvidia.com/kit/docs/omni_replicator/latest/source/extensions/omni.replicator.core/docs/API.html
 - **[OLD]** annotator details page (archived): http://web.archive.org/web/20250327182255/https://docs.omniverse.nvidia.com/extensions/latest/ext_replicator/annotators_details.html
 - **[VIS]** https://docs.omniverse.nvidia.com/extensions/latest/ext_replicator/programmatic_visualization.html
-- **[IL]** Isaac Lab, https://github.com/isaac-sim/IsaacLab (`source/isaaclab/isaaclab/envs/mdp/events.py`,
-  `sensors/camera/camera.py`, `tiled_camera.py`, `camera_cfg.py`; v2.3.2 has the same event functions)
+- **[IL]** Isaac Lab, https://github.com/isaac-sim/IsaacLab
+  ([`source/isaaclab/isaaclab/envs/mdp/events.py`](https://github.com/isaac-sim/IsaacLab/blob/v2.3.2/source/isaaclab/isaaclab/envs/mdp/events.py),
+  [`sensors/camera/camera.py`](https://github.com/isaac-sim/IsaacLab/blob/v2.3.2/source/isaaclab/isaaclab/sensors/camera/camera.py), [`tiled_camera.py`](https://github.com/isaac-sim/IsaacLab/blob/v2.3.2/source/isaaclab/isaaclab/sensors/camera/tiled_camera.py),
+  [`camera_cfg.py`](https://github.com/isaac-sim/IsaacLab/blob/v2.3.2/source/isaaclab/isaaclab/sensors/camera/camera_cfg.py); v2.3.2 has the same event functions; links are to v2.3.2)
 - **[ILDOC]** https://isaac-sim.github.io/IsaacLab/main/source/how-to/save_camera_output.html
 - **[SEM]** https://github.com/isaac-sim/IsaacSim/blob/v5.1.0/source/extensions/isaacsim.core.utils/python/impl/semantics.py
 - **[WR]** https://github.com/isaac-sim/IsaacSim/blob/v5.1.0/source/extensions/isaacsim.replicator.writers/python/scripts/writers/__init__.py

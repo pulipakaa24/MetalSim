@@ -2,8 +2,9 @@
 
 Scope: the handoff `docs/HANDOFF_elliptic_cone_perf.md` (another machine's session) found elliptic friction
 cones 2.9–3.9× slower than pyramidal on Metal and attributed it to the launch sizing of
-`_update_gradient_JTCJ_dense` in `mujoco_warp/_src/solver.py`. This note reproduces it on this machine,
-fixes it in a worktree of [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) (`upstream/mujoco_warp-ellip`, branch
+`_update_gradient_JTCJ_dense` in
+[`mujoco_warp/_src/solver.py`](https://github.com/pulipakaa24/mujoco_warp/blob/07a51a63bce527d2d26b363a32c52765df4412fc/mujoco_warp/_src/solver.py).
+This note reproduces it on this machine, fixes it in a worktree of [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) (branch
 [`metalsim-elliptic`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-elliptic), based on [`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc)), audits my fork for every other non-CUDA fallback and capacity-sized launch, and
 re-runs the fidelity protocol with elliptic cones now that they are cheap. Every number is labelled
 **measured** (this machine, M4 Max 40-core GPU, 64 GB, through `scripts/gpu_run.sh ... timing` on an idle
@@ -26,7 +27,7 @@ Jacobian layout, `NJMAX` the row capacity (MetalSim's default 512). Physics step
 | G1 Menagerie (35, `auto` → sparse) | 218,295 | 77,263 | 2.83× | 229,447 / 80,024, 2.9× |
 | G1 Menagerie, forced dense (`JAC=dense`, the layout the G1 task uses) | 196,519 | 60,731 | 3.24× | – |
 | SO-101 + box (12, dense; Menagerie's own cone elliptic, impratio 10) | 1,065,380 | 441,361 | 2.41× | – |
-| DeepMind humanoid (27, dense; `mujoco_warp/test_data/humanoid`) | 958,995 | 143,607 | 6.68× | – |
+| DeepMind humanoid (27, dense; [`mujoco_warp/test_data/humanoid`](https://github.com/pulipakaa24/mujoco_warp/tree/07a51a63bce527d2d26b363a32c52765df4412fc/mujoco_warp/test_data/humanoid)) | 958,995 | 143,607 | 6.68× | – |
 
 The throughput agent's independent measurement on [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) as installed agrees
 (`docs/research/throughput_regression_2026-09-25.md`: Go2 932,628 vs 239,935, 3.9×; SO-101 lift task
@@ -51,7 +52,7 @@ through a shared tile (`tile_scatter_masked`, CUDA cooperative groups), and the 
 ([`8ce5bb0`](https://github.com/pulipakaa24/mujoco_warp/commit/8ce5bb0084e43158ff962b95b7ad6bae933c4564)) ran that kernel with **one lane per constraint group** off CUDA (`threads_per_group = 1`), so the
 whole per-group Hessian block was computed serially by one thread.
 
-## 2. Fixes (fork worktree `upstream/mujoco_warp-ellip`, branch `metalsim-elliptic`)
+## 2. Fixes (branch [`metalsim-elliptic`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-elliptic) of my fork of MuJoCo Warp)
 
 All behind environment variables read at import (defaults in bold), so every option stays available:
 
@@ -157,7 +158,7 @@ ms/step, `world` 5.8–6.0, `world2` 5.1. The "fall back for CPU" branch was slo
   The G1 rows grow to 0.5 rad in 14–17 % of the worlds for the base configuration against itself: the
   PD-to-random-targets G1 falls and its trajectories are chaotic, so the floor itself diverges; every
   patched form sits inside that floor (and the Go2's 1e-6 band). Logs `runs/competitors/ellip_check_*_b.log`,
-  `ellip_check_base2.log`, snapshots `ellip_check_<robot>_<label>.npz`, offline comparer
+  `ellip_check_base2.log`, snapshots `ellip_check_<robot>_<label>.npz` (not kept), offline comparer
   `elliptic_check_compare.py`.
 - A first round of these checks (`ellip_check_base.log` / `_world.log` / `_contact.log`) showed the base
   configuration 1.4e-2 rad from itself with 100 % of worlds apart at step 25, which turned out to be a
@@ -184,7 +185,7 @@ ms/step, `world` 5.8–6.0, `world2` 5.1. The "fall back for CPU" branch was slo
   `solver_test`, `forward_test`, `constraint_test`): 242 passed, 10 skipped in the worktree; the upstream-PR
   worktree on `main`: 246 passed, 10 skipped.
 
-## 3. Audit: non-CUDA fallbacks and capacity-sized launches in the fork (`mujoco_warp/_src`)
+## 3. Audit: non-CUDA fallbacks and capacity-sized launches in the fork ([`mujoco_warp/_src`](https://github.com/pulipakaa24/mujoco_warp/tree/07a51a63bce527d2d26b363a32c52765df4412fc/mujoco_warp/_src))
 
 Representative set at 4096 worlds: G1 task (43 dofs, dense, pyramidal, the RL path), Go2 (elliptic), SO-101
 (elliptic + impratio 10), DeepMind humanoid. "Matters" = measured or estimated share of a step.
@@ -220,7 +221,8 @@ matters when a model takes the sparse Jacobian with elliptic cones.
 ### 4.1 G1 (Isaac-Velocity-Flat-G1 asset, PhysX reference)
 
 Protocol: [PARITY](../PARITY.md) §1.7 / DECISIONS 2026-09-25 (`metalsim.parity.record_g1` A_hold / B_random / C_drop vs
-[Isaac Sim](https://github.com/isaac-sim/IsaacSim) 5.1's `parity_out2/rt` recording, `compare.py`, momentum-derived impulses, Isaac's checkpoints played
+[Isaac Sim](https://github.com/isaac-sim/IsaacSim) 5.1's `parity_out2/rt` recording (not kept; `metalsim/parity/isaac_side/stage6.sh` records it),
+`compare.py`, momentum-derived impulses, Isaac's checkpoints played
 on the task for transfer, `air_time_rollout.py` for feet_air_time / feet_slide of Isaac's checkpoint 1000,
 `bench_contact_tuning.py` for cost). Presets: the adopted `tau10_impact_hardlimits` plus elliptic cones at
 impratio 1 / 10 / 100 on top of it (`elliptic_presets.py` registers `tau10_impact_elliptic[_imp10|_imp100]_hardlimits`),
@@ -351,8 +353,8 @@ Preset `tau10_impact_hardlimits_ellip10` (and `_ellip1`, `_ellip100`) added to `
 checks the MjModel / MjSpec fields and the G1 builder's model: 3 passed). Queued (train class) as
 `runs/il3/run_train2.sh flat flat tau10_impact_hardlimits_ellip10 none 1000 0 g1_flat_flatcfg_ellip10 com origin`,
 i.e. the queued COM run's command with the contact preset swapped (2.3.2 flat config, base_velocity com,
-feet_slide_velocity origin, seed 0, 1000 iterations, same PPO): log `runs/il3/g1_flat_flatcfg_ellip10.log`,
-stdout `runs/il3/g1_flat_flatcfg_ellip10.stdout`. Result (measured, finished 2026-09-25 23:30, exit 0, policy `runs/il3/ckpt/g1_flat_flatcfg_ellip10.pt`):
+feet_slide_velocity origin, seed 0, 1000 iterations, same PPO). Its log, stdout and policy `g1_flat_flatcfg_ellip10.pt`
+were not kept; the command above reruns it. Result (measured, finished 2026-09-25 23:30, exit 0):
 
 | iteration | elliptic impratio 10 (this run): return / length | COM run, default contacts | recommended preset | origin seeds 0 / 1 / 2 (default contacts) | Isaac PhysX |
 |---|---|---|---|---|---|
@@ -388,8 +390,8 @@ measured fidelity option. I did not change the default. For the SO-101 grasp the
 
 ### 7.2 The +18 % falls of the PhysX-trained checkpoint under elliptic cones
 
-Setup of the number: Isaac's PhysX-trained flat checkpoint at iteration 1000 (`runs/contact_research/
-isaac_model_1000_metalsim.pt`), played with the mean action on the task's own commands and resets, 1024 envs ×
+Setup of the number: Isaac's PhysX-trained flat checkpoint at iteration 1000 (the checkpoint file was not kept),
+played with the mean action on the task's own commands and resets, 1024 envs ×
 1000 control steps (20 s), seed 1, one run per preset; a fall is the task's termination (torso touch force
 > 1 N over the 15 ms history, the only non-time-out termination), so every fall is a torso-to-ground contact.
 Counts: pyramidal 142 falls in 1122 episodes, elliptic impratio 1 / 10 / 100: 171 / 168 / 160 in ~1140.
@@ -521,8 +523,9 @@ pending in the render queue). Per Newton iteration (mean over worlds still itera
 | all 9 snapshots | | | 2.2 (it 1), 1.6 (it 2) | | **2.76** |
 | same states, pyramidal | 26–34 | – | 2.8 (it 1), 2.7 (it 2) | | **3.07** |
 
-Policy states (`g1_state_dump.py`: the elliptic-trained checkpoint `g1_flat_flatcfg_ellip10.pt` walking on
-the task, 256 envs, snapshots at control steps 2–399, first 64 worlds analysed; the task's njmax 112):
+Policy states (`g1_state_dump.py`: the elliptic-trained checkpoint `g1_flat_flatcfg_ellip10.pt` of §7.1, not kept,
+walking on the task; the dumped states are `runs/competitors/g1_states/ellip10.npz`, 256 envs, snapshots at control
+steps 2–399, first 64 worlds analysed; the task's njmax 112):
 
 | snapshot | rows / world (elliptic rows) | CONE rows / world by iteration | QUAD flips / world by iteration | solver_niter mean (max), elliptic | same states, pyramidal: rows, flips it 1–3, niter |
 |---|---|---|---|---|---|

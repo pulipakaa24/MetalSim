@@ -37,7 +37,7 @@ checkpoints 500 / 1000 / 1499 for transfer (4 envs).
    stops each one at the surface. A `margin` detects early too, but MuJoCo centres the spring on dist = margin, so the
    robot then rests a margin high. (§2, §4)
 4. **A speculative-contact prototype closes most of the gap, but it is not default-ready.** The prototype is a worktree
-   of my fork, not a preset (`upstream/mujoco_warp-spec`, branch [`metalsim-spec-proto`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-spec-proto), [`bc83fb0`](https://github.com/pulipakaa24/mujoco_warp/commit/bc83fb0fecf345090a02cbb13fba400e9f1ad97e)). It gives contacts
+   of my fork, not a preset (branch [`metalsim-spec-proto`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-spec-proto), [`bc83fb0`](https://github.com/pulipakaa24/mujoco_warp/commit/bc83fb0fecf345090a02cbb13fba400e9f1ad97e)). It gives contacts
    inside the ground `gap` constraint rows whose reference is PhysX's speculative bias a_ref = −(v + dist/h)/h.
    With τ 5 ms it reaches:
 
@@ -59,18 +59,23 @@ checkpoints 500 / 1000 / 1499 for transfer (4 envs).
 ## 1. The definition question
 
 **Sources.**
-- PhysX 5.6.1 TGS contact prep (`upstream/PhysX-5.6.1/physx/source/lowleveldynamics/src/DyTGSContactPrep.cpp:371–373`):
+- PhysX 5.6.1 TGS contact prep
+  ([`physx/source/lowleveldynamics/src/DyTGSContactPrep.cpp:371–373`](https://github.com/NVIDIA-Omniverse/PhysX/blob/107.3-physx-5.6.1/physx/source/lowleveldynamics/src/DyTGSContactPrep.cpp#L371-L373)):
   `penetration = FSub(separation, restDistance); isSeparated = FIsGrtr(penetration, zero)`.
 - The same file, :394: `biasCoeff = FNeg(FSel(isSeparated, invStepDt, invDtp8))`. A separated contact therefore gets the
   bias −separation/dt, and the solve (:1529–1553) makes it the unilateral constraint v_n ≥ −(separation − restDistance)/dt.
   It pushes only on the part of the approach that would cross the surface within the step. The GPU path does the same:
-  `contactConstraintBlockPrep.cuh:924–941`, `solverBlockTGS.cuh:299–306`.
-- restDistance is the sum of the shapes' rest offsets (`ScShapeInteraction.cpp:866`). The reported separation is the
+  [`contactConstraintBlockPrep.cuh:924–941`](https://github.com/NVIDIA-Omniverse/PhysX/blob/107.3-physx-5.6.1/physx/source/gpusolver/src/CUDA/contactConstraintBlockPrep.cuh#L924-L941),
+  [`solverBlockTGS.cuh:299–306`](https://github.com/NVIDIA-Omniverse/PhysX/blob/107.3-physx-5.6.1/physx/source/gpusolver/src/CUDA/solverBlockTGS.cuh#L299-L306).
+- restDistance is the sum of the shapes' rest offsets
+  ([`ScShapeInteraction.cpp:866`](https://github.com/NVIDIA-Omniverse/PhysX/blob/107.3-physx-5.6.1/physx/source/simulationcontroller/src/ScShapeInteraction.cpp#L866)). The reported separation is the
   narrow-phase value: "The separation of the shapes at the contact point. A negative separation denotes a penetration"
-  (`PxSimulationEventCallback.h:466`). The tensor view copies it unchanged (`CpuRigidContactView.cpp:443`).
-- `PxShape.h:423`: "Two shapes will come to rest at a distance equal to the sum of their restOffset values. If the
+  ([`PxSimulationEventCallback.h:466`](https://github.com/NVIDIA-Omniverse/PhysX/blob/107.3-physx-5.6.1/physx/include/PxSimulationEventCallback.h#L466)). The tensor view copies it unchanged
+  ([`CpuRigidContactView.cpp:443`](https://github.com/NVIDIA-Omniverse/PhysX/blob/107.3-omni-and-physx-5.6.1/omni/extensions/runtime/source/omni.physx.tensors/plugins/cpu/CpuRigidContactView.cpp#L443)).
+- [`PxShape.h:423`](https://github.com/NVIDIA-Omniverse/PhysX/blob/107.3-physx-5.6.1/physx/include/PxShape.h#L423): "Two shapes will come to rest at a distance equal to the sum of their restOffset values. If the
   restOffset is 0, they should converge to touching exactly."
-- [Isaac Lab](https://github.com/isaac-sim/IsaacLab)'s G1_CFG sets no collision offsets (`isaaclab_assets/robots/unitree.py:272–288`). The recorded foot colliders
+- [Isaac Lab](https://github.com/isaac-sim/IsaacLab)'s G1_CFG sets no collision offsets
+  ([`isaaclab_assets/robots/unitree.py:272–288`](https://github.com/isaac-sim/IsaacLab/blob/v2.3.2/source/isaaclab_assets/isaaclab_assets/robots/unitree.py#L272-L288)). The recorded foot colliders
   author −inf, i.e. PhysX's automatic contact offset with rest offset 0 (session note §1).
 - On CPU PhysX the full contact report and the tensor view agree to 1e-7 m (session note). So the GPU tensor numbers
   report the same quantity.
@@ -123,7 +128,8 @@ PhysX's 5 ms cadence. The "5 ms tick" columns below do exactly that. The per-sub
   - [MuJoCo Playground](https://github.com/google-deepmind/mujoco_playground) G1 / H1 / T1 / Berkeley Humanoid / Op3 / Go1 keep MuJoCo's default solref / solimp and pyramidal
     cones (G1: 2 ms, 3 iterations). Go1's only non-default is foot solimp width 0.023 (the foot radius). The paper
     ([arXiv 2502.08844](https://arxiv.org/abs/2502.08844)) states no contact rationale.
-  - [Menagerie](https://github.com/google-deepmind/mujoco_menagerie) `unitree_g1/scene_mjx.xml` uses foot-floor `solref="0.008 1"` at a 4 ms step, i.e. the refsafe floor 2 dt.
+  - [Menagerie](https://github.com/google-deepmind/mujoco_menagerie)
+    [`unitree_g1/scene_mjx.xml`](https://github.com/google-deepmind/mujoco_menagerie/blob/main/unitree_g1/scene_mjx.xml) uses foot-floor `solref="0.008 1"` at a 4 ms step, i.e. the refsafe floor 2 dt.
   - Menagerie Go2 uses elliptic cones with impratio 100, `margin="0.001"`.
   - [mjlab](https://github.com/mujocolab/mjlab) keeps defaults for the G1. For the Go1 it sets `solref=(0.01, 1)` with the comment "Harden all collision
     geoms", plus elliptic cones and impratio 10: the same τ and cone as our default.
@@ -247,7 +253,7 @@ already inside the contact offset / gap. PhysX's time axis includes its settle s
 
 **Mechanism.** MuJoCo's primal solver already treats a contact row as unilateral through its reference acceleration: a
 row pushes only while J·a would fall below a_ref. So a row at positive distance behaves speculatively by itself, if it
-exists. The prototype makes it exist and gives it PhysX's reference (worktree `upstream/mujoco_warp-spec` of [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim), branch
+exists. The prototype makes it exist and gives it PhysX's reference ([my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim), branch
 [`metalsim-spec-proto`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-spec-proto), commits [`2b424a4`](https://github.com/pulipakaa24/mujoco_warp/commit/2b424a4bf4e068e96ac081d371f100e9a5103d6a) + [`bc83fb0`](https://github.com/pulipakaa24/mujoco_warp/commit/bc83fb0fecf345090a02cbb13fba400e9f1ad97e), patch `runs/penetration/spec_prototype.patch`, active only with
 `MJW_SPECULATIVE_GAP=1`):
 1. `plane_convex` detects out to margin + gap. My stock fork passes only margin, so gap-zone plane contacts never

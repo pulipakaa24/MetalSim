@@ -1,0 +1,268 @@
+{
+ "shape": "box",
+ "size": [
+  0.05,
+  0.03,
+  0.02
+ ],
+ "placements": 1000,
+ "engines": {
+  "c": {
+   "vs_exact": {
+    "worlds": 1000,
+    "count_equal_min_ref_cap": 0.694,
+    "fewer": 0,
+    "more": 306,
+    "no_contact": 0,
+    "contacts": 1869,
+    "normal_err_deg_p50_p95_p99": [
+     0.0,
+     27.42,
+     59.93
+    ],
+    "share_normal_over_10deg": 0.1627,
+    "deepest_depth_err_mm_p50_p95_max": [
+     0.17,
+     6.09,
+     17.89
+    ],
+    "weighted_normal_err_deg_p95": [
+     26.32
+    ],
+    "coverage_of_ref_mean": 0.8656
+   }
+  },
+  "mjw_base": {
+   "vs_exact": {
+    "worlds": 1000,
+    "count_equal_min_ref_cap": 0.766,
+    "fewer": 108,
+    "more": 126,
+    "no_contact": 0,
+    "contacts": 1513,
+    "normal_err_deg_p50_p95_p99": [
+     0.35,
+     27.81,
+     139.83
+    ],
+    "share_normal_over_10deg": 0.1692,
+    "deepest_depth_err_mm_p50_p95_max": [
+     0.21,
+     7.27,
+     157.14
+    ],
+    "weighted_normal_err_deg_p95": [
+     34.2
+    ],
+    "coverage_of_ref_mean": 0.8438
+   },
+   "vs_c": {
+    "worlds": 1000,
+    "count_equal_min_ref_cap": 0.814,
+    "fewer": 150,
+    "more": 36,
+    "no_contact": 0,
+    "contacts": 1513,
+    "normal_err_deg_p50_p95_p99": [
+     0.0,
+     17.51,
+     102.8
+    ],
+    "share_normal_over_10deg": 0.0694,
+    "deepest_depth_err_mm_p50_p95_max": [
+     0.0,
+     2.6,
+     162.4
+    ],
+    "weighted_normal_err_deg_p95": [
+     29.55
+    ],
+    "coverage_of_ref_mean": 0.9142
+   }
+  },
+  "mjw_final": {
+   "vs_exact": {
+    "worlds": 1000,
+    "count_equal_min_ref_cap": 0.999,
+    "fewer": 0,
+    "more": 1,
+    "no_contact": 0,
+    "contacts": 1508,
+    "normal_err_deg_p50_p95_p99": [
+     0.0,
+     0.01,
+     0.01
+    ],
+    "share_normal_over_10deg": 0.0,
+    "deepest_depth_err_mm_p50_p95_max": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "weighted_normal_err_deg_p95": [
+     0.0
+    ],
+    "coverage_of_ref_mean": 1.0
+   },
+   "vs_c": {
+    "worlds": 1000,
+    "count_equal_min_ref_cap": 0.803,
+    "fewer": 167,
+    "more": 30,
+    "no_contact": 0,
+    "contacts": 1508,
+    "normal_err_deg_p50_p95_p99": [
+     0.01,
+     25.17,
+     52.43
+    ],
+    "share_normal_over_10deg": 0.1538,
+    "deepest_depth_err_mm_p50_p95_max": [
+     0.17,
+     6.09,
+     17.89
+    ],
+    "weighted_normal_err_deg_p95": [
+     26.28
+    ],
+    "coverage_of_ref_mean": 0.8487
+   }
+  },
+  "mjw_fix": {
+   "vs_exact": {
+    "worlds": 1000,
+    "count_equal_min_ref_cap": 0.798,
+    "fewer": 23,
+    "more": 179,
+    "no_contact": 0,
+    "contacts": 1670,
+    "normal_err_deg_p50_p95_p99": [
+     0.69,
+     26.23,
+     52.96
+    ],
+    "share_normal_over_10deg": 0.1701,
+    "deepest_depth_err_mm_p50_p95_max": [
+     0.22,
+     5.65,
+     17.89
+    ],
+    "weighted_normal_err_deg_p95": [
+     25.64
+    ],
+    "coverage_of_ref_mean": 0.8654
+   },
+   "vs_c": {
+    "worlds": 1000,
+    "count_equal_min_ref_cap": 0.949,
+    "fewer": 16,
+    "more": 35,
+    "no_contact": 0,
+    "contacts": 1670,
+    "normal_err_deg_p50_p95_p99": [
+     0.0,
+     10.42,
+     34.04
+    ],
+    "share_normal_over_10deg": 0.0515,
+    "deepest_depth_err_mm_p50_p95_max": [
+     0.0,
+     1.26,
+     12.17
+    ],
+    "weighted_normal_err_deg_p95": [
+     16.04
+    ],
+    "coverage_of_ref_mean": 0.9465
+   }
+  },
+  "mjw_fix2": {
+   "vs_exact": {
+    "worlds": 1000,
+    "count_equal_min_ref_cap": 0.999,
+    "fewer": 0,
+    "more": 1,
+    "no_contact": 0,
+    "contacts": 1508,
+    "normal_err_deg_p50_p95_p99": [
+     0.0,
+     0.01,
+     0.01
+    ],
+    "share_normal_over_10deg": 0.0,
+    "deepest_depth_err_mm_p50_p95_max": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "weighted_normal_err_deg_p95": [
+     0.0
+    ],
+    "coverage_of_ref_mean": 1.0
+   },
+   "vs_c": {
+    "worlds": 1000,
+    "count_equal_min_ref_cap": 0.803,
+    "fewer": 167,
+    "more": 30,
+    "no_contact": 0,
+    "contacts": 1508,
+    "normal_err_deg_p50_p95_p99": [
+     0.01,
+     25.17,
+     52.43
+    ],
+    "share_normal_over_10deg": 0.1538,
+    "deepest_depth_err_mm_p50_p95_max": [
+     0.17,
+     6.09,
+     17.89
+    ],
+    "weighted_normal_err_deg_p95": [
+     26.28
+    ],
+    "coverage_of_ref_mean": 0.8487
+   }
+  },
+  "exact": {
+   "vs_c": {
+    "worlds": 1000,
+    "count_equal_min_ref_cap": 0.814,
+    "fewer": 0,
+    "more": 186,
+    "no_contact": 0,
+    "contacts": 1869,
+    "normal_err_deg_p50_p95_p99": [
+     0.0,
+     23.35,
+     45.23
+    ],
+    "share_normal_over_10deg": 0.1364,
+    "deepest_depth_err_mm_p50_p95_max": [
+     0.17,
+     6.09,
+     17.89
+    ],
+    "weighted_normal_err_deg_p95": [
+     25.8
+    ],
+    "coverage_of_ref_mean": 0.8489
+   }
+  }
+ },
+ "distinct_contacts_per_world_exact": {
+  "1": 593,
+  "2": 322,
+  "3": 70,
+  "4": 12,
+  "5": 3
+ },
+ "distinct_contacts_per_world_c": {
+  "1": 502,
+  "2": 380,
+  "3": 83,
+  "4": 23,
+  "5": 11,
+  "6": 1
+ }
+}

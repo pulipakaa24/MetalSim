@@ -1,0 +1,32 @@
+~/MetalSim/runs/readme_media/scratch/hfield-epa/mjw/mujoco_warp/__init__.py
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     ~/Library/Caches/warp/1.18.0.dev20260917
+bringing up nodes...
+bringing up nodes...
+
+.s.............s........................................................ [ 56%]
+........................................................                 [100%]
+=============================== warnings summary ===============================
+mujoco_warp/_src/collision_driver_test.py::CollisionTest::test_hfield_mesh_on_peak
+mujoco_warp/_src/collision_driver_test.py::CollisionTest::test_hfield_collision1
+mujoco_warp/_src/collision_driver_test.py::CollisionTest::test_hfield_mesh_gap_distance
+  ~/MetalSim/runs/readme_media/scratch/hfield-epa/mjw/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+    warnings.warn(
+
+mujoco_warp/_src/collision_driver_test.py::CollisionTest::test_convex_contact_frame_parity4
+  ~/MetalSim/runs/readme_media/scratch/hfield-epa/mjw/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('CAPSULE', 'CYLINDER')]. At most 1 contact will be generated for these pairs.
+    warnings.warn(
+
+mujoco_warp/_src/collision_driver_test.py::CollisionTest::test_hfield_box_epa_depth
+mujoco_warp/_src/collision_driver_test.py::CollisionTest::test_hfield_collision0
+mujoco_warp/_src/collision_driver_test.py::CollisionTest::test_hfield_maxconpair
+  ~/MetalSim/runs/readme_media/scratch/hfield-epa/mjw/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'BOX')]. At most 1 contact will be generated for these pairs.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+126 passed, 2 skipped, 7 warnings in 13.34s

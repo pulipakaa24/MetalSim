@@ -40,7 +40,9 @@ what changed and why.
   one panel, OIDN) on the 14-inch on battery in Low Power Mode; 250 frames is about 30 s plus about 4 s set-up.
 - **Section 3, MuJoCo Warp row: checked and adopted as the format to copy exactly** (it should have been checked first;
   the first encoder pass ran a byte-budget search instead). From
-  [its repo](https://github.com/google-deepmind/mujoco_warp) (README.md lines 35-79, `mujoco_warp/record.py`,
+  [its repo](https://github.com/google-deepmind/mujoco_warp) (`main` on 2026-10-31:
+  [README.md lines 35-79](https://github.com/google-deepmind/mujoco_warp/blob/d41a47c0837fc71abb44d7d4799bf85ca19ff7ab/README.md#L35-L79),
+  [`mujoco_warp/record.py`](https://github.com/google-deepmind/mujoco_warp/blob/d41a47c0837fc71abb44d7d4799bf85ca19ff7ab/mujoco_warp/record.py),
   CONTRIBUTING.md "Contributing Benchmarks"), with four of its files measured:
   - a 3-column HTML `<table>`, cells `<td align="center" width="33%">`, `<img width="320" src="<relative path>">`, then
     `<br><b>reproduce command</b>`;
@@ -74,13 +76,13 @@ Every tracked video was sampled frame by frame (contact strips) and every still 
 |---|---|---|
 | `docs/renders/franka_pour.mp4`, `franka_pour_grid.mp4` | keep | the one front-page-ready clip: trained policy, clean studio look, particles visible |
 | `runs/scenes/go2_boxes/film/go2_boxes.mp4` (scene YAML film) | good look, no action | `policy: hold`, the Go2 only stands |
-| `~/metalsim-fresh/runs_render/sand25m/demo/anymal_sand_25m_twolevel.mp4` (ANYmal on 25 M grains, 1920x1080, 8 s, 240 frames, 90 MB; PNG frames beside it and in `runs_render/demo/frames`) | keep, front-page ready | only needs a trimmed WebP and a small mp4; not in the repo, on the 14-inch only |
+| `anymal_sand_25m_twolevel.mp4` (ANYmal on 25 M grains, 1920x1080, 8 s, 240 frames, 90 MB, with its PNG frames; not published; its trimmed WebP is now `docs/renders/anymal_sand.webp`, provenance in [docs/renders/README.md](../renders/README.md#anymal-c-on-sand-anymal_sandwebp)) | keep, front-page ready | only needs a trimmed WebP and a small mp4; not in the repo, on the 14-inch only |
 | `docs/renders/g1_flat.mp4` (as committed) | reshoot | the robot falls within 2 s (section 2, bug 1) |
-| `docs/gallery/g1_tier2_policy.mp4` | reshoot | same checkpoint class, robots tumble, tiny in a 2x2 at 2048x1152 |
+| [`docs/gallery/g1_tier2_policy.mp4`](https://github.com/pulipakaa24/MetalSim/blob/9caff7aa53b01c1638e674e3b767bf2d52705be8/docs/gallery/g1_tier2_policy.mp4) | reshoot | same checkpoint class, robots tumble, tiny in a 2x2 at 2048x1152 |
 | `docs/gallery/cartpole_tier2_policy.mp4` | reshoot | poles are a few pixels tall |
 | `docs/gallery/g1_stage_*.mp4` (Isaac-side playback) | not front page | tiny robot in a white void; fine as parity evidence |
-| `docs/gallery/rollout.gif`, tier-0 atlases, `throughput.png`, `isaac_comparison.png` | retire from the front page | 2026-09 test renders; the charts quote superseded numbers |
-| `docs/gallery/g1_tier2_policy.mp4` is 68 MB; `docs/gallery/` is 109 MB | move out of the repo | see section 5 |
+| [`docs/gallery/rollout.gif`](https://github.com/pulipakaa24/MetalSim/blob/9caff7aa53b01c1638e674e3b767bf2d52705be8/docs/gallery/rollout.gif), tier-0 atlases, `throughput.png`, `isaac_comparison.png` | retire from the front page | 2026-09 test renders; the charts quote superseded numbers |
+| `g1_tier2_policy.mp4` is 68 MB; `docs/gallery/` is 109 MB | move out of the repo | see section 5 |
 
 The inventory covered every checkout on this Mac (`~/MetalSim`, `~/metalsim-fresh/**`, `~/metalsim-splat`,
 `~/MetalSim-purge`) and every video named in the docs and logs. A first pass searched only this checkout and wrongly
@@ -93,17 +95,17 @@ Contact strips of each video are reproducible with
 
 Verified:
 
-1. **The film's G1 checkpoint never walked.** `runs/policies/g1_flat_1500.pt` (the path in `tasks.py`) falls in 16 of
-   16 envs within 8 s under `recommended`, `recommended_pyramidal` and `default` contacts (16 envs, seed 3, 400 control
-   steps). The fresh-install check logged `g1_record: ok (rc 0)`, which is all it tested. The G1 adapter returns an
-   all-false done mask (`np.zeros(n, bool)`), so the record log says "episodes ended 0/4" with every robot on the
-   floor. The checkpoint's provenance is unknown: it sits in `~/metalsim-fresh/fix1-20261014-0325/` with no training log.
-   A checkpoint that walks exists: `~/metalsim-fresh/agents/g1regress/out/flat_main_s0.pt` (500 iterations, ep_len
-   996, 16 of 16 upright for 8 s); rough: `~/metalsim-fresh/agents/g1regress/out/rough_main_s0.pt` (terrain level
-   5.86 at iteration 1000) and `~/metalsim-fresh/agents/fixfail/g1_rough_ppowarp_fixed_it1500.pt` (15 of 16 upright).
-   Fix: the adapter should derive `done` from base height / the task's termination, the record stage should refuse a
-   film in which the filmed env terminates early unless asked, and the checkpoint should be fetched or trained by a
-   script, not assumed to be on disk.
+1. **The film's G1 checkpoint never walked.** The film's default checkpoint (`g1_flat_1500.pt` in the git-ignored
+   policies directory `tasks.py` named; not published) falls in 16 of 16 envs within 8 s under `recommended`,
+   `recommended_pyramidal` and `default` contacts (16 envs, seed 3, 400 control steps). The fresh-install check logged
+   `g1_record: ok (rc 0)`, which is all it tested. The G1 adapter returns an all-false done mask (`np.zeros(n, bool)`),
+   so the record log says "episodes ended 0/4" with every robot on the floor. The checkpoint's provenance is unknown:
+   the copy on this Mac has no training log. A checkpoint that walks exists: `flat_main_s0.pt` (500 iterations, ep_len
+   996, 16 of 16 upright for 8 s); rough: `rough_main_s0.pt` (terrain level 5.86 at iteration 1000), both since tracked
+   in `runs/g1regress/ckpt14/`, and `g1_rough_ppowarp_fixed_it1500.pt` (15 of 16 upright; 2.6 MB, not published). Fix:
+   the adapter should derive `done` from base height / the task's termination, the record stage should refuse a film in
+   which the filmed env terminates early unless asked, and the checkpoint should be fetched or trained by a script, not
+   assumed to be on disk.
 2. **Ground plane clipped to the ray tracer env cell** (MuJoCo film path). With 4 envs and with 1 env the laminate
    plane is drawn as a wedge with the HDRI's own floor showing through, and the plane edge moves as the cell grows.
    The render log warns `ray tracer env grid: geometry neared its env's cell boundary` twice per run. Franka-Pour
@@ -114,8 +116,9 @@ Verified:
    run. Fix: key the frame cache on the recording's hash, or clear frames when `rec.json` changes.
 4. **Default checkpoint paths do not exist on a fresh clone.** The film's `G1_FLAT` entry, the gallery's
    `14_g1_policy_video.py` and an example in `parity/side_by_side.py` default to `runs/policies/...`, which is
-   gitignored (GUIDE's `runs/policies/` paths are training outputs, which is fine; corrected in section 0). Fix: a `scripts/fetch_policies.sh` (release assets) or a
-   `scripts/train_demo_policies.sh` with the measured wall time, and the film doc stage records the checkpoint's hash.
+   gitignored (GUIDE's `runs/policies/` paths are training outputs, which is fine; corrected in section 0). Fix: a
+   fetch script for release assets or a training script with the measured wall time (neither written: section 0 chose
+   tracked checkpoints), and the film doc stage records the checkpoint's hash.
 
 Plausible, not fully diagnosed:
 
@@ -231,9 +234,10 @@ power, `scripts/gpu_run.sh ... timing`.
 ## 6. State on 2026-10-31
 
 - Done in the working tree, not committed: bugs 1 to 5 fixed (film tool, ray tracer env grid); G1 flat and rough
-  re-filmed with the tracked g1regress checkpoints (`runs/film/g1_{flat,rough}`, docs `docs/renders/G1_*.md`); the
-  README's 3x3 table, chart and number corrections; `docs/gallery` trimmed (7 files). Render and sensor tests: 194
-  passed, 0 failed, 8 skipped. Agent hand-offs: `runs/readme_media/handoff/`.
+  re-filmed with the tracked g1regress checkpoints (`runs/film/g1_{flat,rough}`, docs `docs/renders/G1_FLAT.md` and
+  `G1_ROUGH.md`); the README's 3x3 table, chart and number corrections; `docs/gallery` trimmed (7 files, removed in
+  [`4e31f77`](https://github.com/pulipakaa24/MetalSim/commit/4e31f77db86ad86712776aec117e73e6676a2563)). Render and
+  sensor tests: 194 passed, 0 failed, 8 skipped. Agent hand-offs: `runs/readme_media/handoff/`.
 - Merged as [PR #83](https://github.com/pulipakaa24/MetalSim/pull/83) (2026-10-31 03:26). Follow-up the same day: the G1 clips shuffled (4.0 Hz steps, 5-7 cm foot
   lift; our checkpoints were 500 and 1000 iterations). NVIDIA's published Isaac Lab 2.3 checkpoints (iterations 1499
   and 2999) now drive both films: 3.78 Hz and 7 cm lift on flat, a real stair climb on rough. The quick steps are

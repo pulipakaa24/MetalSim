@@ -2,12 +2,13 @@
 
 Scope: the G1 default is elliptic friction cones, impratio 10, Newton cap 20 (`contact_cfg="recommended"`), measured
 at 1.68× the full-PPO-loop cost of the pyramidal preset (`recommended_pyramidal`, cap 10): loop 34.3 K vs 57.6 K
-env-steps/s at 4096 envs (`runs/tp26/ellip.wrapper.log`). This note is the work on the owner's question "can that
-premium be cut without changing the converged result", reprioritised mid-way by the independent review
-(`elliptic_cost_review_2026-09-26.md`). Every number is **measured** (this machine, M4 Max 40-core GPU, 64 GB; GPU
-runs through `scripts/gpu_run.sh ... timing` on an idle device, importing frozen per-job worktrees) unless marked
-**estimated**. Raw logs: `runs/ellip_ws/`. Branch [`metalsim-ellip-ws`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-ellip-ws) of [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) (on
-[`0a9de8e`](https://github.com/pulipakaa24/mujoco_warp/commit/0a9de8e5cd098bb9c878dc5f5b98d2b53252aec3)) and [`metalsim-ellip-ws`](https://github.com/pulipakaa24/warp/tree/metalsim-ellip-ws) of [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) (`warp-innate`, on [`9abceff9`](https://github.com/pulipakaa24/warp/commit/9abceff953313e090084ed5950427a5dccf91258)). Scripts added: `scripts/diagnostics/competitors/g1_newton_iters.py`
+env-steps/s at 4096 envs (log not kept; measured with `scripts/diagnostics/g1_tp_variants.py 4096`). This note is the
+work on the owner's question "can that premium be cut without changing the converged result", reprioritised mid-way by
+the independent review (`elliptic_cost_review_2026-09-26.md`). Every number is **measured** (this machine, M4 Max
+40-core GPU, 64 GB; GPU runs through `scripts/gpu_run.sh ... timing` on an idle device, importing frozen per-job
+worktrees) unless marked **estimated**.
+Raw logs: `runs/ellip_ws/`. Branch [`metalsim-ellip-ws`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-ellip-ws) of [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) (on
+[`0a9de8e`](https://github.com/pulipakaa24/mujoco_warp/commit/0a9de8e5cd098bb9c878dc5f5b98d2b53252aec3)) and [`metalsim-ellip-ws`](https://github.com/pulipakaa24/warp/tree/metalsim-ellip-ws) of [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) (on [`9abceff9`](https://github.com/pulipakaa24/warp/commit/9abceff953313e090084ed5950427a5dccf91258)). Scripts added: `scripts/diagnostics/competitors/g1_newton_iters.py`
 ([MuJoCo](https://github.com/google-deepmind/mujoco) C and Warp-CPU Newton statistics on dumped states), `scripts/diagnostics/ellip_fused_cpu_check.py` (fused vs
 unfused, bitwise, CPU), `scripts/diagnostics/ls_noise_floor_check.py` (line-search floor, CPU),
 `scripts/diagnostics/competitors/cap_probe_variant.py` (cap probe for a solver variant); `g1_solve_iteration_cost.py`
@@ -272,7 +273,7 @@ Decision: **archived as an option, off by default** (`MJW_LS_NOISE_FLOOR=8` for 
 | recommended_pyramidal, cap 10 (P1 / P2) | 103,167 / 102,710 (39.7 / 39.9 ms) | 62,710 / 62,683 (65.3) | 62,717 / 62,480 (65.3 / 65.6 per step) | 143 / 154 ms | **57,472 / 56,899** | 1.00× |
 | recommended = elliptic ellip10, cap 20 (E0) | 85,888 / 85,692 (47.7 / 47.8) | 41,779 / 42,010 (98.0 / 97.5) | 39,461 / 39,874 (103.8 / 102.7) | 144 / 143 | **37,303 / 37,693** | **1.53×** |
 | the same with the line-search floor 8 eps (E8) | 85,870 / 86,266 (47.7 / 47.5) | 42,820 / 43,094 (95.7 / 95.0) | 40,413 / 40,473 (101.4 / 101.2) | 150 / 144 | **38,072 / 38,207** | **1.50×** |
-| before this work (`runs/tp26/ellip.wrapper.log`, 10:52): pyramidal / elliptic | 93,308–93,822 / 54,017–54,046 (43.9 / 75.8) | 62,069–62,539 / 36,371–36,513 (66.0 / 112.6) | 62,993–63,249 / 36,042–36,251 | 144–155 / 148 | 57,510–57,678 / **34,191–34,375** | **1.68×** |
+| before this work (`g1_tp_variants.py`, log not kept, 10:52): pyramidal / elliptic | 93,308–93,822 / 54,017–54,046 (43.9 / 75.8) | 62,069–62,539 / 36,371–36,513 (66.0 / 112.6) | 62,993–63,249 / 36,042–36,251 | 144–155 / 148 | 57,510–57,678 / **34,191–34,375** | **1.68×** |
 
 The elliptic cap stays 20 (the cap probe of `elliptic_cones_2026-09-25.md` §8.5 is unchanged by launch-form work; the
 iteration counts are the same to the digit in every check here). Pyramidal's loop is unchanged (57.5 K) although its
@@ -306,10 +307,11 @@ tolerance-level state change, more worlds at the cap; `MJW_WARMSTART_EXTRAP=1`);
 
 ## Sources
 
-- MuJoCo C: `scratch/deformable/mujoco_main/src/engine/engine_forward.c` (`warmstart()` 1072–1131, `mj_fwdConstraint`
-  1234–1296, `qacc_warmstart` written in `mj_advance` 1488), `engine_solver.c` (`mj_solPrimal` 2786–2935: the zero-
+- MuJoCo C: [`src/engine/engine_forward.c`](https://github.com/google-deepmind/mujoco/blob/3991e5459d28be5846377a1144bdb919ecebd3a5/src/engine/engine_forward.c) (`warmstart()` 1072–1131, `mj_fwdConstraint`
+  1234–1296, `qacc_warmstart` written in `mj_advance` 1488), [`engine_solver.c`](https://github.com/google-deepmind/mujoco/blob/3991e5459d28be5846377a1144bdb919ecebd3a5/src/engine/engine_solver.c) (`mj_solPrimal` 2786–2935: the zero-
   iteration certificate 2857–2875, the main loop 2880–2935; `PrimalSearch` 1970–2145), upstream head [`3991e54`](https://github.com/google-deepmind/mujoco/commit/3991e5459d28be5846377a1144bdb919ecebd3a5) (2026-09-25).
-- [My fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim) `upstream/warp-innate` `warp/native/metal.mm` (`Graph`, `graph_build_icb`, `graph_launch`, 92–130 /
+- [My fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim)
+  [`warp/native/metal.mm`](https://github.com/pulipakaa24/warp/blob/9abceff953313e090084ed5950427a5dccf91258/warp/native/metal.mm) (`Graph`, `graph_build_icb`, `graph_launch`, 92–130 /
   1400–1470 at [`9abceff9`](https://github.com/pulipakaa24/warp/commit/9abceff953313e090084ed5950427a5dccf91258)), Apple `MTLComputeCommandEncoder executeCommandsInBuffer:indirectBuffer:indirectBufferOffset:`.
 - [Genesis PR #3382](https://github.com/Genesis-Embodied-AI/genesis-world/pull/3382) (genesis-world, merged 2026-09-22): line-search gradient tolerance floored at the rounding noise of
   the derivative terms, kink candidates instead of midpoints; "bit-identical" on its convex run.

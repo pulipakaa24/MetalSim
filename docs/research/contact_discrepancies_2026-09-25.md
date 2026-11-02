@@ -28,12 +28,12 @@ outputs: `runs/contact_research/`.
 * PhysX `PxContactPairPoint::impulse`: "Divide by the simulation time step to get a force value"
   ([PhysX 5.6.1 API](https://nvidia-omniverse.github.io/PhysX/physx/5.6.1/_api_build/structPxContactPairPoint.html)).
 * The GPU kernel behind the call sums the per-patch **normal** impulses and multiplies by 1/dt:
-  `upstream/PhysX-omni-5.6.1/omni/extensions/runtime/source/omni.physx.tensors/plugins/gpu/CudaKernels.cu:1526–1541`
+  [`omni/extensions/runtime/source/omni.physx.tensors/plugins/gpu/CudaKernels.cu:1526–1541`](https://github.com/NVIDIA-Omniverse/PhysX/blob/107.3-omni-and-physx-5.6.1/omni/extensions/runtime/source/omni.physx.tensors/plugins/gpu/CudaKernels.cu#L1526-L1541)
   (`impulse += impulseMag * patch.normal; return timeStepInv * impulse;`, PhysX tag
   [107.3-omni-and-physx-5.6.1](https://github.com/NVIDIA-Omniverse/PhysX/tree/107.3-omni-and-physx-5.6.1)).
 * In the TGS solver the accumulated `appliedForce` is reset once per `simulate()` in constraint prep, and
   `writeBackContactBlockTGS` writes the sum over all position and velocity iterations
-  (`physx/source/gpusolver/src/CUDA/solverBlockTGS.cuh`, `contactConstraintBlockPrep.cuh`).
+  ([`physx/source/gpusolver/src/CUDA/solverBlockTGS.cuh`](https://github.com/NVIDIA-Omniverse/PhysX/blob/107.3-physx-5.6.1/physx/source/gpusolver/src/CUDA/solverBlockTGS.cuh), [`contactConstraintBlockPrep.cuh`](https://github.com/NVIDIA-Omniverse/PhysX/blob/107.3-physx-5.6.1/physx/source/gpusolver/src/CUDA/contactConstraintBlockPrep.cuh); PhysX 5.6.1).
 
 So what `record_g1.py` stored after each `env.step()` (`contacts.data.net_forces_w`) is **the normal impulse of the
 last 5 ms PhysX step of the 20 ms control step, divided by 5 ms**. The first 15 ms of every control step are never
@@ -127,7 +127,7 @@ Reading:
 * **Offsets**:
   * `g1_minimal.usd` authors no `physxCollision:contactOffset` / `restOffset`, no material, and exactly 3 colliders
     (two foot boxes, one torso box); G1_CFG sets no `collision_props` (read with pxr).
-  * Omniverse then computes the offset itself (`omni.physx` `usdLoad/Collision.cpp:275`, `UsdInterface.cpp`):
+  * Omniverse then computes the offset itself (`omni.physx` [`usdLoad/Collision.cpp:275`](https://github.com/NVIDIA-Omniverse/PhysX/blob/107.3-omni-and-physx-5.6.1/omni/extensions/runtime/source/omni.physx/plugins/usdLoad/Collision.cpp#L275), `UsdInterface.cpp`):
     planes get 0.02 m; the foot box gets max(2·dt²·g, 0.02 × smallest extent) ≈ 0.5 mm (**estimated** from that rule).
     Rest offset is 0.
   * A contact generated at positive separation is solved speculatively: TGS uses the inverse *substep* dt as bias for
@@ -174,13 +174,15 @@ Facts:
   timestep-dependent quantity. You should be looking at the integral of the impulse (force*dt)" (Tassa,
   [#1620](https://github.com/google-deepmind/mujoco/issues/1620); likewise [#1743](https://github.com/google-deepmind/mujoco/issues/1743)).
 * **[Newton](https://github.com/newton-physics/newton)'s ke/kd → MuJoCo mapping**
-  (`upstream/newton/newton/_src/solvers/mujoco/kernels.py:189–203`; newton-1.5.2 `:192–206`):
+  ([`newton/_src/solvers/mujoco/kernels.py:189–203`](https://github.com/pulipakaa24/newton/blob/90e23324521fa86710e483e01d02e80d1dac0060/newton/_src/solvers/mujoco/kernels.py#L189-L203) in my fork of Newton; newton-1.5.2
+  [`:192–206`](https://github.com/newton-physics/newton/blob/v1.5.2/newton/_src/solvers/mujoco/kernels.py#L192-L206)):
   * Formula: `timeconst = 2/(kd·d_width)`, `dampratio = kd/2·sqrt(d_r/ke)`.
   * Applied per geom as `convert_solref(ke, kd, 1.0, 1.0)` (`solver_mujoco.py:6602`, the default
     `SOLREF_MODE_MJCF_DEFAULT`, no mass scaling); solimp stays MuJoCo's default.
   * Isaac Lab 3.0's `NewtonShapeCfg(margin=0.0, ke=160000, kd=1100)`
-    (`scratch/deformable/il3/source/isaaclab_tasks/isaaclab_tasks/core/velocity/velocity_env_cfg.py:71`, 2 substeps of
-    5 ms) maps to **solref (1.82 ms, 1.375)**. refsafe raises that to **(5 ms, 1.375)**, default solimp (0.9, 0.95, 0.001).
+    ([`source/isaaclab_tasks/isaaclab_tasks/core/velocity/velocity_env_cfg.py:71`](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/source/isaaclab_tasks/isaaclab_tasks/core/velocity/velocity_env_cfg.py#L71)
+    at v3.0.0-EA, 2 substeps of 5 ms) maps to **solref (1.82 ms, 1.375)**. refsafe raises that to **(5 ms, 1.375)**,
+    default solimp (0.9, 0.95, 0.001).
   * That is close to our τ5 preset with a softer impedance. The earlier reading of ke/kd as the direct form
     (−160000, −1100) was not Newton's mapping, which is why that robot never fell.
 * **Published humanoid configs**:

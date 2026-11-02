@@ -12,7 +12,8 @@ source was found.
 
 ### 1.1 Materials: OmniPBR and UsdPreviewSurface
 
-The G1 asset (`assets/isaac/G1/g1_minimal.usd`) binds 43 OmniPBR materials that author **only**
+The G1 asset (`assets/isaac/G1/g1_minimal.usd`, fetched from NVIDIA's public Isaac Lab asset store by
+`scripts/fetch_isaac_assets.sh`) binds 43 OmniPBR materials that author **only**
 `diffuse_color_constant` (0.7 grey plates, 0.2 dark parts); everything else is at OmniPBR's defaults
 (`reflection_roughness_constant` 0.5, `metallic_constant` 0, `specular_level` 0.5, no emission, no texture).
 
@@ -80,7 +81,7 @@ by the layer's directional reflectance rather than by F(V·H), Storm uses k = al
   [USDImporter.cpp](https://github.com/NVIDIAGameWorks/Falcor/blob/master/Source/plugins/importers/USDImporter/USDImporter.cpp));
   exposure = 0.01·ISO / (shutter·N²) = 8.0·10⁻⁴ (Falcor's ToneMapper formula; RTX's own formula unverified).
   Default operator, white point, `cm2Factor` and auto-exposure: **unverified** (no defaults on the docs page).
-  Isaac Sim 5.1's `isaacsim.exp.base.kit` and [Isaac Lab](https://github.com/isaac-sim/IsaacLab)'s `apps/*.kit` set no
+  Isaac Sim 5.1's `isaacsim.exp.base.kit` and [Isaac Lab](https://github.com/isaac-sim/IsaacLab)'s [`apps/*.kit`](https://github.com/isaac-sim/IsaacLab/tree/v2.3.2/apps) set no
   tonemap keys, so Kit's defaults apply.
 * **Measured**: the RTX sky reads (168.0, 173.0, 179.9) for a dome radiance of (300, 320, 360) nits. A linear
   exposure + sRGB can match the sky alone (k = 1.27·10⁻³) but then puts the lit ground at 200 vs 230; the Narkowicz
@@ -110,7 +111,7 @@ by the layer's directional reflectance rather than by F(V·H), Storm uses k = al
   ([rtx-renderer_pt](https://docs.omniverse.nvidia.com/materials-and-rendering/latest/rtx-renderer_pt.html));
   our recording ran PT at 32 spp. RT mode: Real-Time 2.0 uses DLSS Ray Reconstruction "if supported by the GPU and
   not optional" ([rtx-renderer_rt](https://docs.omniverse.nvidia.com/materials-and-rendering/latest/rtx-renderer_rt.html));
-  Isaac Lab's `rendering_modes/*.kit` toggle `rtx-transient.dldenoiser`. Isaac Lab's rendering kit disables
+  Isaac Lab's [`rendering_modes/*.kit`](https://github.com/isaac-sim/IsaacLab/tree/v2.3.2/apps/rendering_modes) toggle `rtx-transient.dldenoiser`. Isaac Lab's rendering kit disables
   reflections, translucency and indirect diffuse in RT mode and enables sampled direct lighting at 1 spp
   ([isaaclab.python.rendering.kit](https://github.com/isaac-sim/IsaacLab/blob/main/apps/isaaclab.python.rendering.kit)) —
   which is why RT's shadows are brighter than PT's (measured: shadow 166 vs 126 levels).
@@ -172,7 +173,7 @@ every Isaac frame from Isaac's own recorded root pose and joint angles (kinemati
 IoU 0.999, robot depth RMSE < 1 mm), so all 110 RT / 22 PT frames compare shading only. Metrics are
 `metalsim.parity.compare.image_metrics` (whole frame; robot = union silhouette, grey outside, crop): PSNR / SSIM /
 LPIPS (AlexNet) / FLIP. Tier 2 at 16 spp × 8 passes, 3 bounces unless noted. Per-run outputs and `summary.json` in
-`runs/render_parity/{rt,pt}_<preset>`; logs `runs/render_parity/*.log`; table script `runs/render_parity/analyze.py`.
+`runs/render_parity/{rt,pt}_<preset>`; logs [`runs/render_parity/*.log`](../../runs/render_parity/); table script `runs/render_parity/analyze.py`.
 "ms/frame" = host path (upload, render, readback) at batch 4, 1024×576.
 
 **Reference points.** Isaac RT vs Isaac PT on identical states: whole 28.1 dB / 0.983, robot 25.9 dB / 0.910.
@@ -265,10 +266,10 @@ GPU lock; the renderer's output was identical to the successful runs (`runs/came
 The path tracer now also zeroes any non-finite path estimate before accumulation, and
 `test_physical_preset_batch_is_finite` checks 1024 frames.
 
-**Gallery videos** (`docs/gallery/g1_stage_*.mp4`, 12 files, via `scripts/gallery/g1_stage_videos.sh` + round 2):
+**Gallery videos** ([`docs/gallery/g1_stage_*.mp4`](../gallery/), 12 files, via `scripts/gallery/g1_stage_videos.sh` + round 2):
 re-rendered with `metalsim.parity.side_by_side --tier2_mode rtx` (preset `oidn_cal_fvg`, 16 spp × 4 passes).
 
-### 3.4 Protocol replay (physics re-simulated, `runs/parity/metalsim2`, reports `runs/parity/report_{rt4,pt4}`)
+### 3.4 Protocol replay (physics re-simulated, frames not published, `scripts/gallery/g1_replay_rerender.sh` regenerates them; reports `runs/parity/report_{rt4,pt4}`)
 
 | | whole frame PSNR / SSIM / LPIPS / FLIP | robot, states agreeing (IoU > 0.7): PSNR / SSIM / LPIPS / FLIP (brightness-matched PSNR) | n | robot depth RMSE |
 |---|---|---|---|---|
@@ -334,7 +335,7 @@ randomizes dome textures per episode). MetalSim had only `dome=(intensity, color
 - **Radiance**. UsdLux `LightAPI`: `intensity` "scales the brightness of the light linearly", `exposure`
   "scales the brightness of the light exponentially as a power of 2", `color` "the color of emitted light, in
   the rendering color space"; the schema's formula is L = intensity · 2^exposure · color, "a light with
-  intensity 1 and exposure 0 generates pixel [1, 1, 1] with luminance of 1 nit" (`pxr/usd/usdLux/schema.usda`,
+  intensity 1 and exposure 0 generates pixel [1, 1, 1] with luminance of 1 nit" ([`pxr/usd/usdLux/schema.usda`](https://github.com/PixarAnimationStudios/OpenUSD/blob/release/pxr/usd/usdLux/schema.usda),
   OpenUSD release). For a textured dome the texture multiplies this: L(ω) = texture(ω) · intensity · 2^exposure
   · color. `set_environment(hdr, intensity, exposure, color)` applies exactly that (`test_env_map_furnace`: a
   0.5 map at intensity 2, exposure 1, colour (1, 0.5, 0.25) reads 0.5 · 4 · colour).
@@ -350,9 +351,9 @@ randomizes dome textures per episode). MetalSim had only `dome=(intensity, color
   adds a +90° x-rotation); USD 24.03's `DomeLight_1` adds `inputs:poleAxis` = scene | Y | Z, fallback "scene"
   = the stage's up axis. **Kit/RTX does not follow the +Y rule**: NVIDIA's own
   [`usd-exchange-samples`](https://github.com/NVIDIA-Omniverse/usd-exchange-samples)
-  (`source/createLights/README.md`) states "Kit/RTX treats the DomeLight environment as Z-up, unlike the
+  ([`source/createLights/README.md`](https://github.com/NVIDIA-Omniverse/usd-exchange-samples/blob/main/source/createLights/README.md)) states "Kit/RTX treats the DomeLight environment as Z-up, unlike the
   OpenUSD +Y pole convention" and "does not currently render this authored DomeLight rotation correctly";
-  Isaac Lab's `spawn_light` (`isaaclab/sim/spawners/lights/lights.py`) authors no rotation on a DomeLight and
+  Isaac Lab's `spawn_light` ([`isaaclab/sim/spawners/lights/lights.py`](https://github.com/isaac-sim/IsaacLab/blob/v2.3.2/source/isaaclab/isaaclab/sim/spawners/lights/lights.py)) authors no rotation on a DomeLight and
   Isaac's stages are z-up, so in Isaac a latlong map's poles are ±z with no transform. The Omniverse "Lights"
   documentation adds that the current default is "such that a default camera will be looking at the horizon"
   (the earlier extra transform Kit applied "has been removed").

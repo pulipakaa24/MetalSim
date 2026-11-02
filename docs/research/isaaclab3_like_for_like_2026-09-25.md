@@ -7,12 +7,12 @@ given that 3.0's task is harder than the 2.3.2 one MetalSim's port matches, and 
 [MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp) with settings of its own?
 
 Sources: Isaac Lab tag [`v3.0.0-EA`](https://github.com/isaac-sim/IsaacLab/tree/v3.0.0-EA) (commit
-[`ae37b028`](https://github.com/isaac-sim/IsaacLab/commit/ae37b028ea415c91ea2bc32609efcd759ed2b974), 2026-09-16) cloned to
-`upstream/IsaacLab3`; Isaac Lab tag [`v2.3.2`](https://github.com/isaac-sim/IsaacLab/tree/v2.3.2)
-([`37ddf626`](https://github.com/isaac-sim/IsaacLab/commit/37ddf626871758333d6ed89cf64ad702aef127d0)) sparse-cloned to
-`upstream/IsaacLab232`; upstream Newton [1.5.2](https://github.com/newton-physics/newton/tree/v1.5.2)
+[`ae37b028`](https://github.com/isaac-sim/IsaacLab/commit/ae37b028ea415c91ea2bc32609efcd759ed2b974), 2026-09-16) read from a
+local clone; Isaac Lab tag [`v2.3.2`](https://github.com/isaac-sim/IsaacLab/tree/v2.3.2)
+([`37ddf626`](https://github.com/isaac-sim/IsaacLab/commit/37ddf626871758333d6ed89cf64ad702aef127d0)) read from a
+sparse clone; upstream Newton [1.5.2](https://github.com/newton-physics/newton/tree/v1.5.2)
 ([`cf5378db`](https://github.com/newton-physics/newton/commit/cf5378db6002b5c19b86344737cdd40cb8e08f0c), Isaac Lab 3.0's
-pin) in `upstream/newton-1.5.2`; the live settings recorded on the NVIDIA L4 GPU
+pin); the live settings recorded on the NVIDIA L4 GPU
 (`runs/parity3/isaac/newton_mjwarp_settings.json`,
 `runs/parity3/isaac/fidelity/newton_mjwarp/{meta.json,newton_generated.xml}`). Paths below are relative to each
 repository's `source/` unless stated. Every number is measured unless marked otherwise.
@@ -36,15 +36,17 @@ Code: `metalsim/learn/g1_il3.py` (kernels, constants, citations), switches in `G
 
 | event | 2.3.2 G1 | 3.0 G1 (source) | how it is applied in Isaac | here |
 |---|---|---|---|---|
-| `push_robot` | `None` | `push_by_setting_velocity`, interval, `interval_range_s=(10, 15)`, `velocity_range` x, y ±0.5 m/s (`velocity_env_cfg.py` `EventsCfg`; G1 no longer removes it) | `isaaclab/envs/mdp/events.py:2099`: root **COM** velocity (`root_vel_w` = `root_com_vel_w`) `+= U(range)` per axis, unlisted axes 0; `write_root_velocity_to_sim_index`. `isaaclab/managers/event_manager.py`: per-env timer `U(10, 15)` at start and on each reset of the env, `-= step_dt` every env step, fire and redraw below 1e-6. `manager_based_rl_env.py` step order: physics, terminations, rewards, resets, command update, **interval events**, observations | `g1_il3.g1_push_il3` between the command update and the observation; timer drawn in the reset kernel; the frame origin's velocity changes by the same vector as the COM's (ω unchanged) |
+| `push_robot` | `None` | `push_by_setting_velocity`, interval, `interval_range_s=(10, 15)`, `velocity_range` x, y ±0.5 m/s (`velocity_env_cfg.py` `EventsCfg`; G1 no longer removes it) | [`isaaclab/envs/mdp/events.py:2099`](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/source/isaaclab/isaaclab/envs/mdp/events.py#L2099): root **COM** velocity (`root_vel_w` = `root_com_vel_w`) `+= U(range)` per axis, unlisted axes 0; `write_root_velocity_to_sim_index`. [`isaaclab/managers/event_manager.py`](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/source/isaaclab/isaaclab/managers/event_manager.py): per-env timer `U(10, 15)` at start and on each reset of the env, `-= step_dt` every env step, fire and redraw below 1e-6. `manager_based_rl_env.py` step order: physics, terminations, rewards, resets, command update, **interval events**, observations | `g1_il3.g1_push_il3` between the command update and the observation; timer drawn in the reset kernel; the frame origin's velocity changes by the same vector as the COM's (ω unchanged) |
 | `add_base_mass` | `None` | `randomize_rigid_body_mass` on `torso_link` (G1 override of "base"), startup, `mass_distribution_params=(1/1.25, 1.25)`, `operation="scale"`, `distribution="log_uniform"` | `events.py:665`: mass = default × exp(U(log 0.8, log 1.25)) per env, `recompute_inertia=True` (default): inertia tensor × the same ratio; COM unchanged. Newton backend: `SolverMuJoCo.notify_model_changed(BODY_INERTIAL_PROPERTIES)` (Newton `solver_mujoco.py` ~4440) runs `set_const_fixed` + `set_const_0` and re-scales the force-space joint-limit solref from the new `dof_invweight0` | per-world `body_mass`, `body_inertia` (+ `body_subtreemass`, `body_invweight0`, `dof_invweight0`, and `jnt_solref` on the isaaclab3 preset) on the torso; MuJoCo Warp `set_const`; `stat.meaninertia` restored to nominal (a shared field) |
 | `reset_base` | pose xy ±0.5, yaw ±3.14, **velocity 0** | the base config's: pose xy ±0.5, yaw ±3.14, **velocity ±0.5 on x, y, z, roll, pitch, yaw** | `events.py:2127`: velocity = default (0) + U(range), world frame, written as the root COM velocity ("the root's center of mass rather than the root's frame"); orientation = default × quat_from_euler_xyz(0, 0, yaw) | `g1_il3.g1_reset_il3`: MuJoCo's free joint takes v_origin = v_com − ω × (R r_com), ω_body = Rᵀ ω; yaw ±3.14 (the 2.3.2 port keeps its ±π) |
 | unchanged | `physics_material` 0.8 / 0.6 degenerate, `reset_robot_joints` (1, 1), zero `base_external_force_torque`, `base_com` None | same | – | – |
 
 ### 1.2 Other differences that change the MDP
 
-* **Contact sensor on Newton** (`isaaclab_newton/sensors/contact_sensor/contact_sensor.py`): `force_threshold` None →
-  **0 N** on Newton (1 N on PhysX, `isaaclab_physx/.../contact_sensor.py:131`, and in 2.3.2), so a foot is "in contact"
+* **Contact sensor on Newton**
+  ([`isaaclab_newton/sensors/contact_sensor/contact_sensor.py`](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/source/isaaclab_newton/isaaclab_newton/sensors/contact_sensor/contact_sensor.py)):
+  `force_threshold` None → **0 N** on Newton (1 N on PhysX,
+  [`isaaclab_physx/.../contact_sensor.py:131`](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/source/isaaclab_physx/isaaclab_physx/sensors/contact_sensor/contact_sensor.py#L131), and in 2.3.2), so a foot is "in contact"
   for air/contact time as soon as its normal force is non-zero. The sensor is updated once per 5 ms physics tick with the
   forces of the tick's last 2.5 ms substep (`NewtonManager._update_sensors` → `solver.update_contacts`); the G1's
   implicit actuators are not all CUDA-graph-safe, so `handles_decimation()` is False and the env loops the four ticks,
@@ -54,16 +56,18 @@ Code: `metalsim/learn/g1_il3.py` (kernels, constants, citations), switches in `G
   2.3.2 documents as the normal force). MetalSim's sensor reports the normal force in both.
 * **Root linear velocity = the pelvis COM's.** `base_lin_vel`, `track_lin_vel_xy_yaw_frame_exp` and `lin_vel_z_l2`
   read `root_lin_vel_*`, which is `root_com_lin_vel_*` in both versions (3.0
-  `isaaclab/assets/articulation/base_articulation_data.py:1384-1398`; 2.3.2 `articulation_data.py:1041`). The 2.3.2
+  [`isaaclab/assets/articulation/base_articulation_data.py:1384-1398`](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/source/isaaclab/isaaclab/assets/articulation/base_articulation_data.py#L1384-L1398);
+  2.3.2 [`articulation_data.py:1041`](https://github.com/isaac-sim/IsaacLab/blob/v2.3.2/source/isaaclab/isaaclab/assets/articulation/articulation_data.py#L1041)). The 2.3.2
   ports (and their tests) used MuJoCo's free-joint velocity, i.e. the pelvis frame origin, 7.6 cm above the pelvis COM
   (difference ω × r, up to ~4 cm/s at 0.5 rad/s). **This is a defect of the 2.3.2 ports**, found here; the il3
   configs use the COM velocity (checked against [MuJoCo](https://github.com/google-deepmind/mujoco) C's
   `mj_objectVelocity`); the 2.3.2 configs are left as they
   were (rule: keep them untouched; ledger row below).
 * **Rough terrain on Newton is a heightfield.** 3.0's `ROUGH_TERRAINS_CFG` sets `convert_to_heightfield=True` on every
-  sub-terrain (`isaaclab/terrains/config/rough.py`; the hf terrains default to True), and the terrain importer tags the
+  sub-terrain ([`isaaclab/terrains/config/rough.py`](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/source/isaaclab/isaaclab/terrains/config/rough.py); the hf terrains default to True), and the terrain importer tags the
   mesh for conversion only if all do (`terrain_importer.py` `_tag_heightfield_collider`); Newton then rasterizes the
-  mesh to a heightfield at the 0.1 m horizontal scale (`isaaclab_newton/physics/newton_manager.py`
+  mesh to a heightfield at the 0.1 m horizontal scale
+  ([`isaaclab_newton/physics/newton_manager.py`](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/source/isaaclab_newton/isaaclab_newton/physics/newton_manager.py)
   `_inject_terrain_heightfields` → `newton.Heightfield.create_from_mesh`, "rays are cast straight down ... on a regular
   grid"). Stair risers and box walls become 0.1 m ramps on Isaac's Newton backend: MetalSim's `terrain_collision="hfield"`,
   which is `rough_il3`'s default (the 2.3.2 rough port keeps its exact boxes, which match PhysX's mesh). The height
@@ -76,8 +80,10 @@ Code: `metalsim/learn/g1_il3.py` (kernels, constants, citations), switches in `G
 
 ### 1.3 Unchanged between the tags (diff)
 
-Reward terms, weights and formulas (`isaaclab_tasks/core/velocity/mdp/rewards.py`: only `.torch` accessors and the
-normal-force field above; `isaaclab/envs/mdp/rewards.py`: `joint_torques_l2` reads `actuators.applied_effort`, the
+Reward terms, weights and formulas
+([`isaaclab_tasks/core/velocity/mdp/rewards.py`](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/source/isaaclab_tasks/isaaclab_tasks/core/velocity/mdp/rewards.py): only
+`.torch` accessors and the normal-force field above;
+[`isaaclab/envs/mdp/rewards.py`](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/source/isaaclab/isaaclab/envs/mdp/rewards.py): `joint_torques_l2` reads `actuators.applied_effort`, the
 same implicit-PD estimate as 2.3.2's `applied_torque`); observation terms and noise (`UniformNoiseCfg` is additive like
 2.3.2's `AdditiveUniformNoiseCfg`; projected gravity now normalizes the gravity vector, a no-op); command ranges and
 heading control (`velocity_command.py`: only new success metrics); terminations (field above); curriculum
@@ -121,7 +127,7 @@ and is only read). `G1VelocityTask(solver_cfg=...)`, `metalsim.parity.record_g1 
 |---|---|---|
 | 5 ms tick × 2 substeps = 2.5 ms solver step (`NewtonCfg.num_substeps=2`, `sim.dt` 0.005) | yes | the task's 2.5 ms substeps, 8 per control step |
 | Newton solver, caps 100 / 50 (`MJWarpSolverCfg`) | yes (`isaaclab3`); cap 20 in the training preset | caps copied; see the cost row |
-| early exit at tolerance 1e-6, ls_tolerance 0.01 | **numerically yes, cost no** | MuJoCo Warp marks every world done at the tolerance and skips it in later iterations whether or not a CUDA conditional graph node stops the loop (`mujoco_warp/_src/solver.py` `_solve_done`, `ctx.done`); Metal has no conditional node, so all 100 iterations still launch: 27.5 K vs 53.7 K env-steps/s (§2.3). A cap of 20 gives the same states to float noise (1.2e-7 after 0.2 s, `test_iteration_cap_only_changes_worlds_that_reach_it`) whenever no world needs more than 20 iterations (probe below) |
+| early exit at tolerance 1e-6, ls_tolerance 0.01 | **numerically yes, cost no** | MuJoCo Warp marks every world done at the tolerance and skips it in later iterations whether or not a CUDA conditional graph node stops the loop ([`mujoco_warp/_src/solver.py`](https://github.com/pulipakaa24/mujoco_warp/blob/metalsim/mujoco_warp/_src/solver.py) `_solve_done`, `ctx.done`); Metal has no conditional node, so all 100 iterations still launch: 27.5 K vs 53.7 K env-steps/s (§2.3). A cap of 20 gives the same states to float noise (1.2e-7 after 0.2 s, `test_iteration_cap_only_changes_worlds_that_reach_it`) whenever no world needs more than 20 iterations (probe below) |
 | implicitfast, pyramidal cone, impratio 1 | yes | already the task's |
 | contact solref (1.82 ms, 1.375) from ke 1.6e5 / kd 1100 via `convert_solref(ke, kd, 1, 1)` (shape `solref_mode` default MJCF_DEFAULT, so no force-space override), solimp (0.9, 0.95, 0.001, 0.5, 2) | yes | geom solref / solimp; MuJoCo's refsafe raises 1.82 ms to 2 dt = 5 ms in both engines |
 | friction: max(robot 0.8, ground 1.0) = 1.0 | yes (already) | MuJoCo's max rule with robot geoms at 1.0 |
@@ -222,7 +228,7 @@ launch; per-world exit makes most of them no-ops); a cap of 20 recovers 91–93 
 Run: `runs/il3/run_train.sh flat isaaclab3_every_substep_cap20 1500 0` = `python -m metalsim.learn.g1_velocity 4096 flat train
 1500 ... 0.0025 --reward_cfg flat_il3 --solver_cfg isaaclab3_every_substep_cap20 --seed 0` (PPOWarp, Isaac's G1 flat PPO
 configuration, 4096 envs, 2.5 ms physics, seed 0). Log `runs/il3/train_flat_il3_isaaclab3_every_substep_cap20_s0.log`
-(with a `terms it N {...}` line per iteration), checkpoints every 100 iterations in `runs/il3/ckpt/`. Comparison:
+(with a `terms it N {...}` line per iteration), checkpoints every 100 iterations (not kept). Comparison:
 `python scripts/diagnostics/g1_learning_curves.py il3 flat <log>` (`runs/il3/curves_flat.md`); Isaac's side is
 `runs/parity3/isaac/train/train_flat_{newton_mjwarp,isaacsim_physx}_terms.txt`. add_base_mass drew torso scales 0.800–1.250
 (dof_invweight0 ratios 0.95–1.05, joint-limit time-constant ratios 0.98–1.02); 139,712 pushes over the run (≈0.8 per
@@ -528,7 +534,8 @@ finding.
 Reloading a saved state (qpos, qvel, ctrl, qacc_warmstart) and re-stepping one control step is not bit-reproducible:
 up to 2.9 (flat) / 4.5 (rough) rad/s in the worst world of 4096, p99 1e-3 rad/s (§6.4). Where it comes from: MuJoCo
 Warp accumulates with floating-point atomics whose order the GPU does not fix. Counts of `wp.atomic_*` in
-`upstream/mujoco_warp/mujoco_warp/_src`: constraint.py 52 (constraint-row assembly and efc address reservation),
+[`mujoco_warp/_src`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim/mujoco_warp/_src) of
+[my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim): constraint.py 52 (constraint-row assembly and efc address reservation),
 smooth.py 45 (composite inertia, com velocities, Jacobian products), solver.py 13 (gradients, the unconverged-world
 counter), collision_driver.py 1 (the contact counter: contact order varies run to run), forward.py 2; also
 collision_core / convex / flex, passive, sensor, derivative, island, set_const. The solver comment at solver.py:2612
@@ -537,8 +544,9 @@ state left out of the reload (e.g. the contact buffer order) is covered, so part
 not the atomics.
 
 A deterministic mode exists upstream but not for Metal. Warp (the base of
-[my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim), `warp/config.py`) has
-`warp.config.deterministic = DeterministicMode.RUN_TO_RUN | GPU_TO_GPU` (`warp/_src/deterministic.py`: scatter-sort-reduce
+[my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim), [`warp/config.py`](https://github.com/NVIDIA/warp/blob/v1.16.0/warp/config.py)) has
+`warp.config.deterministic = DeterministicMode.RUN_TO_RUN | GPU_TO_GPU`
+([`warp/_src/deterministic.py`](https://github.com/NVIDIA/warp/blob/v1.16.0/warp/_src/deterministic.py): scatter-sort-reduce
 for accumulating atomics, a two-pass scheme for counter atomics). Newton 1.5.2 drives it for MuJoCo Warp's modules
 (`SolverMuJoCo._set_mujoco_warp_module_options`: per-module `deterministic` and `deterministic_max_records`, with a
 record bound derived from njmax and constraint-row widths). Isaac Lab 3.0 exposes it as `NewtonCfg.deterministic_mode`;
@@ -824,7 +832,7 @@ Newton puts the same limit on the joint (actuatorfrcrange, applied after the act
 implicit, so Isaac never blows a finger.**
 
 Sources: MuJoCo C `engine_derivative.c:2416` (mjd_actuator_vel: "skip if force is clamped by forcerange") and MuJoCo Warp
-`_src/derivative.py:133` ([my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) at
+[`_src/derivative.py:133`](https://github.com/pulipakaa24/mujoco_warp/blob/9b4e96af2ddec285e0f58595fbba27c31a64852a/mujoco_warp/_src/derivative.py#L133) ([my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) at
 [`9b4e96a`](https://github.com/pulipakaa24/mujoco_warp/commit/9b4e96af2ddec285e0f58595fbba27c31a64852a)) zero a clamped
 actuator's velocity derivative. `engine_forward.c:998` /
 `forward.py:1595` clamp `qfrc_actuator` by `jnt_actfrcrange` after the sum. Newton writes the G1 as two `<general>`

@@ -10,20 +10,20 @@ on Metal, the [Isaac Lab](https://github.com/isaac-sim/IsaacLab) 3.0 path). **Me
 in the cited file; **estimated** = judgement.
 
 Sources (all BSD-3 unless noted):
-* [PX] `upstream/PhysX` = [github.com/NVIDIA-Omniverse/PhysX](https://github.com/NVIDIA-Omniverse/PhysX) `main` at
+* [PX] [github.com/NVIDIA-Omniverse/PhysX](https://github.com/NVIDIA-Omniverse/PhysX) `main` at
   [`da950a35`](https://github.com/NVIDIA-Omniverse/PhysX/commit/da950a3537927784951853c66618036f332ca0ce) (2026-09-16,
-  PhysX 5.11.0, ovphysx 0.6.3), shallow clone.
-* [PX561] `upstream/PhysX-5.6.1` = tag
+  PhysX 5.11.0, ovphysx 0.6.3), read from a local shallow clone.
+* [PX561] tag
   [`107.3-physx-5.6.1`](https://github.com/NVIDIA-Omniverse/PhysX/tree/107.3-physx-5.6.1)
   ([`5ca9f472`](https://github.com/NVIDIA-Omniverse/PhysX/commit/5ca9f472105a90d70d957c243cb0ef36fe251a9f), PhysX
   5.6.1.b07ddd12): the PhysX of [Isaac Sim](https://github.com/isaac-sim/IsaacSim) 5.1, which recorded every Isaac
   reference so far and is the last release with particle cloth.
-* [OMNI] `upstream/PhysX-omni-5.6.1` = tag
+* [OMNI] tag
   [`107.3-omni-and-physx-5.6.1`](https://github.com/NVIDIA-Omniverse/PhysX/tree/107.3-omni-and-physx-5.6.1)
   ([`09ff24f3`](https://github.com/NVIDIA-Omniverse/PhysX/commit/09ff24f3279b735e672ff27b155cbf49f6296f4d)): the same
   PhysX plus the omni.physx Kit extensions (USD parsing, `particleUtils.py`), i.e. the code between Isaac Sim 5.1's USD
   and PhysX.
-* File paths below are relative to `physx/source/` of [PX561] unless prefixed.
+* File paths below are relative to [`physx/source/`](https://github.com/NVIDIA-Omniverse/PhysX/tree/107.3-physx-5.6.1/physx/source) of [PX561] unless prefixed.
 * Cross-check: [`deformables_2026-09-25.md`](deformables_2026-09-25.md) §9 (the fitting agent, same sources) reaches the
   same formulations; this note adds the partition/copy/blend scheme, the exact spring and contact update formulas, the
   TGS schedule
@@ -47,11 +47,11 @@ reproducing the schedule, not only the constraint functions.
 ## 1. Versions and licence
 
 * PhysX GPU source is public (since 5.6) and BSD-3 (`LICENSE.md`, "Copyright (c) 2008-2025, NVIDIA Corporation";
-  identical text in [OMNI]). No GPL/Apache/MPL text anywhere under `physx/source` or `physx/include` (grep,
-  source). [OMNI] ships two third-party licences (`omni/licenses/pyboost11-LICENSE.md`, `vhacd-LICENSE.md`),
+  identical text in [OMNI]). No GPL/Apache/MPL text anywhere under [`physx/source`](https://github.com/NVIDIA-Omniverse/PhysX/tree/107.3-physx-5.6.1/physx/source) or [`physx/include`](https://github.com/NVIDIA-Omniverse/PhysX/tree/107.3-physx-5.6.1/physx/include) (grep,
+  source). [OMNI] ships two third-party licences ([`omni/licenses/pyboost11-LICENSE.md`](https://github.com/NVIDIA-Omniverse/PhysX/blob/107.3-omni-and-physx-5.6.1/omni/licenses/pyboost11-LICENSE.md), [`vhacd-LICENSE.md`](https://github.com/NVIDIA-Omniverse/PhysX/blob/107.3-omni-and-physx-5.6.1/omni/licenses/vhacd-LICENSE.md)),
   neither in the solver paths. Porting the algorithms (or code) into MetalSim is licence-compatible with
   attribution.
-* **Particle cloth is gone from PhysX main.** [PX] `physx/CHANGELOG.md` v5.9.0-110.1, "Particles / Removed":
+* **Particle cloth is gone from PhysX main.** [PX] [`physx/CHANGELOG.md`](https://github.com/NVIDIA-Omniverse/PhysX/blob/da950a3537927784951853c66618036f332ca0ce/physx/CHANGELOG.md) v5.9.0-110.1, "Particles / Removed":
   "Removed the deprecated particle cloth feature. Use PxDeformableSurface as a replacement for cloth simulation"
   (with `PxParticleClothBuffer`, `PxParticleClothCooker`, `SnippetPBDCloth`); particle rigids, attachments and
   volumes removed as well. v5.9 also removed the `PxSoftBody` compatibility layer. So: Isaac Sim 5.1 (PhysX
@@ -68,10 +68,12 @@ reproducing the schedule, not only the constraint functions.
 
 ### 2.1 Host side: how a cloth becomes springs
 
-* API: `include/PxParticleBuffer.h` (`PxParticleSpring {ind0, ind1, length, stiffness, damping}`,
+* API: [`include/PxParticleBuffer.h`](https://github.com/NVIDIA-Omniverse/PhysX/blob/107.3-physx-5.6.1/physx/include/PxParticleBuffer.h) (`PxParticleSpring {ind0, ind1, length, stiffness, damping}`,
   `PxParticleCloth {startVertexIndex, numVertices, clothBlendScale, restVolume, pressure, ...}`),
-  `include/extensions/PxParticleExt.h`, `include/PxPBDParticleSystem.h`, `include/PxPBDMaterial.h`.
-* Spring generation (`physxextensions/src/ExtParticleClothCooker.cpp`, 464 lines, `cookConstraints`): all unique
+  [`include/extensions/PxParticleExt.h`](https://github.com/NVIDIA-Omniverse/PhysX/blob/107.3-physx-5.6.1/physx/include/extensions/PxParticleExt.h),
+  [`include/PxPBDParticleSystem.h`](https://github.com/NVIDIA-Omniverse/PhysX/blob/107.3-physx-5.6.1/physx/include/PxPBDParticleSystem.h),
+  [`include/PxPBDMaterial.h`](https://github.com/NVIDIA-Omniverse/PhysX/blob/107.3-physx-5.6.1/physx/include/PxPBDMaterial.h).
+* Spring generation ([`physxextensions/src/ExtParticleClothCooker.cpp`](https://github.com/NVIDIA-Omniverse/PhysX/blob/107.3-physx-5.6.1/physx/source/physxextensions/src/ExtParticleClothCooker.cpp), 464 lines, `cookConstraints`): all unique
   triangle edges; an edge that is the longest edge of both adjacent triangles is a quad diagonal → **shear**
   (`eTYPE_DIAGONAL_CONSTRAINT`) plus the other diagonal of the quad; other edges are **stretch**, classed
   vertical/horizontal by the angle to `verticalDirection` (45°); **bending**: for every vertex, pairs of
@@ -79,9 +81,9 @@ reproducing the schedule, not only the constraint functions.
   distance constraint between the two neighbours (i.e. i−1/i+1 along grid lines, not the flap-opposite vertices
   that MetalSim's `XPBDSim` uses). Rest lengths from the rest pose.
 * **Isaac Sim's path is not in the open source.** `particleUtils.add_physx_particle_cloth`
-  ([OMNI] `omni/extensions/runtime/source/omni.physx/python/scripts/particleUtils.py:515`) applies
+  ([OMNI] [`omni/extensions/runtime/source/omni.physx/python/scripts/particleUtils.py:515`](https://github.com/NVIDIA-Omniverse/PhysX/blob/107.3-omni-and-physx-5.6.1/omni/extensions/runtime/source/omni.physx/python/scripts/particleUtils.py#L515)) applies
   `PhysxAutoParticleClothAPI` with `springStretchStiffness/BendStiffness/ShearStiffness/Damping`; the springs
-  are cooked by the omni.physx cooking service (`include/private/omni/physx/IPhysxCookingServicePrivate.h:131`,
+  are cooked by the omni.physx cooking service ([`include/private/omni/physx/IPhysxCookingServicePrivate.h:131`](https://github.com/NVIDIA-Omniverse/PhysX/blob/107.3-omni-and-physx-5.6.1/omni/include/private/omni/physx/IPhysxCookingServicePrivate.h#L131),
   `ParticleClothMeshCookingParamsDeprecated`, with mesh welding on by default) whose implementation is **not** in
   the repository (`CookingDataAsync.cpp:3011-3100` only fills the parameters and stores the result). The result
   is written back to the prim (`storeParticleClothDataToUsdDeprecated`, `CookingDataAsync.cpp:3100-3135`:
@@ -89,7 +91,7 @@ reproducing the schedule, not only the constraint functions.
   agent:** dump those four attributes (and the welded triangle indices) from the stage after `sim.reset()`; that
   removes the only unverifiable part of the cloth model. Until then the port uses `ExtParticleClothCooker` with all
   constraint types and assigns stretch/shear/bend stiffness by class (an assumption, flagged in the code).
-* Partitioning (`physx/src/NpParticleBuffer.cpp:93-596`, `NpParticleClothPreProcessor`): greedy 32-bit
+* Partitioning ([`physx/src/NpParticleBuffer.cpp:93-596`](https://github.com/NVIDIA-Omniverse/PhysX/blob/107.3-physx-5.6.1/physx/source/physx/src/NpParticleBuffer.cpp#L93-L596), `NpParticleClothPreProcessor`): greedy 32-bit
   partition masks (`PARTICLE_MAX_NUM_PARTITIONS_TEMP` 32) → partitions **combined** into
   `PARTICLE_MAX_NUM_PARTITIONS_FINAL` = 8 (partition p, p+8, p+16… merged; `combinePartitions`). Every spring
   endpoint gets its own copy slot; `remapOutput` chains the copy of a particle in one combined partition to its
@@ -100,17 +102,17 @@ reproducing the schedule, not only the constraint functions.
 ### 2.2 Step schedule (TGS, the Isaac default)
 
 * One `PxScene::simulate(dt)` with the TGS solver: `stepDt = dt / numPositionIterations`
-  (`gpusolver/src/PxgTGSCudaSolverCore.cpp:1269`), and `numPositionIterations` is the maximum over the island,
+  ([`gpusolver/src/PxgTGSCudaSolverCore.cpp:1269`](https://github.com/NVIDIA-Omniverse/PhysX/blob/107.3-physx-5.6.1/physx/source/gpusolver/src/PxgTGSCudaSolverCore.cpp#L1269)), and `numPositionIterations` is the maximum over the island,
   which includes the particle system's `solverPositionIterationCount` (default 16, [OMNI] schema) and every
   rigid body/articulation (`PxgParticleSystemCore::getMaxIterationCount`). **A particle cloth with 16 iterations
   forces 16 TGS substeps on every rigid body in the scene.** `biasCoefficient = min(0.9, 2·sqrt(1/nPos))` = 0.5
-  at 16 (`gpusolver/src/PxgContext.cpp:2004`).
-* Before the solver: `ps_preIntegrateLaunch` (`gpusimulationcontroller/src/CUDA/particlesystem.cu:304`):
+  at 16 ([`gpusolver/src/PxgContext.cpp:2004`](https://github.com/NVIDIA-Omniverse/PhysX/blob/107.3-physx-5.6.1/physx/source/gpusolver/src/PxgContext.cpp#L2004)).
+* Before the solver: `ps_preIntegrateLaunch` ([`gpusimulationcontroller/src/CUDA/particlesystem.cu:304`](https://github.com/NVIDIA-Omniverse/PhysX/blob/107.3-physx-5.6.1/physx/source/gpusimulationcontroller/src/CUDA/particlesystem.cu#L304)):
   v ← (v + g·dt)·(1 − min(1, damping·dt)); positions are projected forward by v·dt·0.5 (TGS,
-  `PARTICLE_FORWARD_PROJECTION_STEP_SCALE_TGS`, `gpucommon/src/CUDA/gridCal.cuh:114`) **only** for the hash grid
+  `PARTICLE_FORWARD_PROJECTION_STEP_SCALE_TGS`, [`gpucommon/src/CUDA/gridCal.cuh:114`](https://github.com/NVIDIA-Omniverse/PhysX/blob/107.3-physx-5.6.1/physx/source/gpucommon/src/CUDA/gridCal.cuh#L114)) **only** for the hash grid
   and contact generation; the original positions are kept (`mOriginPos`).
-* Contact generation once per step (narrow phase, `gpunarrowphase/src/CUDA/cudaParticleSystem.cu:378-500`,
-  `particlePrimitiveCollision` `:268`, `contactPointBox` `gpunarrowphase/src/CUDA/particleCollision.cuh:42`):
+* Contact generation once per step (narrow phase, [`gpunarrowphase/src/CUDA/cudaParticleSystem.cu:378-500`](https://github.com/NVIDIA-Omniverse/PhysX/blob/107.3-physx-5.6.1/physx/source/gpunarrowphase/src/CUDA/cudaParticleSystem.cu#L378-L500),
+  `particlePrimitiveCollision` `:268`, `contactPointBox` [`gpunarrowphase/src/CUDA/particleCollision.cuh:42`](https://github.com/NVIDIA-Omniverse/PhysX/blob/107.3-physx-5.6.1/physx/source/gpunarrowphase/src/CUDA/particleCollision.cuh#L42)):
   particle at its step-start position vs plane/sphere/capsule/box/convex-core; contact if distance ≤
   `cDistance` = particle-system contact offset + shape contact offset; stored error = distance − restDistance
   (particle rest offset + shape rest offset). Box: closest point, inside → nearest face. Triangle meshes and
@@ -119,7 +121,7 @@ reproducing the schedule, not only the constraint functions.
   particle contact distance, `maxNeighborhood` (96) cap, pairs whose rest distance ≤ 2.01·solidRestOffset
   filtered (`selfCollisionFilter`).
 * Each of the 16 TGS position iterations (`PxgPBDParticleSystemCore::solveTGS`,
-  `gpusimulationcontroller/src/PxgPBDParticleSystemCore.cpp:518`):
+  [`gpusimulationcontroller/src/PxgPBDParticleSystemCore.cpp:518`](https://github.com/NVIDIA-Omniverse/PhysX/blob/107.3-physx-5.6.1/physx/source/gpusimulationcontroller/src/PxgPBDParticleSystemCore.cpp#L518)):
   1. `ps_stepParticlesLaunch` (`particlesystem.cu:120`): x ← x + v·stepDt (from the original position on the
      first iteration), deltaP accumulates the displacement.
   2. Springs (`solveSprings` `PxgPBDParticleSystemCore.cpp:952`): gather copies (`ps_updateRemapVertsLaunch`
@@ -163,10 +165,10 @@ engine's state (MuJoCo Warp `Data` here).
 
 ## 3. FEM deformable volume and surface (PhysX 5.6.1)
 
-* Material (`include/PxDeformableVolumeMaterial.h:43`): `eCO_ROTATIONAL` (default, "well suited for high
+* Material ([`include/PxDeformableVolumeMaterial.h:43`](https://github.com/NVIDIA-Omniverse/PhysX/blob/107.3-physx-5.6.1/physx/include/PxDeformableVolumeMaterial.h#L43)): `eCO_ROTATIONAL` (default, "well suited for high
   stiffness") or `eNEO_HOOKEAN` ("lower stiffness, robust to any tetrahedron shape"); Young's modulus, Poisson
   ratio, `elasticityDamping`, `dampingScale` (removed in 5.9: always 1), friction, density.
-* Solver (`gpusimulationcontroller/src/CUDA/softBodyGM.cu`, 3,272 lines; `softBody.cu`, 2,128):
+* Solver ([`gpusimulationcontroller/src/CUDA/softBodyGM.cu`](https://github.com/NVIDIA-Omniverse/PhysX/blob/107.3-physx-5.6.1/physx/source/gpusimulationcontroller/src/CUDA/softBodyGM.cu), 3,272 lines; `softBody.cu`, 2,128):
   `tetrahedronsSolveGM` (`softBodyGM.cu:926`): co-rotational = XPBD `ARAP_constraint` (`:722`, C = ‖F − R‖,
   R from a per-tet quaternion updated by `computeGMTetrahedronRotations` / `sb_gm_updateTetrahedraRotationsLaunch`
   `:418`) with α̃ = 1/(2μV·h²), then `volume_constraint` (`:756`, C = det F − 1, α̃ = 1/(λV·h²)), damping in
@@ -176,7 +178,7 @@ engine's state (MuJoCo Warp `Data` here).
   (`sb_gm_cp_averageVertsLaunch` `:1509`), like the cloth springs. The simulation mesh is a voxel tet mesh
   (Isaac's `simulation_hexahedral_resolution`), the collision mesh a separate tet mesh embedded in it.
 * Schedule: inside the same TGS loop (`PxgTGSCudaSolverCore.cpp:1399`, `PxgSoftBodyCore::solveTGS`
-  `gpusimulationcontroller/src/PxgSoftBodyCore.cpp:2661`): step, FEM solve, rigid attachments, rigid–soft
+  [`gpusimulationcontroller/src/PxgSoftBodyCore.cpp:2661`](https://github.com/NVIDIA-Omniverse/PhysX/blob/107.3-physx-5.6.1/physx/source/gpusimulationcontroller/src/PxgSoftBodyCore.cpp#L2661)): step, FEM solve, rigid attachments, rigid–soft
   contacts (`sb_solveRigidSoftCollisionLaunchTGS`, rigid deltas output → two-way per TGS iteration),
   soft–soft / self contacts, particle and cloth interactions.
 * FEM surface ("FEM cloth", `FEMCloth.cu` 1,356, `FEMClothUtil.cuh` 704, `FEMClothExternalSolve.cu` 1,682,
@@ -227,12 +229,12 @@ k·h²·w_sum ≈ 0.098 of its error per substep, so the converged stiffness is 
    step (what `XPBDSim` does); (c) per-substep exchange: MuJoCo Warp stepped at dt/16 with the cloth's reaction
    as `xfrc_applied` each substep (16× the rigid cost, the closest to PhysX TGS; measure before adopting). This
    mirrors Newton's `SolverCoupledProxy` "lagged" mode (Isaac Lab 3.0's choice, companion doc) at (b)/(c).
-4. Validation (runs/parity/isaac/deformable/ when the recordings land): cloth scene (21×21, 1 m, over a 0.4 m
-   static box, 200 Hz, 5 s): per-step particle RMS/max error vs PhysX, mean height, contact-band height on the
-   box top, settling time, edge-strain distribution; controls: PhysX-vs-PhysX run-to-run spread (if the
-   recorder is run twice) and our float32 perturbation spread (1e-7 m initial jitter), exactly as done for
-   MuJoCo C (`deformables_2026-09-25.md` §2). Parameters taken from `meta.json`, never fitted, for the
-   "same algorithm" claim; fitting is the other agent's route for the existing backends.
+4. Validation (against the Isaac Sim 5.1 recordings; their `meta.json` is in `runs/deformable/isaac51/`): cloth
+   scene (21×21, 1 m, over a 0.4 m static box, 200 Hz, 5 s): per-step particle RMS/max error vs PhysX, mean
+   height, contact-band height on the box top, settling time, edge-strain distribution; controls: PhysX-vs-PhysX
+   run-to-run spread (if the recorder is run twice) and our float32 perturbation spread (1e-7 m initial jitter),
+   exactly as done for MuJoCo C (`deformables_2026-09-25.md` §2). Parameters taken from `meta.json`, never fitted,
+   for the "same algorithm" claim; fitting is the other agent's route for the existing backends.
 5. Effort (estimated): cooking + partitioning + springs + plane/box contacts + tests: 1.5 days (prototype, step
    3); self-collision grid: 1 day; mesh/heightfield one-way contacts: 1 day; two-way coupling (b) 0.5 day,
    (c) 1 day + measurement; validation against the recordings: 1 day once they exist. Total ≈ 5–6 days.
@@ -304,9 +306,9 @@ The prototype does 5.5× XPBDSim's work per substep:
 At 4096 worlds its copy buffers are 4096 × 5,754 × 12 B = 283 MB per array (positions and velocities), which
 explains the drop from 1024.
 
-What is still needed before a parity claim against the recordings (the other agent's
-`runs/parity/isaac/deformable/`): the USD springs from Isaac's cooker, self-collision (the recorder enables it),
-and a check of the velocity-iteration count PhysX used. Next steps and estimates are in §5.1.
+What is still needed before a parity claim against the recordings (the other agent's Isaac Sim 5.1 recording,
+`runs/deformable/isaac51/`): the USD springs from Isaac's cooker, self-collision (the recorder enables it), and a
+check of the velocity-iteration count PhysX used. Next steps and estimates are in §5.1.
 
 ### 6.1 Decisions (archived options, DECISIONS.md style; not yet copied into `docs/DECISIONS.md`)
 

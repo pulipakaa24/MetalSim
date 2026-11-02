@@ -19,24 +19,25 @@ the wrapper's per-process GPU log idle (0 %, no process at or above 1 %) at the 
 
 ## 1. What is actually installed here (a finding in itself)
 
-The shared checkout `upstream/mujoco_warp` (the editable install the queue's jobs import) is at
+The shared MuJoCo Warp checkout (the editable install the queue's jobs import) is at
 **[`1791414`](https://github.com/pulipakaa24/mujoco_warp/commit/17914144d132dec4c0aa3bccfe743816faec72c9)**, the local
 `metalsim` branch, 11 commits behind the `metalsim` branch of
 [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim)
 ([`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc)): the flex
-merge and its follow-ups were pushed from the `upstream/mujoco_warp-merge` worktree and the shared checkout's branch was
+merge and its follow-ups were pushed from a separate merge worktree and the shared checkout's branch was
 never fast-forwarded. So "the fork head" on this machine has been the headline's own commit all along, and the other
 machine (a fresh clone at
 [`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc)) was the first
 to run the merge. The A/B below therefore compares the installed
 [`1791414`](https://github.com/pulipakaa24/mujoco_warp/commit/17914144d132dec4c0aa3bccfe743816faec72c9) against a
 worktree at [`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc)
-(`upstream/mujoco_warp-07a51a6`, imported through `PYTHONPATH`, import path verified in every run). Warp: the shared
-checkout `upstream/warp-innate` is at
+(imported through `PYTHONPATH`, import path verified in every run). Warp: the shared checkout is at
 [`9050cb54`](https://github.com/pulipakaa24/warp/commit/9050cb5452de26ca6c80871bee15c389c06f9b10), 3 commits behind the
 `metalsim` branch of [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim)
 ([`f194006a`](https://github.com/pulipakaa24/warp/commit/f194006a4cf197fda93633252af81bc3f57f5561); those commits touch
-only `segmented_sort_pairs` in `warp/_src/utils.py`, a flex-only path). The other machine's Warp commit
+only `segmented_sort_pairs` in
+[`warp/_src/utils.py`](https://github.com/pulipakaa24/warp/blob/f194006a4cf197fda93633252af81bc3f57f5561/warp/_src/utils.py),
+a flex-only path). The other machine's Warp commit
 [`4127c48`](https://github.com/pulipakaa24/warp/commit/4127c4818334080de6f3d23aef522e582ff6a2a7) is not an object in
 this repository's fork remote, so it could not be measured here; the Warp delta since the headline
 ([`b9557cb`](https://github.com/pulipakaa24/warp/commit/b9557cb987a51b51aae947f5345b61aeb6e28b32) →
@@ -215,7 +216,8 @@ paths to elliptic cones: if the JTCJ term cost what the pyramidal JTDAJ assembly
 34.5 → ~2 ms per env step), SO-101 elliptic would go from 52 to ~20 ms of GPU time per step, i.e. from 123 K to an
 estimated 250–280 K env-steps/s (2.0–2.3×), and Panda elliptic from 9.9 K to an estimated 25 K; Go2 elliptic
 (240 K, JTCJ 19.0 of 24.0 ms) to an estimated 700–850 K physics steps/s. That is the elliptic-cone work already under
-way in my fork's worktree `upstream/mujoco_warp-ellip` (`docs/HANDOFF_elliptic_cone_perf.md`), so it is reported here,
+way on my fork's branch [`metalsim-elliptic`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-elliptic)
+(`docs/HANDOFF_elliptic_cone_perf.md`), so it is reported here,
 not done. Whether a task uses elliptic cones is a fidelity choice (slip), not a throughput knob: the SO-101 lift scene's
 2.4× should not be taken by switching its cone.
 
@@ -229,15 +231,16 @@ not done. Whether a task uses elliptic cones is a fidelity choice (slip), not a 
   device utilisation with no process at or above 1 % except WindowServer / Terminal / a Chrome helper at 1.0–2.3 %
   (the queue dashboard tab), and ended the same; the wrapper's "end: device utilisation 95–100 %" readings are the
   job's own last command buffers draining (the `ab1` and `gen2` jobs read 0 % at the end with the same code). The
-  `ellip_bench_world` job was granted 2 s after `mjw_generality` released (`runs/gpu_history.jsonl` 19:48:02 →
+  `ellip_bench_world` job was granted 2 s after `mjw_generality` released (GPU queue history, not kept: 19:48:02 →
   19:48:04), no overlap. No row added to `runs/CONTAMINATION_2026-09-25.txt`.
 - Tools: `scripts/diagnostics/g1_tp_variants.py` and `g1_step_profile.py` take `contact_cfg` / `solver_cfg` in
   `MJW_TP_VARIANT` (null = the headline setting); `scripts/diagnostics/g1_tp_generality.py` prints the fast-path flags
-  of any scene and measures it. Worktree `upstream/mujoco_warp-07a51a6` (read-only, for `PYTHONPATH` A/Bs).
-- For the main session: the shared checkout `upstream/mujoco_warp` is 11 commits behind the `metalsim` branch of
+  of any scene and measures it. A read-only worktree at
+  [`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc) for `PYTHONPATH` A/Bs.
+- For the main session: the shared MuJoCo Warp checkout is 11 commits behind the `metalsim` branch of
   [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim); the A/B says fast-forwarding it to
   [`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc) costs the G1
-  nothing. Not done here (shared checkout, rule 5). Warp `upstream/warp-innate` is 3 commits behind for the same reason
+  nothing. Not done here (shared checkout, rule 5). The shared Warp checkout is 3 commits behind for the same reason
   (flex-only). No fork fix branch was needed (`metalsim-tp-regress` not created: there is nothing to fix in my fork).
 - Open: (1) the Newton cap hits under the preset (12–28 worlds of 4096 per step): whether those worlds' forces are
   acceptably converged is a fidelity question for the preset's owner (a cheap probe: `iterations` 20 vs 10 under

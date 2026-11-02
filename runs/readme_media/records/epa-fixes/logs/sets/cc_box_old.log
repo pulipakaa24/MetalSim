@@ -1,0 +1,14 @@
+~/MetalSim/runs/readme_media/scratch/epa-fixes/v_1eb/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'BOX')]. At most 1 contact will be generated for these pairs.
+  warnings.warn(
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     ~/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth 42ba4b9 load on device 'cpu' took 0.95 ms  (cached)
+Module _nxn_broadphase__locals__kernel_1edb6cf5 52155e3 load on device 'cpu' took 0.24 ms  (cached)
+Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_9ae9ebcd 0c99d53 load on device 'cpu' took 0.88 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_8871ddb9 ff50bb1 load on device 'cpu' took 0.23 ms  (cached)
+mjw  ~/MetalSim/runs/readme_media/scratch/epa-fixes/v_1eb/mujoco_warp/__init__.py contacts 1508 worlds with contact 1000 of 1000

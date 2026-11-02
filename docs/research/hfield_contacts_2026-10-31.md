@@ -6,31 +6,37 @@
 and settle the margin convention. Found through the [`g1_bumps` film](../renders/G1_BUMPS.md)
 ([Unitree's G1](https://github.com/unitreerobotics/unitree_rl_gym), 5 mm sphere feet, on
 [Isaac Lab](https://github.com/isaac-sim/IsaacLab)'s random rough tile): CPU MuJoCo 11 of 16 robots fall, my fork far
-fewer (`runs/readme_media/handoff/g1-bumps.md`). **measured** = run here (MacBook Pro 14-inch M4 Max, Mac16,6; GPU work
-through `scripts/gpu_run.sh`); **reported** = from the cited source; **estimated** = our judgement.
+fewer (level 0.10 of `runs/film/g1_bumps/measure/cpu_levels.json` and `gpu_levels.json`). **measured** = run here
+(MacBook Pro 14-inch M4 Max, Mac16,6; GPU work through `scripts/gpu_run.sh`); **reported** = from the cited source;
+**estimated** = our judgement.
 
 Code: branch [`metalsim-hfield-contacts`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-hfield-contacts) of
-my fork (worktree `runs/readme_media/scratch/hfield-contacts/mjw`) on
+my fork on
 [`8eb51fe`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624) (the pinned
-`metalsim` head); full diff `runs/readme_media/handoff/hfield-contacts.patch`. **Landed 2026-10-31:** my fork's
+`metalsim` head); full diff
+[`8eb51fe...93e5ce1`](https://github.com/pulipakaa24/mujoco_warp/compare/8eb51fe637437108185f5a4750b7f5f64ef26624...93e5ce18e76854c430ce669314af00ddceb92147).
+**Landed 2026-10-31:** my fork's
 `metalsim` was fast-forwarded to it
 ([`93e5ce1`](https://github.com/pulipakaa24/mujoco_warp/commit/93e5ce18e76854c430ce669314af00ddceb92147)), then to the
 follow-up of section 12
 ([`787a5b3`](https://github.com/pulipakaa24/mujoco_warp/commit/787a5b3a37acc2551ffc8a2c1af1e9781d76723f)), which
-MetalSim pins (the commit README.md's `pip install` line names); the six commits are `patches/mujoco_warp/0018-0023` (on
+MetalSim pins (the commit README.md's `pip install` line names); the six commits are `0018`-`0023` of
+[`patches/mujoco_warp/`](../../patches/mujoco_warp/) (on
 [`8eb51fe`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624)), the
 follow-up's eight `0024-0031` (on
 [`93e5ce1`](https://github.com/pulipakaa24/mujoco_warp/commit/93e5ce18e76854c430ce669314af00ddceb92147)), the whole
 branch `patches/mujoco_warp/metalsim-787a5b3.diff` (on upstream MuJoCo Warp v3.14.0
 [`88af9cc`](https://github.com/google-deepmind/mujoco_warp/commit/88af9cc682d42e2e925daa0bae25f53277999f7b)). The
-scratch paths cited below (`runs/readme_media/scratch/hfield-contacts/`) are local to the machine that ran them and are
-not in the repository. Sources:
+probes, harnesses, logs and summaries cited below are committed in `runs/readme_media/records/hfield-contacts/`: the
+bare `probe/`, `falls/`, `gpu/`, `cc*` and `sel_proto.py` paths of sections 2-11 are relative to it (the scripts still
+name the scratch directory they ran in). The per-placement contact arrays (6.4 MB of `.npz`) are not published.
+Sources:
 [MJW] [MuJoCo Warp](https://github.com/google-deepmind/mujoco_warp): my fork at
 [`8eb51fe`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624) and upstream
 `main` at [`d41a47c0`](https://github.com/google-deepmind/mujoco_warp/commit/d41a47c0837fc71abb44d7d4799bf85ca19ff7ab)
 (2026-10-31);
 [C] [MuJoCo C 3.14.0](https://github.com/google-deepmind/mujoco/tree/3.14.0) sources
-(`runs/readme_media/scratch/hfield-contacts/src_c/`), the version installed here;
+([`src/engine/`](https://github.com/google-deepmind/mujoco/tree/3.14.0/src/engine)), the version installed here;
 [C-main] https://github.com/google-deepmind/mujoco (main, read 2026-10-31), commit
 [8626d3c](https://github.com/google-deepmind/mujoco/commit/8626d3c35eceb8b36dbc5182852b25ffde7a6465) "Fix margin
 and gap double-counting in heightfield collisions" (2026-10-06).
@@ -91,12 +97,13 @@ fork is the column "upstream MJW". **measured**:
   point within 0.1 mm and normal within 0.05 deg), 0 normals off. As the brief.
 - G1 falls on Isaac's tile (seed 0, 16 robots, 8 s): GPU runs of the pinned fork gave 2, 5, 4, 3, 1 and 3 of 16 in
   six runs: MuJoCo Warp on Metal is not run-to-run repeatable here (contact order from atomics, chaotic gait), so
-  the g1-bumps hand-off's 6/16 (the stale checkout with every geom on GJK/EPA) is inside that spread, and a single
+  the earlier 6/16 (the stale checkout with every geom on GJK/EPA, level 0.10 of
+  `runs/film/g1_bumps/measure/gpu-upstreamhf_levels.json`) is inside that spread, and a single
   run is not a measurement. Section 8.3 uses five tile seeds and repeats.
 
 ## 3. Defect 1: the heightfield side-wall override, separated prisms, and the 1 mm selection rule
 
-Probe `runs/readme_media/scratch/hfield-contacts/probe/gjk_point_prism.py 15` (placement 15: exact depth 1.85 mm,
+Probe `runs/readme_media/records/hfield-contacts/probe/gjk_point_prism.py 15` (placement 15: exact depth 1.85 mm,
 fork 25.6 mm with normal (0, 0, 1)) runs MuJoCo Warp's `gjk` and `ccd` on the sphere against each of the 18 prisms
 around it. **measured**: GJK's point-to-prism distance is right (prism 9: 3.147 mm, float64 3.147 mm; prism 8: 13.567
 mm vs 13.574 mm), but `ccd` returns -25.6 mm for prism 8, which is 8.6 mm clear of the sphere. The source:
@@ -194,7 +201,8 @@ and gaps 0). False restores C 3.14's form.
 
 ### 8.1 Contacts against the exact geometry (static, Warp's CPU device)
 
-Harness `runs/readme_media/scratch/hfield-contacts/cc2.py` (extends `contact_check.py`; outputs `cc/<shape>/`):
+Harness `runs/readme_media/records/hfield-contacts/cc2.py` (extends `contact_check.py`; outputs `cc/<shape>/`, whose
+`compare.json` summaries are committed):
 Isaac's random rough tile (seed 0, bumps 2-10 cm every 0.1 m); 3000 spheres (the g1_bumps placements) and 1000
 random poses for each other shape, pressed 0.5-3 mm into the surface by bisection on MuJoCo C's deepest contact.
 Reference: **exact** for spheres and capsules = every triangle whose closest point to the centre / segment is within
@@ -254,8 +262,9 @@ repeated. **measured** (`falls/summary.json`):
 The fixed fork falls as often as CPU MuJoCo within the run-to-run spread (per 80-robot run 60.7 +- 4.6 vs 54.8 +- 5.4,
 mean +- sd; seed 0, the film's tile: 10-13 vs 10-12); the pinned fork kept 81 % of the robots walking. CPU MuJoCo is
 deterministic, so its single run per seed has no error bar; a 1e-6 rad perturbation of the start already moves a seed
-by up to 8 falls (seed 4: 5 to 13). On flat ground the two engines already agree (the g1-unitree hand-off: within 0.1
-mm of Unitree's CPU run over 8 s; no heightfield, so unaffected here). The remaining gap (about 6 falls per 80 robots,
+by up to 8 falls (seed 4: 5 to 13). On flat ground the two engines already agree
+(`runs/film/g1_unitree/sim2sim_check/compare.json`: within 0.1 mm of Unitree's CPU run over 8 s; no heightfield, so
+unaffected here). The remaining gap (about 6 falls per 80 robots,
 about one standard deviation) is not resolved further here; candidates are float32 vs float64 and MuJoCo C writing
 duplicate contacts at shared edges (each adds stiffness) where my fork writes one.
 
@@ -353,12 +362,13 @@ Re-runs needed (after the pin bump), in order of cost:
 
 ## 11. Reproduce
 
-All from the repository root with `.venv/bin/python`; MuJoCo Warp copy chosen by `PYTHONPATH` (the worktree
-`runs/readme_media/scratch/hfield-contacts/mjw` of
+All from the repository root with `.venv/bin/python`; MuJoCo Warp copy chosen by `PYTHONPATH` (a checkout of branch
+[`metalsim-hfield-contacts`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-hfield-contacts) of
 [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim), or `mjw_base` =
-`git archive 8eb51fe`).
+`git archive 8eb51fe`). Scripts in `runs/readme_media/records/hfield-contacts/`; they name the scratch directory they
+ran from: copy them back to that path (or edit it) to rerun.
 
-- Static: `cc2.py place|c|exact|exactprism <shape> runs/readme_media/scratch/hfield-contacts/cc/<shape>`,
+- Static: `cc2.py place|c|exact|exactprism <shape> <out>/cc/<shape>`,
   `cc_all.sh <tag> <copy>`, `cc2.py compare <shape> <dir>`, `cc_show.py <dir>/compare.json`; spheres also
   `runs/film/g1_bumps/measure/contact_check.py plane|compare <dir>`.
 - Probes: `probe/gjk_point_prism.py 15` (defect 1), `probe/sat_box.py`, `probe/prism_mesh_c.py` (defect 2),
@@ -371,7 +381,8 @@ All from the repository root with `.venv/bin/python`; MuJoCo Warp copy chosen by
 
 The rough-terrain re-runs on
 [`93e5ce1`](https://github.com/pulipakaa24/mujoco_warp/commit/93e5ce18e76854c430ce669314af00ddceb92147)
-(`runs/readme_media/handoff/rough-reruns.md`, items 2-3) found two problems this note's fix had exposed: Isaac Lab 3.0's
+(their smoke runs, `runs/rough_rerun_2026-10-31/smoke/` and `smoke_v1/`) found two problems this note's fix had exposed:
+Isaac Lab 3.0's
 like-for-like config (`rough_il3`) flagged MuJoCo Warp's `EPA_HORIZON` capacity overflow in a few of the 4096 worlds
 within the first iterations (3 in each 8-iteration smoke run; the pair's contact is dropped for that substep), and its
 PPO iteration took about 2.1x as long as on the plane-path pin
@@ -379,26 +390,30 @@ PPO iteration took about 2.1x as long as on the plane-path pin
 -15 % of section 8.4. Both come from the G1's mesh feet now being on per-prism GJK/EPA (section 6) together with
 `rough_il3`'s geom gap (Isaac Lab 3.0's 1 cm per geom; MuJoCo Warp sums a pair's gaps, so `margin + gap` = 0.02 m).
 Branch [`metalsim-hfield-epa`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-hfield-epa) of
-[my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) (worktree
-`runs/readme_media/scratch/hfield-epa/mjw`, on
+[my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) (on
 [`93e5ce1`](https://github.com/pulipakaa24/mujoco_warp/commit/93e5ce18e76854c430ce669314af00ddceb92147); pushed, and my
 fork's `metalsim` fast-forwarded to it):
 [`439b808`](https://github.com/pulipakaa24/mujoco_warp/commit/439b8083ae0ff39f58937a083cfc2d3c56ce022f),
 [`f85879c`](https://github.com/pulipakaa24/mujoco_warp/commit/f85879cd44bd6439d4fa7bace80dd67702184885),
 [`1eb40d5`](https://github.com/pulipakaa24/mujoco_warp/commit/1eb40d55956d073e4fa544ca0f0eb0d456681791), then, after an
-independent review (`runs/readme_media/handoff/epa-review.md`),
+independent review,
 [`d7a90fb`](https://github.com/pulipakaa24/mujoco_warp/commit/d7a90fb635b90f3207e79ef222c3be12997d29bc),
 [`3d8f48c`](https://github.com/pulipakaa24/mujoco_warp/commit/3d8f48ca77fa41c980aa9595dd90071c6eb43e6c),
 [`ba9cfb7`](https://github.com/pulipakaa24/mujoco_warp/commit/ba9cfb7d2079278dfc56f8dd613fe07773360cac),
 [`489f421`](https://github.com/pulipakaa24/mujoco_warp/commit/489f421dd0ee8a243831dd0452d353bb1bbbfd5b),
 [`787a5b3`](https://github.com/pulipakaa24/mujoco_warp/commit/787a5b3a37acc2551ffc8a2c1af1e9781d76723f), which MetalSim
-pins (`patches/mujoco_warp/0024-0031`); patch `runs/readme_media/handoff/hfield-epa.patch.v2`. Sources: [MJW] as above;
+pins (`0024`-`0031` of [`patches/mujoco_warp/`](../../patches/mujoco_warp/)); diff
+[`93e5ce1...787a5b3`](https://github.com/pulipakaa24/mujoco_warp/compare/93e5ce18e76854c430ce669314af00ddceb92147...787a5b3a37acc2551ffc8a2c1af1e9781d76723f).
+Sources: [MJW] as above;
 [C-main] `engine_collision_gjk.c` read 2026-10-31 (`horizon` / `horizonRec`, `epa`, `mjc_ccd`); MuJoCo issue
 [google-deepmind/mujoco#3646](https://github.com/google-deepmind/mujoco/issues/3646) (C's horizon buffer, fixed in
 [`6d662aed`](https://github.com/google-deepmind/mujoco/commit/6d662aedda693a1225a03a26c6b3ddd5e3cc4fbe) by a bound check
 and `24 + max(0, ccd_iterations - 35)` edges); MuJoCo Warp PR
 [google-deepmind/mujoco_warp#1845](https://github.com/google-deepmind/mujoco_warp/pull/1845) (open: the same
-disconnected-horizon failure on aligned mesh plates). Scratch paths are local to the machine that ran them.
+disconnected-horizon failure on aligned mesh plates). Records: the probes and Metal validation jobs (V1-V4) in
+`runs/readme_media/records/hfield-epa/` (`probe/`, `val/`, `val2/`, `val4/`), the CPU checks after the review in
+`runs/readme_media/records/epa-fixes/` (`logs/`, `probe/`); the captured states and contact sets (18-147 MB per
+directory) are not published.
 
 **Mechanism (measured).** A substep hook on Metal stored the qpos of the first `EPA_HORIZON` event per world during
 12 `rough_il3` iterations on
@@ -469,7 +484,8 @@ The fix column was measured at
 fallbacks above, the shrink's condition and the tests. At the defaults it gives bitwise-identical contacts and overflow
 flags on the CPU sets above (the section 8.1 checks, the static placements, box stairs, and 49,278 replayed `rough_il3`
 training states: 359,278 worlds); the suites and `tests/test_terrain.py` were re-run on it; the Metal smoke, capture and
-transfer rows were not (`runs/readme_media/handoff/epa-fixes.md`).
+transfer rows were not (`runs/readme_media/records/epa-fixes/logs/`: `bitwise_old_vs_new.log`,
+`suites_cpu_787a5b3.log`, `gpu_check.log`).
 
 With the shrink, prisms apart within the gap get GJK's exact distance (EPA on the inflated shapes had it to about
 2e-7 m, with normals of neighbouring prisms 0.3 deg apart, which the duplicate test of section 6 then kept as extra
@@ -504,9 +520,9 @@ policy, plus the update) shows larger ratios: 1.30x / 1.19x the plane path in th
 [`93e5ce1`](https://github.com/pulipakaa24/mujoco_warp/commit/93e5ce18e76854c430ce669314af00ddceb92147), 1.31x / 1.21x
 with this fix. The difference between the two protocols was not isolated. Where `rough_il3`'s cost goes (training states
 after iteration 12, 512 worlds, every prism the kernel processes classified by its exact float64 signed distance,
-`probe/profile_counts.py`): with the 2 cm pair gap, 266 / 259 of the 512 left / right feet have prisms within reach (125
-/ 115 without the gap, same states); each such pair processes 13.4 prisms (GJK each), of which 1.25 penetrate and
-5.3-5.5 are apart within the gap. EPA calls per foot pair: 6.5-6.8 on
+`runs/readme_media/records/hfield-epa/probe/profile_counts.py`): with the 2 cm pair gap, 266 / 259 of the 512 left /
+right feet have prisms within reach (125 / 115 without the gap, same states); each such pair processes 13.4 prisms (GJK
+each), of which 1.25 penetrate and 5.3-5.5 are apart within the gap. EPA calls per foot pair: 6.5-6.8 on
 [`93e5ce1`](https://github.com/pulipakaa24/mujoco_warp/commit/93e5ce18e76854c430ce669314af00ddceb92147) (all on the
 inflated shapes), 1.24-1.26 with the fix (-81 %). What remains of the 1.68x is the gap's semantics (twice the foot
 pairs, each with ~13 GJK calls, producing the inactive gap-zone contacts MuJoCo Warp's `gap` asks for) on per-prism
@@ -529,13 +545,13 @@ filed (MuJoCo Warp: horizon scan, face-buffer drop, heightfield margin shrink;
 ## 13. Re-runs on the repaired kernel (2026-10-31, night)
 
 The re-runs of section 9 that need neither the L4 nor the timing machine, run on the 14-inch MacBook Pro (Mac16,6)
-through the GPU queue, every job on AC power (battery 75-85 %, charging, powermode 2). The pipeline, the original
-commands and how each maps onto today's CLI: `runs/readme_media/handoff/rough-reruns.md`; job directory
-`runs/rough_rerun_2026-10-31/` (`status.jsonl`; `logs/<job>.out`, each with a provenance header; training logs
-`logs/<job>.log`; `transfer/`; checkpoints `ckpt/`; exports for Isaac `isaac_export/`); analysis
-`runs/readme_media/handoff/rough-parity.md` and `runs/readme_media/scratch/rough-parity/` (`analyze_training.py`,
-`analyze_transfer.py`). These paths are local to the machine that ran them. "Old" is the record PARITY cites
-(plane-path kernel, 2026-09-25/26 code), "new" these runs. **measured** unless marked.
+through the GPU queue, every job on AC power (battery 75-85 %, charging, powermode 2). Job directory
+`runs/rough_rerun_2026-10-31/`: the pipeline `run_all.sh` and `run_il3fix.sh` (their header names the original commands;
+the flags map those settings onto today's CLI), `job.sh`, `jobs/`, `status.jsonl`, `logs/<job>.out` (each with a
+provenance header), training logs `logs/<job>.log`, `transfer/`; its checkpoints (`ckpt/`) and the exports for Isaac
+(`isaac_export/`) are not published. Analysis: `runs/readme_media/records/rough-parity/` (`analyze_training.py`,
+`analyze_transfer.py` and their outputs `training.md`, `transfer.md`, `curriculum.txt`, `anomalies.txt`). "Old" is the
+record PARITY cites (plane-path kernel, 2026-09-25/26 code), "new" these runs. **measured** unless marked.
 
 | job | MuJoCo Warp loaded (job header) | outcome |
 |---|---|---|
@@ -553,7 +569,8 @@ contacts only at non-loop horizons and full face buffers (section 12), so these 
 from section 12's static and replay sets; not re-run on
 [`787a5b3`](https://github.com/pulipakaa24/mujoco_warp/commit/787a5b3a37acc2551ffc8a2c1af1e9781d76723f)).
 
-Deviations from the originals and limits of the comparison (the rough-reruns hand-off has the details):
+Deviations from the originals and limits of the comparison (the flags are in `runs/rough_rerun_2026-10-31/run_all.sh`
+and `run_il3fix.sh`):
 - Every training run starts from the task reset (`--initial_reset 1`). The originals started each env's first episode
   at `qpos0` (PARITY §1.5, start-state defect), which on the repaired kernel overflows `njmax` on the box cells (`NEFC`
   at iteration 1 of a 4096-env sizing run). The first ~12 iterations differ by design, and `rough_il3`'s early
@@ -658,7 +675,8 @@ No fall on pyramid stairs or random rough in any B row. Reading (small samples: 
   full protocol on
   [`93e5ce1`](https://github.com/pulipakaa24/mujoco_warp/commit/93e5ce18e76854c430ce669314af00ddceb92147) and on the EPA
   fix (gap-0 contacts the same but for non-loop horizons) differs by up to 0.33 m per cell mean
-  (`runs/readme_media/handoff/hfield-epa.md`, job V2). Changes beyond that: on heightfield cells the repaired contacts
+  (job V2, `runs/readme_media/records/hfield-epa/probe/val_check.sh`, output `val/transfer/` there, against
+  `runs/rough_rerun_2026-10-31/transfer/`). Changes beyond that: on heightfield cells the repaired contacts
   shorten the travel of policies trained elsewhere, our old checkpoint by 1.28 m on pyramid stairs and 0.77 m on random
   rough in A and 0.74 m on random rough in B, NVIDIA's by 1.10 m on pyramid stairs in A and 0.77 m on random rough in
   B (its other A cells: random rough −0.33 m, boxes +0.51 m, inverted stairs +1.15 m). On B's box-built cells, which
@@ -673,7 +691,8 @@ No fall on pyramid stairs or random rough in any B row. Reading (small samples: 
   `model_500/1000/1499.pt` of Isaac's 2026-09-25 rough run are not on this machine (only `params/`); they may still be
   on the L4.
 - Our checkpoints played in Isaac (12 / 24): needs the L4; the re-trained seeds' exports (iterations 500 / 1000 /
-  1500) are in `runs/rough_rerun_2026-10-31/isaac_export/metalsim_ckpts_rough/`.
+  1500) were written by `runs/rough_rerun_2026-10-31/jobs/export.sh` (`metalsim/parity/export_policy.py`) from the
+  training checkpoints; neither is published (nine exports of 1.3 MB).
 - The rough throughput rows of PARITY §1.4 and every training throughput: the timing machine (16-inch) only; the
   14-inch figures in these logs are not performance figures. Section 12's per-iteration ratios remain the indicative
   cost.

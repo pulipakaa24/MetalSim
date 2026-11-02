@@ -1,0 +1,1122 @@
+{
+ "2.3.2 seed 0": {
+  "old": {
+   "path": "runs/g1_rough_ppowarp_fixed.log",
+   "header": "G1 rough PPO: N=4096 obs_dim 310 act_dim 37 rollout 24 x 1500 iterations, engine mjwarp, physics dt 0.0025 (decimation 8), seed 0, reward_cfg rough_isaac",
+   "restarts_cut": 0,
+   "iterations": 1500,
+   "milestones": {
+    "100": {
+     "len": 80.2,
+     "ret": -4.82,
+     "level": 0.0,
+     "ret_w": -4.833,
+     "len_w": 80.53999999999999
+    },
+    "150": {
+     "len": 510.2,
+     "ret": -9.98,
+     "level": 0.0137,
+     "ret_w": -9.818999999999999,
+     "len_w": 490.39
+    },
+    "200": {
+     "len": 948.9,
+     "ret": -7.17,
+     "level": 0.1138,
+     "ret_w": -6.295,
+     "len_w": 951.39
+    },
+    "300": {
+     "len": 984.4,
+     "ret": 4.03,
+     "level": 1.6082,
+     "ret_w": 3.814,
+     "len_w": 986.68
+    },
+    "500": {
+     "len": 976.5,
+     "ret": 8.44,
+     "level": 4.4065,
+     "ret_w": 8.549,
+     "len_w": 984.85
+    },
+    "750": {
+     "len": 981.5,
+     "ret": 8.59,
+     "level": 5.7898,
+     "ret_w": 8.597,
+     "len_w": 988.7
+    },
+    "1000": {
+     "len": 991.4,
+     "ret": 11.33,
+     "level": 6.0142,
+     "ret_w": 11.154,
+     "len_w": 995.0600000000001
+    },
+    "1250": {
+     "len": 994.3,
+     "ret": 14.16,
+     "level": 6.0923,
+     "ret_w": 13.788999999999998,
+     "len_w": 993.29
+    },
+    "1499": {
+     "len": 991.5,
+     "ret": 16.63,
+     "level": 6.0979,
+     "ret_w": 16.580000000000002,
+     "len_w": 994.6333333333333
+    },
+    "1500": {
+     "len": 991.8,
+     "ret": 16.42,
+     "level": 6.0972,
+     "ret_w": 16.624000000000002,
+     "len_w": 996.14
+    }
+   },
+   "blown_total": 0,
+   "blown_its": 0,
+   "blown_early_le_30": 0,
+   "blown_late_ge_100": 0,
+   "blown_first_last": null,
+   "pen": {
+    "all": [
+     1497,
+     2.9,
+     21.9
+    ],
+    "it1-50": [
+     50,
+     2.9,
+     16.2
+    ],
+    "it1400-1500": [
+     101,
+     4.8,
+     18.9
+    ]
+   },
+   "force": {
+    "all": [
+     0,
+     null,
+     null
+    ],
+    "it1-50": [
+     0,
+     null,
+     null
+    ],
+    "it1400-1500": [
+     0,
+     null,
+     null
+    ]
+   },
+   "speed": {
+    "all": [
+     0,
+     null,
+     null
+    ]
+   },
+   "dropped_rows": [],
+   "epa_lines": 0,
+   "overflow_lines": [],
+   "sec_per_it_median_100_1500": 4.223406083519876
+  },
+  "new": {
+   "path": "runs/rough_rerun_2026-10-31/logs/g1_rough_ppowarp_fixed_s0.log",
+   "header": "G1 rough PPO: N=4096 obs_dim 310 act_dim 37 rollout 24 x 1500 iterations, engine mjwarp, physics dt 0.0025 (decimation 8), seed 0, reward_cfg rough_isaac, height-scan ray order ij, terrain collision hfield, height scan grid, solver_cfg None, contact_cfg default, base velocity origin, feet-slide velocity origin, initial reset True, effort limit on the actuator",
+   "restarts_cut": 0,
+   "iterations": 1500,
+   "milestones": {
+    "100": {
+     "len": 84.8,
+     "ret": -4.88,
+     "level": 0.0,
+     "ret_w": -4.904999999999999,
+     "len_w": 87.02000000000001
+    },
+    "150": {
+     "len": 521.7,
+     "ret": -9.91,
+     "level": 0.0186,
+     "ret_w": -9.965,
+     "len_w": 523.19
+    },
+    "200": {
+     "len": 966.5,
+     "ret": -7.42,
+     "level": 0.1216,
+     "ret_w": -7.476999999999999,
+     "len_w": 950.6299999999999
+    },
+    "300": {
+     "len": 957.0,
+     "ret": 0.79,
+     "level": 1.1826,
+     "ret_w": 0.9269999999999999,
+     "len_w": 976.2700000000001
+    },
+    "500": {
+     "len": 984.0,
+     "ret": 5.44,
+     "level": 3.5303,
+     "ret_w": 5.356,
+     "len_w": 974.64
+    },
+    "750": {
+     "len": 983.5,
+     "ret": 6.69,
+     "level": 5.1458,
+     "ret_w": 6.723999999999999,
+     "len_w": 983.95
+    },
+    "1000": {
+     "len": 997.4,
+     "ret": 9.71,
+     "level": 5.5059,
+     "ret_w": 9.637,
+     "len_w": 990.95
+    },
+    "1250": {
+     "len": 998.4,
+     "ret": 13.52,
+     "level": 5.8179,
+     "ret_w": 13.475,
+     "len_w": 997.28
+    },
+    "1499": {
+     "len": 988.7,
+     "ret": 16.35,
+     "level": 6.125,
+     "ret_w": 15.931666666666667,
+     "len_w": 992.5666666666666
+    },
+    "1500": {
+     "len": 1000.0,
+     "ret": 15.96,
+     "level": 6.1255,
+     "ret_w": 15.906,
+     "len_w": 992.22
+    }
+   },
+   "blown_total": 0,
+   "blown_its": 0,
+   "blown_early_le_30": 0,
+   "blown_late_ge_100": 0,
+   "blown_first_last": null,
+   "pen": {
+    "all": [
+     1499,
+     3.1,
+     8.4
+    ],
+    "it1-50": [
+     50,
+     3.6,
+     6.2
+    ],
+    "it1400-1500": [
+     101,
+     3.9,
+     7.5
+    ]
+   },
+   "force": {
+    "all": [
+     0,
+     null,
+     null
+    ],
+    "it1-50": [
+     0,
+     null,
+     null
+    ],
+    "it1400-1500": [
+     0,
+     null,
+     null
+    ]
+   },
+   "speed": {
+    "all": [
+     0,
+     null,
+     null
+    ]
+   },
+   "dropped_rows": [],
+   "epa_lines": 0,
+   "overflow_lines": [],
+   "sec_per_it_median_100_1500": 2.7521487163694474
+  }
+ },
+ "2.3.2 seed 1": {
+  "old": {
+   "path": "runs/g1_rough_ppowarp_fixed_seed1.log",
+   "header": "G1 rough PPO: N=4096 obs_dim 310 act_dim 37 rollout 24 x 1500 iterations, engine mjwarp, physics dt 0.0025 (decimation 8), seed 1, reward_cfg rough_isaac, height-scan ray order xy, terrain collision boxes_local, height scan exact",
+   "restarts_cut": 0,
+   "iterations": 1500,
+   "milestones": {
+    "100": {
+     "len": 74.3,
+     "ret": -4.7,
+     "level": 0.0002,
+     "ret_w": -4.713,
+     "len_w": 75.24
+    },
+    "150": {
+     "len": 377.0,
+     "ret": -8.56,
+     "level": 0.0081,
+     "ret_w": -8.858,
+     "len_w": 394.24
+    },
+    "200": {
+     "len": 830.2,
+     "ret": -7.36,
+     "level": 0.1328,
+     "ret_w": -7.098999999999999,
+     "len_w": 851.71
+    },
+    "300": {
+     "len": 951.4,
+     "ret": -0.37,
+     "level": 1.2927,
+     "ret_w": -0.195,
+     "len_w": 964.86
+    },
+    "500": {
+     "len": 968.1,
+     "ret": 4.21,
+     "level": 3.4131,
+     "ret_w": 4.381,
+     "len_w": 982.46
+    },
+    "750": {
+     "len": 972.9,
+     "ret": 7.97,
+     "level": 5.1089,
+     "ret_w": 7.569,
+     "len_w": 974.93
+    },
+    "1000": {
+     "len": 999.0,
+     "ret": 11.01,
+     "level": 5.6011,
+     "ret_w": 10.992,
+     "len_w": 987.65
+    },
+    "1250": {
+     "len": 991.5,
+     "ret": 15.11,
+     "level": 5.8762,
+     "ret_w": 15.235,
+     "len_w": 996.71
+    },
+    "1499": {
+     "len": 1000.0,
+     "ret": 18.87,
+     "level": 6.0242,
+     "ret_w": 18.895,
+     "len_w": 997.6166666666667
+    },
+    "1500": {
+     "len": 996.0,
+     "ret": 19.08,
+     "level": 6.0261,
+     "ret_w": 18.926,
+     "len_w": 997.1600000000001
+    }
+   },
+   "blown_total": 0,
+   "blown_its": 0,
+   "blown_early_le_30": 0,
+   "blown_late_ge_100": 0,
+   "blown_first_last": null,
+   "pen": {
+    "all": [
+     1487,
+     3.1,
+     16.5
+    ],
+    "it1-50": [
+     49,
+     3.8,
+     9.0
+    ],
+    "it1400-1500": [
+     100,
+     4.3,
+     9.7
+    ]
+   },
+   "force": {
+    "all": [
+     602,
+     15870.0,
+     56259.0
+    ],
+    "it1-50": [
+     6,
+     17159.0,
+     52093.0
+    ],
+    "it1400-1500": [
+     12,
+     20796.0,
+     50477.0
+    ]
+   },
+   "speed": {
+    "all": [
+     0,
+     null,
+     null
+    ]
+   },
+   "dropped_rows": [
+    [
+     54,
+     "3162896135 non-finite rows dropped from the update"
+    ]
+   ],
+   "epa_lines": 0,
+   "overflow_lines": [],
+   "sec_per_it_median_100_1500": 2.5910384818134844
+  },
+  "new": {
+   "path": "runs/rough_rerun_2026-10-31/logs/g1_rough_ppowarp_fixed_s1.log",
+   "header": "G1 rough PPO: N=4096 obs_dim 310 act_dim 37 rollout 24 x 1500 iterations, engine mjwarp, physics dt 0.0025 (decimation 8), seed 1, reward_cfg rough_isaac, height-scan ray order xy, terrain collision boxes_local, height scan exact, solver_cfg None, contact_cfg default, base velocity origin, feet-slide velocity origin, initial reset True, effort limit on the actuator",
+   "restarts_cut": 0,
+   "iterations": 1500,
+   "milestones": {
+    "100": {
+     "len": 76.7,
+     "ret": -4.71,
+     "level": 0.0,
+     "ret_w": -4.7219999999999995,
+     "len_w": 77.15
+    },
+    "150": {
+     "len": 427.0,
+     "ret": -8.84,
+     "level": 0.0088,
+     "ret_w": -9.129999999999999,
+     "len_w": 440.98999999999995
+    },
+    "200": {
+     "len": 845.4,
+     "ret": -8.46,
+     "level": 0.0679,
+     "ret_w": -8.318000000000001,
+     "len_w": 879.6600000000001
+    },
+    "300": {
+     "len": 933.1,
+     "ret": -1.75,
+     "level": 1.0457,
+     "ret_w": -1.405,
+     "len_w": 947.1700000000001
+    },
+    "500": {
+     "len": 970.6,
+     "ret": 3.68,
+     "level": 3.2549,
+     "ret_w": 3.871,
+     "len_w": 977.9200000000001
+    },
+    "750": {
+     "len": 979.5,
+     "ret": 6.41,
+     "level": 5.0227,
+     "ret_w": 6.388,
+     "len_w": 983.78
+    },
+    "1000": {
+     "len": 991.3,
+     "ret": 11.39,
+     "level": 5.5605,
+     "ret_w": 11.35,
+     "len_w": 990.3
+    },
+    "1250": {
+     "len": 993.1,
+     "ret": 16.44,
+     "level": 6.0068,
+     "ret_w": 16.625,
+     "len_w": 995.1600000000001
+    },
+    "1499": {
+     "len": 997.9,
+     "ret": 20.85,
+     "level": 6.1062,
+     "ret_w": 20.540000000000003,
+     "len_w": 997.75
+    },
+    "1500": {
+     "len": 997.8,
+     "ret": 20.61,
+     "level": 6.1077,
+     "ret_w": 20.580000000000002,
+     "len_w": 998.3799999999999
+    }
+   },
+   "blown_total": 0,
+   "blown_its": 0,
+   "blown_early_le_30": 0,
+   "blown_late_ge_100": 0,
+   "blown_first_last": null,
+   "pen": {
+    "all": [
+     1496,
+     3.0,
+     27.2
+    ],
+    "it1-50": [
+     48,
+     3.4,
+     6.9
+    ],
+    "it1400-1500": [
+     101,
+     4.5,
+     11.1
+    ]
+   },
+   "force": {
+    "all": [
+     282,
+     15822.0,
+     44202.0
+    ],
+    "it1-50": [
+     0,
+     null,
+     null
+    ],
+    "it1400-1500": [
+     15,
+     17601.0,
+     32162.0
+    ]
+   },
+   "speed": {
+    "all": [
+     0,
+     null,
+     null
+    ]
+   },
+   "dropped_rows": [],
+   "epa_lines": 0,
+   "overflow_lines": [],
+   "sec_per_it_median_100_1500": 2.7433929617950525
+  }
+ },
+ "2.3.2 seed 2": {
+  "old": {
+   "path": "runs/g1_rough_ppowarp_fixed_seed2.log",
+   "header": "G1 rough PPO: N=4096 obs_dim 310 act_dim 37 rollout 24 x 1500 iterations, engine mjwarp, physics dt 0.0025 (decimation 8), seed 2, reward_cfg rough_isaac, height-scan ray order xy, terrain collision boxes_local, height scan exact",
+   "restarts_cut": 1,
+   "iterations": 1500,
+   "milestones": {
+    "100": {
+     "len": 75.8,
+     "ret": -4.72,
+     "level": 0.0,
+     "ret_w": -4.702,
+     "len_w": 75.62
+    },
+    "150": {
+     "len": 348.6,
+     "ret": -8.4,
+     "level": 0.0042,
+     "ret_w": -8.187999999999999,
+     "len_w": 360.53000000000003
+    },
+    "200": {
+     "len": 831.7,
+     "ret": -8.35,
+     "level": 0.0498,
+     "ret_w": -8.136,
+     "len_w": 849.8100000000001
+    },
+    "300": {
+     "len": 971.1,
+     "ret": -0.1,
+     "level": 0.6689,
+     "ret_w": -0.094,
+     "len_w": 968.2299999999999
+    },
+    "500": {
+     "len": 957.7,
+     "ret": 4.98,
+     "level": 3.051,
+     "ret_w": 5.022,
+     "len_w": 973.24
+    },
+    "750": {
+     "len": 974.0,
+     "ret": 10.31,
+     "level": 5.4768,
+     "ret_w": 10.757000000000001,
+     "len_w": 980.2700000000001
+    },
+    "1000": {
+     "len": 990.6,
+     "ret": 14.25,
+     "level": 5.8806,
+     "ret_w": 14.075999999999999,
+     "len_w": 987.82
+    },
+    "1250": {
+     "len": 992.5,
+     "ret": 18.21,
+     "level": 6.1284,
+     "ret_w": 18.348000000000003,
+     "len_w": 992.2
+    },
+    "1499": {
+     "len": 997.5,
+     "ret": 22.17,
+     "level": 6.0764,
+     "ret_w": 22.453333333333333,
+     "len_w": 996.2666666666668
+    },
+    "1500": {
+     "len": 997.8,
+     "ret": 22.62,
+     "level": 6.0789,
+     "ret_w": 22.502000000000002,
+     "len_w": 997.1
+    }
+   },
+   "blown_total": 0,
+   "blown_its": 0,
+   "blown_early_le_30": 0,
+   "blown_late_ge_100": 0,
+   "blown_first_last": null,
+   "pen": {
+    "all": [
+     1500,
+     3.4,
+     13.8
+    ],
+    "it1-50": [
+     50,
+     3.8,
+     9.0
+    ],
+    "it1400-1500": [
+     101,
+     4.4,
+     11.4
+    ]
+   },
+   "force": {
+    "all": [
+     440,
+     15877.0,
+     51504.0
+    ],
+    "it1-50": [
+     8,
+     16027.0,
+     51504.0
+    ],
+    "it1400-1500": [
+     2,
+     22107.0,
+     22166.0
+    ]
+   },
+   "speed": {
+    "all": [
+     0,
+     null,
+     null
+    ]
+   },
+   "dropped_rows": [
+    [
+     1403,
+     "1018292785 non-finite rows dropped from the update"
+    ]
+   ],
+   "epa_lines": 0,
+   "overflow_lines": [],
+   "sec_per_it_median_100_1500": 2.5873558982998475
+  },
+  "new": {
+   "path": "runs/rough_rerun_2026-10-31/logs/g1_rough_ppowarp_fixed_s2.log",
+   "header": "G1 rough PPO: N=4096 obs_dim 310 act_dim 37 rollout 24 x 1500 iterations, engine mjwarp, physics dt 0.0025 (decimation 8), seed 2, reward_cfg rough_isaac, height-scan ray order xy, terrain collision boxes_local, height scan exact, solver_cfg None, contact_cfg default, base velocity origin, feet-slide velocity origin, initial reset True, effort limit on the actuator",
+   "restarts_cut": 0,
+   "iterations": 1500,
+   "milestones": {
+    "100": {
+     "len": 73.6,
+     "ret": -4.67,
+     "level": 0.0,
+     "ret_w": -4.662000000000001,
+     "len_w": 73.71000000000001
+    },
+    "150": {
+     "len": 321.3,
+     "ret": -7.96,
+     "level": 0.0056,
+     "ret_w": -7.9,
+     "len_w": 321.51
+    },
+    "200": {
+     "len": 814.1,
+     "ret": -9.29,
+     "level": 0.0457,
+     "ret_w": -8.888,
+     "len_w": 832.3100000000001
+    },
+    "300": {
+     "len": 952.1,
+     "ret": -2.62,
+     "level": 0.582,
+     "ret_w": -2.85,
+     "len_w": 954.8700000000001
+    },
+    "500": {
+     "len": 972.8,
+     "ret": 2.89,
+     "level": 2.4568,
+     "ret_w": 3.038,
+     "len_w": 966.65
+    },
+    "750": {
+     "len": 977.1,
+     "ret": 5.61,
+     "level": 4.6836,
+     "ret_w": 6.422,
+     "len_w": 984.1199999999999
+    },
+    "1000": {
+     "len": 997.8,
+     "ret": 10.34,
+     "level": 5.3818,
+     "ret_w": 10.172,
+     "len_w": 989.65
+    },
+    "1250": {
+     "len": 1000.0,
+     "ret": 13.84,
+     "level": 5.6963,
+     "ret_w": 13.981,
+     "len_w": 994.35
+    },
+    "1499": {
+     "len": 991.4,
+     "ret": 17.38,
+     "level": 6.1167,
+     "ret_w": 17.3,
+     "len_w": 991.3166666666666
+    },
+    "1500": {
+     "len": 1000.0,
+     "ret": 17.43,
+     "level": 6.1108,
+     "ret_w": 17.284,
+     "len_w": 991.0600000000001
+    }
+   },
+   "blown_total": 0,
+   "blown_its": 0,
+   "blown_early_le_30": 0,
+   "blown_late_ge_100": 0,
+   "blown_first_last": null,
+   "pen": {
+    "all": [
+     1488,
+     3.1,
+     13.8
+    ],
+    "it1-50": [
+     47,
+     3.9,
+     9.3
+    ],
+    "it1400-1500": [
+     101,
+     4.4,
+     12.1
+    ]
+   },
+   "force": {
+    "all": [
+     306,
+     15830.0,
+     46274.0
+    ],
+    "it1-50": [
+     0,
+     null,
+     null
+    ],
+    "it1400-1500": [
+     14,
+     19692.0,
+     22313.0
+    ]
+   },
+   "speed": {
+    "all": [
+     0,
+     null,
+     null
+    ]
+   },
+   "dropped_rows": [],
+   "epa_lines": 0,
+   "overflow_lines": [],
+   "sec_per_it_median_100_1500": 2.6937768887182756
+  }
+ },
+ "rough_il3 seed 0": {
+  "old": {
+   "path": "runs/il3/il3fix_rough_s0.log",
+   "header": "G1 rough PPO: N=4096 obs_dim 310 act_dim 37 rollout 24 x 1500 iterations, engine mjwarp, physics dt 0.0025 (decimation 8), seed 0, reward_cfg rough_il3, height-scan ray order xy, terrain collision hfield, height scan exact, solver_cfg isaaclab3_every_substep_cap20, contact_cfg recommended, base velocity com, feet-slide velocity com, Isaac Lab 3.0 events True (backend newton_mjwarp), add_base_mass {'body': 'torso_link', 'scale_min': 0.8000494837760925, 'scale_max': 1.2497823238372803, 'dof_invweight0_ratio_range': [0.9505320191383362, 1.0460338592529297], 'limit_timeconst_ratio_range': [0.9787041187018577, 1.0248056023509573]}",
+   "restarts_cut": 0,
+   "iterations": 1500,
+   "milestones": {
+    "100": {
+     "len": 59.0,
+     "ret": -4.64,
+     "level": 0.0,
+     "ret_w": -4.646,
+     "len_w": 59.9
+    },
+    "150": {
+     "len": 234.8,
+     "ret": -7.06,
+     "level": 0.0032,
+     "ret_w": -7.126,
+     "len_w": 245.09
+    },
+    "200": {
+     "len": 906.3,
+     "ret": -9.31,
+     "level": 0.1846,
+     "ret_w": -9.25,
+     "len_w": 923.78
+    },
+    "300": {
+     "len": 977.2,
+     "ret": 0.27,
+     "level": 1.4666,
+     "ret_w": 0.097,
+     "len_w": 974.28
+    },
+    "500": {
+     "len": 959.9,
+     "ret": 3.47,
+     "level": 4.0117,
+     "ret_w": 3.6480000000000006,
+     "len_w": 969.3399999999999
+    },
+    "750": {
+     "len": 968.8,
+     "ret": 3.36,
+     "level": 5.4661,
+     "ret_w": 3.3939999999999997,
+     "len_w": 969.4100000000001
+    },
+    "1000": {
+     "len": 936.6,
+     "ret": 4.42,
+     "level": 5.7344,
+     "ret_w": 3.9539999999999997,
+     "len_w": 960.9100000000001
+    },
+    "1250": {
+     "len": 969.9,
+     "ret": 5.89,
+     "level": 5.8457,
+     "ret_w": 6.377000000000001,
+     "len_w": 970.72
+    },
+    "1499": {
+     "len": 969.3,
+     "ret": 8.0,
+     "level": 5.9543,
+     "ret_w": 8.206666666666667,
+     "len_w": 978.4499999999999
+    },
+    "1500": {
+     "len": 975.8,
+     "ret": 8.38,
+     "level": 5.957,
+     "ret_w": 8.156,
+     "len_w": 976.0600000000001
+    }
+   },
+   "blown_total": 1010,
+   "blown_its": 163,
+   "blown_early_le_30": 823,
+   "blown_late_ge_100": 187,
+   "blown_first_last": [
+    10,
+    1500
+   ],
+   "pen": {
+    "all": [
+     67,
+     2.0,
+     17.3
+    ],
+    "it1-50": [
+     3,
+     2.1,
+     17.3
+    ],
+    "it1400-1500": [
+     6,
+     2.1,
+     5.0
+    ]
+   },
+   "force": {
+    "all": [
+     9,
+     16055.0,
+     277931.0
+    ],
+    "it1-50": [
+     1,
+     277931.0,
+     277931.0
+    ],
+    "it1400-1500": [
+     0,
+     null,
+     null
+    ]
+   },
+   "speed": {
+    "all": [
+     201,
+     122.0,
+     931.0
+    ]
+   },
+   "dropped_rows": [],
+   "epa_lines": 0,
+   "overflow_lines": [],
+   "sec_per_it_median_100_1500": 2.5421256788208666,
+   "terms_1000": {
+    "action_rate_l2": -0.601688,
+    "ang_vel_xy_l2": -0.0465,
+    "base_contact": 0.088347,
+    "dof_acc_l2": -0.06898,
+    "dof_pos_limits": -0.021172,
+    "dof_torques_l2": -0.000762,
+    "episodes": 86.4,
+    "feet_air_time": 0.004275,
+    "feet_slide": -0.035741,
+    "flat_orientation_l2": -0.016588,
+    "joint_deviation": -0.265164,
+    "lin_vel_z_l2": 0.0,
+    "pushes": 116.1,
+    "termination_penalty": -0.017669,
+    "track_ang_vel_z_exp": 0.569994,
+    "track_lin_vel_xy_exp": 0.697683
+   },
+   "terms_1499": {
+    "action_rate_l2": -0.5759433333333334,
+    "ang_vel_xy_l2": -0.04041,
+    "base_contact": 0.060615,
+    "dof_acc_l2": -0.06018333333333333,
+    "dof_pos_limits": -0.022101666666666665,
+    "dof_torques_l2": -0.0007233333333333333,
+    "episodes": 89.16666666666667,
+    "feet_air_time": 0.005321666666666666,
+    "feet_slide": -0.03238666666666667,
+    "flat_orientation_l2": -0.020416666666666666,
+    "joint_deviation": -0.2594933333333333,
+    "lin_vel_z_l2": 0.0,
+    "pushes": 111,
+    "termination_penalty": -0.012123333333333333,
+    "track_ang_vel_z_exp": 0.6824966666666666,
+    "track_lin_vel_xy_exp": 0.7462616666666666
+   }
+  },
+  "new": {
+   "path": "runs/rough_rerun_2026-10-31/logs/il3fix_rough_s0.log",
+   "header": "G1 rough PPO: N=4096 obs_dim 310 act_dim 37 rollout 24 x 1500 iterations, engine mjwarp, physics dt 0.0025 (decimation 8), seed 0, reward_cfg rough_il3, height-scan ray order xy, terrain collision hfield, height scan exact, solver_cfg isaaclab3_every_substep_cap20, contact_cfg recommended_pyramidal, base velocity com, feet-slide velocity com, initial reset True, effort limit on the actuator, Isaac Lab 3.0 events True (backend newton_mjwarp), add_base_mass {'body': 'torso_link', 'scale_min': 0.8000494837760925, 'scale_max': 1.2497823238372803, 'dof_invweight0_ratio_range': [0.9505320191383362, 1.0460337400436401], 'limit_timeconst_ratio_range': [0.9787044773626695, 1.0248058414581651]}",
+   "restarts_cut": 0,
+   "iterations": 1500,
+   "milestones": {
+    "100": {
+     "len": 62.3,
+     "ret": -4.62,
+     "level": 0.0,
+     "ret_w": -4.62,
+     "len_w": 62.64
+    },
+    "150": {
+     "len": 272.9,
+     "ret": -7.14,
+     "level": 0.0061,
+     "ret_w": -7.25,
+     "len_w": 284.06
+    },
+    "200": {
+     "len": 909.6,
+     "ret": -9.04,
+     "level": 0.2458,
+     "ret_w": -8.837,
+     "len_w": 920.51
+    },
+    "300": {
+     "len": 978.4,
+     "ret": -0.28,
+     "level": 1.4597,
+     "ret_w": -0.066,
+     "len_w": 979.22
+    },
+    "500": {
+     "len": 968.5,
+     "ret": 3.65,
+     "level": 3.7285,
+     "ret_w": 3.444,
+     "len_w": 960.5200000000001
+    },
+    "750": {
+     "len": 958.2,
+     "ret": 4.53,
+     "level": 5.3306,
+     "ret_w": 4.377,
+     "len_w": 968.0600000000001
+    },
+    "1000": {
+     "len": 999.3,
+     "ret": 7.11,
+     "level": 5.8293,
+     "ret_w": 6.517,
+     "len_w": 976.43
+    },
+    "1250": {
+     "len": 992.4,
+     "ret": 9.6,
+     "level": 6.0364,
+     "ret_w": 9.106,
+     "len_w": 983.28
+    },
+    "1499": {
+     "len": 973.2,
+     "ret": 11.17,
+     "level": 5.9329,
+     "ret_w": 11.464999999999998,
+     "len_w": 980.7833333333333
+    },
+    "1500": {
+     "len": 985.3,
+     "ret": 12.02,
+     "level": 5.9331,
+     "ret_w": 11.492,
+     "len_w": 980.9799999999999
+    }
+   },
+   "blown_total": 67,
+   "blown_its": 61,
+   "blown_early_le_30": 0,
+   "blown_late_ge_100": 67,
+   "blown_first_last": [
+    1012,
+    1500
+   ],
+   "pen": {
+    "all": [
+     48,
+     2.0,
+     3.3
+    ],
+    "it1-50": [
+     2,
+     2.1,
+     2.6
+    ],
+    "it1400-1500": [
+     4,
+     2.2,
+     2.7
+    ]
+   },
+   "force": {
+    "all": [
+     31,
+     15826.0,
+     41069.0
+    ],
+    "it1-50": [
+     0,
+     null,
+     null
+    ],
+    "it1400-1500": [
+     4,
+     17052.0,
+     21326.0
+    ]
+   },
+   "speed": {
+    "all": [
+     53,
+     200.0,
+     725.0
+    ]
+   },
+   "dropped_rows": [],
+   "epa_lines": 0,
+   "overflow_lines": [],
+   "sec_per_it_median_100_1500": 3.6560132401846204,
+   "terms_1000": {
+    "action_rate_l2": -0.5757,
+    "ang_vel_xy_l2": -0.045465,
+    "base_contact": 0.05371,
+    "dof_acc_l2": -0.063607,
+    "dof_pos_limits": -0.019175,
+    "dof_torques_l2": -0.000746,
+    "episodes": 104.5,
+    "feet_air_time": 0.004182,
+    "feet_slide": -0.033979999999999996,
+    "flat_orientation_l2": -0.016287,
+    "joint_deviation": -0.253228,
+    "lin_vel_z_l2": 0.0,
+    "pushes": 99.2,
+    "termination_penalty": -0.010741,
+    "track_ang_vel_z_exp": 0.604397,
+    "track_lin_vel_xy_exp": 0.736249
+   },
+   "terms_1499": {
+    "action_rate_l2": -0.5305166666666666,
+    "ang_vel_xy_l2": -0.03813333333333333,
+    "base_contact": 0.03804166666666667,
+    "dof_acc_l2": -0.05283,
+    "dof_pos_limits": -0.018601666666666666,
+    "dof_torques_l2": -0.0006216666666666666,
+    "episodes": 100.5,
+    "feet_air_time": 0.004565,
+    "feet_slide": -0.031091666666666667,
+    "flat_orientation_l2": -0.016631666666666666,
+    "joint_deviation": -0.24436166666666667,
+    "lin_vel_z_l2": 0.0,
+    "pushes": 97.16666666666667,
+    "termination_penalty": -0.007606666666666667,
+    "track_ang_vel_z_exp": 0.7294616666666667,
+    "track_lin_vel_xy_exp": 0.7795650000000001
+   }
+  }
+ }
+}

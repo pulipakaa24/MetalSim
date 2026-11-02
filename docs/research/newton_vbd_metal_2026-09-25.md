@@ -11,13 +11,13 @@ bodies under Newton. Companion: [`physx_deformables_port_2026-09-25.md`](physx_d
 (PhysX-backend formulations). **Measured** = run here (M4 Max; Metal through `scripts/gpu_run.sh` at kind `low`,
 `gpu_lock.py status` at the top of every log); **source** = read in the cited file.
 
-Sources: [N152] `upstream/newton-1.5.2` = newton-physics/newton tag
+Sources: [N152] newton-physics/newton tag
 [`v1.5.2`](https://github.com/newton-physics/newton/tree/v1.5.2)
 ([`cf5378db`](https://github.com/newton-physics/newton/commit/cf5378db6002b5c19b86344737cdd40cb8e08f0c), 2026-09-09),
-the version Isaac Lab 3.0 EA pins; [NF] `upstream/newton` = branch `metalsim` of
+the version Isaac Lab 3.0 EA pins; [NF] branch `metalsim` of
 [my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim)
 ([`90e23324`](https://github.com/pulipakaa24/newton/commit/90e23324521fa86710e483e01d02e80d1dac0060), 1.7.0.dev); [W]
-`upstream/warp-innate` = branch `metalsim` of [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim);
+branch `metalsim` of [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim);
 [IL3] isaac-sim/IsaacLab tag [`v3.0.0-EA`](https://github.com/isaac-sim/IsaacLab/tree/v3.0.0-EA) and `develop`
 ([`24fd3182`](https://github.com/isaac-sim/IsaacLab/commit/24fd31827ee878c6fe68850aa06a7a60f490e209)), read from a
 sparse clone. Logs and data: `runs/newton_vbd/`. Scripts: `scripts/diagnostics/newton_vbd/` (`vbd_probe.py`,
@@ -31,11 +31,12 @@ sparse clone. Logs and data: `runs/newton_vbd/`. Scripts: `scripts/diagnostics/n
   [my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim) (1.7.0.dev) failed to build one module,
   `rigid_vbd_kernels`, with a link error: `Undefined symbol(s) for architecture 'air64': 'nextafterf'`. The Metal
   standard library has no `nextafterf`, and clang lowers `__builtin_nextafterf` to a call to it. Newton's interval
-  arithmetic for rigid–soft Divide-and-Truncate (`newton/_src/solvers/vbd/interval_arithmetic.py`, upstream Newton
+  arithmetic for rigid–soft Divide-and-Truncate
+  ([`newton/_src/solvers/vbd/interval_arithmetic.py`](https://github.com/newton-physics/newton/blob/e42568d9895f12b5bb004f3fedb600053e233f8c/newton/_src/solvers/vbd/interval_arithmetic.py), upstream Newton
   [`e42568d9`](https://github.com/newton-physics/newton/commit/e42568d9895f12b5bb004f3fedb600053e233f8c), after 1.5.2)
   calls it from the non-CUDA branch of a native snippet, and Metal takes that branch. **Fixed in my fork of Warp**
   ([`9050cb54`](https://github.com/pulipakaa24/warp/commit/9050cb5452de26ca6c80871bee15c389c06f9b10);
-  `patches/warp/0007-Metal-nextafterf-*`, and merged into its `metalsim` branch as
+  `patches/warp/0007-Metal-nextafterf-in-the-kernel-CRT-and-the-__builtin.patch`, and merged into its `metalsim` branch as
   [`f194006`](https://github.com/pulipakaa24/warp/commit/f194006a4cf197fda93633252af81bc3f57f5561)): `metal_crt.h` now
   has a bit-exact IEEE `nextafterf`, computed on bit patterns because Apple GPUs flush float32 subnormals in
   comparisons, and maps `__builtin_nextafterf` onto it. The new test `test_metal.test_nextafterf` matches
@@ -77,7 +78,7 @@ sparse clone. Logs and data: `runs/newton_vbd/`. Scripts: `scripts/diagnostics/n
 |---|---|---|---|---|
 | Isaac Lab 3.0 EA | 1.5.2 (`pyproject.toml:407`, uv override; line 93 is the loose `newton[sim]>=1.2.0`) | ~=3.11 (Newton's `[sim]` extra) | 1.16 | [IL3] |
 | Isaac Lab `develop` | 1.6.0 (`pyproject.toml:91`) | | | [IL3] |
-| `.venv-newton152` (this work) | 1.5.2, editable `upstream/newton-1.5.2` | 3.11.0 / 3.11.0 (stock) | fork 1.18.0.dev (`upstream/warp-innate` [`9050cb54`](https://github.com/pulipakaa24/warp/commit/9050cb5452de26ca6c80871bee15c389c06f9b10)) | `scripts/setup_newton152.sh` |
+| `.venv-newton152` (this work) | 1.5.2, editable install of a local [N152] clone | 3.11.0 / 3.11.0 (stock) | fork 1.18.0.dev ([W] at [`9050cb54`](https://github.com/pulipakaa24/warp/commit/9050cb5452de26ca6c80871bee15c389c06f9b10)) | `scripts/setup_newton152.sh` |
 | `.venv-newtonfork` | [my fork](https://github.com/pulipakaa24/newton/tree/metalsim) 1.7.0.dev (or 1.5.2 via `PYTHONPATH`) | 3.14.0 / [my fork](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) 3.14.0 | same | `scripts/setup_newton.sh` |
 
 On particle-only scenes the Newton 1.5.2 and 1.7.0.dev VBD produce **bitwise-identical** CPU trajectories (cloth
@@ -123,7 +124,7 @@ Per-kernel profile (`profile_launches.py`, eager, synchronising after every laun
 
 ## 4. Newton's coupled solvers (from source) and on Metal
 
-**Mechanism (source, [N152] `newton/_src/solvers/coupled/`, exported as `newton.solvers.experimental.coupled`)**
+**Mechanism (source, [N152] [`newton/_src/solvers/coupled/`](https://github.com/newton-physics/newton/tree/v1.5.2/newton/_src/solvers/coupled), exported as `newton.solvers.experimental.coupled`)**
 * `CouplingInterface` (`interface.py:108`) is a set of hooks: effective mass, gravity, rewinding proxy
   bodies/particles, harvesting proxy wrenches or particle forces, and preparing proxy contacts. MuJoCo, VBD,
   Featherstone, XPBD, SemiImplicit, Kamino and ImplicitMPM implement it.
@@ -142,20 +143,24 @@ Per-kernel profile (`profile_launches.py`, eager, synchronising after every laun
 | `SolverCoupledADMM` (`solver_coupled_admm.py:424`) | interface constraints: cross-entry joints, body–particle attachments, rigid–rigid / rigid–particle / particle–particle contacts | internal collision, then `iterations` (default 5) of force accumulation → step all entries → dual update (`:2824-2885`) | symmetric two-way |
 
 * A legacy pattern also exists: `SolverVBD(integrate_with_external_rigid_solver=True)` gives one-way coupling
-  (the robot is kinematic for VBD); it is used by `examples/cloth/example_cloth_franka.py`.
+  (the robot is kinematic for VBD); it is used by
+  [`examples/cloth/example_cloth_franka.py`](https://github.com/newton-physics/newton/blob/v1.5.2/newton/examples/cloth/example_cloth_franka.py).
 
 **Isaac Lab 3.0 (source, [IL3])**
-* The coupled Franka soft/cloth/cable lift tasks (`isaaclab_tasks/core/lift/config/franka_soft/*_env_cfg.py`,
+* The coupled Franka soft/cloth/cable lift tasks
+  ([`isaaclab_tasks/core/lift/config/franka_soft/*_env_cfg.py`](https://github.com/isaac-sim/IsaacLab/tree/v3.0.0-EA/source/isaaclab_tasks/isaaclab_tasks/core/lift/config/franka_soft),
   EA `franka_soft_env_cfg.py:143-186`) use `SolverCoupledProxy` through
-  `isaaclab_contrib/coupling/coupler.py` (`NewtonCouplerManager`, `:383-400`):
+  [`isaaclab_contrib/coupling/coupler.py`](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/source/isaaclab_contrib/isaaclab_contrib/coupling/coupler.py) (`NewtonCouplerManager`, `:383-400`):
   * rigid entry: `MJWarpSolverCfg(cone="elliptic", integrator="implicitfast")`, owning the whole robot;
   * soft entry: `VBDSolverCfg(iterations=10)` with all particles and static shapes;
   * proxies rigid → soft for the hand and fingers only, `collide_interval=1`, full-surface rigid–soft contact,
     proxy iterations 1;
   * 2 substeps (4 for the cable).
-* Isaac Lab's documentation (`docs/source/concepts/coupled_solvers.rst`) calls the proxy "the established path for
+* Isaac Lab's documentation
+  ([`docs/source/concepts/coupled_solvers.rst`](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/docs/source/concepts/coupled_solvers.rst)) calls the proxy "the established path for
   Isaac Lab's coupled MJWarp–VBD tasks" and recommends `mode="lagged"`. ADMM is available through the same manager.
-* EA also ships a hand-rolled one-/two-way coupler (`isaaclab_contrib/custom_coupling/coupled_mjwarp_vbd_manager.py`)
+* EA also ships a hand-rolled one-/two-way coupler
+  ([`isaaclab_contrib/custom_coupling/coupled_mjwarp_vbd_manager.py`](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/source/isaaclab_contrib/isaaclab_contrib/custom_coupling/coupled_mjwarp_vbd_manager.py))
   as a separate example task.
 * A deformable scene without articulations uses one `SolverVBD` (`isaaclab_newton/physics/vbd_manager.py:62-72`).
 * Unclear: runtime behaviour of the Isaac Lab tasks, and whether `develop` still ships `custom_coupling`.

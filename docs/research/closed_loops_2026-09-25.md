@@ -61,13 +61,14 @@ which is how the controller sees it (`knee_*_Joint` in the SDK's motor order).
 
 ### 2.1 Newton's SolverKamino (Disney Research)
 
-Sources: [K] `upstream/newton/newton/_src/solvers/kamino/`
+Sources: [K] [`newton/_src/solvers/kamino/`](https://github.com/pulipakaa24/newton/tree/90e23324521fa86710e483e01d02e80d1dac0060/newton/_src/solvers/kamino)
 ([my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim), 1.7.0.dev,
 [`90e23324`](https://github.com/pulipakaa24/newton/commit/90e23324521fa86710e483e01d02e80d1dac0060)) and
-`upstream/newton-1.5.2/...` (upstream tag [v1.5.2](https://github.com/newton-physics/newton/tree/v1.5.2)); [TR] Tsounis,
+[the same directory](https://github.com/newton-physics/newton/tree/v1.5.2/newton/_src/solvers/kamino) in upstream tag
+[v1.5.2](https://github.com/newton-physics/newton/tree/v1.5.2); [TR] Tsounis,
 Grandia, Bächer, "On Solving the Dynamics of Constrained Rigid Multi-Body Systems with Kinematic Loops",
 [arXiv:2504.19771](https://arxiv.org/abs/2504.19771) (v1, 2025-04-28); [IL3] Isaac Lab
-[`v3.0.0-EA`](https://github.com/isaac-sim/IsaacLab/tree/v3.0.0-EA) sparse clone `upstream/IsaacLab3`.
+[`v3.0.0-EA`](https://github.com/isaac-sim/IsaacLab/tree/v3.0.0-EA), read from a sparse clone.
 
 * **Status.** "`SolverKamino` is currently in BETA (`BETA 1`) ... we discourage users of Newton from depending on
   it ... A more stable `BETA 2` version is planned for release during the summer of 2026" ([K] README.md).
@@ -79,12 +80,12 @@ Grandia, Bächer, "On Solving the Dynamics of Constrained Rigid Multi-Body Syste
   D = J M⁻¹ Jᵀ (Eq. 11), post-event velocity v⁺ = Dλ + v_f (Eq. 13), De Saxcé-augmented velocity (Eq. 14), NCP
   K* ∋ v̂(λ) ⊥ λ ∈ K (Eq. 15); contacts are Signorini + Coulomb cone with restitution (Eqs. 40b, 45b).
   Constraints are **hard**: loop-closing joints are ordinary bilateral joint rows ("closes the loop" joint outside
-  the articulation, `newton/tests/utils/basics.py` `build_boxes_fourbar`), rank deficiency from redundant loop rows
+  the articulation, [`newton/tests/utils/basics.py`](https://github.com/pulipakaa24/newton/blob/90e23324521fa86710e483e01d02e80d1dac0060/newton/tests/utils/basics.py) `build_boxes_fourbar`), rank deficiency from redundant loop rows
   handled by the proximal regularisation.
 * **Solver.** Default backend Proximal-ADMM ("realizes the Proximal-ADMM algorithm described in [TR] and is based on
   the work of J. Carpentier et al." ([arXiv:2405.17020](https://arxiv.org/abs/2405.17020)), diagonal preconditioning,
   Nesterov acceleration with the Goldstein et al. fast-ADMM restart, optional residual-balancing penalty updates;
-  `_src/solvers/padmm/__init__.py`).
+  [`_src/solvers/padmm/__init__.py`](https://github.com/pulipakaa24/newton/blob/90e23324521fa86710e483e01d02e80d1dac0060/newton/_src/solvers/kamino/_src/solvers/padmm/__init__.py)).
   Defaults: 200 iterations, primal/dual/complementarity tolerance 1e-6, warm start from containers
   (`config.py` `PADMMSolverConfig`). Opt-in `"dvi"` backend: projected iterations with a direct bilateral block
   solve (`solver_kamino.py` `Config.dynamics_solver`). The iteration loop is a `wp.capture_while` on
@@ -92,11 +93,13 @@ Grandia, Bächer, "On Solving the Dynamics of Constrained Rigid Multi-Body Syste
   (`padmm/solver.py:414`).
 * **Stabilisation.** Baumgarte per constraint class: α = 0.01 bilateral joints, β = 0.01 joint limits, γ = 0.01
   contacts, contact margin δ = 1e-6 m (`config.py:225-258`); overridable per constraint. Isaac Lab 3.0 overrides α to
-  **0.1** (`isaaclab_newton/physics/kamino_manager_cfg.py` `KaminoConstraintsCfg`).
+  **0.1** ([`isaaclab_newton/physics/kamino_manager_cfg.py`](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/source/isaaclab_newton/isaaclab_newton/physics/kamino_manager_cfg.py)
+  `KaminoConstraintsCfg`).
 * **Time integration.** `"euler"` (semi-implicit, default) or `"moreau"` (Moreau–Jean midpoint; needs Kamino's
-  collision detector) (`solver_kamino.py` `Config.integrator`; `_src/integrators/`).
+  collision detector) (`solver_kamino.py` `Config.integrator`; [`_src/integrators/`](https://github.com/pulipakaa24/newton/tree/90e23324521fa86710e483e01d02e80d1dac0060/newton/_src/solvers/kamino/_src/integrators)).
 * **Drives.** Effort (explicit `joint_f`) and implicit PD (`POSITION_VELOCITY` target mode with `target_ke/kd`,
-  armature, viscous damping as "dynamic" constraint rows; `_src/core/conversions.py`), joint Coulomb friction and
+  armature, viscous damping as "dynamic" constraint rows;
+  [`_src/core/conversions.py`](https://github.com/pulipakaa24/newton/blob/90e23324521fa86710e483e01d02e80d1dac0060/newton/_src/solvers/kamino/_src/core/conversions.py)), joint Coulomb friction and
   effort limits (Newton [v1.6.0 release notes](https://github.com/newton-physics/newton/releases/tag/v1.6.0)).
 * **Limits (beta 1).** Refuses particles, springs, triangles/edges/tets, muscles, `DISTANCE` and `ROD` joints, and
   bodies with singular inertia (`solver_kamino.py` `_validate_model_compatibility`); immovability decided once at
@@ -104,9 +107,11 @@ Grandia, Bächer, "On Solving the Dynamics of Constrained Rigid Multi-Body Syste
 * **Isaac Lab 3.0.** Ships a `newton_kamino` physics preset (`KaminoPADMMSolverCfg`: 100 iterations, tolerances
   1e-4, ρ₀ 0.05, α 0.1, integrator `moreau`, `use_graph_conditionals=False`), a Kamino-only four-bar task
   `Isaac-Fourbar-Pole-Swingup` (dt 1/120 s, `integrator="euler"`, ρ₀ 0.1; "the closed four-bar kinematic loop is
-  resolved as an equality constraint by kamino", `isaaclab_tasks/core/fourbar_pole/fourbar_pole_manager_env_cfg.py`)
+  resolved as an equality constraint by kamino",
+  [`isaaclab_tasks/core/fourbar_pole/fourbar_pole_manager_env_cfg.py`](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/source/isaaclab_tasks/isaaclab_tasks/core/fourbar_pole/fourbar_pole_manager_env_cfg.py))
   and the Disney DR Legs asset ("parallel-linkage bipedal lower body with 30 joints (12 actuated + 18 passive
-  linkage DOFs) plus 6 loop-closing joints", `isaaclab_assets/robots/dr_legs.py`).
+  linkage DOFs) plus 6 loop-closing joints",
+  [`isaaclab_assets/robots/dr_legs.py`](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/source/isaaclab_assets/isaaclab_assets/robots/dr_legs.py)).
 
 ### 2.2 MuJoCo's loop closure
 
@@ -125,9 +130,9 @@ Grandia, Bächer, "On Solving the Dynamics of Constrained Rigid Multi-Body Syste
   all joints this way. The same can be done in MuJoCo but is not recommended – because it leads to both slower and
   less accurate simulation" (Computation > Equality). That sentence is about replacing tree joints; loops that
   cannot be in the tree have no other route in MuJoCo. Menagerie's Agility Cassie closes its achilles-rod and
-  plantar-rod loops with four `connect` equalities whose default class stiffens them to solref "0.005 1" (`upstream/mujoco_menagerie/agility_cassie/cassie.xml:10, 228-233`): the model author chose a 5 ms time constant (4x stiffer than the default) at a 0.5 ms timestep (line 4).
+  plantar-rod loops with four `connect` equalities whose default class stiffens them to solref "0.005 1" ([`agility_cassie/cassie.xml:10, 228-233`](https://github.com/google-deepmind/mujoco_menagerie/blob/main/agility_cassie/cassie.xml)): the model author chose a 5 ms time constant (4x stiffer than the default) at a 0.5 ms timestep (line 4).
 * **MuJoCo Warp.** `EqType` implements CONNECT, WELD, JOINT, TENDON, FLEX, FLEXSTRAIN; DISTANCE unsupported
-  (`upstream/mujoco_warp/mujoco_warp/_src/types.py:729-747`); kernels `_equality_connect` / `_equality_weld` in
+  ([`mujoco_warp/_src/types.py:729-747`](https://github.com/pulipakaa24/mujoco_warp/blob/metalsim/mujoco_warp/_src/types.py)); kernels `_equality_connect` / `_equality_weld` in
   `constraint.py`. No Metal-specific code path for equality rows in
   [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim); the only Metal caveat is general
   (graph conditionals off, `m.opt.graph_conditional = False`, so all solver iterations launch;
@@ -140,8 +145,9 @@ Grandia, Bächer, "On Solving the Dynamics of Constrained Rigid Multi-Body Syste
   Agility Digit) ... **Affects:** `physics=newton_mjwarp`,
   `physics=newton_kamino`. Robots whose USD encodes a closed kinematic loop — such as the achilles rod and toe
   push-rods on the Agility Digit — are not currently validated on the Newton backends. The Digit-based contrib tasks
-  are PhysX-only and do not expose a Newton preset at all" (`upstream/IsaacLab3/docs/source/refs/issues.rst:119-136`).
-  The Python config (`isaaclab_assets/robots/agility.py`, `DIGIT_V4_CFG`) has no loop handling: the loop lives in
+  are PhysX-only and do not expose a Newton preset at all"
+  ([`docs/source/refs/issues.rst:119-136`](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/docs/source/refs/issues.rst#L119-L136)).
+  The Python config ([`isaaclab_assets/robots/agility.py`](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/source/isaaclab_assets/isaaclab_assets/robots/agility.py), `DIGIT_V4_CFG`) has no loop handling: the loop lives in
   the USD.
 * [PhysX](https://github.com/NVIDIA-Omniverse/PhysX): "Articulations must have a tree structure ... it is possible to
   create loops in the articulation by adding rigid-body Joints between articulation links" (PhysX 5.6 docs,

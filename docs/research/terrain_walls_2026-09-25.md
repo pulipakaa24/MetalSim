@@ -11,9 +11,8 @@ Sources: [IL-mesh] https://github.com/isaac-sim/IsaacLab/blob/v2.3.2/source/isaa
 [IL-imp] .../terrains/terrain_importer.py (L226-253), [IL-utils] .../terrains/utils.py (L60-103),
 [IL-hf] .../terrains/height_field/utils.py (L60-66, L130-150), [IL-rough] .../terrains/config/rough.py (L12-41);
 local copies in `assets/isaac/terrains/`. [MJ-hf] https://mujoco.readthedocs.io/en/latest/XMLreference.html#asset-hfield,
-[MJ-coll] https://mujoco.readthedocs.io/en/latest/computation/index.html#collision, [MJW] `upstream/mujoco_warp`
-([my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim): v3.14.0 + MetalSim patches;
-upstream main
+[MJ-coll] https://mujoco.readthedocs.io/en/latest/computation/index.html#collision, [MJW]
+[my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) (v3.14.0 + MetalSim patches; upstream main
 [`7a060f6`](https://github.com/google-deepmind/mujoco_warp/commit/7a060f6054018b7c6c2c8944ce4a542573337521) for the
 table), [MJW-326] https://github.com/google-deepmind/mujoco_warp/issues/326, [MJW-1083] .../issues/1083, [mjlab]
 https://github.com/mujocolab/mjlab (main
@@ -45,7 +44,8 @@ https://github.com/google-deepmind/mujoco_playground
   terrain mesh [IL-gen], imported by `create_prim_from_mesh` as one USD `Mesh` prim with only
   `UsdPhysics.CollisionAPI` applied [IL-utils]: no `MeshCollisionAPI`, so the approximation is USD's default "none",
   which PhysX treats as a triangle-mesh collider (an inference from the USD defaults; Isaac Lab does not state it).
-  No convex decomposition, no SDF anywhere in `terrains/`.
+  No convex decomposition, no SDF anywhere in
+  [`terrains/`](https://github.com/isaac-sim/IsaacLab/tree/v2.3.2/source/isaaclab/isaaclab/terrains).
 * Height-field sub-terrains (random rough, slopes) go through `convert_height_field_to_mesh` with
   `slope_threshold=0.75`: vertices whose height jump exceeds the threshold are moved one cell, which turns steep
   pixels into vertical walls [IL-hf]; this is legged_gym's `convert_heightfield_to_trimesh` ported [LG]
@@ -85,7 +85,7 @@ https://github.com/google-deepmind/mujoco_playground
 
 * **mjlab** (MuJoCo Warp, Isaac Lab's terrain generator ported): stairs, inverted stairs and random grids are native
   **box geoms** (`BoxPyramidStairsTerrainCfg`, `BoxInvertedPyramidStairsTerrainCfg`, `BoxRandomGridTerrainCfg` in
-  `src/mjlab/terrains/primitive_terrains.py`), slopes and random rough are **hfields**
+  [`src/mjlab/terrains/primitive_terrains.py`](https://github.com/mujocolab/mjlab/blob/c2e1e06400e309b6897a536693fe5d2aa772c5b2/src/mjlab/terrains/primitive_terrains.py)), slopes and random rough are **hfields**
   (`heightfield_terrains.py`). All sub-terrains share one static `terrain` body. `BoxRandomGridTerrainCfg` has an
   optional `merge_similar_heights` (height quantisation 0.05 m, greedy rectangles) to cut the geom count, off by
   default (it changes the heights). Its G1 rough config raises `nconmax` to 70 and `ccd_iterations` to 500.

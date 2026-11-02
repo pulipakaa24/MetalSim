@@ -10,8 +10,8 @@ Sources: [MX] https://mujoco.readthedocs.io/en/latest/XMLreference.html (flexcom
 [MM] https://mujoco.readthedocs.io/en/latest/modeling.html (Deformable objects), [MC314]
 https://github.com/google-deepmind/mujoco/blob/3.14.0/src/engine/engine_collision_driver.c and
 engine_collision_primitive.c, [MCmain] the same files on `main` (2026-09-23 commits "Integrate flex collisions into
-threaded mj_narrowphase", "Enable threading across mj_collideTree"), [MJW] upstream/mujoco_warp
-([my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim): v3.14.0 + MetalSim patches), [ILA]
+threaded mj_narrowphase", "Enable threading across mj_collideTree"), [MJW]
+[my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) (v3.14.0 + MetalSim patches), [ILA]
 https://isaac-sim.github.io/IsaacLab/main/source/api/lab/isaaclab.assets.html (DeformableObject,
 DeformableObjectCfg, DeformableObjectData), [ILT] https://isaac-sim.github.io/IsaacLab/main/source/tutorials/01_assets/run_deformable_object.html,
 [ILM] https://isaac-sim.github.io/IsaacLab/main/_modules/isaaclab/sim/spawners/materials/physics_materials_cfg.html,
@@ -156,16 +156,17 @@ were the mesh-normal change of fix 11 on Metal, §6).
 |---|---|---|---|
 | MuJoCo Warp flex (this work) | runs, fixed to MuJoCo C's contact model | per-step equal (table above) | measured §6 |
 | Newton VBD | fails to compile on Metal ([GAPS](../GAPS.md) ledger), Newton path archived | different model (VBD) | not measured |
-| Newton XPBD particles / Warp's old `warp.sim` cloth | `warp.sim` removed from Warp (only `warp/examples/benchmarks/benchmark_cloth_*`, a spring cloth); Newton XPBD runs on Metal for rigid bodies | different model | not pursued (archived engine) |
+| Newton XPBD particles / Warp's old `warp.sim` cloth | `warp.sim` removed from Warp (only [`warp/examples/benchmarks/benchmark_cloth_*`](https://github.com/NVIDIA/warp/tree/main/warp/examples/benchmarks), a spring cloth); Newton XPBD runs on Metal for rigid bodies | different model | not pursued (archived engine) |
 | MetalSim-native XPBD cloth/cable (`metalsim.physics.deformable.XPBDSim`) | runs: same flex topology, graph-coloured distance + cross-edge bending constraints, geom contacts with friction (plane/sphere/capsule/box; meshes as OBBs), two-way coupling via `xfrc_applied`, one captured graph | **not MuJoCo C's model** (measured, box scene, same start as §2): max vertex error 5.4 cm already at step 50 (it removes the initial 2 mm constraint violation at once where MuJoCo's soft edge constraints relax over solref's 20 ms), 5.5–15 cm at rest for 10–40 substeps, cloth mean height +0.9 to +2.0 cm; rejected on fidelity | measured §6 |
 
 ## 5. Plan and effort (estimated at the start; status in brackets)
 
-1. Done: research; isolated environment (`.venv-flex`, worktree `upstream/mujoco_warp-flex` on `metalsim-flex`);
-   flex contact fidelity fixes 1–11 (≈ 1 day) [done].
+1. Done: research; isolated environment (`.venv-flex`, a MuJoCo Warp worktree on branch
+   [`metalsim-flex`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-flex)); flex contact fidelity fixes 1–11
+   (≈ 1 day) [done].
 2. Metal: run MuJoCo Warp's flex tests on `metal:0`, read the three failures, fix in the Metal codegen /
-   [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim-flex) (branch `metalsim-flex` of
-   upstream/warp-innate) or MuJoCo Warp (0.5–2 days depending on cause) [done: row order + capture + mesh normal;
+   [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim-flex) (branch `metalsim-flex`) or
+   MuJoCo Warp (0.5–2 days depending on cause) [done: row order + capture + mesh normal;
    237/237 on Metal].
 3. Demo + tests on Metal: `metalsim/physics/deformable.py`, `tests/test_deformable.py` — MuJoCo C parity (free fall,
    contact trajectory, in-contact one-step), energy over 2 s, graph replay = eager; throughput at 64–4096 envs
@@ -177,14 +178,14 @@ were the mesh-normal change of fix 11 on Metal, §6).
    `elasticity`), surface cloth with bending (`elastic2d="both"`), quadratic dofs and flex–heightfield in MuJoCo Warp
    (2–5 days each).
 
-## 6. Metal results and throughput (measured, `runs/deformable/metal_run*.log`, `metal_final.log`)
+## 6. Metal results and throughput (measured, `runs/deformable/metal_run1.log` to `metal_run5.log`, `metal_final.log`)
 
-Environment: `.venv-flex` (git-ignored) with the MuJoCo Warp worktree `upstream/mujoco_warp-flex` (branch
+Environment: `.venv-flex` (git-ignored) with a MuJoCo Warp worktree (branch
 [`metalsim-flex`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-flex) of
 [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim), commits
 [`b2e9ea5`](https://github.com/pulipakaa24/mujoco_warp/commit/b2e9ea5c7498f5ecc2c3c290f757d09e2f61e1d2) to
-[`dfa5d30`](https://github.com/pulipakaa24/mujoco_warp/commit/dfa5d30725cd2f96d02cbbb68b7a9a6f22fc3ac8)) and the Warp
-worktree `upstream/warp-innate-flex` (branch [`metalsim-flex`](https://github.com/pulipakaa24/warp/tree/metalsim-flex)
+[`dfa5d30`](https://github.com/pulipakaa24/mujoco_warp/commit/dfa5d30725cd2f96d02cbbb68b7a9a6f22fc3ac8)) and a Warp
+worktree (branch [`metalsim-flex`](https://github.com/pulipakaa24/warp/tree/metalsim-flex)
 of [my fork of Warp](https://github.com/pulipakaa24/warp/tree/metalsim),
 [`9dcb140`](https://github.com/pulipakaa24/warp/commit/9dcb1406a49101ff6645f9a8b38221f09e0fc0d6)), both pushed to my
 forks. All GPU work ran through `scripts/gpu_run.sh` at kind `low`.
@@ -268,10 +269,10 @@ omni.physx 107.3) and PhysX main (5.11,
 v2.3.2 and v3.0.0-EA
 ([`ae37b02`](https://github.com/isaac-sim/IsaacLab/commit/ae37b028ea415c91ea2bc32609efcd759ed2b974)); Newton
 [`90e2332`](https://github.com/pulipakaa24/newton/commit/90e23324521fa86710e483e01d02e80d1dac0060) on
-[my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim) (upstream/newton).
+[my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim).
 
-**Particle cloth (PBD).** `PxParticleClothBuffer` / `PxParticleSpring` (5.6.1 `include/PxParticleBuffer.h`), solved by
-`ps_solveSpringsLaunch` (`source/gpusimulationcontroller/src/CUDA/particlesystem.cu` ~L4137–4300): every cloth
+**Particle cloth (PBD).** `PxParticleClothBuffer` / `PxParticleSpring` (5.6.1 [`include/PxParticleBuffer.h`](https://github.com/NVIDIA-Omniverse/PhysX/blob/107.3-physx-5.6.1/physx/include/PxParticleBuffer.h)), solved by
+`ps_solveSpringsLaunch` ([`source/gpusimulationcontroller/src/CUDA/particlesystem.cu`](https://github.com/NVIDIA-Omniverse/PhysX/blob/107.3-physx-5.6.1/physx/source/gpusimulationcontroller/src/CUDA/particlesystem.cu#L4137-L4300) ~L4137–4300): every cloth
 spring is a distance constraint with stiffness `k` and damping `d` applied as an implicit spring,
 `a = dt(dt k + d)`, `x = 1/(1 + a w)`, position and velocity updated together, clamped to the full error — i.e. a
 compliant (XPBD-type) distance constraint with compliance `1/k`. Springs are processed in partitions (graph colouring:
@@ -299,14 +300,14 @@ Jacobi fallback above `SB_PARTITION_LIMIT`, L1454–1503) once per TGS iteration
 (Müller's rotation extraction, `deformableUtils.cuh` L43) once per step.
 
 **Isaac Lab v2.3.2 mapping.** `DeformableBodyMaterialCfg` → `spawn_deformable_body_material`
-(`sim/spawners/materials/physics_materials.py` L110–128) applies `PhysxSchema.PhysxDeformableBodyMaterialAPI` and sets
+([`sim/spawners/materials/physics_materials.py`](https://github.com/isaac-sim/IsaacLab/blob/v2.3.2/source/isaaclab/isaaclab/sim/spawners/materials/physics_materials.py#L110-L128) L110–128) applies `PhysxSchema.PhysxDeformableBodyMaterialAPI` and sets
 `density`, `dynamicFriction`, `youngsModulus`, `poissonsRatio`, `elasticityDamping`, `dampingScale` one to one.
-`DeformableBodyPropertiesCfg` → `modify_deformable_body_properties` (`sim/schemas/schemas.py` L930–975): mesh and solver
+`DeformableBodyPropertiesCfg` → `modify_deformable_body_properties` ([`sim/schemas/schemas.py`](https://github.com/isaac-sim/IsaacLab/blob/v2.3.2/source/isaaclab/isaaclab/sim/schemas/schemas.py#L930-L975) L930–975): mesh and solver
 options through `deformable_utils.add_physx_deformable_body(...)` (`simulation_hexahedral_resolution`,
 collision simplification, `solver_position_iteration_count`, `vertex_velocity_damping`, sleep/settling, `self_collision`,
 `self_collision_filter_distance`), `rest_offset` / `contact_offset` on `PhysxCollisionAPI`, the rest on
 `PhysxDeformableAPI`. `DeformableObject` reads and writes nodes through `physics_sim_view.create_soft_body_view`
-(`assets/deformable_object/deformable_object.py` L327). **Isaac Lab v2.3.2 exposes no cloth object**: only volume
+([`assets/deformable_object/deformable_object.py`](https://github.com/isaac-sim/IsaacLab/blob/v2.3.2/source/isaaclab/isaaclab/assets/deformable_object/deformable_object.py#L327) L327). **Isaac Lab v2.3.2 exposes no cloth object**: only volume
 soft bodies. The 5.1 recording therefore made its cloth with omni.physx `particleUtils` directly (ParticleClothDemo
 values), and its rope as a thin volume soft body.
 
@@ -316,9 +317,9 @@ values), and its rope as a thin volume soft body.
 deformables (`PhysxDeformableBodyMaterialCfg`); Newton VBD (`isaaclab_newton`): volumes with `k_mu`, `k_lambda`, `k_damp`
 (stable Neo-Hookean, Newton `particle_vbd_kernels.py` L178–218), cloth with `tri_ke`, `tri_ka`, `tri_kd` (Neo-Hookean
 membrane, L532–578) and `edge_ke`, `edge_kd` (dihedral-angle bending, L694–798); a Newton-only `CableObject` (VBD rod:
-`CableMaterialCfg` thickness, density, stretch/bend/shear/twist moduli). `scripts/demos/deformables.py` is the reference
-usage. Recording script prepared: `metalsim/parity/isaac_side/record_deformables_il3.py` (both backends, same three
-protocols); not run (the 3.0 environment is being built by another agent).
+`CableMaterialCfg` thickness, density, stretch/bend/shear/twist moduli). [`scripts/demos/deformables.py`](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/scripts/demos/deformables.py)
+is the reference usage. Recording script prepared: `metalsim/parity/isaac_side/record_deformables_il3.py` (both
+backends, same three protocols); not run (the 3.0 environment is being built by another agent).
 
 **Which MetalSim backend shares the formulation:**
 
@@ -426,7 +427,7 @@ largely numerical (XPBD with 16 iterations on stiff tetrahedra). Matching it nee
 **Implicit flex damping** (branch [`metalsim-flex`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-flex) of
 [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) at
 [`c013067`](https://github.com/pulipakaa24/mujoco_warp/commit/c013067735aff729364375dd819ba0de088a2f34),
-`mujoco_warp/_src/flex_damping.py`, opt-in
+[`mujoco_warp/_src/flex_damping.py`](https://github.com/pulipakaa24/mujoco_warp/blob/c013067735aff729364375dd819ba0de088a2f34/mujoco_warp/_src/flex_damping.py), opt-in
 `flex_damping.ENABLE`): MuJoCo's flex elasticity damping is stiffness-proportional (the strain includes
 (d² − d_prev²)·damping/dt) and explicit, stable only for damping·dt·ω²max < 2. The explicit term is dropped and,
 after `forward()`, the flex vertex velocities solve (M + dt D) v′ = M(qvel + dt qacc) per world with
@@ -466,8 +467,8 @@ choice (PhysX-style co-rotational FEM port, Newton VBD on Metal, or flex) waits 
 simulation mesh appears softer at the same Young's modulus
 (https://nvidia-omniverse.github.io/PhysX/physx/5.4.1/docs/SoftBodies.html), and the FEM literature on shear locking
 explains why: first-order solid elements are too stiff in bending, hexahedra less so than tetrahedra
-(https://www.sciencedirect.com/topics/engineering/shear-locking). Local mesh sweep (`scripts/diagnostics/deformable/mesh_sweep.py`,
-`runs/deformable/physx_fit51/mesh_sweep_local.json`; static cantilever under 1 % gravity, same 0.5 × 0.02 m rod,
+(https://www.sciencedirect.com/topics/engineering/shear-locking). Local mesh sweep (`scripts/diagnostics/deformable/mesh_sweep.py`;
+its JSON output not kept, the script reruns it; static cantilever under 1 % gravity, same 0.5 × 0.02 m rod,
 E 1e5, ν 0.4, flex StVK tetrahedra): EI_eff / (E t⁴/12) = 14.0 at 1 cell across (5 cm along), 7.0 at 2 across,
 7.3 at 1 across with 2 cm cells along; the 4-across and cubic-2-across meshes diverged at dt 2.5e-4 / 1e-4 (explicit
 flex elasticity on 5 mm cells). Refining halves the locking factor each time, as locking predicts. The XPBD rod (1D,
@@ -517,7 +518,7 @@ from compression plus numerical dissipation, ours from the elasticity damping (0
 Recorded 2026-09-25 on the L4 machine (Isaac Sim 6.1, Isaac Lab v3.0.0-EA) with
 `metalsim/parity/isaac_side/record_deformables_il3.py` on both backends, one Kit process at a time.
 Data: `runs/parity3/isaac/deformable/deformable_il3/{isaacsim_physx,newton_vbd}` (meta.json, cooked
-prims; record.npz local, 190/160 MB). Isaac Lab's automatic tetrahedralization needs
+prims; record.npz not published, 190/160 MB). Isaac Lab's automatic tetrahedralization needs
 [`pytetwild`](https://github.com/pyvista/pytetwild), which is not in the 3.0 environment and, once installed, aborted
 Kit ("double free or corruption"); it was removed again and the rods and
 cubes use pre-tetrahedralized structured meshes (`make_tetmeshes.py`: hexahedral grid, 6 tetrahedra per cell; rod

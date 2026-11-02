@@ -1,0 +1,34 @@
+G1 rough PPO: N=4096 obs_dim 310 act_dim 37 rollout 24 x 8 iterations, engine mjwarp, physics dt 0.0025 (decimation 8), seed 1, reward_cfg rough_isaac, height-scan ray order xy, terrain collision boxes_local, height scan exact, solver_cfg None, contact_cfg default, base velocity origin, feet-slide velocity origin, initial reset True, effort limit on the actuator
+it    1 steps     98304 sps   36,900 | ep_ret   -5.44 ep_len   23.5 (n=47) | pg 0.061 vf 0.199 kl 0.2169 lr 1.0e-05
+[anomaly] it 1: KL 0.217 > 10x target: stale data or LR too high
+[anomaly] it 1: joint limit violated by 0.37 rad
+[anomaly] it 1: contact penetration 5.5 cm
+terrain it    1 mean_level 2.5237
+it    2 steps    196608 sps   38,037 | ep_ret   -5.82 ep_len   36.3 (n=3316) | pg 0.001 vf 3.682 kl 0.0078 lr 1.1e-04
+[anomaly] it 2: joint limit violated by 0.35 rad
+[anomaly] it 2: contact penetration 5.1 cm
+terrain it    2 mean_level 1.8855
+it    3 steps    294912 sps   38,477 | ep_ret   -5.91 ep_len   40.1 (n=2116) | pg -0.000 vf 1.971 kl 0.0125 lr 2.6e-04
+[anomaly] it 3: joint limit violated by 0.37 rad
+[anomaly] it 3: contact penetration 6.2 cm
+terrain it    3 mean_level 1.5300
+it    4 steps    393216 sps   38,663 | ep_ret   -5.93 ep_len   40.9 (n=2474) | pg -0.006 vf 1.701 kl 0.0107 lr 5.8e-04
+[anomaly] it 4: joint limit violated by 0.27 rad
+[anomaly] it 4: contact penetration 4.9 cm
+terrain it    4 mean_level 1.1550
+it    5 steps    491520 sps   38,778 | ep_ret   -5.87 ep_len   39.5 (n=2491) | pg -0.002 vf 1.440 kl 0.0169 lr 5.8e-04
+[anomaly] it 5: joint limit violated by 0.25 rad
+[anomaly] it 5: contact penetration 4.7 cm
+terrain it    5 mean_level 0.8452
+it    6 steps    589824 sps   38,859 | ep_ret   -5.90 ep_len   40.3 (n=2460) | pg -0.002 vf 1.066 kl 0.0121 lr 3.8e-04
+[anomaly] it 6: joint limit violated by 0.46 rad
+[anomaly] it 6: contact penetration 5.4 cm
+terrain it    6 mean_level 0.5745
+it    7 steps    688128 sps   38,802 | ep_ret   -5.88 ep_len   40.1 (n=2408) | pg -0.003 vf 0.847 kl 0.0149 lr 5.8e-04
+[anomaly] it 7: joint limit violated by 0.40 rad
+[anomaly] it 7: contact penetration 5.9 cm
+terrain it    7 mean_level 0.3628
+it    8 steps    786432 sps   38,581 | ep_ret   -5.87 ep_len   40.6 (n=2417) | pg 0.005 vf 0.610 kl 0.0152 lr 1.7e-04
+[anomaly] it 8: joint limit violated by 0.33 rad
+[anomaly] it 8: contact penetration 5.4 cm
+terrain it    8 mean_level 0.1995

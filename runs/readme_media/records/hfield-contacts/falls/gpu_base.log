@@ -1,0 +1,65 @@
+~/MetalSim/runs/readme_media/scratch/hfield-contacts/mjw/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'CYLINDER'), ('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+  warnings.warn(
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     ~/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth d0e6c82 load on device 'metal:0' took 28.27 ms  (cached)
+Module _nxn_broadphase__locals__kernel_3582bd6f 3582bd6 load on device 'metal:0' took 17.84 ms  (cached)
+Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_263042dc 263042d load on device 'metal:0' took 25.31 ms  (cached)
+Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_6b61cc0a 6b61cc0 load on device 'metal:0' took 25.43 ms  (cached)
+Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_b3132664 b313266 load on device 'metal:0' took 25.39 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_26fc98f9 26fc98f load on device 'metal:0' took 23.93 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_24d9c077 24d9c07 load on device 'metal:0' took 26.34 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_78310433 7831043 load on device 'metal:0' took 26.18 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_d8acee07 d8acee0 load on device 'metal:0' took 18.69 ms  (cached)
+Module mujoco_warp._src.constraint f5f4518 load on device 'metal:0' took 16.48 ms  (cached)
+Module _friction_dof__locals__kernel_0bb9a331 0bb9a33 load on device 'metal:0' took 16.34 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_914cb5e1 914cb5e load on device 'metal:0' took 17.12 ms  (cached)
+Module _efc_contact_init__locals__kernel_03ee81b4 03ee81b load on device 'metal:0' took 16.77 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_16824443 e86c3ac load on device 'metal:0' took 17.22 ms  (cached)
+Module _efc_contact_update__locals__kernel_89d497ae 89d497a load on device 'metal:0' took 17.07 ms  (cached)
+Module mujoco_warp._src.forward d8b3582 load on device 'metal:0' took 23.04 ms  (cached)
+Module mujoco_warp._src.passive 9e93f67 load on device 'metal:0' took 21.80 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_8ed29e9b 8ed29e9 load on device 'metal:0' took 16.47 ms  (cached)
+Module mujoco_warp._src.forward 2b3c9a0 load on device 'metal:0' took 24.48 ms  (cached)
+Module _qfrc_smooth__locals__kernel_08dfc9ad 08dfc9a load on device 'metal:0' took 17.03 ms  (cached)
+Module mujoco_warp._src.support 040f2c5 load on device 'metal:0' took 17.39 ms  (cached)
+Module _tile_cholesky_factorize_solve_block__locals__kernel_760c2957 c7dd817 load on device 'metal:0' took 17.17 ms  (cached)
+Module _solve_init_dof__locals__kernel_72ef2137 72ef213 load on device 'metal:0' took 17.13 ms  (cached)
+Module _solve_init_efc__locals__kernel_bdeaa14b bdeaa14 load on device 'metal:0' took 17.30 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_8d6e9982 8d6e998 load on device 'metal:0' took 17.14 ms  (cached)
+Module mul_m_kernel__locals___mul_m_505d9f1c 505d9f1 load on device 'metal:0' took 17.29 ms  (cached)
+Module _update_constraint_efc__locals__kernel_1994cb68 1994cb6 load on device 'metal:0' took 17.42 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_6f502a20 6f502a2 load on device 'metal:0' took 17.07 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_86f1e084 86f1e08 load on device 'metal:0' took 16.46 ms  (cached)
+Module _update_gradient_grad__locals__kernel_e5baa4a1 e5baa4a load on device 'metal:0' took 17.10 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_6dd64898 15eba98 load on device 'metal:0' took 16.55 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_a739171b e75e522 load on device 'metal:0' took 16.53 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_03abef12 0be11c8 load on device 'metal:0' took 17.57 ms  (cached)
+Module _update_constraint_gradient_fused__locals__kernel_94b53f8f 79a189d load on device 'metal:0' took 16.85 ms  (cached)
+Module _update_gradient_h_incremental_cholesky__locals__kernel_323f4600 46a0099 load on device 'metal:0' took 16.57 ms  (cached)
+Module _solve_done__locals__kernel_58601440 5860144 load on device 'metal:0' took 16.46 ms  (cached)
+Module mujoco_warp._src.solver a260d3b load on device 'metal:0' took 18.35 ms  (cached)
+Module _next_time_builder__locals___next_time_bd97507a bd97507 load on device 'metal:0' took 16.78 ms  (cached)
+Module metalsim.physics.batch 0febfdf load on device 'metal:0' took 16.38 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_f05e0f72 f05e0f7 load on device 'metal:0' took 17.10 ms  (cached)
+Module reset_data__locals__reset_M_debb12fa debb12f load on device 'metal:0' took 17.59 ms  (cached)
+Module reset_data__locals__reset_mocap_d5f6a172 d5f6a17 load on device 'metal:0' took 17.16 ms  (cached)
+Module reset_data__locals__reset_contact_10be067b 10be067 load on device 'metal:0' took 17.21 ms  (cached)
+Module reset_data__locals__reset_sleep_4c0bb4a4 4c0bb4a load on device 'metal:0' took 17.92 ms  (cached)
+Module reset_data__locals__reset_nworld_f0ec89aa f0ec89a load on device 'metal:0' took 17.66 ms  (cached)
+~/MetalSim/.venv/lib/python3.13/site-packages/torch/jit/_serialization.py:176: FutureWarning: `torch.jit.load` is deprecated. Please switch to `torch.export`.
+  warnings.warn(
+Module _pd_kernel__locals__unitree_pd_59356377 5935637 load on device 'metal:0' took 17.81 ms  (cached)
+[gpu base] seed 0: falls 2/16 first 2.9 median 4.09 forward 2.7365 {'engine': 'MuJoCo Warp BatchSim (film adapter UnitreeG1)', 'overflow': {}, 'hfield_plane_contacts': True, 'rollout_s': 34.8}
+~/MetalSim/runs/readme_media/scratch/hfield-contacts/mjw/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'CYLINDER'), ('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+  warnings.warn(
+[gpu base] seed 1: falls 3/16 first 2.54 median 3.08 forward 2.542 {'engine': 'MuJoCo Warp BatchSim (film adapter UnitreeG1)', 'overflow': {}, 'hfield_plane_contacts': True, 'rollout_s': 38.7}
+[gpu base] seed 2: falls 1/16 first 5.08 median 5.08 forward 2.6655 {'engine': 'MuJoCo Warp BatchSim (film adapter UnitreeG1)', 'overflow': {}, 'hfield_plane_contacts': True, 'rollout_s': 31.2}
+[gpu base] seed 3: falls 3/16 first 2.78 median 2.8 forward 3.1775 {'engine': 'MuJoCo Warp BatchSim (film adapter UnitreeG1)', 'overflow': {}, 'hfield_plane_contacts': True, 'rollout_s': 36.8}
+[gpu base] seed 4: falls 1/16 first 1.84 median 1.84 forward 2.757 {'engine': 'MuJoCo Warp BatchSim (film adapter UnitreeG1)', 'overflow': {}, 'hfield_plane_contacts': True, 'rollout_s': 33.5}
+[gpu base] total falls 10/80

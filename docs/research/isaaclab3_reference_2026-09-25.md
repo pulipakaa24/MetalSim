@@ -17,7 +17,8 @@ Sources are cited inline. "Source" means the [v3.0.0-EA tag](https://github.com/
   2026-09-16T22:34Z, tag `v3.0.0-EA` on branch `release/3.0.0`). Built for **Isaac Sim 6.1**,
   Python 3.12, PyTorch 2.11, [Warp](https://github.com/NVIDIA/warp) 1.16, Newton 1.5.2. General Availability targeted for the end of
   October 2026; `release/3.0.0` takes only fixes until then.
-- Pins in `pyproject.toml` `[tool.isaaclab.versions]` and `[tool.uv].override-dependencies`:
+- Pins in [`pyproject.toml`](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/pyproject.toml)
+  `[tool.isaaclab.versions]` and `[tool.uv].override-dependencies`:
   `isaacsim[all,extscache]==6.1.0.0`, `torch==2.11.0`, `torchvision==0.26.0`, `warp==1.16.0`,
   `newton[sim]==1.5.2`, `mujoco~=3.11.0`, **`mujoco-warp~=3.11.0`**, `rsl-rl-lib==5.4.1`
   (extra `rsl-rl`), `numpy>=2`.
@@ -42,9 +43,10 @@ Sources are cited inline. "Source" means the [v3.0.0-EA tag](https://github.com/
 
 ## 2. Installing Isaac Sim 6.1 + Isaac Lab 3.0.0-EA (pip path)
 
-Source: `docs/source/setup/installation/index.rst` and the command template in
-`docs/_extensions/isaaclab_docs.py` (`_quickstart_isaacsim`), published at
-https://isaac-sim.github.io/IsaacLab/release/3.0.0/source/setup/installation/index.html:
+Source: [`docs/source/setup/installation/index.rst`](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/docs/source/setup/installation/index.rst)
+and the command template in [`docs/_extensions/isaaclab_docs.py`](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/docs/_extensions/isaaclab_docs.py)
+(`_quickstart_isaacsim`), published at
+https://isaac-sim.github.io/IsaacLab/v3.0.0-EA/source/setup/installation/index.html:
 
 ```bash
 git clone https://github.com/isaac-sim/IsaacLab.git --branch <branch>   # we use --branch v3.0.0-EA
@@ -70,10 +72,12 @@ fails. Non-interactive EULA: `OMNI_KIT_ACCEPT_EULA=yes`. First Kit launch can ta
 ## 3. How a task selects its backend
 
 - Physics is a `PresetCfg` on `SimulationCfg.physics`; the CLI token `physics=<name>` picks one of
-  its fields (`docs/source/concepts/backends_and_presets.rst`; https://isaac-sim.github.io/IsaacLab/release/3.0.0/source/concepts/backends_and_presets.html).
+  its fields ([`docs/source/concepts/backends_and_presets.rst`](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/docs/source/concepts/backends_and_presets.rst);
+  https://isaac-sim.github.io/IsaacLab/v3.0.0-EA/source/concepts/backends_and_presets.html).
   `PresetCfg` fields may also appear in other configs via `preset(default=..., newton_mjwarp=...)`
   (e.g. the PPO `max_iterations` below).
-- For the velocity tasks (`source/isaaclab_tasks/isaaclab_tasks/core/velocity/velocity_env_cfg.py`,
+- For the velocity tasks
+  ([`source/isaaclab_tasks/isaaclab_tasks/core/velocity/velocity_env_cfg.py`](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/source/isaaclab_tasks/isaaclab_tasks/core/velocity/velocity_env_cfg.py),
   `RoughPhysicsCfg`) the fields are `isaacsim_physx = PhysxCfg(gpu_max_rigid_patch_count=10*2**15)`,
   `ovphysx`, `physx = PhysxAutoCfg(...)`, `newton_mjwarp = NewtonCfg(...)`, `newton_kamino`, and
   **`default = newton_mjwarp`**. The G1 flat config sets `self.sim.physics.default = newton_mjwarp`
@@ -82,7 +86,8 @@ fails. Non-interactive EULA: `OMNI_KIT_ACCEPT_EULA=yes`. First Kit launch can ta
 
 ## 4. G1 velocity tasks in 3.0
 
-Registration: `source/isaaclab_tasks/isaaclab_tasks/core/velocity/config/g1/__init__.py`.
+Registration:
+[`source/isaaclab_tasks/isaaclab_tasks/core/velocity/config/g1/__init__.py`](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/source/isaaclab_tasks/isaaclab_tasks/core/velocity/config/g1/__init__.py).
 
 | 2.3.2 id | 3.0 id | env cfg | rsl_rl cfg | backends (docs env browser) |
 |---|---|---|---|---|
@@ -92,7 +97,8 @@ Registration: `source/isaaclab_tasks/isaaclab_tasks/core/velocity/config/g1/__in
 There is **one task id per terrain**, not one per backend: the reward, observation, action, command,
 termination and event configs are the same Python objects on every backend; only `sim.physics`
 (and the rough PPO `max_iterations`) differ. The `-Play` variants are gone (`play_mode()` instead).
-The backend list is from `docs/source/_static/css/environment-browser.js` lines 52/57.
+The backend list is from
+[`docs/source/_static/css/environment-browser.js`](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/docs/source/_static/css/environment-browser.js#L52-L57) lines 52/57.
 
 **Differences from Isaac Lab 2.3.2's G1 task that matter for comparisons** (diff of the 3.0 files
 against our copies in `assets/isaac/`):
@@ -109,21 +115,23 @@ against our copies in `assets/isaac/`):
 - Rewards, observations, commands, actuators: identical values (same 13 reward terms and weights,
   same noise, `UniformNoiseCfg` rename only). Asset config `G1_MINIMAL_CFG` identical apart from the
   `effort_limit_sim` → `joint_effort_limit` rename; the USD now comes from the Isaac Sim **6.1**
-  asset root (`isaaclab/utils/assets.py`, `_ISAAC_SIM_ASSET_RELEASE = "6.1"`), to be hashed against
-  our 5.1 copy.
+  asset root ([`isaaclab/utils/assets.py`](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/source/isaaclab/isaaclab/utils/assets.py),
+  `_ISAAC_SIM_ASSET_RELEASE = "6.1"`), to be hashed against our 5.1 copy.
 - Contact sensor prim regex `{ENV_REGEX_NS}/Robot/.*` → `/Robot/[^/]*` (direct children only).
 - PPO: [rsl_rl](https://github.com/leggedrobotics/rsl_rl) 5.4.1 config shape (`actor`/`critic`
   `RslRlMLPModelCfg`, `obs_groups`), same hyper-parameters. Flat: 1500 iterations on every backend.
   Rough: `max_iterations = preset(default=3000, newton_mjwarp=5000)`, with NVIDIA's comment: "Newton
   needs ~1.7x the PPO iterations to match PhysX on G1 ... The gap is sample-efficiency, not a ceiling —
-  no physics or reward tuning closes it" (`config/g1/agents/rsl_rl_ppo_cfg.py`).
+  no physics or reward tuning closes it"
+  ([`config/g1/agents/rsl_rl_ppo_cfg.py`](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/source/isaaclab_tasks/isaaclab_tasks/core/velocity/config/g1/agents/rsl_rl_ppo_cfg.py)).
 - Physics step: `sim.dt = 0.005`, decimation 4 (unchanged). On Newton, `num_substeps = 2`, so
   **MuJoCo Warp integrates at 2.5 ms**, which is the step MetalSim already trains at ([PARITY](../PARITY.md) §1.5).
 
 ## 5. Newton / MuJoCo Warp solver settings as exposed and as the G1 tasks set them
 
-Config classes: `isaaclab_newton.physics.NewtonCfg` (`physics/newton_manager_cfg.py`) and
-`MJWarpSolverCfg` (`physics/mjwarp_manager_cfg.py`).
+Config classes: `isaaclab_newton.physics.NewtonCfg`
+([`physics/newton_manager_cfg.py`](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/source/isaaclab_newton/isaaclab_newton/physics/newton_manager_cfg.py)) and `MJWarpSolverCfg`
+([`physics/mjwarp_manager_cfg.py`](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/source/isaaclab_newton/isaaclab_newton/physics/mjwarp_manager_cfg.py)).
 
 | field | `MJWarpSolverCfg` default | G1 rough (`RoughPhysicsCfg.newton_mjwarp`) | G1 flat |
 |---|---|---|---|
@@ -149,7 +157,8 @@ Notes:
   runs a fixed 10 / 20 budget because Metal has no conditional graph node (PARITY §1.4). Matching
   Isaac's convergence rather than its caps is the relevant target.
 - Contact softness comes from Newton's shape `ke`/`kd`, converted to a MuJoCo `solref` by Newton's
-  `SolverMuJoCo` (`newton/_src/solvers/mujoco/kernels.py::convert_solref` in Newton 1.5.2: with
+  `SolverMuJoCo`
+  ([`newton/_src/solvers/mujoco/kernels.py`](https://github.com/newton-physics/newton/blob/v1.5.2/newton/_src/solvers/mujoco/kernels.py)`::convert_solref` in Newton 1.5.2: with
   d(width) = d(r) = 1, timeconst = 2 / kd = 1.82 ms and dampratio = kd / 2 · sqrt(1 / ke) = 1.375
   for the G1 values, versus MetalSim's solref 0.02 / 1; which conversion mode 1.5.2 applies is to be
   read from the live `mjw_model.geom_solref` on the L4 machine and recorded in `meta.json`).
@@ -162,13 +171,18 @@ Notes:
   iterative line search"). The Newton integration index page on `main`
   (https://isaac-sim.github.io/IsaacLab/main/source/experimental-features/newton-physics-integration/index.html)
   still describes Newton as beta with "a limited set of classic RL and flat terrain locomotion"
-  examples; the 3.0 docs replace it with `concepts/physics_backends.rst`, `solver_differences.rst`
-  and `solver-tuning/tune_mjwarp.rst` (the tuning guide: capacities `nconmax`/`njmax`, substeps,
+  examples; the 3.0 docs replace it with
+  [`concepts/physics_backends.rst`](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/docs/source/concepts/physics_backends.rst),
+  [`solver_differences.rst`](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/docs/source/concepts/solver_differences.rst) and
+  [`solver-tuning/tune_mjwarp.rst`](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/docs/source/concepts/solver-tuning/tune_mjwarp.rst)
+  (the tuning guide: capacities `nconmax`/`njmax`, substeps,
   `iterations`/`ls_iterations`/`tolerance`, cone / impratio, contact pipeline, "diagnose-first order").
 
 ## 6. Deformables on both backends
 
-Source: `docs/source/concepts/deformables.rst`, `coupled_solvers.rst`, `migration/include/deformables.rst`.
+Source: [`docs/source/concepts/deformables.rst`](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/docs/source/concepts/deformables.rst),
+[`coupled_solvers.rst`](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/docs/source/concepts/coupled_solvers.rst),
+[`migration/include/deformables.rst`](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/docs/source/migration/include/deformables.rst).
 
 - One asset class `isaaclab.assets.DeformableObject` / `DeformableObjectCfg` for volume
   (`UsdGeom.TetMesh`) and surface (triangle mesh, cloth) deformables; `CableObject` for cables.
@@ -191,10 +205,11 @@ Source: `docs/source/concepts/deformables.rst`, `coupled_solvers.rst`, `migratio
 
 ## 7. NVIDIA's published G1 throughput in 3.0 (reported, not re-measured)
 
-`docs/source/_static/benchmarks/environment-performance-release.csv` (2026-09-09, RTX PRO 6000
+[`docs/source/_static/benchmarks/environment-performance-release.csv`](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/docs/source/_static/benchmarks/environment-performance-release.csv)
+(2026-09-09, RTX PRO 6000
 Blackwell Server, rsl_rl training, 8192 envs, total env-steps/s): flat G1 PhysX 136,950, **Newton
 MJWarp 264,026**, OVPhysX 176,802; rough G1 PhysX 112,289, Newton MJWarp 172,780, OVPhysX 150,628.
-`environment-performance.csv` (2026-08-18, RTX PRO 6000 Workstation, 4096 envs, rough G1): runtime
+[`environment-performance.csv`](https://github.com/isaac-sim/IsaacLab/blob/v3.0.0-EA/docs/source/_static/benchmarks/environment-performance.csv) (2026-08-18, RTX PRO 6000 Workstation, 4096 envs, rough G1): runtime
 (random actions) Newton 153,865, OVPhysX 120,116, PhysX 82,573; training Newton 148,556, PhysX 74,529.
 So on NVIDIA's hardware Newton/MuJoCo Warp is 1.5–1.9× Isaac Sim PhysX on this task.
 

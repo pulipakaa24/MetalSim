@@ -1,0 +1,38 @@
+[gpu_run] hfield-batch-b start: device utilisation 0% (16:38:51)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.8 s:
+[gpu_run] gpu_top:   pid    181 WindowServer                       1.4 %
+== power  -InternalBattery-0 (id=8257635)	41%; discharging; 1:13 remaining pres |  powermode 2 | 16:38:54
+== fork tests on Metal (fix)
+mujoco_warp ~/MetalSim/runs/readme_media/scratch/hfield-contacts/mjw/mujoco_warp/__init__.py
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+120 passed, 2 skipped, 6 warnings in 206.49s (0:03:26)
+== fork -k hfield on Metal (base)
+mujoco_warp ~/MetalSim/runs/readme_media/scratch/hfield-contacts/mjw_base/mujoco_warp/__init__.py
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+3 passed, 67 deselected, 3 warnings in 12.81s
+== timing base rep 1 power  -InternalBattery-0 (id=8257635)	39%; discharging; 1:15 remaining pres |  powermode 2 | 16:42:37
+mujoco_warp ~/MetalSim/runs/readme_media/scratch/hfield-contacts/mjw_base/mujoco_warp/__init__.py
+G1 (rough, mjwarp, physics dt 0.005): nbody 45 nv 43 nu 37 ngeom 100 obs_dim 310
+N=4096: 62,257 env-steps/s (110 steps, synchronized); per-call mean 32.20 ms -> 127,214 env-steps/s is queue-absorbed and not comparable
+== timing fix rep 1 power  -InternalBattery-0 (id=8257635)	38%; discharging; 1:08 remaining pres |  powermode 2 | 16:42:57
+mujoco_warp ~/MetalSim/runs/readme_media/scratch/hfield-contacts/mjw/mujoco_warp/__init__.py
+G1 (rough, mjwarp, physics dt 0.005): nbody 45 nv 43 nu 37 ngeom 100 obs_dim 310
+N=4096: 52,073 env-steps/s (110 steps, synchronized); per-call mean 37.19 ms -> 110,148 env-steps/s is queue-absorbed and not comparable
+== timing base rep 2 power  -InternalBattery-0 (id=8257635)	37%; discharging; 0:56 remaining pres |  powermode 2 | 16:43:26
+mujoco_warp ~/MetalSim/runs/readme_media/scratch/hfield-contacts/mjw_base/mujoco_warp/__init__.py
+G1 (rough, mjwarp, physics dt 0.005): nbody 45 nv 43 nu 37 ngeom 100 obs_dim 310
+N=4096: 62,346 env-steps/s (110 steps, synchronized); per-call mean 32.36 ms -> 126,562 env-steps/s is queue-absorbed and not comparable
+== timing fix rep 2 power  -InternalBattery-0 (id=8257635)	36%; discharging; 0:51 remaining pres |  powermode 2 | 16:43:46
+mujoco_warp ~/MetalSim/runs/readme_media/scratch/hfield-contacts/mjw/mujoco_warp/__init__.py
+G1 (rough, mjwarp, physics dt 0.005): nbody 45 nv 43 nu 37 ngeom 100 obs_dim 310
+N=4096: 52,820 env-steps/s (110 steps, synchronized); per-call mean 37.01 ms -> 110,687 env-steps/s is queue-absorbed and not comparable
+== random actions base power  -InternalBattery-0 (id=8257635)	36%; discharging; 0:51 remaining pres |  powermode 2 | 16:44:09
+mujoco_warp ~/MetalSim/runs/readme_media/scratch/hfield-contacts/mjw_base/mujoco_warp/__init__.py
+400 steps x 1024 envs: max |qvel| 33.4, worlds with non-finite qvel 0; heightfield contacts sampled 21343: normal z min 0.662 p1 0.745 share < 0.3 0.0000; depth p99 13.0 mm max 30.3 mm
+== random actions fix power  -InternalBattery-0 (id=8257635)	35%; discharging; 0:46 remaining pres |  powermode 2 | 16:44:28
+mujoco_warp ~/MetalSim/runs/readme_media/scratch/hfield-contacts/mjw/mujoco_warp/__init__.py
+400 steps x 1024 envs: max |qvel| 147.8, worlds with non-finite qvel 0; heightfield contacts sampled 27295: normal z min -0.000 p1 0.003 share < 0.3 0.0361; depth p99 12.0 mm max 30.8 mm
+== done power  -InternalBattery-0 (id=8257635)	35%; discharging; 0:46 remaining pres |  powermode 2 | 16:44:52
+[gpu_run] hfield-batch-b end: device utilisation 91% (16:44:52), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.7 s: none >= 1 %
