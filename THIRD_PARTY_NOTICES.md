@@ -305,7 +305,7 @@ runs on. MetalSim is an independent project, not affiliated with or endorsed by 
 - NVIDIA PhysicalAI-Robotics-NuRec (https://huggingface.co/datasets/nvidia/PhysicalAI-Robotics-NuRec, CC-BY-4.0,
   attribution NVIDIA Corporation): the `zh_lounge` scene, optional, fetched the same way.
 - Format decoders in `metalsim/render/splat/formats.py` reimplement published layouts in numpy: SPZ (the MIT-licensed
-  [`spz`](https://github.com/nianticlabs/spz) reference library's `load-spz.cc`), the SuperSplat compressed PLY
+  `spz` reference library's `load-spz.cc`), the SuperSplat compressed PLY
   ([PlayCanvas engine](https://github.com/playcanvas/engine), MIT,
   `gsplat-compressed-data.js`) and the 3DGS training PLY; the NuRec `.nurec` layout was read from files (no NVIDIA code).
   The rasterizer follows the [3DGS](https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/) /

@@ -22,7 +22,7 @@ Robot and objects drawn by a `Tier0Renderer` are composited with correct occlusi
 | file | content |
 |---|---|
 | `render/splat/__init__.py` | the public API (§7): `load_scene`, `make_transform`, `floor_plane_transform`, `SplatRenderer` (lazy) |
-| `render/splat/formats.py` | loaders → `GaussianCloud`: [SPZ][spz] v1–3 (gzip), 3DGS `.ply`, [SuperSplat][supersplat] compressed `.ply` (InteriorGS), [antimatter15][antimatter15] `.splat`, [NVIDIA NuRec][nurec] `.nurec` (§7d); `save_ply` |
+| `render/splat/formats.py` | loaders → `GaussianCloud`: SPZ v1–3 (gzip), 3DGS `.ply`, [SuperSplat][supersplat] compressed `.ply` (InteriorGS), [antimatter15][antimatter15] `.splat`, [NVIDIA NuRec][nurec] `.nurec` (§7d); `save_ply` |
 | `render/splat/scene.py` | `prepare` / `load_scene`: affine file→sim transform, crop, alpha cull, Morton order, GPU packing, disk cache; `make_transform`, `floor_plane_transform` |
 | `render/splat/renderer.py` | `SplatRenderer` (batched, GPU/host paths, mesh composite, profiling, capacity management) |
 | `render/shaders/splat.metal` | kernels: cull, project (EWA + SH), emit keys, scans, 5-pass radix sort, blend |
@@ -418,7 +418,6 @@ their licence is unknown, so nothing from them is in the repo. Use the CC-BY-4.0
 [interiorgs]: https://huggingface.co/datasets/spatialverse/InteriorGS
 [interiorgs-paper]: https://arxiv.org/abs/2510.21307
 [mujoco]: https://github.com/google-deepmind/mujoco
-[spz]: https://github.com/nianticlabs/spz
 [supersplat]: https://github.com/playcanvas/supersplat
 [antimatter15]: https://github.com/antimatter15/splat
 [nurec]: https://docs.nvidia.com/nurec/
