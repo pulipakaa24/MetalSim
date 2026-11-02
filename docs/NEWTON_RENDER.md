@@ -211,7 +211,8 @@ after the run, an ioreg artefact. The queue held the GPU exclusively.
 
 ## 4. Differences from Isaac Lab 3.0
 
-Isaac Lab 3.0 renders Newton scenes in two ways (source: `upstream/IsaacLab3`, Isaac Lab 3.0.0):
+Isaac Lab 3.0 renders Newton scenes in two ways (source: `upstream/IsaacLab3`, Isaac Lab 3.0.0 at
+[`ae37b028`](https://github.com/isaac-sim/IsaacLab/tree/ae37b028ea415c91ea2bc32609efcd759ed2b974)):
 - `isaac_rtx` (the default `CameraCfg.renderer_cfg`): `NewtonManager.pre_render` writes `body_q` and `particle_q`
   into Fabric for Kit's RTX.
 - `newton_warp`: Newton's `SensorTiledCamera`, a Warp BVH ray caster over the shapes with `ShapeFlags.VISIBLE`.

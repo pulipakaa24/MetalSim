@@ -68,7 +68,7 @@ runs on. MetalSim is an independent project, not affiliated with or endorsed by 
   ([pulipakaa24/warp](https://github.com/pulipakaa24/warp)), branches `metalsim` and
   `metalsim-flex`; `LICENSE.md` and `licenses/` are byte-identical to NVIDIA/warp's. The fork's
   [`METALSIM_CHANGES.md`](https://github.com/pulipakaa24/warp/blob/metalsim/METALSIM_CHANGES.md) lists the changes.
-- In this repository: `patches/warp/0001-0007` (the fork's seven code commits), and two older single-commit
+- In this repository: [`patches/warp/0001-0007`](patches/warp) (the fork's seven code commits), and two older single-commit
   exports, `patches/0001-Metal-fixed-size-arrays-wp.zeros-in-kernels-thread-q.patch` and
   `patches/warp-innate-metal-pending-frees.patch`. **Each patch modifies Apache-2.0 code and is offered under the
   Apache License 2.0** ([`licenses/Apache-2.0.txt`](licenses/Apache-2.0.txt)).
@@ -84,10 +84,10 @@ runs on. MetalSim is an independent project, not affiliated with or endorsed by 
 - [My fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim)
   ([pulipakaa24/mujoco_warp](https://github.com/pulipakaa24/mujoco_warp)), branches `metal`,
   `metalsim` and `metalsim-flex`; `LICENSE` is byte-identical to upstream's.
-- In this repository: `patches/mujoco_warp/0001-0016` (0001 is David Dobas's patch; 0002-0016 are MetalSim's) and
-  the older exports `patches/mujoco_warp-hfield-plane-contacts.patch` and
-  `patches/mujoco_warp-plane-convex-c-contact-set.patch`. **Each patch modifies Apache-2.0 code and is offered
-  under the Apache License 2.0.**
+- In this repository: [`patches/mujoco_warp/0001-0031`](patches/mujoco_warp) (0001 is David Dobas's patch; 0002-0031 are
+  MetalSim's; `metalsim-787a5b3.diff` is the whole branch as one diff) and the older exports
+  `patches/mujoco_warp-hfield-plane-contacts.patch` and `patches/mujoco_warp-plane-convex-c-contact-set.patch`.
+  **Each patch modifies Apache-2.0 code and is offered under the Apache License 2.0.**
 - MuJoCo ([google-deepmind/mujoco](https://github.com/google-deepmind/mujoco), Apache-2.0) is a pip dependency.
   Some comments and research notes cite MuJoCo C function names and file names; no MuJoCo source is copied.
 
@@ -98,8 +98,10 @@ runs on. MetalSim is an independent project, not affiliated with or endorsed by 
 - [My fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim)
   ([pulipakaa24/newton](https://github.com/pulipakaa24/newton)), branches `metalsim`,
   `metalsim-hashtable-metal` and `metalsim-1.5.2` (Newton 1.5.2 for MPM and Franka-Pour); `LICENSE.md`
-  byte-identical to upstream's. Pull-request branches `fix/xpbd-revolute-angle-wrap`, `fix/xpbd-joint-relaxation`,
-  `feat/xpbd-pd-joint-drive` (upstream PRs
+  byte-identical to upstream's. Pull-request branches
+  [`fix/xpbd-revolute-angle-wrap`](https://github.com/pulipakaa24/newton/tree/fix/xpbd-revolute-angle-wrap),
+  [`fix/xpbd-joint-relaxation`](https://github.com/pulipakaa24/newton/tree/fix/xpbd-joint-relaxation),
+  [`feat/xpbd-pd-joint-drive`](https://github.com/pulipakaa24/newton/tree/feat/xpbd-pd-joint-drive) (upstream PRs
   [#4316](https://github.com/newton-physics/newton/pull/4316)-[#4318](https://github.com/newton-physics/newton/pull/4318)).
 - In this repository: `metalsim/physics/newton_backend.py` calls Newton's API (MetalSim code);
   `scripts/diagnostics/newton_upstream/` holds the issue and pull-request texts filed upstream: MetalSim-written
@@ -117,7 +119,7 @@ runs on. MetalSim is an independent project, not affiliated with or endorsed by 
   `SPDX-License-Identifier: Apache-2.0` with a modification notice. It calls
   Newton's own per-node functions at run time. The rest of `metalsim/physics/mpm` calls Newton's API (MetalSim code).
 - **Vendored source, `metalsim/physics/mpm/implicit_mpm/`**: Newton's implicit MPM solver package
-  (`newton/_src/solvers/implicit_mpm/`) from [my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim-1.5.2),
+  ([`newton/_src/solvers/implicit_mpm/`](https://github.com/pulipakaa24/newton/tree/addd10cbeb25e946b3a4c2bb1d4097acc7a98ca2/newton/_src/solvers/implicit_mpm)) from [my fork of Newton](https://github.com/pulipakaa24/newton/tree/metalsim-1.5.2),
   commit [`addd10cbeb25e946b3a4c2bb1d4097acc7a98ca2`](https://github.com/pulipakaa24/newton/commit/addd10cbeb25e946b3a4c2bb1d4097acc7a98ca2) (branch `metalsim-1.5.2`, off
   upstream [`v1.5.2`](https://github.com/newton-physics/newton/tree/v1.5.2)), copyright The
   Newton Developers, **Apache-2.0** ([`licenses/Apache-2.0.txt`](licenses/Apache-2.0.txt)). Every file keeps its SPDX
@@ -148,16 +150,21 @@ runs on. MetalSim is an independent project, not affiliated with or endorsed by 
   `isaaclab` API used as references). Every file is byte-identical (by git blob hash) to a file of Isaac Lab
   v2.3.2, some under a shorter name, and keeps its `Copyright (c) ... The Isaac Lab Project Developers ...
   SPDX-License-Identifier: BSD-3-Clause` header. Renamed files and their v2.3.2 paths:
-  `g1_asset_cfg.py` = `source/isaaclab_assets/isaaclab_assets/robots/unitree.py`;
-  `g1_velocity_env_cfg.py` = `.../manager_based/locomotion/velocity/velocity_env_cfg.py`;
-  `g1_flat_env_cfg.py`, `g1_rough_env_cfg.py`, `g1_rsl_rl_ppo_cfg.py` = `.../velocity/config/g1/{flat_env_cfg,rough_env_cfg,agents/rsl_rl_ppo_cfg}.py`;
-  `g1_rewards.py` = `.../velocity/mdp/rewards.py`; `cartpole.py` = `source/isaaclab_assets/isaaclab_assets/robots/cartpole.py`;
-  `cartpole_env.py`, `cartpole_camera_env.py` = `.../direct/cartpole/`; `cartpole_rsl_rl_ppo_cfg.py`,
-  `cartpole_skrl_camera_ppo_cfg.yaml` = `.../direct/cartpole/agents/{rsl_rl_ppo_cfg.py,skrl_camera_ppo_cfg.yaml}`;
-  `benchmark_non_rl.py`, `utils.py` = `scripts/benchmarks/`; `api/train.py`, `api/play.py` =
-  `scripts/reinforcement_learning/rsl_rl/`; `api/camera_cfg.py`, `api/simulation_cfg.py`, `api/mdp_observations.py` =
-  `source/isaaclab/isaaclab/{sensors/camera/camera_cfg,sim/simulation_cfg,envs/mdp/observations}.py`;
-  `sensors/contact_sensor/` and `terrains/` keep their v2.3.2 names under `source/isaaclab/isaaclab/`.
+  `g1_asset_cfg.py` = [`source/isaaclab_assets/isaaclab_assets/robots/unitree.py`](https://github.com/isaac-sim/IsaacLab/blob/v2.3.2/source/isaaclab_assets/isaaclab_assets/robots/unitree.py);
+  `g1_velocity_env_cfg.py` = [`.../manager_based/locomotion/velocity/velocity_env_cfg.py`](https://github.com/isaac-sim/IsaacLab/blob/v2.3.2/source/isaaclab_tasks/isaaclab_tasks/manager_based/locomotion/velocity/velocity_env_cfg.py);
+  `g1_flat_env_cfg.py`, `g1_rough_env_cfg.py`, `g1_rsl_rl_ppo_cfg.py` =
+  [`.../velocity/config/g1/{flat_env_cfg,rough_env_cfg,agents/rsl_rl_ppo_cfg}.py`](https://github.com/isaac-sim/IsaacLab/tree/v2.3.2/source/isaaclab_tasks/isaaclab_tasks/manager_based/locomotion/velocity/config/g1);
+  `g1_rewards.py` = [`.../velocity/mdp/rewards.py`](https://github.com/isaac-sim/IsaacLab/blob/v2.3.2/source/isaaclab_tasks/isaaclab_tasks/manager_based/locomotion/velocity/mdp/rewards.py);
+  `cartpole.py` = [`source/isaaclab_assets/isaaclab_assets/robots/cartpole.py`](https://github.com/isaac-sim/IsaacLab/blob/v2.3.2/source/isaaclab_assets/isaaclab_assets/robots/cartpole.py);
+  `cartpole_env.py`, `cartpole_camera_env.py` = [`.../direct/cartpole/`](https://github.com/isaac-sim/IsaacLab/tree/v2.3.2/source/isaaclab_tasks/isaaclab_tasks/direct/cartpole);
+  `cartpole_rsl_rl_ppo_cfg.py`, `cartpole_skrl_camera_ppo_cfg.yaml` =
+  [`.../direct/cartpole/agents/{rsl_rl_ppo_cfg.py,skrl_camera_ppo_cfg.yaml}`](https://github.com/isaac-sim/IsaacLab/tree/v2.3.2/source/isaaclab_tasks/isaaclab_tasks/direct/cartpole/agents);
+  `benchmark_non_rl.py`, `utils.py` = [`scripts/benchmarks/`](https://github.com/isaac-sim/IsaacLab/tree/v2.3.2/scripts/benchmarks); `api/train.py`, `api/play.py` =
+  [`scripts/reinforcement_learning/rsl_rl/`](https://github.com/isaac-sim/IsaacLab/tree/v2.3.2/scripts/reinforcement_learning/rsl_rl);
+  `api/camera_cfg.py`, `api/simulation_cfg.py`, `api/mdp_observations.py` =
+  [`source/isaaclab/isaaclab/{sensors/camera/camera_cfg,sim/simulation_cfg,envs/mdp/observations}.py`](https://github.com/isaac-sim/IsaacLab/tree/v2.3.2/source/isaaclab/isaaclab);
+  `sensors/contact_sensor/` and `terrains/` keep their v2.3.2 names under
+  [`source/isaaclab/isaaclab/`](https://github.com/isaac-sim/IsaacLab/tree/v2.3.2/source/isaaclab/isaaclab).
   `assets/isaac/api/observations.py` is an empty placeholder.
 - Use: the tests read these files as the oracle (`tests/test_g1_parity.py` parses `G1_CFG` with `ast`;
   `tests/isaac_terrain_ref.py` executes the terrain package on the CPU with the `isaaclab` utilities it needs
@@ -169,11 +176,12 @@ runs on. MetalSim is an independent project, not affiliated with or endorsed by 
   match; they are MetalSim code.
 - **Included, unchanged, header kept** (Isaac Lab 3.0.0-EA, release/3.0.0
   [`ae37b028`](https://github.com/isaac-sim/IsaacLab/commit/ae37b028ea415c91ea2bc32609efcd759ed2b974)):
-  `metalsim/learn/isaac_math.py` = `source/isaaclab/isaaclab/utils/math.py`. **Derived** (BSD-3-Clause, Isaac Lab's
-  notice applies): the Franka-Pour task terms, reset-dataset sampler and digest encoder in
-  `metalsim/learn/franka_pour.py` and the scene constants and
-  builder-hook edits in `metalsim/learn/franka_pour_scene.py` are transcriptions of
-  `source/isaaclab_tasks/isaaclab_tasks/contrib/franka_pour/` (each cites the file and lines);
+  `metalsim/learn/isaac_math.py` = [`source/isaaclab/isaaclab/utils/math.py`](https://github.com/isaac-sim/IsaacLab/blob/ae37b028ea415c91ea2bc32609efcd759ed2b974/source/isaaclab/isaaclab/utils/math.py).
+  **Derived** (BSD-3-Clause, Isaac Lab's notice applies): the Franka-Pour task terms, reset-dataset sampler and
+  digest encoder in `metalsim/learn/franka_pour.py` and the scene constants and builder-hook edits in
+  `metalsim/learn/franka_pour_scene.py` are transcriptions of
+  [`source/isaaclab_tasks/isaaclab_tasks/contrib/franka_pour/`](https://github.com/isaac-sim/IsaacLab/tree/ae37b028ea415c91ea2bc32609efcd759ed2b974/source/isaaclab_tasks/isaaclab_tasks/contrib/franka_pour)
+  (each cites the file and lines);
   `metalsim/parity/isaac_side/isaaclab3/franka_pour_published_asset.patch` is a diff against that task's
   `pour_env_cfg.py`. `tests/franka_pour_isaac_ref.py` executes Isaac's files from a local checkout and contains none.
   The rsl_rl 5.4.1 PPO in `metalsim/learn/franka_pour_ppo.py` is a transcription of rsl_rl (BSD-3-Clause, ETH Zurich
@@ -233,7 +241,8 @@ runs on. MetalSim is an independent project, not affiliated with or endorsed by 
   - `assets/tron1/limx_policy/WF_TRON1A/` (`params.yaml`, ONNX encoder and policy networks, Isaac Gym and Isaac Lab
     variants) from [limxdynamics/tron1-rl-deploy-python](https://github.com/limxdynamics/tron1-rl-deploy-python)
     (licence: `assets/tron1/LICENSE-rl-deploy-python`).
-- **Derived**: `metalsim/tron1/limx_policy.py` ports that repository's `controllers/WheelfootController.py`
+- **Derived**: `metalsim/tron1/limx_policy.py` ports that repository's
+  [`controllers/WheelfootController.py`](https://github.com/limxdynamics/tron1-rl-deploy-python/blob/035e4c9e2f24e916fa5e8363ac6f0f788a2e1e8c/controllers/WheelfootController.py)
   (commit
   [`035e4c9`](https://github.com/limxdynamics/tron1-rl-deploy-python/commit/035e4c9e2f24e916fa5e8363ac6f0f788a2e1e8c));
   header `SPDX-License-Identifier: Apache-2.0`, and the docstring states the changes.
@@ -258,11 +267,15 @@ runs on. MetalSim is an independent project, not affiliated with or endorsed by 
   `scripts/fetch_unitree_rl_gym.sh` makes a shallow, sparse checkout at commit
   [`276801e4`](https://github.com/unitreerobotics/unitree_rl_gym/commit/276801e46c5d433564f24658bac64f254b7d2d4b) into
   `assets/unitree_rl_gym/`, which is git-ignored: nothing of it is committed. The film tool's `g1_unitree` task reads
-  from it Unitree's pretrained G1 walking policy (`deploy/pre_train/g1/motion.pt`, TorchScript, sha256 `cf668f75...`
-  as fetched), the sim2sim config (`deploy/deploy_mujoco/configs/g1.yaml`) and the G1 model with its STL meshes
-  (`resources/robots/g1_description/scene.xml`, `g1_12dof.xml`, `meshes/`).
+  from it Unitree's pretrained G1 walking policy
+  ([`deploy/pre_train/g1/motion.pt`](https://github.com/unitreerobotics/unitree_rl_gym/blob/276801e46c5d433564f24658bac64f254b7d2d4b/deploy/pre_train/g1/motion.pt), TorchScript, sha256 `cf668f75...`
+  as fetched), the sim2sim config ([`deploy/deploy_mujoco/configs/g1.yaml`](https://github.com/unitreerobotics/unitree_rl_gym/blob/276801e46c5d433564f24658bac64f254b7d2d4b/deploy/deploy_mujoco/configs/g1.yaml))
+  and the G1 model with its STL meshes
+  ([`resources/robots/g1_description/scene.xml`](https://github.com/unitreerobotics/unitree_rl_gym/blob/276801e46c5d433564f24658bac64f254b7d2d4b/resources/robots/g1_description/scene.xml),
+  [`g1_12dof.xml`](https://github.com/unitreerobotics/unitree_rl_gym/blob/276801e46c5d433564f24658bac64f254b7d2d4b/resources/robots/g1_description/g1_12dof.xml),
+  [`meshes/`](https://github.com/unitreerobotics/unitree_rl_gym/tree/276801e46c5d433564f24658bac64f254b7d2d4b/resources/robots/g1_description/meshes)).
 - **Derived**: `metalsim/render/film/unitree.py` ports the observation, gravity projection, gait clock and PD
-  torque of `deploy/deploy_mujoco/deploy_mujoco.py` to batched numpy and a Warp kernel; header
+  torque of [`deploy/deploy_mujoco/deploy_mujoco.py`](https://github.com/unitreerobotics/unitree_rl_gym/blob/276801e46c5d433564f24658bac64f254b7d2d4b/deploy/deploy_mujoco/deploy_mujoco.py) to batched numpy and a Warp kernel; header
   `SPDX-License-Identifier: Apache-2.0 AND BSD-3-Clause` with Unitree's copyright line, and the docstring states the
   changes (MuJoCo Warp instead of MuJoCo, one policy copy per env, no viewer).
 - Rendered frames of Unitree's model driven by its policy are committed as media: `docs/renders/g1_unitree*`
@@ -347,8 +360,8 @@ committed and later removed:
 | path | status | rewrite needed? |
 |---|---|---|
 | `assets/isaac/G1/g1_minimal_from_usd.xml` | MJCF conversion of NVIDIA's `g1_minimal.usd` (numbers and three boxes; no meshes, no USD); in history from [`1359a52`](https://github.com/pulipakaa24/MetalSim/commit/1359a5284dda87d516c858b69e711bee56ab6cfe) (2026-09-22), removed in this audit | Recommended if strict: it is the one derived NVIDIA-asset file in the public history. The underlying kinematic and inertial values originate from Unitree's BSD-3-Clause G1 description, so the practical exposure is small. Not rewritten (report only). |
-| `orchard/**` | MetalSim's own code before the rename to `metalsim` | no |
-| `patches/warp/0005-Metal-configurable-register-Cholesky-bound-*.patch` | own patch, renumbered | no |
+| `orchard/**` | MetalSim's own code before the rename to `metalsim` ([its last tree](https://github.com/pulipakaa24/MetalSim/tree/1359a5284dda87d516c858b69e711bee56ab6cfe/orchard)) | no |
+| `patches/warp/0005-Metal-configurable-register-Cholesky-bound-*.patch` | own patch, renumbered (now [`patches/warp/0006-Metal-configurable-register-Cholesky-bound-warp.conf.patch`](patches/warp/0006-Metal-configurable-register-Cholesky-bound-warp.conf.patch)) | no |
 | `runs/contact_tuning_bench_4096*.log` | own logs | no |
 | `.DS_Store`, `MUJOCO_LOG.TXT` | macOS and MuJoCo droppings | no |
 

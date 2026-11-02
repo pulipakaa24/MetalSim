@@ -60,14 +60,14 @@ occlude the splats by depth.
 
 | `collision.type` | what collides | where it comes from |
 |---|---|---|
-| `plane` | a plane at `plane_z` | Isaac Lab's NuRec recipe: the floor aligned at z = 0, a ground plane added (`docs/source/features/imitation-learning/humanoids_imitation.rst`) |
+| `plane` | a plane at `plane_z` | Isaac Lab's NuRec recipe: the floor aligned at z = 0, a ground plane added ([`docs/source/features/imitation-learning/humanoids_imitation.rst`](https://github.com/isaac-sim/IsaacLab/blob/ae37b028ea415c91ea2bc32609efcd759ed2b974/docs/source/features/imitation-learning/humanoids_imitation.rst)) |
 | `mesh` | a supplied mesh (.obj / .stl / .usd, e.g. a NuRec scene's `mesh.usd`) | NVIDIA's NuRec scenes reference an nvblox mesh as the volume's `proxy`; World Labs Marble exports a GLB collider |
 | `structure` | floor plane + every wall of the floor plan as a box | [InteriorGS](https://huggingface.co/datasets/spatialverse/InteriorGS) `structure.json`; doors are closed |
 | `occupancy` | a height field from the 2D occupancy map, furniture included | InteriorGS `occupancy.png` / `occupancy.json` |
 
 Research behind this (2026-10-14):
 - **Isaac Lab 3.0.** It loads a splat as a plain `AssetBaseCfg(spawn=UsdFileCfg(...usdz))` with no collision
-  (`scripts/demos/sensors/ppisp_camera.py`), or adds a ground plane for NuRec scenes.
+  ([`scripts/demos/sensors/ppisp_camera.py`](https://github.com/isaac-sim/IsaacLab/blob/ae37b028ea415c91ea2bc32609efcd759ed2b974/scripts/demos/sensors/ppisp_camera.py)), or adds a ground plane for NuRec scenes.
 - **[Isaac Sim](https://developer.nvidia.com/isaac/sim)'s NuRec volumes.** These take up to four proxy meshes for
   shadows and physics.
 - **Research systems.** They build a mesh from the reconstruction:

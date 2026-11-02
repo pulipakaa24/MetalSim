@@ -61,7 +61,8 @@ project, not affiliated with or endorsed by NVIDIA, Google DeepMind or Apple.
 </table>
 
 Row 1: Unitree's own pretrained G1 walking policy
-([`unitree_rl_gym`](https://github.com/unitreerobotics/unitree_rl_gym)'s `deploy/pre_train/g1/motion.pt`,
+([`unitree_rl_gym`](https://github.com/unitreerobotics/unitree_rl_gym)'s
+[`deploy/pre_train/g1/motion.pt`](https://github.com/unitreerobotics/unitree_rl_gym/blob/276801e46c5d433564f24658bac64f254b7d2d4b/deploy/pre_train/g1/motion.pt),
 BSD-3-Clause, fetched by `scripts/fetch_unitree_rl_gym.sh`) through Unitree's MuJoCo sim2sim loop ported to MuJoCo
 Warp: it steps at 1.25 gait cycles per second, the 0.8 s gait clock Unitree trains it with, and stays within 3 µm of
 Unitree's own CPU MuJoCo run of the same loop after 5 s ([G1_UNITREE.md](docs/renders/G1_UNITREE.md)). Then the
@@ -519,7 +520,7 @@ Recordings, logs and benchmark JSON are under `runs/parity/`, `runs/parity3/` an
 - [`franka_pour_2026-10-11.md`](docs/research/franka_pour_2026-10-11.md): Isaac Lab 3.0-EA's Franka-Pour task read from Isaac's source, for the port.
 - [`ppowarp_checkpoint_load_2026-10-13.md`](docs/research/ppowarp_checkpoint_load_2026-10-13.md): checkpoints loaded into PPOWarp ran the untrained weights (fixed), and which results it touched.
 - [`hfield_contacts_2026-10-31.md`](docs/research/hfield_contacts_2026-10-31.md): heightfield contacts in the MuJoCo Warp fork against the exact geometry and MuJoCo C: three defects, the fix, its cost and the results it touches.
-- [`research_notes/`](research_notes): also the capacity overflow guard (`capacity_overflow_guard/`), Kit's dome-light orientation (`dome_light_azimuth/`) and transparency in the ray-traced sensors with true area lights (`Render sensor fidelity/`).
+- [`research_notes/`](research_notes): also the capacity overflow guard ([`capacity_overflow_guard/`](research_notes/capacity_overflow_guard)), Kit's dome-light orientation ([`dome_light_azimuth/`](research_notes/dome_light_azimuth)) and transparency in the ray-traced sensors with true area lights ([`Render sensor fidelity/`](research_notes/Render%20sensor%20fidelity)).
 
 ## Working rules
 

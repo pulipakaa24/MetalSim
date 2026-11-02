@@ -3,7 +3,7 @@
 **Status 2026-09-25 (evening): done on this machine.** Reproduced (Go2 3.84×, G1 2.83× sparse / 3.24× dense,
 SO-101 2.41×, DeepMind humanoid 6.68×, MetalSim G1 task 7.07×) and fixed in a worktree
 of [my fork of MuJoCo Warp](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim) (`upstream/mujoco_warp-ellip`,
-branch `metalsim-elliptic`, commit
+branch [`metalsim-elliptic`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-elliptic), commit
 [`c301880`](https://github.com/pulipakaa24/mujoco_warp/commit/c30188029f6729b9f7cfe69706d6b8069b7f53d2), not merged at
 the time: awaiting the main session's approval; **merged since** into the fork's `metalsim`, in the then-pinned
 [`f1b35e2`](https://github.com/pulipakaa24/mujoco_warp/commit/f1b35e2b3ddc80b197b0c665bf6d71523d175daf), and elliptic
@@ -85,7 +85,9 @@ by capsules, both) all run at 262–271K steps/s.
 
 ## Why `_update_gradient_JTCJ_dense` is slow on Metal
 
-The file is `upstream/mujoco_warp` (fork branch `metalsim`), `mujoco_warp/_src/solver.py`, in
+The file is `upstream/mujoco_warp` (fork branch `metalsim`),
+[`mujoco_warp/_src/solver.py`](https://github.com/pulipakaa24/mujoco_warp/blob/07a51a63bce527d2d26b363a32c52765df4412fc/mujoco_warp/_src/solver.py)
+(at [`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc), the branch head then), in
 `_update_gradient` and `_update_gradient_JTCJ_dense`.
 
 1. **Launch size.** The elliptic-cone Hessian term is launched as `dim=(dim_block, dof_tri_row.size)`.

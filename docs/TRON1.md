@@ -158,7 +158,7 @@ L1 + X -> DAMP from anywhere. Faults -> DAMP: state/IMU older than 50 ms, contro
 The same Bridge code runs the whole hung-start procedure against the sim (a rope that only pulls
 when taut, lowered to the ground) in `simulate_procedure`, tested in `tests/test_tron1.py`.
 
-With the gains saved from the panel (`runs/tron1_gains.json`): 0/60 falls nominal and 7/60
+With the gains saved from the panel (that gains file is not in the repository): 0/60 falls nominal and 7/60
 randomized (defaults: 0/60 and 16/60), and with extra command delay 0/24 falls at 10 ms, 2/24 at
 20 ms, 24/24 at 30 ms.
 
@@ -190,7 +190,7 @@ Hardware: dry run on the Jetson reads the stream (static robot: odometry < 1 mm)
 
 ## LimX's open policy + hold in Developer Mode (`--controller limx`)
 
-Stock-mode hold findings (2026-09-24, `runs/probe_vx.npz`, ramp probe): the stock controller
+Stock-mode hold findings (2026-09-24, ramp probe; its recording is not in the repository): the stock controller
 ignores `request_twist` |vx| up to ~0.15 (forward) / 0.2 (backward) m/s and tracks above; stops
 going backward rebound (+0.3 m/s, pitch 2 -> 7.5 deg); at zero command it creeps 3-7 cm/s forward
 and turns ~0.9 deg/s. The deadzone is not documented or configurable, and LimX's open wheel-foot

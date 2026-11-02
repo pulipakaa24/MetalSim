@@ -101,8 +101,8 @@ tile Cholesky (`wp.config.metal_register_cholesky_max`), `segmented_sort_pairs` 
 installs it editable. `METALSIM_WARP_REPO` and `METALSIM_WARP_REF` (branch, tag or commit) point it
 elsewhere. If the fork cannot be cloned, the script clones innate-inc/warp at
 [`ce15f6b`](https://github.com/innate-inc/warp/commit/ce15f6bb2545e2d6c4a4c1fac8e40bb800db7265) and applies
-`patches/warp/metalsim-52c09cdd.diff`, which gives the same source tree as the pinned commit (`patches/warp/0001-0007` are
-the first seven commits, the tree of [`f194006`](https://github.com/pulipakaa24/warp/commit/f194006a4cf197fda93633252af81bc3f57f5561)). The
+`patches/warp/metalsim-52c09cdd.diff`, which gives the same source tree as the pinned commit
+([`patches/warp/0001-0007`](../patches/warp) are the first seven commits, the tree of [`f194006`](https://github.com/pulipakaa24/warp/commit/f194006a4cf197fda93633252af81bc3f57f5561)). The
 commits since (MPM, scalable deterministic mode, FMA contraction
 from `fuse_fp`, GPU sort / BSR / NanoVDB builders, `fast_math` forms with `warp.config.metal_fast_math = "off"` by
 default) are listed in the branch's `METALSIM_CHANGES.md` and in `metalsim/physics/mpm/MPM.md`.
@@ -127,8 +127,9 @@ every flex, active-layer volume contacts, mesh normals), order flex equality row
 `FlexConstraintTest` failures) and sort on the device on Metal; each behind a `collision_flex` flag
 (`scripts/diagnostics/deformable/UPSTREAM.md`). The same sixteen commits (flex ones rebased linearly after the
 throughput ones; identical tree to the merge [`8fbf965`](https://github.com/pulipakaa24/mujoco_warp/commit/8fbf965acb630aa32573dda802404d519c843a99)) are
-in `patches/mujoco_warp/0001-0016`; `patches/mujoco_warp/0017` is the deterministic CCD split as a plain diff, `0018-0023` are the six
-heightfield-contact commits of 2026-10-31 (`git am` on
+in [`patches/mujoco_warp/0001-0016`](../patches/mujoco_warp);
+[`patches/mujoco_warp/0017`](../patches/mujoco_warp/0017-deterministic-ccd-split.diff) is the deterministic CCD split as
+a plain diff, `0018-0023` are the six heightfield-contact commits of 2026-10-31 (`git am` on
 [`8eb51fe`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624) gives
 [`93e5ce1`](https://github.com/pulipakaa24/mujoco_warp/commit/93e5ce18e76854c430ce669314af00ddceb92147)) and `0024-0031` the eight EPA-horizon and
 margin-shrink commits after them (`git am` of `0018-0031` on the previous pin

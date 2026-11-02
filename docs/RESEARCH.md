@@ -21,7 +21,8 @@ too (`metalsim/physics/mpm/MPM.md`).
   (1.18.0.dev20260917, includes the >32-DOF register-Cholesky fix) from source. verified.
 - MuJoCo Warp 3.14.0 (2026-09-22) needs the DavidDobas `metal` patch (4 files: `is_cpu` gates
   that meant "not CUDA", dense Cholesky ≤64 DOF off-CUDA, in-place `tile_matmul`). Applied on
-  branch `metal` of `upstream/mujoco_warp`. Full suite on Metal here: **1447 passed, 3 failed**
+  branch [`metal`](https://github.com/pulipakaa24/mujoco_warp/tree/metal) of `upstream/mujoco_warp` (my fork of
+  MuJoCo Warp). Full suite on Metal here: **1447 passed, 3 failed**
   (`flex_test::FlexConstraintTest::test_constraint_parity2/3`, and the known
   `io_test::test_put_data_nefc_zero_dense`), 39 skipped, 174 s. verified.
 - mjlab 1.6.0 pins `mujoco~=3.11`, `mujoco-warp~=3.11`, Python <3.14; `MJLAB_AGENT_DEVICE=mps`

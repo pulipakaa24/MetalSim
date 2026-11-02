@@ -21,9 +21,9 @@ comparison was not on the same asset, or a setting favours us, the row says so.
 
 [Isaac Lab](https://github.com/isaac-sim/IsaacLab) publishes step / step+inference / step+train throughput for this task
 at 4096 envs (`benchmark_non_rl.py` protocol: uniform random actions in [-1, 1], 100 frames, wall time per
-`env.step`). Our task is `metalsim.learn.g1_velocity` built from `assets/isaac/G1/g1_minimal.usd`,
-the file Isaac Lab loads for the task (44 rigid bodies, 37 revolute joints, three convex colliders),
-loaded through `metalsim.scene.usd_to_mjcf`.
+`env.step`). Our task is `metalsim.learn.g1_velocity` built from `assets/isaac/G1/g1_minimal.usd`
+(fetched by `scripts/fetch_isaac_assets.sh`), the file Isaac Lab loads for the task (44 rigid bodies, 37 revolute
+joints, three convex colliders), loaded through `metalsim.scene.usd_to_mjcf`.
 
 ### 1.1 Asset and physics model
 
@@ -41,7 +41,7 @@ loaded through `metalsim.scene.usd_to_mjcf`.
 
 ### 1.2 Task definition (observations, actions, rewards, terminations, commands, terrain)
 
-| Isaac (`velocity_env_cfg.py`, `g1/rough_env_cfg.py`) | ours (`g1_velocity.py` kernels) | test | result | verdict |
+| Isaac ([`velocity_env_cfg.py`](https://github.com/isaac-sim/IsaacLab/blob/v2.3.2/source/isaaclab_tasks/isaaclab_tasks/manager_based/locomotion/velocity/velocity_env_cfg.py), [`g1/rough_env_cfg.py`](https://github.com/isaac-sim/IsaacLab/blob/v2.3.2/source/isaaclab_tasks/isaaclab_tasks/manager_based/locomotion/velocity/config/g1/rough_env_cfg.py), v2.3.2) | ours (`g1_velocity.py` kernels) | test | result | verdict |
 |---|---|---|---|---|
 | Policy obs: base lin vel (±0.1 noise), base ang vel (±0.2), projected gravity (±0.05), command (3), joint pos rel (±0.01), joint vel rel (±1.5), last action, height scan (rough, ±0.1, clipped ±1) | same order, same uniform noise ranges, 12 + 3·37 (+187) dims | `tests/test_g1_task_terms.py::test_observation_layout_and_action_mapping` (checks layout, noise bounds, projected gravity) | pass | confirmed |
 | Action: `JointPositionAction`, scale 0.5, default offset, all 37 joints | ctrl = default + 0.5·a | same test (`ctrl == default + 0.5 a`) | pass | confirmed |
@@ -104,7 +104,7 @@ clean pass before the reset change is `runs/bench_clean.log`).
 
 **Measured Isaac Lab reference on NVIDIA hardware** (NVIDIA L4
 24 GB, driver 580.178, Isaac Sim 5.1.0 + Isaac Lab v2.3.2, `benchmark_non_rl.py`, 100 frames, headless;
-`runs/parity/isaac_bench/`): Cartpole-Direct 4096 envs **400,717** mean effective env-steps/s (NVIDIA
+the Isaac-side logs are not in the repository): Cartpole-Direct 4096 envs **400,717** mean effective env-steps/s (NVIDIA
 publishes 620K on an L40, 1.10M on a 4090); G1 rough 4096 envs **39,135** (L40 72K, 4090 94K). The L4's
 FP32 peak is 30.3 TFLOPS, so per TFLOPS the L4 runs G1 rough at 1,292 env-steps/s versus this stack's
 3,012 on the M4 Max (55,423 / 18.4); raw, the M4 Max is 1.4× the L4 on G1 rough and 0.15× on the
@@ -143,7 +143,7 @@ machine through the timing queue, 4096 worlds, Newton 10 / 20).** MuJoCo Warp's 
 took two Metal-specific slow paths in the fork (`_update_gradient_JTCJ_dense` launched with
 `dim_block = naconmax`, 33.6 M threads per launch at 4096 Go2 worlds; `_JTDACJ_sparse` with one lane per
 constraint group), fixed in fork commit [`c301880`](https://github.com/pulipakaa24/mujoco_warp/commit/c30188029f6729b9f7cfe69706d6b8069b7f53d2) (worktree
-`upstream/mujoco_warp-ellip`, branch `metalsim-elliptic`, pending merge at the time; **merged** into the fork's `metalsim`, in the pinned
+`upstream/mujoco_warp-ellip`, branch [`metalsim-elliptic`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-elliptic), pending merge at the time; **merged** into the fork's `metalsim`, in the pinned
 [`f1b35e2`](https://github.com/pulipakaa24/mujoco_warp/commit/f1b35e2b3ddc80b197b0c665bf6d71523d175daf); every previous form kept behind `MJW_JTCJ_MODE` /
 `MJW_JTDAJ_ELLIPTIC_LANES`). Physics steps/s pyramidal / elliptic before / elliptic after (cost after):
 
@@ -269,8 +269,8 @@ timing queue on the M4 Max, idle GPU logged, 4096 envs, 2.5 ms x 8, `contact_cfg
 | camera-RL path (Cartpole-RGB 1024 envs, tier 0, 459 K training steps; `runs/tp26/camera.wrapper.log`) | 11,802-12,655 -> 12,931-13,369 env-steps/s incl. training: inside the run-to-run spread; physics is 0.7 % of this step | no render-side change; measurement only |
 | MuJoCo Warp fork: per-model unrolled register L'DL factorization of M on Metal (`MJW_METAL_LDL_UNROLLED`) | factor 0.453 -> 0.314 ms per 4096 G1 worlds; physics only 90,618-90,708 -> **93,922-93,985 (+3.6 %)**; full step 60,996-61,248 -> 61,432-62,657 (`runs/tp26/unrolled2.wrapper.log`) | factor and D **bitwise** the serial kernel's on the G1 task, Go2 and the humanoid (`scripts/diagnostics/ldl_lanes_check.py`) |
 | **all of the above together** (`runs/tp26/final.wrapper.log`, F1 / F2 vs the day's start R1 / R2 of `runs/mjw_tp/cc.wrapper.log`) | physics only 80,982-81,008 -> **90,395-90,404**; full env step 54,094-54,244 -> **60,775-60,946 (+12.4 %)**; rollout + inference 53,830-54,163 -> **61,397-61,687**; full PPO loop 49,509-50,055 -> **56,351-56,590 (+13.3 %)** | section 5b of the research log; the update (143-159 ms) and learning untouched |
-| Warp fork: register triangular solve for the Newton Hessian on Metal (`tile_cholesky_solve`, one SIMD group, no barriers) | 55,752-55,795 -> **58,587-58,718 env-steps/s (+5.2 %)** on top of the capacity bound; physics only 83.3 -> 85.5 K | summation order only (1.3-3.4e-7 relative vs the cooperative path); state-difference protocol `runs/tp26/check.wrapper.log` |
-| MuJoCo Warp fork: the five per-iteration Newton launches fused into one 32-lane kernel on Metal (9 -> 5 launches per iteration) | 58,439-58,589 -> **60,762-60,803 env-steps/s (+3.9 %)** on top of the register solve; physics only 85.5-85.9 -> 90.2-90.3 K | per-row / per-dof arithmetic and order unchanged, grad_dot a SIMD sum instead of atomics (float noise as before); state-difference protocol `runs/tp26/check*.wrapper.log` |
+| Warp fork: register triangular solve for the Newton Hessian on Metal (`tile_cholesky_solve`, one SIMD group, no barriers) | 55,752-55,795 -> **58,587-58,718 env-steps/s (+5.2 %)** on top of the capacity bound; physics only 83.3 -> 85.5 K | summation order only (1.3-3.4e-7 relative vs the cooperative path); state-difference protocol `runs/tp26/job_check.sh` (its log is not in the repository) |
+| MuJoCo Warp fork: the five per-iteration Newton launches fused into one 32-lane kernel on Metal (9 -> 5 launches per iteration) | 58,439-58,589 -> **60,762-60,803 env-steps/s (+3.9 %)** on top of the register solve; physics only 85.5-85.9 -> 90.2-90.3 K | per-row / per-dof arithmetic and order unchanged, grad_dot a SIMD sum instead of atomics (float noise as before); state-difference protocol `runs/tp26/check2.wrapper.log` |
 | Warp policy layer kernel: four outputs per thread, envs fastest (`mlp_layer4`) | rollout + inference 55,191-55,197 -> 56,201-56,313; full PPO loop 50,912-50,925 -> **51,877-51,918 (+1.9 %)** (installed forks) | bitwise identical activations, actions, log-probs (`tests/test_warp_policy.py::test_layer_mapping_bitwise`) |
 | G1 flat capacities at the provable bound (njmax 144 / nconmax 24 instead of the task's 256 / 32; `metalsim.physics.capacity`, `BatchSim.check_overflow()` guard). Measured under the pyramidal cone, the G1 default until 11:00 that day (4 rows per condim-3 contact: 37 + 24 × 4 = 133 -> 144; still the bound under `recommended_pyramidal` and the Isaac Lab 3.0 presets). The elliptic default (since 2026-09-26 11:00) has 3 rows per contact: 37 + 24 × 3 = 109 -> **njmax 112**, not separately timed | 54,340-54,385 -> **55,646-55,741 env-steps/s (+2.5 %)**; Isaac Lab 3.0 cap-20 preset 56,301 -> 58,287 (+3.6 %) | no overflow possible below the bound (rows, order and arithmetic unchanged); `tests/test_capacity.py` (both cones); overflow raises at every PPO log point, latched per substep since 2026-10-13 (before, a task's reset of an overflowed world erased its flag: 13 of 31 overflowed worlds were invisible in a 100-step probe; `research_notes/capacity_overflow_guard/`) |
 | rough terrain under the preset, first measurement (plane-path kernel; 16-inch re-time pending (2026-10-31)) | recommended 45,217-45,268 vs `contact_cfg=None` 53,843-53,988 (the README's rough 41.9 K loop number is the None setting) | measurement only |
@@ -304,7 +304,7 @@ per-term means and the 150-iteration smoke run (not re-run). Isaac's own runs an
    survived 400 steps of small penalties scored below one that fell at once, and PPO learned to fall: both the
    5 ms and the 2.5 ms runs peaked at 600 / 383 steps around iteration 750 and then collapsed to ~130–150
    while the return fell to −290 / −309. Fixed in `g1_reward_done` (verified against
-   `isaaclab/managers/reward_manager.py` line 150 at v2.3.2).
+   [`isaaclab/managers/reward_manager.py` line 150 at v2.3.2](https://github.com/isaac-sim/IsaacLab/blob/v2.3.2/source/isaaclab/isaaclab/managers/reward_manager.py#L150)).
 
 Runs on record: 5 ms + unscaled penalty `runs/g1_flat_ppo_1500.log` (peak 597 steps at it 750, 190 blow-ups);
 2.5 ms + unscaled penalty `runs/g1_flat_ppo_1500_dt25.log` (peak 383 at it 750, 1 blow-up, same collapse);
@@ -320,7 +320,7 @@ same task on the L4 (rsl_rl, same config) is recorded on the L4 machine for the 
 
 Rough, 2048 envs, Isaac's rough PPO config (512-256-128), 150 iterations on the patched kernel
 (plane-path kernel; not re-run: a stability smoke test, and the 1500-iteration re-runs on the repaired kernel below
-logged no blow-ups; `runs/g1_rough_ppo_150.log`): no blow-ups (the guard counted none), episode length 40 → 50.5 control
+logged no blow-ups; the run's log is not in the repository): no blow-ups (the guard counted none), episode length 40 → 50.5 control
 steps, return −203 → −204, 25.7K env-steps/s end to end while another job shared the GPU. Slower
 than flat: the adaptive schedule keeps the learning rate at 1e-5 to 4e-4 because the 310-dim
 observation (187 height-scan values) makes the KL estimate exceed 0.02 in most updates; Isaac's
@@ -349,7 +349,7 @@ Isaac's run to the end (1500 iterations, 55.7 min on the L4 at 2.14 s per iterat
 env-steps/s in the training loop, measured): return 25.3 / 27.3 / 27.2 at iterations 500 / 1000 /
 1499, tracking 0.93 / 0.92 / 0.93, feet air time 0.036 / 0.045 / 0.046, action std 0.66 / 0.60 /
 0.61, 99.6–99.8 % of episodes time out. Transfer of the checkpoints across simulators
-(`isaac_side/play_policy.py`, 400 steps, 4 envs, mean action, `runs/parity/isaac/parity_out/play`):
+(`isaac_side/play_policy.py`, 400 steps, 4 envs, mean action; the recordings are not in the repository):
 Isaac's iteration-100 policy stands (pelvis 0.70 m) and its 500 / 1000 policies walk (0.62–0.63 m) in
 Isaac; MetalSim's iteration-500 policy also survives 400 steps in Isaac (0.56–0.59 m) while its
 iteration-100, 1000 and 1500 policies fall there (0.03–0.11 m). The side-by-side videos
@@ -496,8 +496,8 @@ episodes by iteration 150; Isaac's single run: +27.3 / 991. So the like-for-like
 seeds: the same return as Isaac's within seed spread. This is the acceptance test "identical PPO
 config, identical result" of the plan, met on one task (three seeds ours, one seed Isaac's).
 
-**Confirming run with the final contact preset (measured 2026-09-25 evening,
-`runs/g1_flat_ppowarp_fixed_flatcfg_tau10.log`):** the same flat config and PPO with
+**Confirming run with the final contact preset (measured 2026-09-25 evening; log not in the repository, curve in
+`docs/research/elliptic_cones_2026-09-25.md` §7.1):** the same flat config and PPO with
 `contact_cfg="recommended"` (= `tau10_impact_hardlimits`, now the task default) reaches **+27.85 / 1000 at
 iteration 1000** (19.9 / 1000 at 500, 26.8 at 900), against +28.4 / 26.3 / 26.0 with MuJoCo's default
 contacts (one seed each, seed 0). The difference is inside the seed spread (±1.3), so the preset that
@@ -514,8 +514,8 @@ contacts, seed 0): **+27.1 / 1000 at iteration 1000** (10.9 / 969 at 300, 19.2 /
 inside the three-seed spread of the origin runs (26.9 ± 1.3) and next to Isaac's +27.3. The headline stands with
 the faithful velocity point.
 
-**Elliptic friction cones, confirming run (measured 2026-09-25 night, `runs/il3/g1_flat_flatcfg_ellip10.log`,
-policy `runs/il3/ckpt/g1_flat_flatcfg_ellip10.pt`):** the COM run's settings with
+**Elliptic friction cones, confirming run (measured 2026-09-25 night, run `g1_flat_flatcfg_ellip10`,
+`docs/research/elliptic_cones_2026-09-25.md` §7.1; its log and policy are not in the repository):** the COM run's settings with
 `contact_cfg = tau10_impact_hardlimits_ellip10` (the recommended preset plus elliptic cones, impratio 10; the cheap cone
 kernel of fork [`c301880`](https://github.com/pulipakaa24/mujoco_warp/commit/c30188029f6729b9f7cfe69706d6b8069b7f53d2),
 §1.4), seed 0, 1000 iterations. Return / episode length: −5.1 / 83 at iteration 100,
@@ -1086,7 +1086,7 @@ Isaac's mean, because the engines' light units differ):
 | RTX path tracer, 32 spp | tier 2 | 22 | 17.6 dB / 0.860 / 0.435 / 0.448 | 13.7 dB / 0.49 / 0.097 / 0.132 (n = 12) | 0.87 | 2.9 cm |
 | RTX path tracer, 32 spp | tier 0 | 22 | 8.5 / 0.802 / 0.444 / 0.698 (matched 9.6 / 0.859 / 0.416 / 0.663) | 11.1 dB / 0.33 / 0.109 / 0.172 | 0.87 | 2.9 cm |
 
-These are from the second recording (`runs/parity/isaac/parity_out2`, `report_rt2` / `report_pt2`), in
+These are from the second recording (`parity_out2`, not in the repository; reports `runs/parity/report_rt2` / `report_pt2`), in
 which the grey ground is actually bound on the Isaac side (Isaac Lab's plane terrain ignores
 `visual_material`; the first recording showed its default grid and the neighbouring envs, whole-frame
 12.7 dB / 0.62 SSIM, and is kept in `report_rt` / `report_pt` for the record; its robot-only numbers
@@ -1187,13 +1187,14 @@ at 1500), so it is not separable from seed spread (**estimated**).
 **Throughput under the elliptic default (measured 2026-09-26 11:00, fork heads mujoco_warp
 [`0a9de8e`](https://github.com/pulipakaa24/mujoco_warp/commit/0a9de8e5cd098bb9c878dc5f5b98d2b53252aec3) / warp
 [`9abceff9`](https://github.com/pulipakaa24/warp/commit/9abceff953313e090084ed5950427a5dccf91258),
-`scripts/diagnostics/g1_tp_variants.py 4096`, two interleaved repeats, `runs/tp26/ellip.wrapper.log`):** pyramidal
+`scripts/diagnostics/g1_tp_variants.py 4096`, two interleaved repeats; the "before" row of
+`docs/research/elliptic_warmstart_2026-09-26.md` §6):** pyramidal
 `recommended_pyramidal` (cap 10): physics 93,308 / 93,822, env step 62,069 / 62,539, full PPO loop 57,678 / 57,510
 env-steps/s; elliptic `recommended` (impratio 10, cap 20): physics 54,046 / 54,017, env step 36,371 / 36,513, **full
 loop 34,191 / 34,375** (1.68× the loop cost; the physics ratio is 1.73×). The elliptic run leaves 1 of 4096 worlds at
 the iteration cap after random actions (pyramidal at cap 10: 18).
 
-**2.3.2 flat headline under the elliptic default (measured 2026-09-26 13:00–15:20, `runs/ellip_default/g1_flat_ellip_default_s{0,1,2}.log`,
+**2.3.2 flat headline under the elliptic default (measured 2026-09-26 13:00–15:20, `runs/ellip_default/run.sh`; logs not in the repository,
 `contact_cfg="recommended"` = elliptic impratio 10, Newton cap 20, base velocity at the pelvis COM, initial reset,
 joint-level effort clamp; seeds 0 / 1 / 2, 1000 iterations):** return / episode length at 300: 6.4 / 987, 7.2 / 992,
 8.7 / 1000; at 500: 17.4 / 1000, 17.4 / 1000, 17.0 / 1000; at 1000: **26.8 / 1000, 26.9 / 991, 26.6 / 1000 (mean
@@ -1207,7 +1208,7 @@ elliptic default: the one contact metric still far from PhysX (impulses and 20 m
 azimuth differs from our shader's by −90° (folded into the USD import path). PhysX closes a four-bar 3–8× tighter than
 MuJoCo's soft constraint but gains 9–20 % energy over 5 s and tracks the exact reference worse.
 
-**2.3.2 rough headline under the elliptic default (measured 2026-09-26 19:30–21:07, `runs/ellip_default/g1_rough_ellip_default_s0.log`,
+**2.3.2 rough headline under the elliptic default (measured 2026-09-26 19:30–21:07, `runs/ellip_default/run.sh`; log not in the repository,
 seed 0, 1500 iterations, `rough_isaac` reward set, both trainer fixes; plane-path kernel; re-run pending: not in the
 2026-10-31 re-run pipeline):** return / episode length +4.2 / 948 at 500,
 +8.2 / 973 at 1000, **+13.7 / 985 at 1500, terrain level 6.10**; Isaac Lab 2.3.2 + PhysX +14.1 / 5.9; the pyramidal

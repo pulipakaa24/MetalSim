@@ -377,7 +377,8 @@ evidence per row (tests, tolerances, results) is in `PARITY.md`; this section re
 
 ### Solver settings and honesty notes
 
-MuJoCo Warp's own G1 benchmark settings are used (`benchmarks/unitree_g1/unitree_g1_mjlab.xml`:
+MuJoCo Warp's own G1 benchmark settings are used
+([`benchmarks/unitree_g1/unitree_g1_mjlab.xml`](https://github.com/google-deepmind/mujoco_warp/blob/88af9cc682d42e2e925daa0bae25f53277999f7b/benchmarks/unitree_g1/unitree_g1_mjlab.xml):
 10 Newton iterations, 20 line-search iterations, `implicitfast`, eulerdamp off), pyramidal cone,
 dense Jacobian, `njmax` 256. On Metal the Newton loop cannot exit early, so the budget is spent
 every step; the line-search cap is reached in most worlds most steps (`LS_ITERATIONS` overflow
